@@ -2,7 +2,7 @@ syntax = "proto2";
 option objc_class_prefix = "ITM";
 package iterm2;
 
-option go_package = "github.com/gnachman/iTerm2/iterm2-go-cli/proto";
+option go_package = "github.com/tmc/it2/proto";
 
 // A note on session IDs:
 // In requests, session IDs may take one of three values;

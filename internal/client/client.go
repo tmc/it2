@@ -529,3 +529,26 @@ func (c *Client) RestartSession(ctx context.Context, sessionID string, onlyIfExi
 
 	return nil, fmt.Errorf("unexpected response type")
 }
+
+
+// GetPrompt gets information about prompts in a session (requires Shell Integration)
+func (c *Client) GetPrompt(ctx context.Context, sessionID string) (*pb.GetPromptResponse, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_GetPromptRequest{
+			GetPromptRequest: &pb.GetPromptRequest{
+				Session: &sessionID,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.GetGetPromptResponse() != nil {
+		return response.GetGetPromptResponse(), nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
