@@ -268,8 +268,6 @@ func (c *Client) SendRequest(ctx context.Context, msg *pb.ClientOriginatedMessag
 	}
 }
 
-// ListSessions is now implemented in sessions.go
-
 func (c *Client) SendText(ctx context.Context, sessionID, text string) error {
 	msg := &pb.ClientOriginatedMessage{
 		Submessage: &pb.ClientOriginatedMessage_SendTextRequest{

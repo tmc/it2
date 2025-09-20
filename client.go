@@ -59,10 +59,10 @@ func (c *Client) ListSessions(ctx context.Context) ([]*Session, error) {
 	sessions := make([]*Session, 0, len(internalSessions))
 	for _, s := range internalSessions {
 		sessions = append(sessions, &Session{
-			ID:       s.GetUniqueIdentifier(),
-			WindowID: s.GetWindowPaneId(),
-			TabID:    s.GetTabId(),
-			Name:     s.GetTitle(),
+			ID:       s.SessionID,
+			WindowID: s.WindowID,
+			TabID:    s.TabID,
+			Name:     s.SessionName,
 		})
 	}
 	return sessions, nil
@@ -115,49 +115,6 @@ type Tab struct {
 	Sessions []*Session
 }
 
-// ListTabs returns all tabs with their sessions.
-func (c *Client) ListTabs(ctx context.Context) ([]*Tab, error) {
-	internalTabs, err := c.internal.ListTabs(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	tabs := make([]*Tab, 0, len(internalTabs))
-	for _, t := range internalTabs {
-		tab := &Tab{
-			ID:       t.GetTabId(),
-			WindowID: t.GetWindowId(),
-			Sessions: make([]*Session, 0),
-		}
-
-		if root := t.GetRoot(); root != nil {
-			tab.Sessions = appendSessionsFromSplitTreeNode(tab.Sessions, root)
-		}
-
-		tabs = append(tabs, tab)
-	}
-	return tabs, nil
-}
-
-// appendSessionsFromSplitTreeNode recursively extracts sessions from a split tree node.
-func appendSessionsFromSplitTreeNode(sessions []*Session, node *pb.SplitTreeNode) []*Session {
-	if node.GetSession() != nil {
-		s := node.GetSession()
-		sessions = append(sessions, &Session{
-			ID:       s.GetUniqueIdentifier(),
-			WindowID: s.GetWindowPaneId(),
-			TabID:    s.GetTabId(),
-			Name:     s.GetTitle(),
-		})
-	}
-
-	for _, child := range node.GetChildren() {
-		sessions = appendSessionsFromSplitTreeNode(sessions, child)
-	}
-
-	return sessions
-}
-
 // CloseTab closes a specific tab.
 func (c *Client) CloseTab(ctx context.Context, tabID string, force bool) error {
 	_, err := c.internal.CloseTabs(ctx, []string{tabID}, force)
@@ -174,39 +131,6 @@ func (c *Client) ActivateTab(ctx context.Context, tabID string, selectTab bool) 
 type Window struct {
 	ID   string
 	Tabs []*Tab
-}
-
-// ListWindows returns all windows with their tabs and sessions.
-func (c *Client) ListWindows(ctx context.Context) ([]*Window, error) {
-	internalWindows, err := c.internal.ListWindows(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	windows := make([]*Window, 0, len(internalWindows))
-	for _, w := range internalWindows {
-		window := &Window{
-			ID:   w.GetWindowId(),
-			Tabs: make([]*Tab, 0),
-		}
-
-		for _, t := range w.GetTabs() {
-			tab := &Tab{
-				ID:       t.GetTabId(),
-				WindowID: w.GetWindowId(),
-				Sessions: make([]*Session, 0),
-			}
-
-			if root := t.GetRoot(); root != nil {
-				tab.Sessions = appendSessionsFromSplitTreeNode(tab.Sessions, root)
-			}
-
-			window.Tabs = append(window.Tabs, tab)
-		}
-
-		windows = append(windows, window)
-	}
-	return windows, nil
 }
 
 // CloseWindow closes a specific window.
