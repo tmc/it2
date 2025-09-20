@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmd/helpers"
 	"github.com/tmc/it2/internal/formatting"
 )
 
@@ -78,16 +79,63 @@ func newListCommand() *cobra.Command {
 func newCreateCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Create a new session",
+		Short: "Create a new session in a tab",
+		Long:  "Create a new session in an existing tab. This creates a split pane.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement session creation
+			wsURL, timeout, _ := helpers.GetFlags(cmd)
+			profile, _ := cmd.Flags().GetString("profile")
+			tabID, _ := cmd.Flags().GetString("tab")
+			vertical, _ := cmd.Flags().GetBool("vertical")
+
+			if tabID == "" {
+				return fmt.Errorf("--tab flag is required")
+			}
+
+			ctx, cancel := helpers.CreateContext(timeout)
+			defer cancel()
+
+			c, err := helpers.ConnectClient(ctx, wsURL)
+			if err != nil {
+				return fmt.Errorf("failed to connect: %w", err)
+			}
+			defer c.Close()
+
+			// Get sessions in the tab to find one to split
+			sessions, err := c.ListSessions(ctx)
+			if err != nil {
+				return fmt.Errorf("failed to list sessions: %w", err)
+			}
+
+			var sessionToSplit string
+			for _, session := range sessions {
+				if session.TabID == tabID {
+					sessionToSplit = session.SessionID
+					break
+				}
+			}
+
+			if sessionToSplit == "" {
+				return fmt.Errorf("no session found in tab %s", tabID)
+			}
+
+			// Create new session by splitting an existing one
+			response, err := c.SplitPane(ctx, sessionToSplit, vertical, false, profile)
+			if err != nil {
+				return fmt.Errorf("failed to create session: %w", err)
+			}
+
+			if response.GetSessionId() != nil {
+				fmt.Printf("Created session: %s\n", response.GetSessionId())
+			} else {
+				fmt.Println("Session created successfully")
+			}
 			return nil
 		},
 	}
 
 	cmd.Flags().String("profile", "Default", "Profile to use for the new session")
-	cmd.Flags().String("window", "", "Window ID to create session in")
-	cmd.Flags().String("tab", "", "Tab ID to create session in")
+	cmd.Flags().String("tab", "", "Tab ID to create session in (required)")
+	cmd.Flags().Bool("vertical", false, "Split vertically instead of horizontally")
 
 	return cmd
 }

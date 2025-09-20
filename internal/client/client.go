@@ -552,3 +552,93 @@ func (c *Client) GetPrompt(ctx context.Context, sessionID string) (*pb.GetPrompt
 
 	return nil, fmt.Errorf("unexpected response type")
 }
+
+// Focus brings iTerm2 to the foreground
+func (c *Client) Focus(ctx context.Context, raiseAll bool) (*pb.FocusResponse, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_FocusRequest{
+			FocusRequest: &pb.FocusRequest{},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.GetFocusResponse() != nil {
+		return response.GetFocusResponse(), nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
+
+// GetVariable gets the value of a variable
+func (c *Client) GetVariable(ctx context.Context, sessionID, name string) (string, error) {
+	req := &pb.VariableRequest{
+		Get: []string{name},
+	}
+
+	// Set scope based on sessionID
+	if sessionID != "" {
+		req.Scope = &pb.VariableRequest_SessionId{
+			SessionId: sessionID,
+		}
+	} else {
+		req.Scope = &pb.VariableRequest_App{
+			App: true,
+		}
+	}
+
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_VariableRequest{
+			VariableRequest: req,
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return "", err
+	}
+
+	if varResponse := response.GetVariableResponse(); varResponse != nil {
+		if varResponse.GetValues() != nil && len(varResponse.GetValues()) > 0 {
+			return varResponse.GetValues()[0], nil
+		}
+		return "", fmt.Errorf("variable not found")
+	}
+
+	return "", fmt.Errorf("unexpected response type")
+}
+
+// SetVariable sets the value of a variable
+func (c *Client) SetVariable(ctx context.Context, sessionID, name, value string) error {
+	req := &pb.VariableRequest{
+		Set: []*pb.VariableRequest_Set{
+			{
+				Name:  &name,
+				Value: &value,
+			},
+		},
+	}
+
+	// Set scope based on sessionID
+	if sessionID != "" {
+		req.Scope = &pb.VariableRequest_SessionId{
+			SessionId: sessionID,
+		}
+	} else {
+		req.Scope = &pb.VariableRequest_App{
+			App: true,
+		}
+	}
+
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_VariableRequest{
+			VariableRequest: req,
+		},
+	}
+
+	_, err := c.SendRequest(ctx, msg)
+	return err
+}
