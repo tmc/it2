@@ -1,7 +1,7 @@
 .PHONY: build clean test proto install deps tidy
 
 # Build variables
-BINARY_NAME=iterm2-cli
+BINARY_NAME=it2
 VERSION=$(shell git describe --tags --always --dirty)
 BUILD_TIME=$(shell date -u '+%Y-%m-%d %H:%M:%S')
 LDFLAGS=-ldflags "-X main.version=$(VERSION) -X main.buildTime=$(BUILD_TIME)"
@@ -10,17 +10,13 @@ LDFLAGS=-ldflags "-X main.version=$(VERSION) -X main.buildTime=$(BUILD_TIME)"
 all: deps proto build
 
 # Build the application
-build:
-	go build $(LDFLAGS) -o $(BINARY_NAME)
+build: install
 
 # Install the application
 install:
-	go install $(LDFLAGS)
+	go install
 
-# Clean build artifacts
 clean:
-	rm -f $(BINARY_NAME)
-	rm -rf dist/
 
 # Generate protobuf code using Buf
 proto:
