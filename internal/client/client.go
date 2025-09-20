@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -39,6 +40,31 @@ func New(wsURL string) *Client {
 	}
 }
 
+// requestAuth dynamically requests authentication from iTerm2
+func (c *Client) requestAuth() {
+	script := `tell application "iTerm2" to request cookie and key for app named "it2"`
+	cmd := exec.Command("osascript", "-e", script)
+	output, err := cmd.CombinedOutput()
+
+	if err == nil {
+		// Parse output - should be "cookie key"
+		result := strings.TrimSpace(string(output))
+		parts := strings.SplitN(result, " ", 2)
+
+		if len(parts) > 0 && parts[0] != "" {
+			os.Setenv("ITERM2_COOKIE", parts[0])
+			if len(parts) > 1 {
+				os.Setenv("ITERM2_KEY", parts[1])
+			}
+			if c.debug {
+				fmt.Fprintf(os.Stderr, "Auth credentials obtained successfully\n")
+			}
+		}
+	} else if c.debug {
+		fmt.Fprintf(os.Stderr, "Failed to get auth: %v\n", err)
+	}
+}
+
 func (c *Client) Connect(ctx context.Context) error {
 	// Check if URL is for Unix socket
 	if strings.HasPrefix(c.url, "unix://") {
@@ -56,6 +82,15 @@ func (c *Client) Connect(ctx context.Context) error {
 			if c.debug {
 				fmt.Fprintf(os.Stderr, "Unix socket found, attempting connection...\n")
 			}
+
+			// Try to get auth dynamically if not already set
+			if os.Getenv("ITERM2_COOKIE") == "" {
+				if c.debug {
+					fmt.Fprintf(os.Stderr, "No auth credentials found, requesting from iTerm2...\n")
+				}
+				c.requestAuth()
+			}
+
 			if err := c.connectUnixSocket(ctx, socketPath); err == nil {
 				return nil
 			} else if c.debug {
@@ -291,6 +326,207 @@ func (c *Client) GetBuffer(ctx context.Context, sessionID string, lines int32) (
 
 	if response.GetGetBufferResponse() != nil {
 		return response.GetGetBufferResponse(), nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
+
+func (c *Client) SplitPane(ctx context.Context, sessionID string, vertical bool, before bool, profileName string) (*pb.SplitPaneResponse, error) {
+	splitDirection := pb.SplitPaneRequest_HORIZONTAL
+	if vertical {
+		splitDirection = pb.SplitPaneRequest_VERTICAL
+	}
+
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_SplitPaneRequest{
+			SplitPaneRequest: &pb.SplitPaneRequest{
+				Session:        &sessionID,
+				SplitDirection: &splitDirection,
+				Before:         &before,
+				ProfileName:    &profileName,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.GetSplitPaneResponse() != nil {
+		return response.GetSplitPaneResponse(), nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
+
+func (c *Client) CloseSessions(ctx context.Context, sessionIDs []string, force bool) (*pb.CloseResponse, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_CloseRequest{
+			CloseRequest: &pb.CloseRequest{
+				Target: &pb.CloseRequest_Sessions{
+					Sessions: &pb.CloseRequest_CloseSessions{
+						SessionIds: sessionIDs,
+					},
+				},
+				Force: &force,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.GetCloseResponse() != nil {
+		return response.GetCloseResponse(), nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
+
+func (c *Client) CloseTabs(ctx context.Context, tabIDs []string, force bool) (*pb.CloseResponse, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_CloseRequest{
+			CloseRequest: &pb.CloseRequest{
+				Target: &pb.CloseRequest_Tabs{
+					Tabs: &pb.CloseRequest_CloseTabs{
+						TabIds: tabIDs,
+					},
+				},
+				Force: &force,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.GetCloseResponse() != nil {
+		return response.GetCloseResponse(), nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
+
+func (c *Client) CloseWindows(ctx context.Context, windowIDs []string, force bool) (*pb.CloseResponse, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_CloseRequest{
+			CloseRequest: &pb.CloseRequest{
+				Target: &pb.CloseRequest_Windows{
+					Windows: &pb.CloseRequest_CloseWindows{
+						WindowIds: windowIDs,
+					},
+				},
+				Force: &force,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.GetCloseResponse() != nil {
+		return response.GetCloseResponse(), nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
+
+func (c *Client) ActivateSession(ctx context.Context, sessionID string, selectSession bool) (*pb.ActivateResponse, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_ActivateRequest{
+			ActivateRequest: &pb.ActivateRequest{
+				Identifier: &pb.ActivateRequest_SessionId{
+					SessionId: sessionID,
+				},
+				SelectSession: &selectSession,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.GetActivateResponse() != nil {
+		return response.GetActivateResponse(), nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
+
+func (c *Client) ActivateTab(ctx context.Context, tabID string, selectTab bool) (*pb.ActivateResponse, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_ActivateRequest{
+			ActivateRequest: &pb.ActivateRequest{
+				Identifier: &pb.ActivateRequest_TabId{
+					TabId: tabID,
+				},
+				SelectTab: &selectTab,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.GetActivateResponse() != nil {
+		return response.GetActivateResponse(), nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
+
+func (c *Client) ActivateWindow(ctx context.Context, windowID string, orderFront bool) (*pb.ActivateResponse, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_ActivateRequest{
+			ActivateRequest: &pb.ActivateRequest{
+				Identifier: &pb.ActivateRequest_WindowId{
+					WindowId: windowID,
+				},
+				OrderWindowFront: &orderFront,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.GetActivateResponse() != nil {
+		return response.GetActivateResponse(), nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
+
+func (c *Client) RestartSession(ctx context.Context, sessionID string, onlyIfExited bool) (*pb.RestartSessionResponse, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_RestartSessionRequest{
+			RestartSessionRequest: &pb.RestartSessionRequest{
+				SessionId:    &sessionID,
+				OnlyIfExited: &onlyIfExited,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.GetRestartSessionResponse() != nil {
+		return response.GetRestartSessionResponse(), nil
 	}
 
 	return nil, fmt.Errorf("unexpected response type")
