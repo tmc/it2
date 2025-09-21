@@ -2,7 +2,7 @@
 //
 // The it2 package enables comprehensive programmatic control of iTerm2 on macOS,
 // providing both a library interface for Go programs and a powerful command-line tool.
-// It supports all major iTerm2 automation features through the WebSocket API.
+// It supports all major iTerm2 automation features through Unix socket and WebSocket APIs.
 //
 // # Features
 //
@@ -88,14 +88,22 @@
 //	// Send to current session (uses $ITERM_SESSION_ID)
 //	err = it2.QuickSendText("echo Quick message\n")
 //
+// # Connection
+//
+// The client automatically chooses the best connection method:
+//
+//   - Unix socket: ~/Library/Application Support/iTerm2/private/socket (preferred, faster)
+//   - WebSocket: ws://localhost:1912 (fallback if Unix socket unavailable)
+//
 // # Authentication
 //
 // The client automatically handles iTerm2 authentication:
 //
-//   - Auto-requests credentials from iTerm2 when needed
+//   - Auto-requests credentials from iTerm2 when needed (via AppleScript)
 //   - iTerm2 prompts user to allow API access on first connection
 //   - Credentials cached for session duration
 //   - Falls back to ITERM2_COOKIE and ITERM2_KEY environment variables
+//   - Can be bypassed entirely in trusted environments (see auth package)
 //
 // # Advanced Features
 //
@@ -129,45 +137,67 @@
 //
 // # CLI Tool
 //
-// The it2 command provides comprehensive terminal control:
+// The it2 command provides comprehensive terminal control.
 //
-//	# Session operations
-//	it2 session list                           # List all sessions
-//	it2 session send-text "echo Hello"         # Send to current session
-//	it2 session split --vertical               # Split current pane
-//	it2 session close <session-id>             # Close a session
+// Usage:
 //
-//	# Prompt/Shell Integration (requires Shell Integration enabled)
-//	it2 prompt list                            # Show command history table
-//	it2 prompt search "git"                    # Search command history
-//	it2 prompt get <prompt-id>                 # Get command details
+//	it2 [command]
 //
-//	# Tab and window management
-//	it2 tab create                             # Create new tab
-//	it2 tab list                               # List all tabs
-//	it2 window create                          # Create new window
-//	it2 window list                            # List all windows
+// Available Commands:
 //
-//	# Text and buffer operations
-//	it2 text get-buffer <session>              # Get terminal contents
-//	it2 text get-cursor <session>              # Get cursor position
-//	it2 text search <session> "pattern"        # Search in buffer
+//	app          Control the iTerm2 application
+//	arrangement  Manage iTerm2 window arrangements
+//	auth         Manage iTerm2 API authentication
+//	broadcast    Manage broadcast domains
+//	color        Manage iTerm2 colors and appearance
+//	completion   Generate the autocompletion script for the specified shell
+//	help         Help about any command
+//	job          Monitor jobs in iTerm2 sessions
+//	notification Subscribe to iTerm2 notifications
+//	profile      Manage iTerm2 profiles
+//	prompt       Manage prompts and command history in iTerm2 sessions
+//	selection    Text selection operations in iTerm2
+//	session      Manage iTerm2 sessions
+//	statusbar    Manage iTerm2 status bar components
+//	tab          Manage iTerm2 tabs
+//	text         Text and buffer operations in iTerm2
+//	tmux         Manage tmux integration
+//	variable     Manage iTerm2 variables
+//	window       Manage iTerm2 windows
 //
-//	# Variable management
-//	it2 variable list app                      # List app variables
-//	it2 variable set session user.key value    # Set user variable
-//	it2 variable monitor <scope> <name>        # Monitor changes
+// Global Flags:
 //
-//	# Profile and appearance
-//	it2 profile list                           # List profiles
-//	it2 profile get "Default"                  # Get profile settings
-//	it2 color preset list                      # List color presets
+//	--format string      Output format (text, json, yaml) (default "text")
+//	--timeout duration   Connection timeout (default 5s)
+//	--url string         API URL (default "ws://localhost:1912", auto-detects Unix socket)
 //
-//	# Real-time monitoring
-//	it2 notification monitor --type keystroke  # Monitor keystrokes
-//	it2 job list <session>                     # List running jobs
+// Examples:
 //
-// Run 'it2 --help' for complete command listing.
+//	# List all sessions
+//	it2 session list
+//
+//	# Send text to current session (uses $ITERM_SESSION_ID)
+//	it2 session send-text "echo Hello, iTerm2!"
+//
+//	# Show command history with Shell Integration
+//	it2 prompt list
+//
+//	# Create a new tab
+//	it2 tab create
+//
+//	# Split current pane vertically
+//	it2 session split --vertical
+//
+//	# Monitor keystroke events in real-time
+//	it2 notification monitor --type keystroke
+//
+//	# Get terminal buffer contents
+//	it2 text get-buffer <session-id>
+//
+//	# Search command history
+//	it2 prompt search "git commit"
+//
+// Use "it2 [command] --help" for more information about a command.
 //
 // # Environment Variables
 //
