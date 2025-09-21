@@ -12,7 +12,8 @@
 // from terminal output.
 //
 // Examples:
-//   it2 text send w0t0p0s0 "echo hello\n"
-//   it2 text buffer w0t0p0s0 --lines 100
-//   it2 text select w0t0p0s0 --start 0,0 --end 10,5
+//
+//	it2 text send w0t0p0s0 "echo hello\n"
+//	it2 text buffer w0t0p0s0 --lines 100
+//	it2 text select w0t0p0s0 --start 0,0 --end 10,5
 package text

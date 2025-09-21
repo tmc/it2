@@ -182,8 +182,8 @@ Common variables:
 			// First check if we can get it from environment
 			// iTerm2 sets various environment variables
 			envVars := map[string]string{
-				"id":        "ITERM_SESSION_ID",
-				"sessionId": "ITERM_SESSION_ID",
+				"id":          "ITERM_SESSION_ID",
+				"sessionId":   "ITERM_SESSION_ID",
 				"profileName": "ITERM_PROFILE",
 			}
 

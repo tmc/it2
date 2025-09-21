@@ -64,8 +64,8 @@ func newSplitCommand() *cobra.Command {
 				if len(newSessionIDs) > 0 {
 					if jsonOutput {
 						result := map[string]interface{}{
-							"success":        true,
-							"new_session_id": newSessionIDs[0],
+							"success":         true,
+							"new_session_id":  newSessionIDs[0],
 							"all_session_ids": newSessionIDs,
 						}
 						return formatting.PrintJSON(result)

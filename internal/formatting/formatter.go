@@ -441,12 +441,12 @@ type WindowInfo struct {
 
 // TabInfo represents tab information for formatting
 type TabInfo struct {
-	TabID       string        `json:"tab_id"`
-	WindowID    string        `json:"window_id"`
-	Title       string        `json:"title,omitempty"`
-	Active      bool          `json:"active"`
-	Position    int           `json:"position"`
-	Sessions    []*client.SessionInfo `json:"sessions,omitempty"`
+	TabID    string                `json:"tab_id"`
+	WindowID string                `json:"window_id"`
+	Title    string                `json:"title,omitempty"`
+	Active   bool                  `json:"active"`
+	Position int                   `json:"position"`
+	Sessions []*client.SessionInfo `json:"sessions,omitempty"`
 }
 
 func (f *Formatter) FormatWindows(windows []*WindowInfo) error {

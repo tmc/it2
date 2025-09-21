@@ -77,4 +77,3 @@ func resolveIdentifier(scope, identifier string) string {
 	}
 	return identifier
 }
-

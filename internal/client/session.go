@@ -7,7 +7,6 @@ import (
 	pb "github.com/tmc/it2/proto"
 )
 
-
 // SendText sends text to a session as if typed by the user
 func (c *Client) SendText(ctx context.Context, sessionID, text string) error {
 	normalizedID := NormalizeSessionID(sessionID)
@@ -321,8 +320,8 @@ func (c *Client) GetPromptByID(ctx context.Context, sessionID, promptID string) 
 	msg := &pb.ClientOriginatedMessage{
 		Submessage: &pb.ClientOriginatedMessage_GetPromptRequest{
 			GetPromptRequest: &pb.GetPromptRequest{
-				Session:          &normalizedID,
-				UniquePromptId:   &promptID,
+				Session:        &normalizedID,
+				UniquePromptId: &promptID,
 			},
 		},
 	}

@@ -588,10 +588,10 @@ func newShellIntegrationStatusCommand() *cobra.Command {
 
 			for _, shell := range shells {
 				shellStatus := map[string]interface{}{
-					"script_exists":    false,
-					"config_modified":  false,
-					"config_file":      "",
-					"script_file":      "",
+					"script_exists":   false,
+					"config_modified": false,
+					"config_file":     "",
+					"script_file":     "",
 				}
 
 				// Check if script file exists

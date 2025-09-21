@@ -11,6 +11,7 @@
 // by their process IDs and associated session information.
 //
 // Examples:
-//   it2 job list w0t0p0s0
-//   it2 job monitor w0t0p0s0 --watch
+//
+//	it2 job list w0t0p0s0
+//	it2 job monitor w0t0p0s0 --watch
 package job

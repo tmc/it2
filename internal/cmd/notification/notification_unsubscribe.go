@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdutil"
 )
 
 func newUnsubscribeCommand() *cobra.Command {
@@ -60,4 +60,3 @@ func runUnsubscribeCommand(cmd *cobra.Command, args []string) error {
 
 	return nil
 }
-

@@ -142,8 +142,6 @@ func newClearCommand() *cobra.Command {
 	return cmd
 }
 
-
-
 func newSendCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "send <text>",
@@ -202,4 +200,3 @@ func newSendCommand() *cobra.Command {
 
 	return cmd
 }
-

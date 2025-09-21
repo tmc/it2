@@ -13,8 +13,9 @@
 // state between different parts of iTerm2 and external automation.
 //
 // Examples:
-//   it2 variable list
-//   it2 variable get user.currentDirectory
-//   it2 variable set user.myVar "value"
-//   it2 variable watch user.currentDirectory
+//
+//	it2 variable list
+//	it2 variable get user.currentDirectory
+//	it2 variable set user.myVar "value"
+//	it2 variable watch user.currentDirectory
 package variable

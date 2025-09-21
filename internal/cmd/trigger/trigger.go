@@ -15,10 +15,10 @@ import (
 
 // Trigger represents a text trigger
 type Trigger struct {
-	ID      string `json:"id"`
-	Pattern string `json:"pattern"`
-	Action  string `json:"action"`
-	Enabled bool   `json:"enabled"`
+	ID      string    `json:"id"`
+	Pattern string    `json:"pattern"`
+	Action  string    `json:"action"`
+	Enabled bool      `json:"enabled"`
 	Created time.Time `json:"created"`
 }
 

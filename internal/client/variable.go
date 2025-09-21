@@ -369,7 +369,7 @@ func (c *Client) MonitorVariable(ctx context.Context, scope, identifier, name st
 			NotificationRequest: &pb.NotificationRequest{
 				Subscribe:        &subscribe,
 				NotificationType: &notifType,
-				Arguments:        &pb.NotificationRequest_VariableMonitorRequest{
+				Arguments: &pb.NotificationRequest_VariableMonitorRequest{
 					VariableMonitorRequest: varMonitorReq,
 				},
 			},

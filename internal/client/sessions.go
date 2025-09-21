@@ -8,12 +8,12 @@ import (
 )
 
 type SessionInfo struct {
-	SessionID    string
-	WindowID     string
-	TabID        string
-	WindowTitle  string
-	TabTitle     string
-	SessionName  string
+	SessionID   string
+	WindowID    string
+	TabID       string
+	WindowTitle string
+	TabTitle    string
+	SessionName string
 }
 
 func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
@@ -67,10 +67,10 @@ func extractSessionsFromNode(node *pb.SplitTreeNode, windowID, tabID string) []*
 			session := child.Session
 			if session != nil {
 				info := &SessionInfo{
-					SessionID:    session.GetUniqueIdentifier(),
-					WindowID:     windowID,
-					TabID:        tabID,
-					SessionName:  session.GetTitle(),
+					SessionID:   session.GetUniqueIdentifier(),
+					WindowID:    windowID,
+					TabID:       tabID,
+					SessionName: session.GetTitle(),
 				}
 				sessions = append(sessions, info)
 			}

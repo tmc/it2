@@ -17,8 +17,8 @@ import (
 // FocusEvent represents a focus change event
 type FocusEvent struct {
 	Timestamp   time.Time `json:"timestamp"`
-	Type        string    `json:"type"`        // application, window, tab, session
-	ID          string    `json:"id,omitempty"` // window/tab/session ID
+	Type        string    `json:"type"`             // application, window, tab, session
+	ID          string    `json:"id,omitempty"`     // window/tab/session ID
 	Status      string    `json:"status,omitempty"` // for windows: became_key, is_current, resigned_key
 	Active      *bool     `json:"active,omitempty"` // for application focus
 	Description string    `json:"description"`

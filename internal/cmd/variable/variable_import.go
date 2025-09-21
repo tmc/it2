@@ -57,9 +57,9 @@ func runImportCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	var exportData struct {
-		Timestamp string                  `json:"timestamp"`
+		Timestamp string                 `json:"timestamp"`
 		Variables []*client.VariableInfo `json:"variables"`
-		Count     int                     `json:"count"`
+		Count     int                    `json:"count"`
 	}
 
 	err = json.Unmarshal(data, &exportData)

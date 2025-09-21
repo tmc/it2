@@ -13,7 +13,8 @@
 // new sessions, tabs, or windows.
 //
 // Examples:
-//   it2 profile list
-//   it2 profile show "Development"
-//   it2 profile set "Development" --background-color "#1e1e1e"
+//
+//	it2 profile list
+//	it2 profile show "Development"
+//	it2 profile set "Development" --background-color "#1e1e1e"
 package profile

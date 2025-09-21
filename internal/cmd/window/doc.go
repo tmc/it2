@@ -14,8 +14,9 @@
 // with specific configurations and modified after creation.
 //
 // Examples:
-//   it2 window list
-//   it2 window create --profile "Development"
-//   it2 window set-property w0 --title "My Project"
-//   it2 window activate w0
+//
+//	it2 window list
+//	it2 window create --profile "Development"
+//	it2 window set-property w0 --title "My Project"
+//	it2 window activate w0
 package window

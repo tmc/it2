@@ -15,8 +15,9 @@
 // and are used as arguments for most session operations.
 //
 // Examples:
-//   it2 session list
-//   it2 session create --profile "Development"
-//   it2 session split w0t0p0s0 --direction horizontal
-//   it2 session close w0t0p0s0
+//
+//	it2 session list
+//	it2 session create --profile "Development"
+//	it2 session split w0t0p0s0 --direction horizontal
+//	it2 session close w0t0p0s0
 package session

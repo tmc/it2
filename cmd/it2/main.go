@@ -98,7 +98,6 @@ REQUIREMENTS:
 Use "it2 [command] --help" for more information about a command.`,
 }
 
-
 func init() {
 	rootCmd.PersistentFlags().StringVar(&wsURL, "url", "ws://localhost:1912", "WebSocket URL for iTerm2 API")
 	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", 5*time.Second, "Connection timeout")

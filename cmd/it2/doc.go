@@ -1,4 +1,3 @@
-//
 // Command it2 provides comprehensive control over iTerm2 through its WebSocket API.
 //
 // The it2 command is a powerful CLI tool that enables terminal automation,
@@ -107,7 +106,9 @@
 //  4. No manual authentication setup is required
 //
 // Authentication can be bypassed entirely for trusted environments by creating:
-//   ~/Library/Application Support/iTerm2/disable-automation-auth
+//
+//	~/Library/Application Support/iTerm2/disable-automation-auth
+//
 // (This file must be owned by root and contain specific content)
 //
 // Check authentication status:
@@ -262,39 +263,39 @@
 //
 // The it2 command uses standard exit codes:
 //
-//   0    Success
-//   1    General error (authentication, connection, invalid arguments)
-//   2    Command usage error (wrong number of arguments, invalid flags)
+//	0    Success
+//	1    General error (authentication, connection, invalid arguments)
+//	2    Command usage error (wrong number of arguments, invalid flags)
 //
 // # Files
 //
 // iTerm2 uses these connection methods for API communication:
 //
-//   ~/Library/Application Support/iTerm2/private/socket
-//       Unix domain socket for local API communication (preferred, faster)
-//       Automatically detected and used when available
+//	~/Library/Application Support/iTerm2/private/socket
+//	    Unix domain socket for local API communication (preferred, faster)
+//	    Automatically detected and used when available
 //
-//   ws://localhost:1912
-//       WebSocket endpoint for API communication (fallback only)
-//       Used only when Unix socket is unavailable
+//	ws://localhost:1912
+//	    WebSocket endpoint for API communication (fallback only)
+//	    Used only when Unix socket is unavailable
 //
 // # Environment Variables
 //
 // The following environment variables affect it2 behavior:
 //
-//   ITERM_SESSION_ID
-//       Current session ID (automatically set by iTerm2 with Shell Integration)
-//       Format: w0t1p12:C3D91F33-3805-47E2-A3F6-B8AED6EC2209
+//	ITERM_SESSION_ID
+//	    Current session ID (automatically set by iTerm2 with Shell Integration)
+//	    Format: w0t1p12:C3D91F33-3805-47E2-A3F6-B8AED6EC2209
 //
-//   ITERM2_COOKIE
-//       Authentication cookie (auto-requested if not set)
+//	ITERM2_COOKIE
+//	    Authentication cookie (auto-requested if not set)
 //
-//   ITERM2_KEY
-//       Authentication key (auto-requested if not set)
+//	ITERM2_KEY
+//	    Authentication key (auto-requested if not set)
 //
-//   ITERM2_DEBUG
-//       Enable debug logging when set to "1"
-//       Shows WebSocket messages and connection details
+//	ITERM2_DEBUG
+//	    Enable debug logging when set to "1"
+//	    Shows WebSocket messages and connection details
 //
 // # More Information
 //

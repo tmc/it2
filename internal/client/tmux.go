@@ -9,8 +9,8 @@ import (
 
 // TmuxConnection represents a tmux integration connection
 type TmuxConnection struct {
-	ConnectionId       string `json:"connection_id"`
-	OwningSessionId    string `json:"owning_session_id"`
+	ConnectionId    string `json:"connection_id"`
+	OwningSessionId string `json:"owning_session_id"`
 }
 
 // ListTmuxConnections returns all tmux integration connections

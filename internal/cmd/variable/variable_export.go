@@ -88,9 +88,9 @@ func runExportCommand(cmd *cobra.Command, args []string) error {
 
 	// Create export data structure
 	exportData := struct {
-		Timestamp string                  `json:"timestamp"`
+		Timestamp string                 `json:"timestamp"`
 		Variables []*client.VariableInfo `json:"variables"`
-		Count     int                     `json:"count"`
+		Count     int                    `json:"count"`
 	}{
 		Timestamp: time.Now().Format(time.RFC3339),
 		Variables: variables,

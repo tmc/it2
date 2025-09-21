@@ -14,9 +14,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/tmc/it2/internal/auth"
 	pb "github.com/tmc/it2/proto"
-	"github.com/gorilla/websocket"
 	protobuf "google.golang.org/protobuf/proto"
 )
 
@@ -403,9 +403,9 @@ func (c *Client) ReadNotification(ctx context.Context) (*pb.ServerOriginatedMess
 // FocusInfo represents current focus state
 type FocusInfo struct {
 	ApplicationFocused bool   `json:"application_focused"`
-	WindowId          string `json:"window_id,omitempty"`
-	TabId             string `json:"tab_id,omitempty"`
-	SessionId         string `json:"session_id,omitempty"`
+	WindowId           string `json:"window_id,omitempty"`
+	TabId              string `json:"tab_id,omitempty"`
+	SessionId          string `json:"session_id,omitempty"`
 }
 
 // GetFocus gets current focus information

@@ -12,13 +12,15 @@
 //
 // The get-variable command is particularly useful for getting the current
 // session, tab, or window ID:
-//   it2 app get-variable id        # Current session ID
-//   it2 app get-variable tab.id    # Current tab ID
-//   it2 app get-variable windowId  # Current window ID
+//
+//	it2 app get-variable id        # Current session ID
+//	it2 app get-variable tab.id    # Current tab ID
+//	it2 app get-variable windowId  # Current window ID
 //
 // Examples:
-//   it2 app activate --raise-all
-//   it2 app list-windows
-//   it2 app get-variable effectiveTheme
-//   it2 app set-variable user.myvar "value"
+//
+//	it2 app activate --raise-all
+//	it2 app list-windows
+//	it2 app get-variable effectiveTheme
+//	it2 app set-variable user.myvar "value"
 package app

@@ -39,11 +39,11 @@ type ReplaceResult struct {
 
 // HighlightResult represents a text highlighting result
 type HighlightResult struct {
-	Line      int64  `json:"line"`
-	Column    int32  `json:"column"`
-	Text      string `json:"text"`
-	Color     string `json:"color"`
-	Duration  int32  `json:"duration"`
+	Line        int64  `json:"line"`
+	Column      int32  `json:"column"`
+	Text        string `json:"text"`
+	Color       string `json:"color"`
+	Duration    int32  `json:"duration"`
 	HighlightID string `json:"highlight_id"`
 }
 
@@ -64,7 +64,7 @@ func (c *Client) BindKey(ctx context.Context, key, action, profile string, globa
 
 	keyProperty := fmt.Sprintf("keyboard_binding_%s", normalizeKeyName(key))
 	bindingData := map[string]interface{}{
-		"action": action,
+		"action":      action,
 		"description": description,
 	}
 
@@ -303,7 +303,6 @@ func normalizeKeyName(key string) string {
 	key = strings.ReplaceAll(key, " ", "_")
 	return key
 }
-
 
 // Text search and manipulation methods
 

@@ -14,20 +14,20 @@ func (c *Client) SubscribeToGenericNotifications(ctx context.Context, notificati
 
 	// Map notification type string to notification type enum
 	notifTypeMap := map[string]pb.NotificationType{
-		"keystroke":  pb.NotificationType_NOTIFY_ON_KEYSTROKE,
-		"screen":     pb.NotificationType_NOTIFY_ON_SCREEN_UPDATE,
-		"prompt":     pb.NotificationType_NOTIFY_ON_PROMPT,
-		"focus":      pb.NotificationType_NOTIFY_ON_FOCUS_CHANGE,
-		"session":    pb.NotificationType_NOTIFY_ON_NEW_SESSION,
-		"variable":   pb.NotificationType_NOTIFY_ON_VARIABLE_CHANGE,
-		"profile":    pb.NotificationType_NOTIFY_ON_PROFILE_CHANGE,
-		"layout":     pb.NotificationType_NOTIFY_ON_LAYOUT_CHANGE,
-		"custom":     pb.NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE,
-		"rpc":        pb.NotificationType_NOTIFY_ON_SERVER_ORIGINATED_RPC,
-		"broadcast":  pb.NotificationType_NOTIFY_ON_BROADCAST_CHANGE,
-		"location":   pb.NotificationType_NOTIFY_ON_LOCATION_CHANGE,
-		"terminate":  pb.NotificationType_NOTIFY_ON_TERMINATE_SESSION,
-		"filter":     pb.NotificationType_KEYSTROKE_FILTER,
+		"keystroke": pb.NotificationType_NOTIFY_ON_KEYSTROKE,
+		"screen":    pb.NotificationType_NOTIFY_ON_SCREEN_UPDATE,
+		"prompt":    pb.NotificationType_NOTIFY_ON_PROMPT,
+		"focus":     pb.NotificationType_NOTIFY_ON_FOCUS_CHANGE,
+		"session":   pb.NotificationType_NOTIFY_ON_NEW_SESSION,
+		"variable":  pb.NotificationType_NOTIFY_ON_VARIABLE_CHANGE,
+		"profile":   pb.NotificationType_NOTIFY_ON_PROFILE_CHANGE,
+		"layout":    pb.NotificationType_NOTIFY_ON_LAYOUT_CHANGE,
+		"custom":    pb.NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE,
+		"rpc":       pb.NotificationType_NOTIFY_ON_SERVER_ORIGINATED_RPC,
+		"broadcast": pb.NotificationType_NOTIFY_ON_BROADCAST_CHANGE,
+		"location":  pb.NotificationType_NOTIFY_ON_LOCATION_CHANGE,
+		"terminate": pb.NotificationType_NOTIFY_ON_TERMINATE_SESSION,
+		"filter":    pb.NotificationType_KEYSTROKE_FILTER,
 	}
 
 	notifType, exists := notifTypeMap[notificationType]
@@ -182,20 +182,20 @@ func (c *Client) SubscribeToNotifications(ctx context.Context, sessionID, notifi
 func (c *Client) UnsubscribeFromNotifications(ctx context.Context, notificationType, sessionID string) error {
 	// Map notification type string to notification type enum
 	notifTypeMap := map[string]pb.NotificationType{
-		"keystroke":  pb.NotificationType_NOTIFY_ON_KEYSTROKE,
-		"screen":     pb.NotificationType_NOTIFY_ON_SCREEN_UPDATE,
-		"prompt":     pb.NotificationType_NOTIFY_ON_PROMPT,
-		"focus":      pb.NotificationType_NOTIFY_ON_FOCUS_CHANGE,
-		"session":    pb.NotificationType_NOTIFY_ON_NEW_SESSION,
-		"variable":   pb.NotificationType_NOTIFY_ON_VARIABLE_CHANGE,
-		"profile":    pb.NotificationType_NOTIFY_ON_PROFILE_CHANGE,
-		"layout":     pb.NotificationType_NOTIFY_ON_LAYOUT_CHANGE,
-		"custom":     pb.NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE,
-		"rpc":        pb.NotificationType_NOTIFY_ON_SERVER_ORIGINATED_RPC,
-		"broadcast":  pb.NotificationType_NOTIFY_ON_BROADCAST_CHANGE,
-		"location":   pb.NotificationType_NOTIFY_ON_LOCATION_CHANGE,
-		"terminate":  pb.NotificationType_NOTIFY_ON_TERMINATE_SESSION,
-		"filter":     pb.NotificationType_KEYSTROKE_FILTER,
+		"keystroke": pb.NotificationType_NOTIFY_ON_KEYSTROKE,
+		"screen":    pb.NotificationType_NOTIFY_ON_SCREEN_UPDATE,
+		"prompt":    pb.NotificationType_NOTIFY_ON_PROMPT,
+		"focus":     pb.NotificationType_NOTIFY_ON_FOCUS_CHANGE,
+		"session":   pb.NotificationType_NOTIFY_ON_NEW_SESSION,
+		"variable":  pb.NotificationType_NOTIFY_ON_VARIABLE_CHANGE,
+		"profile":   pb.NotificationType_NOTIFY_ON_PROFILE_CHANGE,
+		"layout":    pb.NotificationType_NOTIFY_ON_LAYOUT_CHANGE,
+		"custom":    pb.NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE,
+		"rpc":       pb.NotificationType_NOTIFY_ON_SERVER_ORIGINATED_RPC,
+		"broadcast": pb.NotificationType_NOTIFY_ON_BROADCAST_CHANGE,
+		"location":  pb.NotificationType_NOTIFY_ON_LOCATION_CHANGE,
+		"terminate": pb.NotificationType_NOTIFY_ON_TERMINATE_SESSION,
+		"filter":    pb.NotificationType_KEYSTROKE_FILTER,
 	}
 
 	notifType, exists := notifTypeMap[notificationType]

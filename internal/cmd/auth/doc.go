@@ -11,6 +11,7 @@
 // typically stored in environment variables for subsequent use.
 //
 // Examples:
-//   it2 auth request
-//   it2 auth check
+//
+//	it2 auth request
+//	it2 auth check
 package auth

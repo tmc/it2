@@ -123,9 +123,9 @@ type Dict struct {
 
 // Value represents a dictionary value in plist
 type Value struct {
-	Keys   []string  `xml:"key"`
-	Reals  []float64 `xml:"real"`
-	Strings []string `xml:"string"`
+	Keys    []string  `xml:"key"`
+	Reals   []float64 `xml:"real"`
+	Strings []string  `xml:"string"`
 }
 
 // ImportColorPreset imports a color preset from an .itermcolors file
@@ -163,7 +163,7 @@ func (c *Client) ExportColorPreset(ctx context.Context, name, filePath string) e
 	// Convert ColorPreset to .itermcolors plist format
 	plist := ITerm2ColorPreset{
 		Dict: Dict{
-			Keys: make([]string, 0),
+			Keys:   make([]string, 0),
 			Values: make([]Value, 0),
 		},
 	}

@@ -84,15 +84,15 @@ Examples:
 func formatValueAsJSON(property, value string) (string, error) {
 	// Handle boolean properties
 	booleanProperties := map[string]bool{
-		"use_transparency":     true,
-		"cursor_guide":         true,
-		"cursor_boost":         true,
-		"mouse_reporting":      true,
-		"paste_bracketing":     true,
-		"application_keypad":   true,
-		"focus_reporting":      true,
-		"blink_cursor":         true,
-		"auto_log":             true,
+		"use_transparency":   true,
+		"cursor_guide":       true,
+		"cursor_boost":       true,
+		"mouse_reporting":    true,
+		"paste_bracketing":   true,
+		"application_keypad": true,
+		"focus_reporting":    true,
+		"blink_cursor":       true,
+		"auto_log":           true,
 	}
 
 	if booleanProperties[property] {

@@ -11,6 +11,7 @@
 // directory changes, or custom triggers.
 //
 // Examples:
-//   it2 notification send --title "Build Complete" --message "Success"
-//   it2 notification watch --filter "job.*"
+//
+//	it2 notification send --title "Build Complete" --message "Success"
+//	it2 notification watch --filter "job.*"
 package notification
