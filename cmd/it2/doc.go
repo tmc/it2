@@ -1,5 +1,3 @@
-// [![Go Reference](https://pkg.go.dev/badge/github.com/tmc/it2.svg)](https://pkg.go.dev/github.com/tmc/it2)
-// [![Go Report Card](https://goreportcard.com/badge/github.com/tmc/it2)](https://goreportcard.com/report/github.com/tmc/it2)
 //
 // Command it2 provides comprehensive control over iTerm2 through its WebSocket API.
 //
