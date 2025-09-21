@@ -1,8 +1,17 @@
+// [![Go Reference](https://pkg.go.dev/badge/github.com/tmc/it2.svg)](https://pkg.go.dev/github.com/tmc/it2)
+// [![Go Report Card](https://goreportcard.com/badge/github.com/tmc/it2)](https://goreportcard.com/report/github.com/tmc/it2)
+//
 // Command it2 provides comprehensive control over iTerm2 through its WebSocket API.
 //
 // The it2 command is a powerful CLI tool that enables terminal automation,
 // session management, and access to advanced iTerm2 features.
 // It's designed for both interactive use and scripting workflows.
+//
+// # Go Package
+//
+// For library usage, see: https://pkg.go.dev/github.com/tmc/it2
+//
+//	go get github.com/tmc/it2
 //
 // # Usage
 //
@@ -303,4 +312,4 @@
 //	it2 [command] [subcommand] --help
 package main
 
-//go:generate go run github.com/tmc/misc/gocmddoc@latest -o ../../README.md
+//go:generate go run github.com/tmc/misc/gocmddoc@latest --shields=report -o ../../README.md
