@@ -9,12 +9,12 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/tmc/it2/internal/auth"
 	pb "github.com/tmc/it2/proto"
 	"github.com/gorilla/websocket"
 	protobuf "google.golang.org/protobuf/proto"
@@ -61,26 +61,11 @@ func (c *Client) buildHeaders() http.Header {
 
 // requestAuth dynamically requests authentication from iTerm2
 func (c *Client) requestAuth() {
-	script := `tell application "iTerm2" to request cookie and key for app named "it2"`
-	cmd := exec.Command("osascript", "-e", script)
-	output, err := cmd.CombinedOutput()
-
-	if err == nil {
-		// Parse output - should be "cookie key"
-		result := strings.TrimSpace(string(output))
-		parts := strings.SplitN(result, " ", 2)
-
-		if len(parts) > 0 && parts[0] != "" {
-			os.Setenv("ITERM2_COOKIE", parts[0])
-			if len(parts) > 1 {
-				os.Setenv("ITERM2_KEY", parts[1])
-			}
-			if c.debug {
-				fmt.Fprintf(os.Stderr, "Auth credentials obtained successfully\n")
-			}
-		}
-	} else if c.debug {
+	// Use the centralized auth package instead of inline osascript
+	if err := auth.RequestAuthentication(); err != nil && c.debug {
 		fmt.Fprintf(os.Stderr, "Failed to get auth: %v\n", err)
+	} else if c.debug {
+		fmt.Fprintf(os.Stderr, "Auth credentials obtained successfully\n")
 	}
 }
 

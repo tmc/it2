@@ -4,11 +4,23 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
+	"syscall"
 )
 
 // RequestAuthentication requests cookie and key from iTerm2 via AppleScript
 func RequestAuthentication() error {
+	// Check if authentication is disabled
+	if AuthDisabled() {
+		return nil
+	}
+
+	// Check if we already have authentication
+	if HasAuthentication() {
+		return nil
+	}
+
 	// Get the script name for identification
 	scriptName := "iterm2-go-cli"
 
@@ -61,6 +73,38 @@ func RequestAuthentication() error {
 	}
 
 	return nil
+}
+
+// AuthDisabled checks if authentication is disabled via the special file
+// This follows the same mechanism as the Python iTerm2 API
+func AuthDisabled() bool {
+	filename := filepath.Join(os.Getenv("HOME"), "Library", "Application Support", "iTerm2", "disable-automation-auth")
+
+	// Check if file exists and has correct format
+	stat, err := os.Stat(filename)
+	if err != nil {
+		return false
+	}
+
+	// File must be owned by root (uid 0)
+	if stat.Sys().(*syscall.Stat_t).Uid != 0 {
+		return false
+	}
+
+	// Check file contents match expected format
+	magic := "61DF88DC-3423-4823-B725-22570E01C027"
+	expected := fmt.Sprintf("%x %s", filename, magic)
+
+	if stat.Size() != int64(len(expected)) {
+		return false
+	}
+
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return false
+	}
+
+	return string(content) == expected
 }
 
 // HasAuthentication checks if authentication credentials are present

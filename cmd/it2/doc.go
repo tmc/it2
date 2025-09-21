@@ -12,7 +12,7 @@
 //
 //	--format string      Output format: text, json, yaml (default "text")
 //	--timeout duration   Connection timeout (default 5s)
-//	--url string         WebSocket URL (default "ws://localhost:1912")
+//	--url string         API URL (default "ws://localhost:1912", auto-detects Unix socket)
 //
 // # Installation
 //
@@ -79,7 +79,7 @@
 //
 //	--format string      Output format: text, json, yaml (default "text")
 //	--timeout duration   Connection timeout (default 5s)
-//	--url string         WebSocket URL (default "ws://localhost:1912")
+//	--url string         API URL (default "ws://localhost:1912", auto-detects Unix socket)
 //
 // # Environment Variables
 //
@@ -98,6 +98,10 @@
 //  2. iTerm2 prompts the user to allow API access
 //  3. Credentials are cached for the session duration
 //  4. No manual authentication setup is required
+//
+// Authentication can be bypassed entirely for trusted environments by creating:
+//   ~/Library/Application Support/iTerm2/disable-automation-auth
+// (This file must be owned by root and contain specific content)
 //
 // Check authentication status:
 //
@@ -257,13 +261,15 @@
 //
 // # Files
 //
-// iTerm2 uses these files for configuration and communication:
+// iTerm2 uses these connection methods for API communication:
 //
 //   ~/Library/Application Support/iTerm2/private/socket
-//       Unix domain socket for local API communication (preferred)
+//       Unix domain socket for local API communication (preferred, faster)
+//       Automatically detected and used when available
 //
 //   ws://localhost:1912
-//       WebSocket endpoint for API communication (fallback)
+//       WebSocket endpoint for API communication (fallback only)
+//       Used only when Unix socket is unavailable
 //
 // # Environment Variables
 //
