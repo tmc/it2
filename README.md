@@ -3,6 +3,16 @@
 Command it2 provides comprehensive control over iTerm2 through its WebSocket API.
 
 The it2 command is a powerful CLI tool that enables terminal automation, session management, and access to advanced iTerm2 features. It's designed for both interactive use and scripting workflows.
+## Usage
+
+	it2 [global-flags] <command> [command-flags] [arguments]
+
+## Global Flags
+
+	--format string      Output format: text, json, yaml (default "text")
+	--timeout duration   Connection timeout (default 5s)
+	--url string         WebSocket URL (default "ws://localhost:1912")
+
 ## Installation
 
 Install the latest version:
@@ -178,6 +188,43 @@ Useful patterns for automation:
 	# Save terminal state
 	it2 arrangement save "development-setup"
 
+## Common Use Cases
+
+Development workflow automation:
+
+	# Setup development environment
+	it2 tab create "Development"
+	it2 session send-text "cd ~/project"
+	it2 session split --vertical
+	it2 session send-text "npm run dev"
+	it2 session split --horizontal
+	it2 session send-text "git status"
+
+Remote server management:
+
+	# Connect to multiple servers
+	for server in web1 web2 db1; do
+	    it2 tab create "$server"
+	    it2 session send-text "ssh $server"
+	done
+
+Monitoring and logging:
+
+	# Watch logs in real-time
+	it2 session send-text "tail -f /var/log/app.log"
+	it2 notification monitor --type screen | grep "ERROR"
+
+Session backup and restore:
+
+	# Save current arrangement
+	it2 arrangement save "$(date +%Y%m%d_%H%M%S)"
+
+	# List saved arrangements
+	it2 arrangement list
+
+	# Restore arrangement
+	it2 arrangement restore "20240101_120000"
+
 ## Troubleshooting
 
 Common issues and solutions:
@@ -204,6 +251,42 @@ Shell Integration not working:
   - Python API enabled: Preferences → General → Magic → Enable Python API
   - macOS (iTerm2 is macOS-only)
   - Shell Integration (for prompt/job commands)
+
+## Exit Codes
+
+The it2 command uses standard exit codes:
+
+	0    Success
+	1    General error (authentication, connection, invalid arguments)
+	2    Command usage error (wrong number of arguments, invalid flags)
+
+## Files
+
+iTerm2 uses these files for configuration and communication:
+
+	~/Library/Application Support/iTerm2/private/socket
+	    Unix domain socket for local API communication (preferred)
+
+	ws://localhost:1912
+	    WebSocket endpoint for API communication (fallback)
+
+## Environment Variables
+
+The following environment variables affect it2 behavior:
+
+	ITERM_SESSION_ID
+	    Current session ID (automatically set by iTerm2 with Shell Integration)
+	    Format: w0t1p12:C3D91F33-3805-47E2-A3F6-B8AED6EC2209
+
+	ITERM2_COOKIE
+	    Authentication cookie (auto-requested if not set)
+
+	ITERM2_KEY
+	    Authentication key (auto-requested if not set)
+
+	ITERM2_DEBUG
+	    Enable debug logging when set to "1"
+	    Shows WebSocket messages and connection details
 
 ## More Information
 
