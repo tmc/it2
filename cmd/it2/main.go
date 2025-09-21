@@ -32,8 +32,70 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:   "it2",
-	Short: "iTerm2 API command-line client",
-	Long:  `A command-line interface for interacting with iTerm2's API`,
+	Short: "Comprehensive command-line interface for iTerm2 automation",
+	Long: `it2 - iTerm2 API Command-Line Interface
+
+A powerful command-line tool for controlling iTerm2 programmatically through its WebSocket API.
+Provides comprehensive access to terminal automation, session management, and advanced iTerm2 features.
+
+FEATURES:
+  • Session Management: Create, list, close, split, activate, restart sessions
+  • Tab & Window Control: Manage tabs and windows with full lifecycle support
+  • Text Operations: Send text, manipulate buffers, control cursor, search content
+  • Shell Integration: Access command history, prompts, job monitoring (requires Shell Integration)
+  • Variable Management: Get/set variables with session, tab, window, and app scopes
+  • Profile Management: List profiles, get/set properties, apply to sessions
+  • Color Management: Import/export color presets, modify appearance
+  • Real-time Monitoring: Subscribe to notifications and monitor iTerm2 events
+  • tmux Integration: Control tmux sessions through iTerm2
+  • Broadcast Domains: Manage input broadcasting to multiple sessions
+
+EXAMPLES:
+  # List all sessions
+  it2 session list
+
+  # Send text to current session (uses $ITERM_SESSION_ID)
+  it2 session send-text "echo Hello, iTerm2!"
+
+  # Show command history with Shell Integration
+  it2 prompt list
+
+  # Create a new tab
+  it2 tab create
+
+  # Split current pane vertically
+  it2 session split --vertical
+
+  # Monitor keystroke events in real-time
+  it2 notification monitor --type keystroke
+
+  # Get terminal buffer contents
+  it2 text get-buffer <session-id>
+
+  # Search command history
+  it2 prompt search "git commit"
+
+GLOBAL FLAGS:
+  --format string      Output format: text, json, yaml (default "text")
+  --timeout duration   Connection timeout (default 5s)
+  --url string         WebSocket URL (default "ws://localhost:1912")
+
+ENVIRONMENT VARIABLES:
+  ITERM_SESSION_ID     Current session ID (set by iTerm2)
+  ITERM2_COOKIE        Authentication cookie (auto-requested)
+  ITERM2_KEY           Authentication key (auto-requested)
+  ITERM2_DEBUG         Enable debug output (set to "1")
+
+AUTHENTICATION:
+  The tool automatically requests authentication from iTerm2 on first use.
+  iTerm2 will prompt to allow API access. No manual setup required.
+
+REQUIREMENTS:
+  • iTerm2 version 3.3.0 or later
+  • Python API enabled in iTerm2 preferences
+  • macOS (iTerm2 is macOS-only)
+
+Use "it2 [command] --help" for more information about a command.`,
 }
 
 
