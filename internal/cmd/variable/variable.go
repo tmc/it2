@@ -1,6 +1,9 @@
 package variable
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -9,81 +12,69 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "variable",
 		Short: "Manage iTerm2 variables",
-		Long:  "Commands for getting, setting, and watching iTerm2 variables",
+		Long:  "Commands for getting, setting, listing, monitoring, and managing iTerm2 variables",
 	}
 
-	cmd.AddCommand(newListCommand())
 	cmd.AddCommand(newGetCommand())
 	cmd.AddCommand(newSetCommand())
-	cmd.AddCommand(newWatchCommand())
+	cmd.AddCommand(newListCommand())
+	cmd.AddCommand(newMonitorCommand())
+	cmd.AddCommand(newDeleteCommand())
+	cmd.AddCommand(newExportCommand())
+	cmd.AddCommand(newImportCommand())
 
 	return cmd
 }
 
-func newListCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "list",
-		Short: "List all available variables",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement variable listing
-			return nil
-		},
+// validateScopeAndIdentifier validates scope and identifier requirements
+func validateScopeAndIdentifier(scope, identifier string) error {
+	switch scope {
+	case "app":
+		// App scope doesn't need an identifier
+		return nil
+	case "session":
+		if identifier == "" {
+			// For session scope, try to use $ITERM_SESSION_ID
+			if envSessionID := os.Getenv("ITERM_SESSION_ID"); envSessionID == "" {
+				return fmt.Errorf("session scope requires a session-id or $ITERM_SESSION_ID environment variable")
+			}
+		}
+		return nil
+	case "tab", "window":
+		if identifier == "" {
+			return fmt.Errorf("%s scope requires an identifier", scope)
+		}
+		return nil
+	default:
+		return fmt.Errorf("invalid scope: %s (must be app, session, tab, or window)", scope)
 	}
-
-	cmd.Flags().String("scope", "", "Filter by scope (session, tab, window, app)")
-
-	return cmd
 }
 
-func newGetCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "get <variable-name>",
-		Short: "Get value of a variable",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement variable get
-			return nil
-		},
+// resolveIdentifier resolves the identifier, using environment variable fallback for session scope
+func resolveIdentifier(scope, identifier string) string {
+	if scope == "session" && identifier == "" {
+		if envSessionID := os.Getenv("ITERM_SESSION_ID"); envSessionID != "" {
+			// Normalize the environment session ID
+			if idx := len(envSessionID) - 1; idx >= 0 {
+				for i := idx; i >= 0; i-- {
+					if envSessionID[i] == ':' {
+						return envSessionID[i+1:]
+					}
+				}
+			}
+			return envSessionID
+		}
 	}
-
-	cmd.Flags().String("session", "", "Session ID for session-scoped variables")
-	cmd.Flags().String("tab", "", "Tab ID for tab-scoped variables")
-	cmd.Flags().String("window", "", "Window ID for window-scoped variables")
-
-	return cmd
-}
-
-func newSetCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "set <variable-name> <value>",
-		Short: "Set value of a variable",
-		Args:  cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement variable set
-			return nil
-		},
+	// For session scope, normalize if provided
+	if scope == "session" && identifier != "" {
+		if idx := len(identifier) - 1; idx >= 0 {
+			for i := idx; i >= 0; i-- {
+				if identifier[i] == ':' {
+					return identifier[i+1:]
+				}
+			}
+		}
 	}
-
-	cmd.Flags().String("session", "", "Session ID for session-scoped variables")
-	cmd.Flags().String("tab", "", "Tab ID for tab-scoped variables")
-	cmd.Flags().String("window", "", "Window ID for window-scoped variables")
-
-	return cmd
+	return identifier
 }
 
-func newWatchCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "watch [variable-name]",
-		Short: "Watch variable changes in real-time",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement variable watching
-			return nil
-		},
-	}
-
-	cmd.Flags().String("session", "", "Session ID to watch")
-	cmd.Flags().String("tab", "", "Tab ID to watch")
-	cmd.Flags().String("window", "", "Window ID to watch")
-
-	return cmd
-}

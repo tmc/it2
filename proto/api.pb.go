@@ -21,121 +21,166 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type AlternateColor int32
+type SelectionMode int32
 
 const (
-	AlternateColor_DEFAULT          AlternateColor = 0
-	AlternateColor_REVERSED_DEFAULT AlternateColor = 3
-	AlternateColor_SYSTEM_MESSAGE   AlternateColor = 4
+	SelectionMode_CHARACTER  SelectionMode = 0
+	SelectionMode_WORD       SelectionMode = 1
+	SelectionMode_LINE       SelectionMode = 2
+	SelectionMode_SMART      SelectionMode = 3
+	SelectionMode_BOX        SelectionMode = 4
+	SelectionMode_WHOLE_LINE SelectionMode = 5
 )
 
-// Enum value maps for AlternateColor.
+// Enum value maps for SelectionMode.
 var (
-	AlternateColor_name = map[int32]string{
-		0: "DEFAULT",
-		3: "REVERSED_DEFAULT",
-		4: "SYSTEM_MESSAGE",
+	SelectionMode_name = map[int32]string{
+		0: "CHARACTER",
+		1: "WORD",
+		2: "LINE",
+		3: "SMART",
+		4: "BOX",
+		5: "WHOLE_LINE",
 	}
-	AlternateColor_value = map[string]int32{
-		"DEFAULT":          0,
-		"REVERSED_DEFAULT": 3,
-		"SYSTEM_MESSAGE":   4,
+	SelectionMode_value = map[string]int32{
+		"CHARACTER":  0,
+		"WORD":       1,
+		"LINE":       2,
+		"SMART":      3,
+		"BOX":        4,
+		"WHOLE_LINE": 5,
 	}
 )
 
-func (x AlternateColor) Enum() *AlternateColor {
-	p := new(AlternateColor)
+func (x SelectionMode) Enum() *SelectionMode {
+	p := new(SelectionMode)
 	*p = x
 	return p
 }
 
-func (x AlternateColor) String() string {
+func (x SelectionMode) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (AlternateColor) Descriptor() protoreflect.EnumDescriptor {
+func (SelectionMode) Descriptor() protoreflect.EnumDescriptor {
 	return file_api_proto_enumTypes[0].Descriptor()
 }
 
-func (AlternateColor) Type() protoreflect.EnumType {
+func (SelectionMode) Type() protoreflect.EnumType {
 	return &file_api_proto_enumTypes[0]
 }
 
-func (x AlternateColor) Number() protoreflect.EnumNumber {
+func (x SelectionMode) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *AlternateColor) UnmarshalJSON(b []byte) error {
+func (x *SelectionMode) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = AlternateColor(num)
+	*x = SelectionMode(num)
 	return nil
 }
 
-// Deprecated: Use AlternateColor.Descriptor instead.
-func (AlternateColor) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use SelectionMode.Descriptor instead.
+func (SelectionMode) EnumDescriptor() ([]byte, []int) {
 	return file_api_proto_rawDescGZIP(), []int{0}
 }
 
-type ImagePlaceholderType int32
+type NotificationType int32
 
 const (
-	ImagePlaceholderType_NONE   ImagePlaceholderType = 0
-	ImagePlaceholderType_ITERM2 ImagePlaceholderType = 1
-	ImagePlaceholderType_KITTY  ImagePlaceholderType = 2
+	// Notifications that use the `session` parameter.
+	NotificationType_NOTIFY_ON_KEYSTROKE     NotificationType = 1
+	NotificationType_NOTIFY_ON_SCREEN_UPDATE NotificationType = 2
+	NotificationType_NOTIFY_ON_PROMPT        NotificationType = 3
+	// Deprecated: Marked as deprecated in api.proto.
+	NotificationType_NOTIFY_ON_LOCATION_CHANGE        NotificationType = 4
+	NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE NotificationType = 5
+	NotificationType_NOTIFY_ON_VARIABLE_CHANGE        NotificationType = 12
+	NotificationType_KEYSTROKE_FILTER                 NotificationType = 14 // Does not send a notification
+	// Notifications that ignore the `session` parameter.
+	NotificationType_NOTIFY_ON_NEW_SESSION           NotificationType = 6
+	NotificationType_NOTIFY_ON_TERMINATE_SESSION     NotificationType = 7
+	NotificationType_NOTIFY_ON_LAYOUT_CHANGE         NotificationType = 8
+	NotificationType_NOTIFY_ON_FOCUS_CHANGE          NotificationType = 9
+	NotificationType_NOTIFY_ON_SERVER_ORIGINATED_RPC NotificationType = 10
+	NotificationType_NOTIFY_ON_BROADCAST_CHANGE      NotificationType = 11
+	NotificationType_NOTIFY_ON_PROFILE_CHANGE        NotificationType = 13
 )
 
-// Enum value maps for ImagePlaceholderType.
+// Enum value maps for NotificationType.
 var (
-	ImagePlaceholderType_name = map[int32]string{
-		0: "NONE",
-		1: "ITERM2",
-		2: "KITTY",
+	NotificationType_name = map[int32]string{
+		1:  "NOTIFY_ON_KEYSTROKE",
+		2:  "NOTIFY_ON_SCREEN_UPDATE",
+		3:  "NOTIFY_ON_PROMPT",
+		4:  "NOTIFY_ON_LOCATION_CHANGE",
+		5:  "NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE",
+		12: "NOTIFY_ON_VARIABLE_CHANGE",
+		14: "KEYSTROKE_FILTER",
+		6:  "NOTIFY_ON_NEW_SESSION",
+		7:  "NOTIFY_ON_TERMINATE_SESSION",
+		8:  "NOTIFY_ON_LAYOUT_CHANGE",
+		9:  "NOTIFY_ON_FOCUS_CHANGE",
+		10: "NOTIFY_ON_SERVER_ORIGINATED_RPC",
+		11: "NOTIFY_ON_BROADCAST_CHANGE",
+		13: "NOTIFY_ON_PROFILE_CHANGE",
 	}
-	ImagePlaceholderType_value = map[string]int32{
-		"NONE":   0,
-		"ITERM2": 1,
-		"KITTY":  2,
+	NotificationType_value = map[string]int32{
+		"NOTIFY_ON_KEYSTROKE":              1,
+		"NOTIFY_ON_SCREEN_UPDATE":          2,
+		"NOTIFY_ON_PROMPT":                 3,
+		"NOTIFY_ON_LOCATION_CHANGE":        4,
+		"NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE": 5,
+		"NOTIFY_ON_VARIABLE_CHANGE":        12,
+		"KEYSTROKE_FILTER":                 14,
+		"NOTIFY_ON_NEW_SESSION":            6,
+		"NOTIFY_ON_TERMINATE_SESSION":      7,
+		"NOTIFY_ON_LAYOUT_CHANGE":          8,
+		"NOTIFY_ON_FOCUS_CHANGE":           9,
+		"NOTIFY_ON_SERVER_ORIGINATED_RPC":  10,
+		"NOTIFY_ON_BROADCAST_CHANGE":       11,
+		"NOTIFY_ON_PROFILE_CHANGE":         13,
 	}
 )
 
-func (x ImagePlaceholderType) Enum() *ImagePlaceholderType {
-	p := new(ImagePlaceholderType)
+func (x NotificationType) Enum() *NotificationType {
+	p := new(NotificationType)
 	*p = x
 	return p
 }
 
-func (x ImagePlaceholderType) String() string {
+func (x NotificationType) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (ImagePlaceholderType) Descriptor() protoreflect.EnumDescriptor {
+func (NotificationType) Descriptor() protoreflect.EnumDescriptor {
 	return file_api_proto_enumTypes[1].Descriptor()
 }
 
-func (ImagePlaceholderType) Type() protoreflect.EnumType {
+func (NotificationType) Type() protoreflect.EnumType {
 	return &file_api_proto_enumTypes[1]
 }
 
-func (x ImagePlaceholderType) Number() protoreflect.EnumNumber {
+func (x NotificationType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *ImagePlaceholderType) UnmarshalJSON(b []byte) error {
+func (x *NotificationType) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = ImagePlaceholderType(num)
+	*x = NotificationType(num)
 	return nil
 }
 
-// Deprecated: Use ImagePlaceholderType.Descriptor instead.
-func (ImagePlaceholderType) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use NotificationType.Descriptor instead.
+func (NotificationType) EnumDescriptor() ([]byte, []int) {
 	return file_api_proto_rawDescGZIP(), []int{1}
 }
 
@@ -207,619 +252,1763 @@ func (Modifiers) EnumDescriptor() ([]byte, []int) {
 	return file_api_proto_rawDescGZIP(), []int{2}
 }
 
-type SelectionMode int32
+type VariableScope int32
 
 const (
-	SelectionMode_CHARACTER  SelectionMode = 0
-	SelectionMode_WORD       SelectionMode = 1
-	SelectionMode_LINE       SelectionMode = 2
-	SelectionMode_SMART      SelectionMode = 3
-	SelectionMode_BOX        SelectionMode = 4
-	SelectionMode_WHOLE_LINE SelectionMode = 5
+	VariableScope_SESSION VariableScope = 1
+	VariableScope_TAB     VariableScope = 2
+	VariableScope_WINDOW  VariableScope = 3
+	VariableScope_APP     VariableScope = 4
 )
 
-// Enum value maps for SelectionMode.
+// Enum value maps for VariableScope.
 var (
-	SelectionMode_name = map[int32]string{
-		0: "CHARACTER",
-		1: "WORD",
-		2: "LINE",
-		3: "SMART",
-		4: "BOX",
-		5: "WHOLE_LINE",
+	VariableScope_name = map[int32]string{
+		1: "SESSION",
+		2: "TAB",
+		3: "WINDOW",
+		4: "APP",
 	}
-	SelectionMode_value = map[string]int32{
-		"CHARACTER":  0,
-		"WORD":       1,
-		"LINE":       2,
-		"SMART":      3,
-		"BOX":        4,
-		"WHOLE_LINE": 5,
+	VariableScope_value = map[string]int32{
+		"SESSION": 1,
+		"TAB":     2,
+		"WINDOW":  3,
+		"APP":     4,
 	}
 )
 
-func (x SelectionMode) Enum() *SelectionMode {
-	p := new(SelectionMode)
+func (x VariableScope) Enum() *VariableScope {
+	p := new(VariableScope)
 	*p = x
 	return p
 }
 
-func (x SelectionMode) String() string {
+func (x VariableScope) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (SelectionMode) Descriptor() protoreflect.EnumDescriptor {
+func (VariableScope) Descriptor() protoreflect.EnumDescriptor {
 	return file_api_proto_enumTypes[3].Descriptor()
 }
 
-func (SelectionMode) Type() protoreflect.EnumType {
+func (VariableScope) Type() protoreflect.EnumType {
 	return &file_api_proto_enumTypes[3]
 }
 
-func (x SelectionMode) Number() protoreflect.EnumNumber {
+func (x VariableScope) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *SelectionMode) UnmarshalJSON(b []byte) error {
+func (x *VariableScope) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = SelectionMode(num)
+	*x = VariableScope(num)
 	return nil
 }
 
-// Deprecated: Use SelectionMode.Descriptor instead.
-func (SelectionMode) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use VariableScope.Descriptor instead.
+func (VariableScope) EnumDescriptor() ([]byte, []int) {
 	return file_api_proto_rawDescGZIP(), []int{3}
 }
 
-type GetBufferResponse_Status int32
+type PromptMonitorMode int32
 
 const (
-	GetBufferResponse_OK                 GetBufferResponse_Status = 0
-	GetBufferResponse_SESSION_NOT_FOUND  GetBufferResponse_Status = 1
-	GetBufferResponse_INVALID_LINE_RANGE GetBufferResponse_Status = 2
-	GetBufferResponse_REQUEST_MALFORMED  GetBufferResponse_Status = 3
+	PromptMonitorMode_PROMPT        PromptMonitorMode = 1
+	PromptMonitorMode_COMMAND_START PromptMonitorMode = 2
+	PromptMonitorMode_COMMAND_END   PromptMonitorMode = 3
 )
 
-// Enum value maps for GetBufferResponse_Status.
+// Enum value maps for PromptMonitorMode.
 var (
-	GetBufferResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "SESSION_NOT_FOUND",
-		2: "INVALID_LINE_RANGE",
-		3: "REQUEST_MALFORMED",
+	PromptMonitorMode_name = map[int32]string{
+		1: "PROMPT",
+		2: "COMMAND_START",
+		3: "COMMAND_END",
 	}
-	GetBufferResponse_Status_value = map[string]int32{
-		"OK":                 0,
-		"SESSION_NOT_FOUND":  1,
-		"INVALID_LINE_RANGE": 2,
-		"REQUEST_MALFORMED":  3,
+	PromptMonitorMode_value = map[string]int32{
+		"PROMPT":        1,
+		"COMMAND_START": 2,
+		"COMMAND_END":   3,
 	}
 )
 
-func (x GetBufferResponse_Status) Enum() *GetBufferResponse_Status {
-	p := new(GetBufferResponse_Status)
+func (x PromptMonitorMode) Enum() *PromptMonitorMode {
+	p := new(PromptMonitorMode)
 	*p = x
 	return p
 }
 
-func (x GetBufferResponse_Status) String() string {
+func (x PromptMonitorMode) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (GetBufferResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+func (PromptMonitorMode) Descriptor() protoreflect.EnumDescriptor {
 	return file_api_proto_enumTypes[4].Descriptor()
 }
 
-func (GetBufferResponse_Status) Type() protoreflect.EnumType {
+func (PromptMonitorMode) Type() protoreflect.EnumType {
 	return &file_api_proto_enumTypes[4]
 }
 
-func (x GetBufferResponse_Status) Number() protoreflect.EnumNumber {
+func (x PromptMonitorMode) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *GetBufferResponse_Status) UnmarshalJSON(b []byte) error {
+func (x *PromptMonitorMode) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = GetBufferResponse_Status(num)
+	*x = PromptMonitorMode(num)
 	return nil
 }
 
-// Deprecated: Use GetBufferResponse_Status.Descriptor instead.
-func (GetBufferResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{3, 0}
+// Deprecated: Use PromptMonitorMode.Descriptor instead.
+func (PromptMonitorMode) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{4}
 }
 
-// How does this line end?
-type LineContents_Continuation int32
+type AlternateColor int32
 
 const (
-	// This line is not wrapped.
-	LineContents_CONTINUATION_HARD_EOL LineContents_Continuation = 1
-	// The next line is a continuation of this line.
-	LineContents_CONTINUATION_SOFT_EOL LineContents_Continuation = 2
+	AlternateColor_DEFAULT          AlternateColor = 0
+	AlternateColor_REVERSED_DEFAULT AlternateColor = 3
+	AlternateColor_SYSTEM_MESSAGE   AlternateColor = 4
 )
 
-// Enum value maps for LineContents_Continuation.
+// Enum value maps for AlternateColor.
 var (
-	LineContents_Continuation_name = map[int32]string{
-		1: "CONTINUATION_HARD_EOL",
-		2: "CONTINUATION_SOFT_EOL",
+	AlternateColor_name = map[int32]string{
+		0: "DEFAULT",
+		3: "REVERSED_DEFAULT",
+		4: "SYSTEM_MESSAGE",
 	}
-	LineContents_Continuation_value = map[string]int32{
-		"CONTINUATION_HARD_EOL": 1,
-		"CONTINUATION_SOFT_EOL": 2,
+	AlternateColor_value = map[string]int32{
+		"DEFAULT":          0,
+		"REVERSED_DEFAULT": 3,
+		"SYSTEM_MESSAGE":   4,
 	}
 )
 
-func (x LineContents_Continuation) Enum() *LineContents_Continuation {
-	p := new(LineContents_Continuation)
+func (x AlternateColor) Enum() *AlternateColor {
+	p := new(AlternateColor)
 	*p = x
 	return p
 }
 
-func (x LineContents_Continuation) String() string {
+func (x AlternateColor) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (LineContents_Continuation) Descriptor() protoreflect.EnumDescriptor {
+func (AlternateColor) Descriptor() protoreflect.EnumDescriptor {
 	return file_api_proto_enumTypes[5].Descriptor()
 }
 
-func (LineContents_Continuation) Type() protoreflect.EnumType {
+func (AlternateColor) Type() protoreflect.EnumType {
 	return &file_api_proto_enumTypes[5]
 }
 
-func (x LineContents_Continuation) Number() protoreflect.EnumNumber {
+func (x AlternateColor) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *LineContents_Continuation) UnmarshalJSON(b []byte) error {
+func (x *AlternateColor) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = LineContents_Continuation(num)
+	*x = AlternateColor(num)
 	return nil
 }
 
-// Deprecated: Use LineContents_Continuation.Descriptor instead.
-func (LineContents_Continuation) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use AlternateColor.Descriptor instead.
+func (AlternateColor) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{5}
+}
+
+type ImagePlaceholderType int32
+
+const (
+	ImagePlaceholderType_NONE   ImagePlaceholderType = 0
+	ImagePlaceholderType_ITERM2 ImagePlaceholderType = 1
+	ImagePlaceholderType_KITTY  ImagePlaceholderType = 2
+)
+
+// Enum value maps for ImagePlaceholderType.
+var (
+	ImagePlaceholderType_name = map[int32]string{
+		0: "NONE",
+		1: "ITERM2",
+		2: "KITTY",
+	}
+	ImagePlaceholderType_value = map[string]int32{
+		"NONE":   0,
+		"ITERM2": 1,
+		"KITTY":  2,
+	}
+)
+
+func (x ImagePlaceholderType) Enum() *ImagePlaceholderType {
+	p := new(ImagePlaceholderType)
+	*p = x
+	return p
+}
+
+func (x ImagePlaceholderType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ImagePlaceholderType) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[6].Descriptor()
+}
+
+func (ImagePlaceholderType) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[6]
+}
+
+func (x ImagePlaceholderType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *ImagePlaceholderType) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = ImagePlaceholderType(num)
+	return nil
+}
+
+// Deprecated: Use ImagePlaceholderType.Descriptor instead.
+func (ImagePlaceholderType) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{6}
+}
+
+type InvokeFunctionResponse_Status int32
+
+const (
+	InvokeFunctionResponse_TIMEOUT           InvokeFunctionResponse_Status = 1
+	InvokeFunctionResponse_FAILED            InvokeFunctionResponse_Status = 2
+	InvokeFunctionResponse_REQUEST_MALFORMED InvokeFunctionResponse_Status = 3
+	InvokeFunctionResponse_INVALID_ID        InvokeFunctionResponse_Status = 4
+)
+
+// Enum value maps for InvokeFunctionResponse_Status.
+var (
+	InvokeFunctionResponse_Status_name = map[int32]string{
+		1: "TIMEOUT",
+		2: "FAILED",
+		3: "REQUEST_MALFORMED",
+		4: "INVALID_ID",
+	}
+	InvokeFunctionResponse_Status_value = map[string]int32{
+		"TIMEOUT":           1,
+		"FAILED":            2,
+		"REQUEST_MALFORMED": 3,
+		"INVALID_ID":        4,
+	}
+)
+
+func (x InvokeFunctionResponse_Status) Enum() *InvokeFunctionResponse_Status {
+	p := new(InvokeFunctionResponse_Status)
+	*p = x
+	return p
+}
+
+func (x InvokeFunctionResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (InvokeFunctionResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[7].Descriptor()
+}
+
+func (InvokeFunctionResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[7]
+}
+
+func (x InvokeFunctionResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *InvokeFunctionResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = InvokeFunctionResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use InvokeFunctionResponse_Status.Descriptor instead.
+func (InvokeFunctionResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{3, 0}
+}
+
+type CloseResponse_Status int32
+
+const (
+	CloseResponse_OK            CloseResponse_Status = 0
+	CloseResponse_NOT_FOUND     CloseResponse_Status = 1
+	CloseResponse_USER_DECLINED CloseResponse_Status = 2
+)
+
+// Enum value maps for CloseResponse_Status.
+var (
+	CloseResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "NOT_FOUND",
+		2: "USER_DECLINED",
+	}
+	CloseResponse_Status_value = map[string]int32{
+		"OK":            0,
+		"NOT_FOUND":     1,
+		"USER_DECLINED": 2,
+	}
+)
+
+func (x CloseResponse_Status) Enum() *CloseResponse_Status {
+	p := new(CloseResponse_Status)
+	*p = x
+	return p
+}
+
+func (x CloseResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CloseResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[8].Descriptor()
+}
+
+func (CloseResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[8]
+}
+
+func (x CloseResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *CloseResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = CloseResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use CloseResponse_Status.Descriptor instead.
+func (CloseResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{5, 0}
+}
+
+type SetBroadcastDomainsResponse_Status int32
+
+const (
+	SetBroadcastDomainsResponse_OK                             SetBroadcastDomainsResponse_Status = 0
+	SetBroadcastDomainsResponse_SESSION_NOT_FOUND              SetBroadcastDomainsResponse_Status = 1
+	SetBroadcastDomainsResponse_BROADCAST_DOMAINS_NOT_DISJOINT SetBroadcastDomainsResponse_Status = 2
+	SetBroadcastDomainsResponse_SESSIONS_NOT_IN_SAME_WINDOW    SetBroadcastDomainsResponse_Status = 3
+)
+
+// Enum value maps for SetBroadcastDomainsResponse_Status.
+var (
+	SetBroadcastDomainsResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "SESSION_NOT_FOUND",
+		2: "BROADCAST_DOMAINS_NOT_DISJOINT",
+		3: "SESSIONS_NOT_IN_SAME_WINDOW",
+	}
+	SetBroadcastDomainsResponse_Status_value = map[string]int32{
+		"OK":                             0,
+		"SESSION_NOT_FOUND":              1,
+		"BROADCAST_DOMAINS_NOT_DISJOINT": 2,
+		"SESSIONS_NOT_IN_SAME_WINDOW":    3,
+	}
+)
+
+func (x SetBroadcastDomainsResponse_Status) Enum() *SetBroadcastDomainsResponse_Status {
+	p := new(SetBroadcastDomainsResponse_Status)
+	*p = x
+	return p
+}
+
+func (x SetBroadcastDomainsResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SetBroadcastDomainsResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[9].Descriptor()
+}
+
+func (SetBroadcastDomainsResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[9]
+}
+
+func (x SetBroadcastDomainsResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *SetBroadcastDomainsResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = SetBroadcastDomainsResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use SetBroadcastDomainsResponse_Status.Descriptor instead.
+func (SetBroadcastDomainsResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{7, 0}
+}
+
+type StatusBarComponentResponse_Status int32
+
+const (
+	StatusBarComponentResponse_OK                 StatusBarComponentResponse_Status = 0
+	StatusBarComponentResponse_SESSION_NOT_FOUND  StatusBarComponentResponse_Status = 1
+	StatusBarComponentResponse_REQUEST_MALFORMED  StatusBarComponentResponse_Status = 2
+	StatusBarComponentResponse_INVALID_IDENTIFIER StatusBarComponentResponse_Status = 3
+)
+
+// Enum value maps for StatusBarComponentResponse_Status.
+var (
+	StatusBarComponentResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "SESSION_NOT_FOUND",
+		2: "REQUEST_MALFORMED",
+		3: "INVALID_IDENTIFIER",
+	}
+	StatusBarComponentResponse_Status_value = map[string]int32{
+		"OK":                 0,
+		"SESSION_NOT_FOUND":  1,
+		"REQUEST_MALFORMED":  2,
+		"INVALID_IDENTIFIER": 3,
+	}
+)
+
+func (x StatusBarComponentResponse_Status) Enum() *StatusBarComponentResponse_Status {
+	p := new(StatusBarComponentResponse_Status)
+	*p = x
+	return p
+}
+
+func (x StatusBarComponentResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (StatusBarComponentResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[10].Descriptor()
+}
+
+func (StatusBarComponentResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[10]
+}
+
+func (x StatusBarComponentResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *StatusBarComponentResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = StatusBarComponentResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use StatusBarComponentResponse_Status.Descriptor instead.
+func (StatusBarComponentResponse_Status) EnumDescriptor() ([]byte, []int) {
 	return file_api_proto_rawDescGZIP(), []int{9, 0}
 }
 
-type SendTextResponse_Status int32
+type SelectionResponse_Status int32
 
 const (
-	SendTextResponse_OK                SendTextResponse_Status = 0
-	SendTextResponse_SESSION_NOT_FOUND SendTextResponse_Status = 1
+	SelectionResponse_OK                SelectionResponse_Status = 0
+	SelectionResponse_INVALID_SESSION   SelectionResponse_Status = 1
+	SelectionResponse_INVALID_RANGE     SelectionResponse_Status = 2
+	SelectionResponse_REQUEST_MALFORMED SelectionResponse_Status = 3
 )
 
-// Enum value maps for SendTextResponse_Status.
+// Enum value maps for SelectionResponse_Status.
 var (
-	SendTextResponse_Status_name = map[int32]string{
+	SelectionResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "INVALID_SESSION",
+		2: "INVALID_RANGE",
+		3: "REQUEST_MALFORMED",
+	}
+	SelectionResponse_Status_value = map[string]int32{
+		"OK":                0,
+		"INVALID_SESSION":   1,
+		"INVALID_RANGE":     2,
+		"REQUEST_MALFORMED": 3,
+	}
+)
+
+func (x SelectionResponse_Status) Enum() *SelectionResponse_Status {
+	p := new(SelectionResponse_Status)
+	*p = x
+	return p
+}
+
+func (x SelectionResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SelectionResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[11].Descriptor()
+}
+
+func (SelectionResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[11]
+}
+
+func (x SelectionResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *SelectionResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = SelectionResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use SelectionResponse_Status.Descriptor instead.
+func (SelectionResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{14, 0}
+}
+
+type ColorPresetResponse_Status int32
+
+const (
+	ColorPresetResponse_OK                ColorPresetResponse_Status = 0
+	ColorPresetResponse_PRESET_NOT_FOUND  ColorPresetResponse_Status = 1
+	ColorPresetResponse_REQUEST_MALFORMED ColorPresetResponse_Status = 2
+)
+
+// Enum value maps for ColorPresetResponse_Status.
+var (
+	ColorPresetResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "PRESET_NOT_FOUND",
+		2: "REQUEST_MALFORMED",
+	}
+	ColorPresetResponse_Status_value = map[string]int32{
+		"OK":                0,
+		"PRESET_NOT_FOUND":  1,
+		"REQUEST_MALFORMED": 2,
+	}
+)
+
+func (x ColorPresetResponse_Status) Enum() *ColorPresetResponse_Status {
+	p := new(ColorPresetResponse_Status)
+	*p = x
+	return p
+}
+
+func (x ColorPresetResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ColorPresetResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[12].Descriptor()
+}
+
+func (ColorPresetResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[12]
+}
+
+func (x ColorPresetResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *ColorPresetResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = ColorPresetResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use ColorPresetResponse_Status.Descriptor instead.
+func (ColorPresetResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{16, 0}
+}
+
+type PreferencesResponse_Result_SetPreferenceResult_Status int32
+
+const (
+	PreferencesResponse_Result_SetPreferenceResult_OK            PreferencesResponse_Result_SetPreferenceResult_Status = 0
+	PreferencesResponse_Result_SetPreferenceResult_BAD_JSON      PreferencesResponse_Result_SetPreferenceResult_Status = 1
+	PreferencesResponse_Result_SetPreferenceResult_INVALID_VALUE PreferencesResponse_Result_SetPreferenceResult_Status = 2 // Not legal for a plist
+)
+
+// Enum value maps for PreferencesResponse_Result_SetPreferenceResult_Status.
+var (
+	PreferencesResponse_Result_SetPreferenceResult_Status_name = map[int32]string{
+		0: "OK",
+		1: "BAD_JSON",
+		2: "INVALID_VALUE",
+	}
+	PreferencesResponse_Result_SetPreferenceResult_Status_value = map[string]int32{
+		"OK":            0,
+		"BAD_JSON":      1,
+		"INVALID_VALUE": 2,
+	}
+)
+
+func (x PreferencesResponse_Result_SetPreferenceResult_Status) Enum() *PreferencesResponse_Result_SetPreferenceResult_Status {
+	p := new(PreferencesResponse_Result_SetPreferenceResult_Status)
+	*p = x
+	return p
+}
+
+func (x PreferencesResponse_Result_SetPreferenceResult_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PreferencesResponse_Result_SetPreferenceResult_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[13].Descriptor()
+}
+
+func (PreferencesResponse_Result_SetPreferenceResult_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[13]
+}
+
+func (x PreferencesResponse_Result_SetPreferenceResult_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *PreferencesResponse_Result_SetPreferenceResult_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = PreferencesResponse_Result_SetPreferenceResult_Status(num)
+	return nil
+}
+
+// Deprecated: Use PreferencesResponse_Result_SetPreferenceResult_Status.Descriptor instead.
+func (PreferencesResponse_Result_SetPreferenceResult_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{18, 0, 0, 0}
+}
+
+type PreferencesResponse_Result_SetDefaultProfileResult_Status int32
+
+const (
+	PreferencesResponse_Result_SetDefaultProfileResult_OK       PreferencesResponse_Result_SetDefaultProfileResult_Status = 0
+	PreferencesResponse_Result_SetDefaultProfileResult_BAD_GUID PreferencesResponse_Result_SetDefaultProfileResult_Status = 1
+)
+
+// Enum value maps for PreferencesResponse_Result_SetDefaultProfileResult_Status.
+var (
+	PreferencesResponse_Result_SetDefaultProfileResult_Status_name = map[int32]string{
+		0: "OK",
+		1: "BAD_GUID",
+	}
+	PreferencesResponse_Result_SetDefaultProfileResult_Status_value = map[string]int32{
+		"OK":       0,
+		"BAD_GUID": 1,
+	}
+)
+
+func (x PreferencesResponse_Result_SetDefaultProfileResult_Status) Enum() *PreferencesResponse_Result_SetDefaultProfileResult_Status {
+	p := new(PreferencesResponse_Result_SetDefaultProfileResult_Status)
+	*p = x
+	return p
+}
+
+func (x PreferencesResponse_Result_SetDefaultProfileResult_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PreferencesResponse_Result_SetDefaultProfileResult_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[14].Descriptor()
+}
+
+func (PreferencesResponse_Result_SetDefaultProfileResult_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[14]
+}
+
+func (x PreferencesResponse_Result_SetDefaultProfileResult_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *PreferencesResponse_Result_SetDefaultProfileResult_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = PreferencesResponse_Result_SetDefaultProfileResult_Status(num)
+	return nil
+}
+
+// Deprecated: Use PreferencesResponse_Result_SetDefaultProfileResult_Status.Descriptor instead.
+func (PreferencesResponse_Result_SetDefaultProfileResult_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{18, 0, 2, 0}
+}
+
+type ReorderTabsResponse_Status int32
+
+const (
+	ReorderTabsResponse_OK                 ReorderTabsResponse_Status = 0
+	ReorderTabsResponse_INVALID_ASSIGNMENT ReorderTabsResponse_Status = 1 // e.g., duplicate tab id
+	ReorderTabsResponse_INVALID_WINDOW_ID  ReorderTabsResponse_Status = 2
+	ReorderTabsResponse_INVALID_TAB_ID     ReorderTabsResponse_Status = 3
+)
+
+// Enum value maps for ReorderTabsResponse_Status.
+var (
+	ReorderTabsResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "INVALID_ASSIGNMENT",
+		2: "INVALID_WINDOW_ID",
+		3: "INVALID_TAB_ID",
+	}
+	ReorderTabsResponse_Status_value = map[string]int32{
+		"OK":                 0,
+		"INVALID_ASSIGNMENT": 1,
+		"INVALID_WINDOW_ID":  2,
+		"INVALID_TAB_ID":     3,
+	}
+)
+
+func (x ReorderTabsResponse_Status) Enum() *ReorderTabsResponse_Status {
+	p := new(ReorderTabsResponse_Status)
+	*p = x
+	return p
+}
+
+func (x ReorderTabsResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ReorderTabsResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[15].Descriptor()
+}
+
+func (ReorderTabsResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[15]
+}
+
+func (x ReorderTabsResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *ReorderTabsResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = ReorderTabsResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use ReorderTabsResponse_Status.Descriptor instead.
+func (ReorderTabsResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{20, 0}
+}
+
+type TmuxResponse_Status int32
+
+const (
+	TmuxResponse_OK                    TmuxResponse_Status = 0
+	TmuxResponse_INVALID_REQUEST       TmuxResponse_Status = 1
+	TmuxResponse_INVALID_CONNECTION_ID TmuxResponse_Status = 2
+	TmuxResponse_INVALID_WINDOW_ID     TmuxResponse_Status = 3
+)
+
+// Enum value maps for TmuxResponse_Status.
+var (
+	TmuxResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "INVALID_REQUEST",
+		2: "INVALID_CONNECTION_ID",
+		3: "INVALID_WINDOW_ID",
+	}
+	TmuxResponse_Status_value = map[string]int32{
+		"OK":                    0,
+		"INVALID_REQUEST":       1,
+		"INVALID_CONNECTION_ID": 2,
+		"INVALID_WINDOW_ID":     3,
+	}
+)
+
+func (x TmuxResponse_Status) Enum() *TmuxResponse_Status {
+	p := new(TmuxResponse_Status)
+	*p = x
+	return p
+}
+
+func (x TmuxResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TmuxResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[16].Descriptor()
+}
+
+func (TmuxResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[16]
+}
+
+func (x TmuxResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *TmuxResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = TmuxResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use TmuxResponse_Status.Descriptor instead.
+func (TmuxResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{22, 0}
+}
+
+type SetTabLayoutResponse_Status int32
+
+const (
+	SetTabLayoutResponse_OK           SetTabLayoutResponse_Status = 0
+	SetTabLayoutResponse_BAD_TAB_ID   SetTabLayoutResponse_Status = 1
+	SetTabLayoutResponse_WRONG_TREE   SetTabLayoutResponse_Status = 2
+	SetTabLayoutResponse_INVALID_SIZE SetTabLayoutResponse_Status = 3
+)
+
+// Enum value maps for SetTabLayoutResponse_Status.
+var (
+	SetTabLayoutResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "BAD_TAB_ID",
+		2: "WRONG_TREE",
+		3: "INVALID_SIZE",
+	}
+	SetTabLayoutResponse_Status_value = map[string]int32{
+		"OK":           0,
+		"BAD_TAB_ID":   1,
+		"WRONG_TREE":   2,
+		"INVALID_SIZE": 3,
+	}
+)
+
+func (x SetTabLayoutResponse_Status) Enum() *SetTabLayoutResponse_Status {
+	p := new(SetTabLayoutResponse_Status)
+	*p = x
+	return p
+}
+
+func (x SetTabLayoutResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SetTabLayoutResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[17].Descriptor()
+}
+
+func (SetTabLayoutResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[17]
+}
+
+func (x SetTabLayoutResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *SetTabLayoutResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = SetTabLayoutResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use SetTabLayoutResponse_Status.Descriptor instead.
+func (SetTabLayoutResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{27, 0}
+}
+
+type MenuItemResponse_Status int32
+
+const (
+	MenuItemResponse_OK             MenuItemResponse_Status = 0
+	MenuItemResponse_BAD_IDENTIFIER MenuItemResponse_Status = 1
+	MenuItemResponse_DISABLED       MenuItemResponse_Status = 2
+)
+
+// Enum value maps for MenuItemResponse_Status.
+var (
+	MenuItemResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "BAD_IDENTIFIER",
+		2: "DISABLED",
+	}
+	MenuItemResponse_Status_value = map[string]int32{
+		"OK":             0,
+		"BAD_IDENTIFIER": 1,
+		"DISABLED":       2,
+	}
+)
+
+func (x MenuItemResponse_Status) Enum() *MenuItemResponse_Status {
+	p := new(MenuItemResponse_Status)
+	*p = x
+	return p
+}
+
+func (x MenuItemResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (MenuItemResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[18].Descriptor()
+}
+
+func (MenuItemResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[18]
+}
+
+func (x MenuItemResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *MenuItemResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = MenuItemResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use MenuItemResponse_Status.Descriptor instead.
+func (MenuItemResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{29, 0}
+}
+
+type RestartSessionResponse_Status int32
+
+const (
+	RestartSessionResponse_OK                RestartSessionResponse_Status = 0
+	RestartSessionResponse_SESSION_NOT_FOUND RestartSessionResponse_Status = 1
+	// Some sessions, such as tmux integration sessions, are not restartable.
+	// Also, when `only_if_exited` is set in the request and the session is still running then this
+	// status will be returned.
+	RestartSessionResponse_SESSION_NOT_RESTARTABLE RestartSessionResponse_Status = 2
+)
+
+// Enum value maps for RestartSessionResponse_Status.
+var (
+	RestartSessionResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "SESSION_NOT_FOUND",
+		2: "SESSION_NOT_RESTARTABLE",
+	}
+	RestartSessionResponse_Status_value = map[string]int32{
+		"OK":                      0,
+		"SESSION_NOT_FOUND":       1,
+		"SESSION_NOT_RESTARTABLE": 2,
+	}
+)
+
+func (x RestartSessionResponse_Status) Enum() *RestartSessionResponse_Status {
+	p := new(RestartSessionResponse_Status)
+	*p = x
+	return p
+}
+
+func (x RestartSessionResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RestartSessionResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[19].Descriptor()
+}
+
+func (RestartSessionResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[19]
+}
+
+func (x RestartSessionResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *RestartSessionResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = RestartSessionResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use RestartSessionResponse_Status.Descriptor instead.
+func (RestartSessionResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{31, 0}
+}
+
+type SavedArrangementRequest_Action int32
+
+const (
+	// Restore an existing arrangement with the given name
+	SavedArrangementRequest_RESTORE SavedArrangementRequest_Action = 0
+	// Save windows to a new arrangement with the given name
+	SavedArrangementRequest_SAVE SavedArrangementRequest_Action = 1
+	// List arrangements
+	SavedArrangementRequest_LIST SavedArrangementRequest_Action = 2
+)
+
+// Enum value maps for SavedArrangementRequest_Action.
+var (
+	SavedArrangementRequest_Action_name = map[int32]string{
+		0: "RESTORE",
+		1: "SAVE",
+		2: "LIST",
+	}
+	SavedArrangementRequest_Action_value = map[string]int32{
+		"RESTORE": 0,
+		"SAVE":    1,
+		"LIST":    2,
+	}
+)
+
+func (x SavedArrangementRequest_Action) Enum() *SavedArrangementRequest_Action {
+	p := new(SavedArrangementRequest_Action)
+	*p = x
+	return p
+}
+
+func (x SavedArrangementRequest_Action) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SavedArrangementRequest_Action) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[20].Descriptor()
+}
+
+func (SavedArrangementRequest_Action) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[20]
+}
+
+func (x SavedArrangementRequest_Action) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *SavedArrangementRequest_Action) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = SavedArrangementRequest_Action(num)
+	return nil
+}
+
+// Deprecated: Use SavedArrangementRequest_Action.Descriptor instead.
+func (SavedArrangementRequest_Action) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{38, 0}
+}
+
+type SavedArrangementResponse_Status int32
+
+const (
+	SavedArrangementResponse_OK                    SavedArrangementResponse_Status = 0
+	SavedArrangementResponse_ARRANGEMENT_NOT_FOUND SavedArrangementResponse_Status = 1 // Tried to restore, but name doesn't exist
+	SavedArrangementResponse_WINDOW_NOT_FOUND      SavedArrangementResponse_Status = 2 // Bad window ID provided
+	SavedArrangementResponse_REQUEST_MALFORMED     SavedArrangementResponse_Status = 3
+)
+
+// Enum value maps for SavedArrangementResponse_Status.
+var (
+	SavedArrangementResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "ARRANGEMENT_NOT_FOUND",
+		2: "WINDOW_NOT_FOUND",
+		3: "REQUEST_MALFORMED",
+	}
+	SavedArrangementResponse_Status_value = map[string]int32{
+		"OK":                    0,
+		"ARRANGEMENT_NOT_FOUND": 1,
+		"WINDOW_NOT_FOUND":      2,
+		"REQUEST_MALFORMED":     3,
+	}
+)
+
+func (x SavedArrangementResponse_Status) Enum() *SavedArrangementResponse_Status {
+	p := new(SavedArrangementResponse_Status)
+	*p = x
+	return p
+}
+
+func (x SavedArrangementResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SavedArrangementResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[21].Descriptor()
+}
+
+func (SavedArrangementResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[21]
+}
+
+func (x SavedArrangementResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *SavedArrangementResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = SavedArrangementResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use SavedArrangementResponse_Status.Descriptor instead.
+func (SavedArrangementResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{39, 0}
+}
+
+type VariableResponse_Status int32
+
+const (
+	VariableResponse_OK                   VariableResponse_Status = 0
+	VariableResponse_SESSION_NOT_FOUND    VariableResponse_Status = 1
+	VariableResponse_INVALID_NAME         VariableResponse_Status = 2 // Names you set must begin with "user."
+	VariableResponse_MISSING_SCOPE        VariableResponse_Status = 3 // None of the scope oneof fields was set
+	VariableResponse_TAB_NOT_FOUND        VariableResponse_Status = 4
+	VariableResponse_MULTI_GET_DISALLOWED VariableResponse_Status = 5
+	VariableResponse_WINDOW_NOT_FOUND     VariableResponse_Status = 6
+)
+
+// Enum value maps for VariableResponse_Status.
+var (
+	VariableResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "SESSION_NOT_FOUND",
+		2: "INVALID_NAME",
+		3: "MISSING_SCOPE",
+		4: "TAB_NOT_FOUND",
+		5: "MULTI_GET_DISALLOWED",
+		6: "WINDOW_NOT_FOUND",
+	}
+	VariableResponse_Status_value = map[string]int32{
+		"OK":                   0,
+		"SESSION_NOT_FOUND":    1,
+		"INVALID_NAME":         2,
+		"MISSING_SCOPE":        3,
+		"TAB_NOT_FOUND":        4,
+		"MULTI_GET_DISALLOWED": 5,
+		"WINDOW_NOT_FOUND":     6,
+	}
+)
+
+func (x VariableResponse_Status) Enum() *VariableResponse_Status {
+	p := new(VariableResponse_Status)
+	*p = x
+	return p
+}
+
+func (x VariableResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (VariableResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[22].Descriptor()
+}
+
+func (VariableResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[22]
+}
+
+func (x VariableResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *VariableResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = VariableResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use VariableResponse_Status.Descriptor instead.
+func (VariableResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{41, 0}
+}
+
+type ActivateResponse_Status int32
+
+const (
+	ActivateResponse_OK             ActivateResponse_Status = 0
+	ActivateResponse_BAD_IDENTIFIER ActivateResponse_Status = 1
+	ActivateResponse_INVALID_OPTION ActivateResponse_Status = 2
+)
+
+// Enum value maps for ActivateResponse_Status.
+var (
+	ActivateResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "BAD_IDENTIFIER",
+		2: "INVALID_OPTION",
+	}
+	ActivateResponse_Status_value = map[string]int32{
+		"OK":             0,
+		"BAD_IDENTIFIER": 1,
+		"INVALID_OPTION": 2,
+	}
+)
+
+func (x ActivateResponse_Status) Enum() *ActivateResponse_Status {
+	p := new(ActivateResponse_Status)
+	*p = x
+	return p
+}
+
+func (x ActivateResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ActivateResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[23].Descriptor()
+}
+
+func (ActivateResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[23]
+}
+
+func (x ActivateResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *ActivateResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = ActivateResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use ActivateResponse_Status.Descriptor instead.
+func (ActivateResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{43, 0}
+}
+
+type InjectResponse_Status int32
+
+const (
+	InjectResponse_OK                InjectResponse_Status = 0
+	InjectResponse_SESSION_NOT_FOUND InjectResponse_Status = 1
+)
+
+// Enum value maps for InjectResponse_Status.
+var (
+	InjectResponse_Status_name = map[int32]string{
 		0: "OK",
 		1: "SESSION_NOT_FOUND",
 	}
-	SendTextResponse_Status_value = map[string]int32{
+	InjectResponse_Status_value = map[string]int32{
 		"OK":                0,
 		"SESSION_NOT_FOUND": 1,
 	}
 )
 
-func (x SendTextResponse_Status) Enum() *SendTextResponse_Status {
-	p := new(SendTextResponse_Status)
+func (x InjectResponse_Status) Enum() *InjectResponse_Status {
+	p := new(InjectResponse_Status)
 	*p = x
 	return p
 }
 
-func (x SendTextResponse_Status) String() string {
+func (x InjectResponse_Status) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (SendTextResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[6].Descriptor()
+func (InjectResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[24].Descriptor()
 }
 
-func (SendTextResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[6]
+func (InjectResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[24]
 }
 
-func (x SendTextResponse_Status) Number() protoreflect.EnumNumber {
+func (x InjectResponse_Status) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *SendTextResponse_Status) UnmarshalJSON(b []byte) error {
+func (x *InjectResponse_Status) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = SendTextResponse_Status(num)
+	*x = InjectResponse_Status(num)
 	return nil
 }
 
-// Deprecated: Use SendTextResponse_Status.Descriptor instead.
-func (SendTextResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{22, 0}
+// Deprecated: Use InjectResponse_Status.Descriptor instead.
+func (InjectResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{45, 0}
 }
 
-type CreateTabResponse_Status int32
+type GetPropertyResponse_Status int32
 
 const (
-	CreateTabResponse_OK                   CreateTabResponse_Status = 0
-	CreateTabResponse_INVALID_PROFILE_NAME CreateTabResponse_Status = 1
-	CreateTabResponse_INVALID_WINDOW_ID    CreateTabResponse_Status = 2
-	// The tab is still created, just not with the desired index.
-	CreateTabResponse_INVALID_TAB_INDEX CreateTabResponse_Status = 3
-	// A $$VAR$$ substitution was not provided by the user.
-	CreateTabResponse_MISSING_SUBSTITUTION CreateTabResponse_Status = 4
+	GetPropertyResponse_OK                GetPropertyResponse_Status = 0
+	GetPropertyResponse_UNRECOGNIZED_NAME GetPropertyResponse_Status = 1
+	GetPropertyResponse_INVALID_TARGET    GetPropertyResponse_Status = 2
 )
 
-// Enum value maps for CreateTabResponse_Status.
+// Enum value maps for GetPropertyResponse_Status.
 var (
-	CreateTabResponse_Status_name = map[int32]string{
+	GetPropertyResponse_Status_name = map[int32]string{
 		0: "OK",
-		1: "INVALID_PROFILE_NAME",
-		2: "INVALID_WINDOW_ID",
-		3: "INVALID_TAB_INDEX",
-		4: "MISSING_SUBSTITUTION",
+		1: "UNRECOGNIZED_NAME",
+		2: "INVALID_TARGET",
 	}
-	CreateTabResponse_Status_value = map[string]int32{
-		"OK":                   0,
-		"INVALID_PROFILE_NAME": 1,
-		"INVALID_WINDOW_ID":    2,
-		"INVALID_TAB_INDEX":    3,
-		"MISSING_SUBSTITUTION": 4,
+	GetPropertyResponse_Status_value = map[string]int32{
+		"OK":                0,
+		"UNRECOGNIZED_NAME": 1,
+		"INVALID_TARGET":    2,
 	}
 )
 
-func (x CreateTabResponse_Status) Enum() *CreateTabResponse_Status {
-	p := new(CreateTabResponse_Status)
+func (x GetPropertyResponse_Status) Enum() *GetPropertyResponse_Status {
+	p := new(GetPropertyResponse_Status)
 	*p = x
 	return p
 }
 
-func (x CreateTabResponse_Status) String() string {
+func (x GetPropertyResponse_Status) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (CreateTabResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[7].Descriptor()
+func (GetPropertyResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[25].Descriptor()
 }
 
-func (CreateTabResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[7]
+func (GetPropertyResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[25]
 }
 
-func (x CreateTabResponse_Status) Number() protoreflect.EnumNumber {
+func (x GetPropertyResponse_Status) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *CreateTabResponse_Status) UnmarshalJSON(b []byte) error {
+func (x *GetPropertyResponse_Status) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = CreateTabResponse_Status(num)
+	*x = GetPropertyResponse_Status(num)
 	return nil
 }
 
-// Deprecated: Use CreateTabResponse_Status.Descriptor instead.
-func (CreateTabResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{25, 0}
+// Deprecated: Use GetPropertyResponse_Status.Descriptor instead.
+func (GetPropertyResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{47, 0}
 }
 
-type KeystrokeNotification_Action int32
+type SetPropertyResponse_Status int32
 
 const (
-	// These are used for non-modifier keys.
-	KeystrokeNotification_KEY_DOWN KeystrokeNotification_Action = 0
-	KeystrokeNotification_KEY_UP   KeystrokeNotification_Action = 1 // requires advanced=true in request
-	// This is used when only a modifier changes.
-	KeystrokeNotification_FLAGS_CHANGED KeystrokeNotification_Action = 2 // requires advanced=true in request
+	SetPropertyResponse_OK                SetPropertyResponse_Status = 0
+	SetPropertyResponse_UNRECOGNIZED_NAME SetPropertyResponse_Status = 1
+	SetPropertyResponse_INVALID_VALUE     SetPropertyResponse_Status = 2 // e.g., bad JSON value
+	SetPropertyResponse_INVALID_TARGET    SetPropertyResponse_Status = 3 // e.g., bogus window_id
+	SetPropertyResponse_DEFERRED          SetPropertyResponse_Status = 4 // Operation can't be performed immediately. Will be tried later. For example, resizing a session during instant replay.
+	SetPropertyResponse_IMPOSSIBLE        SetPropertyResponse_Status = 5 // Can't be done. For example, resizing a session in a full-screen window.
+	SetPropertyResponse_FAILED            SetPropertyResponse_Status = 6 // Did our best and failed. For example, sometimes toggling full-screen fails if another window is also toggling. Maybe try again?
 )
 
-// Enum value maps for KeystrokeNotification_Action.
+// Enum value maps for SetPropertyResponse_Status.
 var (
-	KeystrokeNotification_Action_name = map[int32]string{
-		0: "KEY_DOWN",
-		1: "KEY_UP",
-		2: "FLAGS_CHANGED",
-	}
-	KeystrokeNotification_Action_value = map[string]int32{
-		"KEY_DOWN":      0,
-		"KEY_UP":        1,
-		"FLAGS_CHANGED": 2,
-	}
-)
-
-func (x KeystrokeNotification_Action) Enum() *KeystrokeNotification_Action {
-	p := new(KeystrokeNotification_Action)
-	*p = x
-	return p
-}
-
-func (x KeystrokeNotification_Action) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (KeystrokeNotification_Action) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[8].Descriptor()
-}
-
-func (KeystrokeNotification_Action) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[8]
-}
-
-func (x KeystrokeNotification_Action) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *KeystrokeNotification_Action) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = KeystrokeNotification_Action(num)
-	return nil
-}
-
-// Deprecated: Use KeystrokeNotification_Action.Descriptor instead.
-func (KeystrokeNotification_Action) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{27, 0}
-}
-
-type GetPromptResponse_Status int32
-
-const (
-	GetPromptResponse_OK                 GetPromptResponse_Status = 0
-	GetPromptResponse_SESSION_NOT_FOUND  GetPromptResponse_Status = 1
-	GetPromptResponse_REQUEST_MALFORMED  GetPromptResponse_Status = 2
-	GetPromptResponse_PROMPT_UNAVAILABLE GetPromptResponse_Status = 3
-)
-
-// Enum value maps for GetPromptResponse_Status.
-var (
-	GetPromptResponse_Status_name = map[int32]string{
+	SetPropertyResponse_Status_name = map[int32]string{
 		0: "OK",
-		1: "SESSION_NOT_FOUND",
-		2: "REQUEST_MALFORMED",
-		3: "PROMPT_UNAVAILABLE",
+		1: "UNRECOGNIZED_NAME",
+		2: "INVALID_VALUE",
+		3: "INVALID_TARGET",
+		4: "DEFERRED",
+		5: "IMPOSSIBLE",
+		6: "FAILED",
 	}
-	GetPromptResponse_Status_value = map[string]int32{
-		"OK":                 0,
-		"SESSION_NOT_FOUND":  1,
-		"REQUEST_MALFORMED":  2,
-		"PROMPT_UNAVAILABLE": 3,
+	SetPropertyResponse_Status_value = map[string]int32{
+		"OK":                0,
+		"UNRECOGNIZED_NAME": 1,
+		"INVALID_VALUE":     2,
+		"INVALID_TARGET":    3,
+		"DEFERRED":          4,
+		"IMPOSSIBLE":        5,
+		"FAILED":            6,
 	}
 )
 
-func (x GetPromptResponse_Status) Enum() *GetPromptResponse_Status {
-	p := new(GetPromptResponse_Status)
+func (x SetPropertyResponse_Status) Enum() *SetPropertyResponse_Status {
+	p := new(SetPropertyResponse_Status)
 	*p = x
 	return p
 }
 
-func (x GetPromptResponse_Status) String() string {
+func (x SetPropertyResponse_Status) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (GetPromptResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[9].Descriptor()
+func (SetPropertyResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[26].Descriptor()
 }
 
-func (GetPromptResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[9]
+func (SetPropertyResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[26]
 }
 
-func (x GetPromptResponse_Status) Number() protoreflect.EnumNumber {
+func (x SetPropertyResponse_Status) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *GetPromptResponse_Status) UnmarshalJSON(b []byte) error {
+func (x *SetPropertyResponse_Status) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = GetPromptResponse_Status(num)
+	*x = SetPropertyResponse_Status(num)
 	return nil
 }
 
-// Deprecated: Use GetPromptResponse_Status.Descriptor instead.
-func (GetPromptResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{29, 0}
+// Deprecated: Use SetPropertyResponse_Status.Descriptor instead.
+func (SetPropertyResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{49, 0}
 }
 
-type GetPromptResponse_State int32
+type RegisterToolRequest_ToolType int32
 
 const (
-	GetPromptResponse_EDITING  GetPromptResponse_State = 0 // Command hasn't been started yet
-	GetPromptResponse_RUNNING  GetPromptResponse_State = 1 // Command is currently running
-	GetPromptResponse_FINISHED GetPromptResponse_State = 2 // Command has finished.
+	RegisterToolRequest_WEB_VIEW_TOOL RegisterToolRequest_ToolType = 1
 )
 
-// Enum value maps for GetPromptResponse_State.
+// Enum value maps for RegisterToolRequest_ToolType.
 var (
-	GetPromptResponse_State_name = map[int32]string{
-		0: "EDITING",
-		1: "RUNNING",
-		2: "FINISHED",
+	RegisterToolRequest_ToolType_name = map[int32]string{
+		1: "WEB_VIEW_TOOL",
 	}
-	GetPromptResponse_State_value = map[string]int32{
-		"EDITING":  0,
-		"RUNNING":  1,
-		"FINISHED": 2,
+	RegisterToolRequest_ToolType_value = map[string]int32{
+		"WEB_VIEW_TOOL": 1,
 	}
 )
 
-func (x GetPromptResponse_State) Enum() *GetPromptResponse_State {
-	p := new(GetPromptResponse_State)
+func (x RegisterToolRequest_ToolType) Enum() *RegisterToolRequest_ToolType {
+	p := new(RegisterToolRequest_ToolType)
 	*p = x
 	return p
 }
 
-func (x GetPromptResponse_State) String() string {
+func (x RegisterToolRequest_ToolType) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (GetPromptResponse_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[10].Descriptor()
+func (RegisterToolRequest_ToolType) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[27].Descriptor()
 }
 
-func (GetPromptResponse_State) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[10]
+func (RegisterToolRequest_ToolType) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[27]
 }
 
-func (x GetPromptResponse_State) Number() protoreflect.EnumNumber {
+func (x RegisterToolRequest_ToolType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *GetPromptResponse_State) UnmarshalJSON(b []byte) error {
+func (x *RegisterToolRequest_ToolType) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = GetPromptResponse_State(num)
+	*x = RegisterToolRequest_ToolType(num)
 	return nil
 }
 
-// Deprecated: Use GetPromptResponse_State.Descriptor instead.
-func (GetPromptResponse_State) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{29, 1}
+// Deprecated: Use RegisterToolRequest_ToolType.Descriptor instead.
+func (RegisterToolRequest_ToolType) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{50, 0}
 }
 
-type FocusChangedNotification_Window_WindowStatus int32
+type RPCRegistrationRequest_Role int32
 
 const (
-	// `window_id` became key
-	FocusChangedNotification_Window_TERMINAL_WINDOW_BECAME_KEY FocusChangedNotification_Window_WindowStatus = 0
-	// `window_id` is not key, but is the current terminal window. Some other non-terminal window is key.
-	FocusChangedNotification_Window_TERMINAL_WINDOW_IS_CURRENT FocusChangedNotification_Window_WindowStatus = 1
-	// `window_id` is no longer key.
-	FocusChangedNotification_Window_TERMINAL_WINDOW_RESIGNED_KEY FocusChangedNotification_Window_WindowStatus = 2
+	RPCRegistrationRequest_GENERIC              RPCRegistrationRequest_Role = 1
+	RPCRegistrationRequest_SESSION_TITLE        RPCRegistrationRequest_Role = 2
+	RPCRegistrationRequest_STATUS_BAR_COMPONENT RPCRegistrationRequest_Role = 3
+	RPCRegistrationRequest_CONTEXT_MENU         RPCRegistrationRequest_Role = 4
 )
 
-// Enum value maps for FocusChangedNotification_Window_WindowStatus.
+// Enum value maps for RPCRegistrationRequest_Role.
 var (
-	FocusChangedNotification_Window_WindowStatus_name = map[int32]string{
-		0: "TERMINAL_WINDOW_BECAME_KEY",
-		1: "TERMINAL_WINDOW_IS_CURRENT",
-		2: "TERMINAL_WINDOW_RESIGNED_KEY",
+	RPCRegistrationRequest_Role_name = map[int32]string{
+		1: "GENERIC",
+		2: "SESSION_TITLE",
+		3: "STATUS_BAR_COMPONENT",
+		4: "CONTEXT_MENU",
 	}
-	FocusChangedNotification_Window_WindowStatus_value = map[string]int32{
-		"TERMINAL_WINDOW_BECAME_KEY":   0,
-		"TERMINAL_WINDOW_IS_CURRENT":   1,
-		"TERMINAL_WINDOW_RESIGNED_KEY": 2,
+	RPCRegistrationRequest_Role_value = map[string]int32{
+		"GENERIC":              1,
+		"SESSION_TITLE":        2,
+		"STATUS_BAR_COMPONENT": 3,
+		"CONTEXT_MENU":         4,
 	}
 )
 
-func (x FocusChangedNotification_Window_WindowStatus) Enum() *FocusChangedNotification_Window_WindowStatus {
-	p := new(FocusChangedNotification_Window_WindowStatus)
+func (x RPCRegistrationRequest_Role) Enum() *RPCRegistrationRequest_Role {
+	p := new(RPCRegistrationRequest_Role)
 	*p = x
 	return p
 }
 
-func (x FocusChangedNotification_Window_WindowStatus) String() string {
+func (x RPCRegistrationRequest_Role) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (FocusChangedNotification_Window_WindowStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[11].Descriptor()
+func (RPCRegistrationRequest_Role) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[28].Descriptor()
 }
 
-func (FocusChangedNotification_Window_WindowStatus) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[11]
+func (RPCRegistrationRequest_Role) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[28]
 }
 
-func (x FocusChangedNotification_Window_WindowStatus) Number() protoreflect.EnumNumber {
+func (x RPCRegistrationRequest_Role) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *FocusChangedNotification_Window_WindowStatus) UnmarshalJSON(b []byte) error {
+func (x *RPCRegistrationRequest_Role) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = FocusChangedNotification_Window_WindowStatus(num)
+	*x = RPCRegistrationRequest_Role(num)
 	return nil
 }
 
-// Deprecated: Use FocusChangedNotification_Window_WindowStatus.Descriptor instead.
-func (FocusChangedNotification_Window_WindowStatus) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{37, 0, 0}
+// Deprecated: Use RPCRegistrationRequest_Role.Descriptor instead.
+func (RPCRegistrationRequest_Role) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51, 0}
 }
 
-type TransactionResponse_Status int32
+type RPCRegistrationRequest_StatusBarComponentAttributes_Format int32
 
 const (
-	TransactionResponse_OK                     TransactionResponse_Status = 0
-	TransactionResponse_NO_TRANSACTION         TransactionResponse_Status = 1
-	TransactionResponse_ALREADY_IN_TRANSACTION TransactionResponse_Status = 2
+	RPCRegistrationRequest_StatusBarComponentAttributes_PLAIN_TEXT RPCRegistrationRequest_StatusBarComponentAttributes_Format = 0
+	RPCRegistrationRequest_StatusBarComponentAttributes_HTML       RPCRegistrationRequest_StatusBarComponentAttributes_Format = 1
 )
 
-// Enum value maps for TransactionResponse_Status.
+// Enum value maps for RPCRegistrationRequest_StatusBarComponentAttributes_Format.
 var (
-	TransactionResponse_Status_name = map[int32]string{
+	RPCRegistrationRequest_StatusBarComponentAttributes_Format_name = map[int32]string{
+		0: "PLAIN_TEXT",
+		1: "HTML",
+	}
+	RPCRegistrationRequest_StatusBarComponentAttributes_Format_value = map[string]int32{
+		"PLAIN_TEXT": 0,
+		"HTML":       1,
+	}
+)
+
+func (x RPCRegistrationRequest_StatusBarComponentAttributes_Format) Enum() *RPCRegistrationRequest_StatusBarComponentAttributes_Format {
+	p := new(RPCRegistrationRequest_StatusBarComponentAttributes_Format)
+	*p = x
+	return p
+}
+
+func (x RPCRegistrationRequest_StatusBarComponentAttributes_Format) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RPCRegistrationRequest_StatusBarComponentAttributes_Format) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[29].Descriptor()
+}
+
+func (RPCRegistrationRequest_StatusBarComponentAttributes_Format) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[29]
+}
+
+func (x RPCRegistrationRequest_StatusBarComponentAttributes_Format) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Format) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = RPCRegistrationRequest_StatusBarComponentAttributes_Format(num)
+	return nil
+}
+
+// Deprecated: Use RPCRegistrationRequest_StatusBarComponentAttributes_Format.Descriptor instead.
+func (RPCRegistrationRequest_StatusBarComponentAttributes_Format) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51, 3, 0}
+}
+
+type RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type int32
+
+const (
+	RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Checkbox              RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type = 1
+	RPCRegistrationRequest_StatusBarComponentAttributes_Knob_String                RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type = 2
+	RPCRegistrationRequest_StatusBarComponentAttributes_Knob_PositiveFloatingPoint RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type = 3
+	RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Color                 RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type = 4
+)
+
+// Enum value maps for RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type.
+var (
+	RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type_name = map[int32]string{
+		1: "Checkbox",
+		2: "String",
+		3: "PositiveFloatingPoint",
+		4: "Color",
+	}
+	RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type_value = map[string]int32{
+		"Checkbox":              1,
+		"String":                2,
+		"PositiveFloatingPoint": 3,
+		"Color":                 4,
+	}
+)
+
+func (x RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type) Enum() *RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type {
+	p := new(RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type)
+	*p = x
+	return p
+}
+
+func (x RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[30].Descriptor()
+}
+
+func (RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[30]
+}
+
+func (x RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type(num)
+	return nil
+}
+
+// Deprecated: Use RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type.Descriptor instead.
+func (RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51, 3, 0, 0}
+}
+
+type RegisterToolResponse_Status int32
+
+const (
+	RegisterToolResponse_OK                RegisterToolResponse_Status = 0
+	RegisterToolResponse_REQUEST_MALFORMED RegisterToolResponse_Status = 1
+	RegisterToolResponse_PERMISSION_DENIED RegisterToolResponse_Status = 2
+)
+
+// Enum value maps for RegisterToolResponse_Status.
+var (
+	RegisterToolResponse_Status_name = map[int32]string{
 		0: "OK",
-		1: "NO_TRANSACTION",
-		2: "ALREADY_IN_TRANSACTION",
+		1: "REQUEST_MALFORMED",
+		2: "PERMISSION_DENIED",
 	}
-	TransactionResponse_Status_value = map[string]int32{
-		"OK":                     0,
-		"NO_TRANSACTION":         1,
-		"ALREADY_IN_TRANSACTION": 2,
+	RegisterToolResponse_Status_value = map[string]int32{
+		"OK":                0,
+		"REQUEST_MALFORMED": 1,
+		"PERMISSION_DENIED": 2,
 	}
 )
 
-func (x TransactionResponse_Status) Enum() *TransactionResponse_Status {
-	p := new(TransactionResponse_Status)
+func (x RegisterToolResponse_Status) Enum() *RegisterToolResponse_Status {
+	p := new(RegisterToolResponse_Status)
 	*p = x
 	return p
 }
 
-func (x TransactionResponse_Status) String() string {
+func (x RegisterToolResponse_Status) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (TransactionResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[12].Descriptor()
+func (RegisterToolResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[31].Descriptor()
 }
 
-func (TransactionResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[12]
+func (RegisterToolResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[31]
 }
 
-func (x TransactionResponse_Status) Number() protoreflect.EnumNumber {
+func (x RegisterToolResponse_Status) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *TransactionResponse_Status) UnmarshalJSON(b []byte) error {
+func (x *RegisterToolResponse_Status) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = TransactionResponse_Status(num)
+	*x = RegisterToolResponse_Status(num)
 	return nil
 }
 
-// Deprecated: Use TransactionResponse_Status.Descriptor instead.
-func (TransactionResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{48, 0}
+// Deprecated: Use RegisterToolResponse_Status.Descriptor instead.
+func (RegisterToolResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{52, 0}
 }
 
 type NotificationResponse_Status int32
@@ -867,11 +2056,11 @@ func (x NotificationResponse_Status) String() string {
 }
 
 func (NotificationResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[13].Descriptor()
+	return file_api_proto_enumTypes[32].Descriptor()
 }
 
 func (NotificationResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[13]
+	return &file_api_proto_enumTypes[32]
 }
 
 func (x NotificationResponse_Status) Number() protoreflect.EnumNumber {
@@ -890,128 +2079,369 @@ func (x *NotificationResponse_Status) UnmarshalJSON(b []byte) error {
 
 // Deprecated: Use NotificationResponse_Status.Descriptor instead.
 func (NotificationResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{50, 0}
+	return file_api_proto_rawDescGZIP(), []int{60, 0}
 }
 
-type RegisterToolResponse_Status int32
+type KeystrokeNotification_Action int32
 
 const (
-	RegisterToolResponse_OK                RegisterToolResponse_Status = 0
-	RegisterToolResponse_REQUEST_MALFORMED RegisterToolResponse_Status = 1
-	RegisterToolResponse_PERMISSION_DENIED RegisterToolResponse_Status = 2
+	// These are used for non-modifier keys.
+	KeystrokeNotification_KEY_DOWN KeystrokeNotification_Action = 0
+	KeystrokeNotification_KEY_UP   KeystrokeNotification_Action = 1 // requires advanced=true in request
+	// This is used when only a modifier changes.
+	KeystrokeNotification_FLAGS_CHANGED KeystrokeNotification_Action = 2 // requires advanced=true in request
 )
 
-// Enum value maps for RegisterToolResponse_Status.
+// Enum value maps for KeystrokeNotification_Action.
 var (
-	RegisterToolResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "REQUEST_MALFORMED",
-		2: "PERMISSION_DENIED",
+	KeystrokeNotification_Action_name = map[int32]string{
+		0: "KEY_DOWN",
+		1: "KEY_UP",
+		2: "FLAGS_CHANGED",
 	}
-	RegisterToolResponse_Status_value = map[string]int32{
-		"OK":                0,
-		"REQUEST_MALFORMED": 1,
-		"PERMISSION_DENIED": 2,
+	KeystrokeNotification_Action_value = map[string]int32{
+		"KEY_DOWN":      0,
+		"KEY_UP":        1,
+		"FLAGS_CHANGED": 2,
 	}
 )
 
-func (x RegisterToolResponse_Status) Enum() *RegisterToolResponse_Status {
-	p := new(RegisterToolResponse_Status)
+func (x KeystrokeNotification_Action) Enum() *KeystrokeNotification_Action {
+	p := new(KeystrokeNotification_Action)
 	*p = x
 	return p
 }
 
-func (x RegisterToolResponse_Status) String() string {
+func (x KeystrokeNotification_Action) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (RegisterToolResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[14].Descriptor()
+func (KeystrokeNotification_Action) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[33].Descriptor()
 }
 
-func (RegisterToolResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[14]
+func (KeystrokeNotification_Action) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[33]
 }
 
-func (x RegisterToolResponse_Status) Number() protoreflect.EnumNumber {
+func (x KeystrokeNotification_Action) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *RegisterToolResponse_Status) UnmarshalJSON(b []byte) error {
+func (x *KeystrokeNotification_Action) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = RegisterToolResponse_Status(num)
+	*x = KeystrokeNotification_Action(num)
 	return nil
 }
 
-// Deprecated: Use RegisterToolResponse_Status.Descriptor instead.
-func (RegisterToolResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{52, 0}
+// Deprecated: Use KeystrokeNotification_Action.Descriptor instead.
+func (KeystrokeNotification_Action) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{67, 0}
 }
 
-type SetProfilePropertyResponse_Status int32
+type FocusChangedNotification_Window_WindowStatus int32
 
 const (
-	SetProfilePropertyResponse_OK                SetProfilePropertyResponse_Status = 0
-	SetProfilePropertyResponse_SESSION_NOT_FOUND SetProfilePropertyResponse_Status = 1
-	SetProfilePropertyResponse_REQUEST_MALFORMED SetProfilePropertyResponse_Status = 2
-	SetProfilePropertyResponse_BAD_GUID          SetProfilePropertyResponse_Status = 3
+	// `window_id` became key
+	FocusChangedNotification_Window_TERMINAL_WINDOW_BECAME_KEY FocusChangedNotification_Window_WindowStatus = 0
+	// `window_id` is not key, but is the current terminal window. Some other non-terminal window is key.
+	FocusChangedNotification_Window_TERMINAL_WINDOW_IS_CURRENT FocusChangedNotification_Window_WindowStatus = 1
+	// `window_id` is no longer key.
+	FocusChangedNotification_Window_TERMINAL_WINDOW_RESIGNED_KEY FocusChangedNotification_Window_WindowStatus = 2
 )
 
-// Enum value maps for SetProfilePropertyResponse_Status.
+// Enum value maps for FocusChangedNotification_Window_WindowStatus.
 var (
-	SetProfilePropertyResponse_Status_name = map[int32]string{
+	FocusChangedNotification_Window_WindowStatus_name = map[int32]string{
+		0: "TERMINAL_WINDOW_BECAME_KEY",
+		1: "TERMINAL_WINDOW_IS_CURRENT",
+		2: "TERMINAL_WINDOW_RESIGNED_KEY",
+	}
+	FocusChangedNotification_Window_WindowStatus_value = map[string]int32{
+		"TERMINAL_WINDOW_BECAME_KEY":   0,
+		"TERMINAL_WINDOW_IS_CURRENT":   1,
+		"TERMINAL_WINDOW_RESIGNED_KEY": 2,
+	}
+)
+
+func (x FocusChangedNotification_Window_WindowStatus) Enum() *FocusChangedNotification_Window_WindowStatus {
+	p := new(FocusChangedNotification_Window_WindowStatus)
+	*p = x
+	return p
+}
+
+func (x FocusChangedNotification_Window_WindowStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FocusChangedNotification_Window_WindowStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[34].Descriptor()
+}
+
+func (FocusChangedNotification_Window_WindowStatus) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[34]
+}
+
+func (x FocusChangedNotification_Window_WindowStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *FocusChangedNotification_Window_WindowStatus) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = FocusChangedNotification_Window_WindowStatus(num)
+	return nil
+}
+
+// Deprecated: Use FocusChangedNotification_Window_WindowStatus.Descriptor instead.
+func (FocusChangedNotification_Window_WindowStatus) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{76, 0, 0}
+}
+
+type GetBufferResponse_Status int32
+
+const (
+	GetBufferResponse_OK                 GetBufferResponse_Status = 0
+	GetBufferResponse_SESSION_NOT_FOUND  GetBufferResponse_Status = 1
+	GetBufferResponse_INVALID_LINE_RANGE GetBufferResponse_Status = 2
+	GetBufferResponse_REQUEST_MALFORMED  GetBufferResponse_Status = 3
+)
+
+// Enum value maps for GetBufferResponse_Status.
+var (
+	GetBufferResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "SESSION_NOT_FOUND",
+		2: "INVALID_LINE_RANGE",
+		3: "REQUEST_MALFORMED",
+	}
+	GetBufferResponse_Status_value = map[string]int32{
+		"OK":                 0,
+		"SESSION_NOT_FOUND":  1,
+		"INVALID_LINE_RANGE": 2,
+		"REQUEST_MALFORMED":  3,
+	}
+)
+
+func (x GetBufferResponse_Status) Enum() *GetBufferResponse_Status {
+	p := new(GetBufferResponse_Status)
+	*p = x
+	return p
+}
+
+func (x GetBufferResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (GetBufferResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[35].Descriptor()
+}
+
+func (GetBufferResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[35]
+}
+
+func (x GetBufferResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *GetBufferResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = GetBufferResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use GetBufferResponse_Status.Descriptor instead.
+func (GetBufferResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{80, 0}
+}
+
+type GetPromptResponse_Status int32
+
+const (
+	GetPromptResponse_OK                 GetPromptResponse_Status = 0
+	GetPromptResponse_SESSION_NOT_FOUND  GetPromptResponse_Status = 1
+	GetPromptResponse_REQUEST_MALFORMED  GetPromptResponse_Status = 2
+	GetPromptResponse_PROMPT_UNAVAILABLE GetPromptResponse_Status = 3
+)
+
+// Enum value maps for GetPromptResponse_Status.
+var (
+	GetPromptResponse_Status_name = map[int32]string{
 		0: "OK",
 		1: "SESSION_NOT_FOUND",
 		2: "REQUEST_MALFORMED",
-		3: "BAD_GUID",
+		3: "PROMPT_UNAVAILABLE",
 	}
-	SetProfilePropertyResponse_Status_value = map[string]int32{
-		"OK":                0,
-		"SESSION_NOT_FOUND": 1,
-		"REQUEST_MALFORMED": 2,
-		"BAD_GUID":          3,
+	GetPromptResponse_Status_value = map[string]int32{
+		"OK":                 0,
+		"SESSION_NOT_FOUND":  1,
+		"REQUEST_MALFORMED":  2,
+		"PROMPT_UNAVAILABLE": 3,
 	}
 )
 
-func (x SetProfilePropertyResponse_Status) Enum() *SetProfilePropertyResponse_Status {
-	p := new(SetProfilePropertyResponse_Status)
+func (x GetPromptResponse_Status) Enum() *GetPromptResponse_Status {
+	p := new(GetPromptResponse_Status)
 	*p = x
 	return p
 }
 
-func (x SetProfilePropertyResponse_Status) String() string {
+func (x GetPromptResponse_Status) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (SetProfilePropertyResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[15].Descriptor()
+func (GetPromptResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[36].Descriptor()
 }
 
-func (SetProfilePropertyResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[15]
+func (GetPromptResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[36]
 }
 
-func (x SetProfilePropertyResponse_Status) Number() protoreflect.EnumNumber {
+func (x GetPromptResponse_Status) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Deprecated: Do not use.
-func (x *SetProfilePropertyResponse_Status) UnmarshalJSON(b []byte) error {
+func (x *GetPromptResponse_Status) UnmarshalJSON(b []byte) error {
 	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
 	if err != nil {
 		return err
 	}
-	*x = SetProfilePropertyResponse_Status(num)
+	*x = GetPromptResponse_Status(num)
 	return nil
 }
 
-// Deprecated: Use SetProfilePropertyResponse_Status.Descriptor instead.
-func (SetProfilePropertyResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{54, 0}
+// Deprecated: Use GetPromptResponse_Status.Descriptor instead.
+func (GetPromptResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{82, 0}
+}
+
+type GetPromptResponse_State int32
+
+const (
+	GetPromptResponse_EDITING  GetPromptResponse_State = 0 // Command hasn't been started yet
+	GetPromptResponse_RUNNING  GetPromptResponse_State = 1 // Command is currently running
+	GetPromptResponse_FINISHED GetPromptResponse_State = 2 // Command has finished.
+)
+
+// Enum value maps for GetPromptResponse_State.
+var (
+	GetPromptResponse_State_name = map[int32]string{
+		0: "EDITING",
+		1: "RUNNING",
+		2: "FINISHED",
+	}
+	GetPromptResponse_State_value = map[string]int32{
+		"EDITING":  0,
+		"RUNNING":  1,
+		"FINISHED": 2,
+	}
+)
+
+func (x GetPromptResponse_State) Enum() *GetPromptResponse_State {
+	p := new(GetPromptResponse_State)
+	*p = x
+	return p
+}
+
+func (x GetPromptResponse_State) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (GetPromptResponse_State) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[37].Descriptor()
+}
+
+func (GetPromptResponse_State) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[37]
+}
+
+func (x GetPromptResponse_State) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *GetPromptResponse_State) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = GetPromptResponse_State(num)
+	return nil
+}
+
+// Deprecated: Use GetPromptResponse_State.Descriptor instead.
+func (GetPromptResponse_State) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{82, 1}
+}
+
+type ListPromptsResponse_Status int32
+
+const (
+	ListPromptsResponse_OK                ListPromptsResponse_Status = 0
+	ListPromptsResponse_SESSION_NOT_FOUND ListPromptsResponse_Status = 1
+)
+
+// Enum value maps for ListPromptsResponse_Status.
+var (
+	ListPromptsResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "SESSION_NOT_FOUND",
+	}
+	ListPromptsResponse_Status_value = map[string]int32{
+		"OK":                0,
+		"SESSION_NOT_FOUND": 1,
+	}
+)
+
+func (x ListPromptsResponse_Status) Enum() *ListPromptsResponse_Status {
+	p := new(ListPromptsResponse_Status)
+	*p = x
+	return p
+}
+
+func (x ListPromptsResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ListPromptsResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[38].Descriptor()
+}
+
+func (ListPromptsResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[38]
+}
+
+func (x ListPromptsResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *ListPromptsResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = ListPromptsResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use ListPromptsResponse_Status.Descriptor instead.
+func (ListPromptsResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{84, 0}
 }
 
 type GetProfilePropertyResponse_Status int32
@@ -1050,11 +2480,11 @@ func (x GetProfilePropertyResponse_Status) String() string {
 }
 
 func (GetProfilePropertyResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[16].Descriptor()
+	return file_api_proto_enumTypes[39].Descriptor()
 }
 
 func (GetProfilePropertyResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[16]
+	return &file_api_proto_enumTypes[39]
 }
 
 func (x GetProfilePropertyResponse_Status) Number() protoreflect.EnumNumber {
@@ -1073,7 +2503,310 @@ func (x *GetProfilePropertyResponse_Status) UnmarshalJSON(b []byte) error {
 
 // Deprecated: Use GetProfilePropertyResponse_Status.Descriptor instead.
 func (GetProfilePropertyResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{56, 0}
+	return file_api_proto_rawDescGZIP(), []int{87, 0}
+}
+
+type SetProfilePropertyResponse_Status int32
+
+const (
+	SetProfilePropertyResponse_OK                SetProfilePropertyResponse_Status = 0
+	SetProfilePropertyResponse_SESSION_NOT_FOUND SetProfilePropertyResponse_Status = 1
+	SetProfilePropertyResponse_REQUEST_MALFORMED SetProfilePropertyResponse_Status = 2
+	SetProfilePropertyResponse_BAD_GUID          SetProfilePropertyResponse_Status = 3
+)
+
+// Enum value maps for SetProfilePropertyResponse_Status.
+var (
+	SetProfilePropertyResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "SESSION_NOT_FOUND",
+		2: "REQUEST_MALFORMED",
+		3: "BAD_GUID",
+	}
+	SetProfilePropertyResponse_Status_value = map[string]int32{
+		"OK":                0,
+		"SESSION_NOT_FOUND": 1,
+		"REQUEST_MALFORMED": 2,
+		"BAD_GUID":          3,
+	}
+)
+
+func (x SetProfilePropertyResponse_Status) Enum() *SetProfilePropertyResponse_Status {
+	p := new(SetProfilePropertyResponse_Status)
+	*p = x
+	return p
+}
+
+func (x SetProfilePropertyResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SetProfilePropertyResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[40].Descriptor()
+}
+
+func (SetProfilePropertyResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[40]
+}
+
+func (x SetProfilePropertyResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *SetProfilePropertyResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = SetProfilePropertyResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use SetProfilePropertyResponse_Status.Descriptor instead.
+func (SetProfilePropertyResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{89, 0}
+}
+
+type TransactionResponse_Status int32
+
+const (
+	TransactionResponse_OK                     TransactionResponse_Status = 0
+	TransactionResponse_NO_TRANSACTION         TransactionResponse_Status = 1
+	TransactionResponse_ALREADY_IN_TRANSACTION TransactionResponse_Status = 2
+)
+
+// Enum value maps for TransactionResponse_Status.
+var (
+	TransactionResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "NO_TRANSACTION",
+		2: "ALREADY_IN_TRANSACTION",
+	}
+	TransactionResponse_Status_value = map[string]int32{
+		"OK":                     0,
+		"NO_TRANSACTION":         1,
+		"ALREADY_IN_TRANSACTION": 2,
+	}
+)
+
+func (x TransactionResponse_Status) Enum() *TransactionResponse_Status {
+	p := new(TransactionResponse_Status)
+	*p = x
+	return p
+}
+
+func (x TransactionResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TransactionResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[41].Descriptor()
+}
+
+func (TransactionResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[41]
+}
+
+func (x TransactionResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *TransactionResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = TransactionResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use TransactionResponse_Status.Descriptor instead.
+func (TransactionResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{91, 0}
+}
+
+// How does this line end?
+type LineContents_Continuation int32
+
+const (
+	// This line is not wrapped.
+	LineContents_CONTINUATION_HARD_EOL LineContents_Continuation = 1
+	// The next line is a continuation of this line.
+	LineContents_CONTINUATION_SOFT_EOL LineContents_Continuation = 2
+)
+
+// Enum value maps for LineContents_Continuation.
+var (
+	LineContents_Continuation_name = map[int32]string{
+		1: "CONTINUATION_HARD_EOL",
+		2: "CONTINUATION_SOFT_EOL",
+	}
+	LineContents_Continuation_value = map[string]int32{
+		"CONTINUATION_HARD_EOL": 1,
+		"CONTINUATION_SOFT_EOL": 2,
+	}
+)
+
+func (x LineContents_Continuation) Enum() *LineContents_Continuation {
+	p := new(LineContents_Continuation)
+	*p = x
+	return p
+}
+
+func (x LineContents_Continuation) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (LineContents_Continuation) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[42].Descriptor()
+}
+
+func (LineContents_Continuation) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[42]
+}
+
+func (x LineContents_Continuation) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *LineContents_Continuation) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = LineContents_Continuation(num)
+	return nil
+}
+
+// Deprecated: Use LineContents_Continuation.Descriptor instead.
+func (LineContents_Continuation) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{99, 0}
+}
+
+type SendTextResponse_Status int32
+
+const (
+	SendTextResponse_OK                SendTextResponse_Status = 0
+	SendTextResponse_SESSION_NOT_FOUND SendTextResponse_Status = 1
+)
+
+// Enum value maps for SendTextResponse_Status.
+var (
+	SendTextResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "SESSION_NOT_FOUND",
+	}
+	SendTextResponse_Status_value = map[string]int32{
+		"OK":                0,
+		"SESSION_NOT_FOUND": 1,
+	}
+)
+
+func (x SendTextResponse_Status) Enum() *SendTextResponse_Status {
+	p := new(SendTextResponse_Status)
+	*p = x
+	return p
+}
+
+func (x SendTextResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SendTextResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[43].Descriptor()
+}
+
+func (SendTextResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[43]
+}
+
+func (x SendTextResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *SendTextResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = SendTextResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use SendTextResponse_Status.Descriptor instead.
+func (SendTextResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{103, 0}
+}
+
+type CreateTabResponse_Status int32
+
+const (
+	CreateTabResponse_OK                   CreateTabResponse_Status = 0
+	CreateTabResponse_INVALID_PROFILE_NAME CreateTabResponse_Status = 1
+	CreateTabResponse_INVALID_WINDOW_ID    CreateTabResponse_Status = 2
+	// The tab is still created, just not with the desired index.
+	CreateTabResponse_INVALID_TAB_INDEX CreateTabResponse_Status = 3
+	// A $$VAR$$ substitution was not provided by the user.
+	CreateTabResponse_MISSING_SUBSTITUTION CreateTabResponse_Status = 4
+)
+
+// Enum value maps for CreateTabResponse_Status.
+var (
+	CreateTabResponse_Status_name = map[int32]string{
+		0: "OK",
+		1: "INVALID_PROFILE_NAME",
+		2: "INVALID_WINDOW_ID",
+		3: "INVALID_TAB_INDEX",
+		4: "MISSING_SUBSTITUTION",
+	}
+	CreateTabResponse_Status_value = map[string]int32{
+		"OK":                   0,
+		"INVALID_PROFILE_NAME": 1,
+		"INVALID_WINDOW_ID":    2,
+		"INVALID_TAB_INDEX":    3,
+		"MISSING_SUBSTITUTION": 4,
+	}
+)
+
+func (x CreateTabResponse_Status) Enum() *CreateTabResponse_Status {
+	p := new(CreateTabResponse_Status)
+	*p = x
+	return p
+}
+
+func (x CreateTabResponse_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CreateTabResponse_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_proto_enumTypes[44].Descriptor()
+}
+
+func (CreateTabResponse_Status) Type() protoreflect.EnumType {
+	return &file_api_proto_enumTypes[44]
+}
+
+func (x CreateTabResponse_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Do not use.
+func (x *CreateTabResponse_Status) UnmarshalJSON(b []byte) error {
+	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
+	if err != nil {
+		return err
+	}
+	*x = CreateTabResponse_Status(num)
+	return nil
+}
+
+// Deprecated: Use CreateTabResponse_Status.Descriptor instead.
+func (CreateTabResponse_Status) EnumDescriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{111, 0}
 }
 
 type SplitPaneRequest_SplitDirection int32
@@ -1106,11 +2839,11 @@ func (x SplitPaneRequest_SplitDirection) String() string {
 }
 
 func (SplitPaneRequest_SplitDirection) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[17].Descriptor()
+	return file_api_proto_enumTypes[45].Descriptor()
 }
 
 func (SplitPaneRequest_SplitDirection) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[17]
+	return &file_api_proto_enumTypes[45]
 }
 
 func (x SplitPaneRequest_SplitDirection) Number() protoreflect.EnumNumber {
@@ -1129,16 +2862,20 @@ func (x *SplitPaneRequest_SplitDirection) UnmarshalJSON(b []byte) error {
 
 // Deprecated: Use SplitPaneRequest_SplitDirection.Descriptor instead.
 func (SplitPaneRequest_SplitDirection) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{57, 0}
+	return file_api_proto_rawDescGZIP(), []int{112, 0}
 }
 
 type SplitPaneResponse_Status int32
 
 const (
-	SplitPaneResponse_OK                                SplitPaneResponse_Status = 0
-	SplitPaneResponse_SESSION_NOT_FOUND                 SplitPaneResponse_Status = 1
-	SplitPaneResponse_INVALID_PROFILE_NAME              SplitPaneResponse_Status = 2
-	SplitPaneResponse_CANNOT_SPLIT                      SplitPaneResponse_Status = 3
+	SplitPaneResponse_OK                   SplitPaneResponse_Status = 0
+	SplitPaneResponse_SESSION_NOT_FOUND    SplitPaneResponse_Status = 1
+	SplitPaneResponse_INVALID_PROFILE_NAME SplitPaneResponse_Status = 2
+	// This can happen if the session to be split is too small. If splitting multiple sessions and
+	// one or more cannot be split, the status will be set to CANNOT_SPLIT, even if some did succeed
+	// (in which case there will be one or more session_id's).
+	SplitPaneResponse_CANNOT_SPLIT SplitPaneResponse_Status = 3
+	// Couldn't decode JSON
 	SplitPaneResponse_MALFORMED_CUSTOM_PROFILE_PROPERTY SplitPaneResponse_Status = 4
 )
 
@@ -1171,11 +2908,11 @@ func (x SplitPaneResponse_Status) String() string {
 }
 
 func (SplitPaneResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[18].Descriptor()
+	return file_api_proto_enumTypes[46].Descriptor()
 }
 
 func (SplitPaneResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[18]
+	return &file_api_proto_enumTypes[46]
 }
 
 func (x SplitPaneResponse_Status) Number() protoreflect.EnumNumber {
@@ -1194,1285 +2931,7 @@ func (x *SplitPaneResponse_Status) UnmarshalJSON(b []byte) error {
 
 // Deprecated: Use SplitPaneResponse_Status.Descriptor instead.
 func (SplitPaneResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{58, 0}
-}
-
-type SetPropertyResponse_Status int32
-
-const (
-	SetPropertyResponse_OK                SetPropertyResponse_Status = 0
-	SetPropertyResponse_UNRECOGNIZED_NAME SetPropertyResponse_Status = 1
-	SetPropertyResponse_INVALID_VALUE     SetPropertyResponse_Status = 2
-	SetPropertyResponse_INVALID_TARGET    SetPropertyResponse_Status = 3
-	SetPropertyResponse_DEFERRED          SetPropertyResponse_Status = 4
-	SetPropertyResponse_IMPOSSIBLE        SetPropertyResponse_Status = 5
-	SetPropertyResponse_FAILED            SetPropertyResponse_Status = 6
-)
-
-// Enum value maps for SetPropertyResponse_Status.
-var (
-	SetPropertyResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "UNRECOGNIZED_NAME",
-		2: "INVALID_VALUE",
-		3: "INVALID_TARGET",
-		4: "DEFERRED",
-		5: "IMPOSSIBLE",
-		6: "FAILED",
-	}
-	SetPropertyResponse_Status_value = map[string]int32{
-		"OK":                0,
-		"UNRECOGNIZED_NAME": 1,
-		"INVALID_VALUE":     2,
-		"INVALID_TARGET":    3,
-		"DEFERRED":          4,
-		"IMPOSSIBLE":        5,
-		"FAILED":            6,
-	}
-)
-
-func (x SetPropertyResponse_Status) Enum() *SetPropertyResponse_Status {
-	p := new(SetPropertyResponse_Status)
-	*p = x
-	return p
-}
-
-func (x SetPropertyResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SetPropertyResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[19].Descriptor()
-}
-
-func (SetPropertyResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[19]
-}
-
-func (x SetPropertyResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *SetPropertyResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = SetPropertyResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use SetPropertyResponse_Status.Descriptor instead.
-func (SetPropertyResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{60, 0}
-}
-
-type GetPropertyResponse_Status int32
-
-const (
-	GetPropertyResponse_OK                GetPropertyResponse_Status = 0
-	GetPropertyResponse_UNRECOGNIZED_NAME GetPropertyResponse_Status = 1
-	GetPropertyResponse_INVALID_TARGET    GetPropertyResponse_Status = 2
-)
-
-// Enum value maps for GetPropertyResponse_Status.
-var (
-	GetPropertyResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "UNRECOGNIZED_NAME",
-		2: "INVALID_TARGET",
-	}
-	GetPropertyResponse_Status_value = map[string]int32{
-		"OK":                0,
-		"UNRECOGNIZED_NAME": 1,
-		"INVALID_TARGET":    2,
-	}
-)
-
-func (x GetPropertyResponse_Status) Enum() *GetPropertyResponse_Status {
-	p := new(GetPropertyResponse_Status)
-	*p = x
-	return p
-}
-
-func (x GetPropertyResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (GetPropertyResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[20].Descriptor()
-}
-
-func (GetPropertyResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[20]
-}
-
-func (x GetPropertyResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *GetPropertyResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = GetPropertyResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use GetPropertyResponse_Status.Descriptor instead.
-func (GetPropertyResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{62, 0}
-}
-
-type InjectResponse_Status int32
-
-const (
-	InjectResponse_OK                InjectResponse_Status = 0
-	InjectResponse_SESSION_NOT_FOUND InjectResponse_Status = 1
-)
-
-// Enum value maps for InjectResponse_Status.
-var (
-	InjectResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "SESSION_NOT_FOUND",
-	}
-	InjectResponse_Status_value = map[string]int32{
-		"OK":                0,
-		"SESSION_NOT_FOUND": 1,
-	}
-)
-
-func (x InjectResponse_Status) Enum() *InjectResponse_Status {
-	p := new(InjectResponse_Status)
-	*p = x
-	return p
-}
-
-func (x InjectResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (InjectResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[21].Descriptor()
-}
-
-func (InjectResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[21]
-}
-
-func (x InjectResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *InjectResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = InjectResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use InjectResponse_Status.Descriptor instead.
-func (InjectResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{64, 0}
-}
-
-type ActivateResponse_Status int32
-
-const (
-	ActivateResponse_OK             ActivateResponse_Status = 0
-	ActivateResponse_BAD_IDENTIFIER ActivateResponse_Status = 1
-	ActivateResponse_INVALID_OPTION ActivateResponse_Status = 2
-)
-
-// Enum value maps for ActivateResponse_Status.
-var (
-	ActivateResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "BAD_IDENTIFIER",
-		2: "INVALID_OPTION",
-	}
-	ActivateResponse_Status_value = map[string]int32{
-		"OK":             0,
-		"BAD_IDENTIFIER": 1,
-		"INVALID_OPTION": 2,
-	}
-)
-
-func (x ActivateResponse_Status) Enum() *ActivateResponse_Status {
-	p := new(ActivateResponse_Status)
-	*p = x
-	return p
-}
-
-func (x ActivateResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ActivateResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[22].Descriptor()
-}
-
-func (ActivateResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[22]
-}
-
-func (x ActivateResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *ActivateResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = ActivateResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use ActivateResponse_Status.Descriptor instead.
-func (ActivateResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{66, 0}
-}
-
-type VariableResponse_Status int32
-
-const (
-	VariableResponse_OK                   VariableResponse_Status = 0
-	VariableResponse_SESSION_NOT_FOUND    VariableResponse_Status = 1
-	VariableResponse_INVALID_NAME         VariableResponse_Status = 2
-	VariableResponse_MISSING_SCOPE        VariableResponse_Status = 3
-	VariableResponse_TAB_NOT_FOUND        VariableResponse_Status = 4
-	VariableResponse_MULTI_GET_DISALLOWED VariableResponse_Status = 5
-	VariableResponse_WINDOW_NOT_FOUND     VariableResponse_Status = 6
-)
-
-// Enum value maps for VariableResponse_Status.
-var (
-	VariableResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "SESSION_NOT_FOUND",
-		2: "INVALID_NAME",
-		3: "MISSING_SCOPE",
-		4: "TAB_NOT_FOUND",
-		5: "MULTI_GET_DISALLOWED",
-		6: "WINDOW_NOT_FOUND",
-	}
-	VariableResponse_Status_value = map[string]int32{
-		"OK":                   0,
-		"SESSION_NOT_FOUND":    1,
-		"INVALID_NAME":         2,
-		"MISSING_SCOPE":        3,
-		"TAB_NOT_FOUND":        4,
-		"MULTI_GET_DISALLOWED": 5,
-		"WINDOW_NOT_FOUND":     6,
-	}
-)
-
-func (x VariableResponse_Status) Enum() *VariableResponse_Status {
-	p := new(VariableResponse_Status)
-	*p = x
-	return p
-}
-
-func (x VariableResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (VariableResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[23].Descriptor()
-}
-
-func (VariableResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[23]
-}
-
-func (x VariableResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *VariableResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = VariableResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use VariableResponse_Status.Descriptor instead.
-func (VariableResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{68, 0}
-}
-
-type SavedArrangementRequest_Action int32
-
-const (
-	SavedArrangementRequest_RESTORE SavedArrangementRequest_Action = 0
-	SavedArrangementRequest_SAVE    SavedArrangementRequest_Action = 1
-	SavedArrangementRequest_LIST    SavedArrangementRequest_Action = 2
-)
-
-// Enum value maps for SavedArrangementRequest_Action.
-var (
-	SavedArrangementRequest_Action_name = map[int32]string{
-		0: "RESTORE",
-		1: "SAVE",
-		2: "LIST",
-	}
-	SavedArrangementRequest_Action_value = map[string]int32{
-		"RESTORE": 0,
-		"SAVE":    1,
-		"LIST":    2,
-	}
-)
-
-func (x SavedArrangementRequest_Action) Enum() *SavedArrangementRequest_Action {
-	p := new(SavedArrangementRequest_Action)
-	*p = x
-	return p
-}
-
-func (x SavedArrangementRequest_Action) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SavedArrangementRequest_Action) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[24].Descriptor()
-}
-
-func (SavedArrangementRequest_Action) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[24]
-}
-
-func (x SavedArrangementRequest_Action) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *SavedArrangementRequest_Action) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = SavedArrangementRequest_Action(num)
-	return nil
-}
-
-// Deprecated: Use SavedArrangementRequest_Action.Descriptor instead.
-func (SavedArrangementRequest_Action) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{69, 0}
-}
-
-type SavedArrangementResponse_Status int32
-
-const (
-	SavedArrangementResponse_OK                    SavedArrangementResponse_Status = 0
-	SavedArrangementResponse_ARRANGEMENT_NOT_FOUND SavedArrangementResponse_Status = 1
-	SavedArrangementResponse_WINDOW_NOT_FOUND      SavedArrangementResponse_Status = 2
-	SavedArrangementResponse_REQUEST_MALFORMED     SavedArrangementResponse_Status = 3
-)
-
-// Enum value maps for SavedArrangementResponse_Status.
-var (
-	SavedArrangementResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "ARRANGEMENT_NOT_FOUND",
-		2: "WINDOW_NOT_FOUND",
-		3: "REQUEST_MALFORMED",
-	}
-	SavedArrangementResponse_Status_value = map[string]int32{
-		"OK":                    0,
-		"ARRANGEMENT_NOT_FOUND": 1,
-		"WINDOW_NOT_FOUND":      2,
-		"REQUEST_MALFORMED":     3,
-	}
-)
-
-func (x SavedArrangementResponse_Status) Enum() *SavedArrangementResponse_Status {
-	p := new(SavedArrangementResponse_Status)
-	*p = x
-	return p
-}
-
-func (x SavedArrangementResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SavedArrangementResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[25].Descriptor()
-}
-
-func (SavedArrangementResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[25]
-}
-
-func (x SavedArrangementResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *SavedArrangementResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = SavedArrangementResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use SavedArrangementResponse_Status.Descriptor instead.
-func (SavedArrangementResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{70, 0}
-}
-
-type RestartSessionResponse_Status int32
-
-const (
-	RestartSessionResponse_OK                      RestartSessionResponse_Status = 0
-	RestartSessionResponse_SESSION_NOT_FOUND       RestartSessionResponse_Status = 1
-	RestartSessionResponse_SESSION_NOT_RESTARTABLE RestartSessionResponse_Status = 2
-)
-
-// Enum value maps for RestartSessionResponse_Status.
-var (
-	RestartSessionResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "SESSION_NOT_FOUND",
-		2: "SESSION_NOT_RESTARTABLE",
-	}
-	RestartSessionResponse_Status_value = map[string]int32{
-		"OK":                      0,
-		"SESSION_NOT_FOUND":       1,
-		"SESSION_NOT_RESTARTABLE": 2,
-	}
-)
-
-func (x RestartSessionResponse_Status) Enum() *RestartSessionResponse_Status {
-	p := new(RestartSessionResponse_Status)
-	*p = x
-	return p
-}
-
-func (x RestartSessionResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (RestartSessionResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[26].Descriptor()
-}
-
-func (RestartSessionResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[26]
-}
-
-func (x RestartSessionResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *RestartSessionResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = RestartSessionResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use RestartSessionResponse_Status.Descriptor instead.
-func (RestartSessionResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{78, 0}
-}
-
-type MenuItemResponse_Status int32
-
-const (
-	MenuItemResponse_OK             MenuItemResponse_Status = 0
-	MenuItemResponse_BAD_IDENTIFIER MenuItemResponse_Status = 1
-	MenuItemResponse_DISABLED       MenuItemResponse_Status = 2
-)
-
-// Enum value maps for MenuItemResponse_Status.
-var (
-	MenuItemResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "BAD_IDENTIFIER",
-		2: "DISABLED",
-	}
-	MenuItemResponse_Status_value = map[string]int32{
-		"OK":             0,
-		"BAD_IDENTIFIER": 1,
-		"DISABLED":       2,
-	}
-)
-
-func (x MenuItemResponse_Status) Enum() *MenuItemResponse_Status {
-	p := new(MenuItemResponse_Status)
-	*p = x
-	return p
-}
-
-func (x MenuItemResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (MenuItemResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[27].Descriptor()
-}
-
-func (MenuItemResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[27]
-}
-
-func (x MenuItemResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *MenuItemResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = MenuItemResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use MenuItemResponse_Status.Descriptor instead.
-func (MenuItemResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{80, 0}
-}
-
-type SetTabLayoutResponse_Status int32
-
-const (
-	SetTabLayoutResponse_OK           SetTabLayoutResponse_Status = 0
-	SetTabLayoutResponse_BAD_TAB_ID   SetTabLayoutResponse_Status = 1
-	SetTabLayoutResponse_WRONG_TREE   SetTabLayoutResponse_Status = 2
-	SetTabLayoutResponse_INVALID_SIZE SetTabLayoutResponse_Status = 3
-)
-
-// Enum value maps for SetTabLayoutResponse_Status.
-var (
-	SetTabLayoutResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "BAD_TAB_ID",
-		2: "WRONG_TREE",
-		3: "INVALID_SIZE",
-	}
-	SetTabLayoutResponse_Status_value = map[string]int32{
-		"OK":           0,
-		"BAD_TAB_ID":   1,
-		"WRONG_TREE":   2,
-		"INVALID_SIZE": 3,
-	}
-)
-
-func (x SetTabLayoutResponse_Status) Enum() *SetTabLayoutResponse_Status {
-	p := new(SetTabLayoutResponse_Status)
-	*p = x
-	return p
-}
-
-func (x SetTabLayoutResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SetTabLayoutResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[28].Descriptor()
-}
-
-func (SetTabLayoutResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[28]
-}
-
-func (x SetTabLayoutResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *SetTabLayoutResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = SetTabLayoutResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use SetTabLayoutResponse_Status.Descriptor instead.
-func (SetTabLayoutResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{82, 0}
-}
-
-type TmuxResponse_Status int32
-
-const (
-	TmuxResponse_OK                    TmuxResponse_Status = 0
-	TmuxResponse_INVALID_REQUEST       TmuxResponse_Status = 1
-	TmuxResponse_INVALID_CONNECTION_ID TmuxResponse_Status = 2
-	TmuxResponse_INVALID_WINDOW_ID     TmuxResponse_Status = 3
-)
-
-// Enum value maps for TmuxResponse_Status.
-var (
-	TmuxResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "INVALID_REQUEST",
-		2: "INVALID_CONNECTION_ID",
-		3: "INVALID_WINDOW_ID",
-	}
-	TmuxResponse_Status_value = map[string]int32{
-		"OK":                    0,
-		"INVALID_REQUEST":       1,
-		"INVALID_CONNECTION_ID": 2,
-		"INVALID_WINDOW_ID":     3,
-	}
-)
-
-func (x TmuxResponse_Status) Enum() *TmuxResponse_Status {
-	p := new(TmuxResponse_Status)
-	*p = x
-	return p
-}
-
-func (x TmuxResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (TmuxResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[29].Descriptor()
-}
-
-func (TmuxResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[29]
-}
-
-func (x TmuxResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *TmuxResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = TmuxResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use TmuxResponse_Status.Descriptor instead.
-func (TmuxResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{86, 0}
-}
-
-type ReorderTabsResponse_Status int32
-
-const (
-	ReorderTabsResponse_OK                 ReorderTabsResponse_Status = 0
-	ReorderTabsResponse_INVALID_ASSIGNMENT ReorderTabsResponse_Status = 1
-	ReorderTabsResponse_INVALID_WINDOW_ID  ReorderTabsResponse_Status = 2
-	ReorderTabsResponse_INVALID_TAB_ID     ReorderTabsResponse_Status = 3
-)
-
-// Enum value maps for ReorderTabsResponse_Status.
-var (
-	ReorderTabsResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "INVALID_ASSIGNMENT",
-		2: "INVALID_WINDOW_ID",
-		3: "INVALID_TAB_ID",
-	}
-	ReorderTabsResponse_Status_value = map[string]int32{
-		"OK":                 0,
-		"INVALID_ASSIGNMENT": 1,
-		"INVALID_WINDOW_ID":  2,
-		"INVALID_TAB_ID":     3,
-	}
-)
-
-func (x ReorderTabsResponse_Status) Enum() *ReorderTabsResponse_Status {
-	p := new(ReorderTabsResponse_Status)
-	*p = x
-	return p
-}
-
-func (x ReorderTabsResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ReorderTabsResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[30].Descriptor()
-}
-
-func (ReorderTabsResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[30]
-}
-
-func (x ReorderTabsResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *ReorderTabsResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = ReorderTabsResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use ReorderTabsResponse_Status.Descriptor instead.
-func (ReorderTabsResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{88, 0}
-}
-
-type PreferencesResponse_Result_SetPreferenceResult_Status int32
-
-const (
-	PreferencesResponse_Result_SetPreferenceResult_OK            PreferencesResponse_Result_SetPreferenceResult_Status = 0
-	PreferencesResponse_Result_SetPreferenceResult_BAD_JSON      PreferencesResponse_Result_SetPreferenceResult_Status = 1
-	PreferencesResponse_Result_SetPreferenceResult_INVALID_VALUE PreferencesResponse_Result_SetPreferenceResult_Status = 2
-)
-
-// Enum value maps for PreferencesResponse_Result_SetPreferenceResult_Status.
-var (
-	PreferencesResponse_Result_SetPreferenceResult_Status_name = map[int32]string{
-		0: "OK",
-		1: "BAD_JSON",
-		2: "INVALID_VALUE",
-	}
-	PreferencesResponse_Result_SetPreferenceResult_Status_value = map[string]int32{
-		"OK":            0,
-		"BAD_JSON":      1,
-		"INVALID_VALUE": 2,
-	}
-)
-
-func (x PreferencesResponse_Result_SetPreferenceResult_Status) Enum() *PreferencesResponse_Result_SetPreferenceResult_Status {
-	p := new(PreferencesResponse_Result_SetPreferenceResult_Status)
-	*p = x
-	return p
-}
-
-func (x PreferencesResponse_Result_SetPreferenceResult_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (PreferencesResponse_Result_SetPreferenceResult_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[31].Descriptor()
-}
-
-func (PreferencesResponse_Result_SetPreferenceResult_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[31]
-}
-
-func (x PreferencesResponse_Result_SetPreferenceResult_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *PreferencesResponse_Result_SetPreferenceResult_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = PreferencesResponse_Result_SetPreferenceResult_Status(num)
-	return nil
-}
-
-// Deprecated: Use PreferencesResponse_Result_SetPreferenceResult_Status.Descriptor instead.
-func (PreferencesResponse_Result_SetPreferenceResult_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{90, 0, 0, 0}
-}
-
-type PreferencesResponse_Result_SetDefaultProfileResult_Status int32
-
-const (
-	PreferencesResponse_Result_SetDefaultProfileResult_OK       PreferencesResponse_Result_SetDefaultProfileResult_Status = 0
-	PreferencesResponse_Result_SetDefaultProfileResult_BAD_GUID PreferencesResponse_Result_SetDefaultProfileResult_Status = 1
-)
-
-// Enum value maps for PreferencesResponse_Result_SetDefaultProfileResult_Status.
-var (
-	PreferencesResponse_Result_SetDefaultProfileResult_Status_name = map[int32]string{
-		0: "OK",
-		1: "BAD_GUID",
-	}
-	PreferencesResponse_Result_SetDefaultProfileResult_Status_value = map[string]int32{
-		"OK":       0,
-		"BAD_GUID": 1,
-	}
-)
-
-func (x PreferencesResponse_Result_SetDefaultProfileResult_Status) Enum() *PreferencesResponse_Result_SetDefaultProfileResult_Status {
-	p := new(PreferencesResponse_Result_SetDefaultProfileResult_Status)
-	*p = x
-	return p
-}
-
-func (x PreferencesResponse_Result_SetDefaultProfileResult_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (PreferencesResponse_Result_SetDefaultProfileResult_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[32].Descriptor()
-}
-
-func (PreferencesResponse_Result_SetDefaultProfileResult_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[32]
-}
-
-func (x PreferencesResponse_Result_SetDefaultProfileResult_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *PreferencesResponse_Result_SetDefaultProfileResult_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = PreferencesResponse_Result_SetDefaultProfileResult_Status(num)
-	return nil
-}
-
-// Deprecated: Use PreferencesResponse_Result_SetDefaultProfileResult_Status.Descriptor instead.
-func (PreferencesResponse_Result_SetDefaultProfileResult_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{90, 0, 2, 0}
-}
-
-type ColorPresetResponse_Status int32
-
-const (
-	ColorPresetResponse_OK                ColorPresetResponse_Status = 0
-	ColorPresetResponse_PRESET_NOT_FOUND  ColorPresetResponse_Status = 1
-	ColorPresetResponse_REQUEST_MALFORMED ColorPresetResponse_Status = 2
-)
-
-// Enum value maps for ColorPresetResponse_Status.
-var (
-	ColorPresetResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "PRESET_NOT_FOUND",
-		2: "REQUEST_MALFORMED",
-	}
-	ColorPresetResponse_Status_value = map[string]int32{
-		"OK":                0,
-		"PRESET_NOT_FOUND":  1,
-		"REQUEST_MALFORMED": 2,
-	}
-)
-
-func (x ColorPresetResponse_Status) Enum() *ColorPresetResponse_Status {
-	p := new(ColorPresetResponse_Status)
-	*p = x
-	return p
-}
-
-func (x ColorPresetResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ColorPresetResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[33].Descriptor()
-}
-
-func (ColorPresetResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[33]
-}
-
-func (x ColorPresetResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *ColorPresetResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = ColorPresetResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use ColorPresetResponse_Status.Descriptor instead.
-func (ColorPresetResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{92, 0}
-}
-
-type SelectionResponse_Status int32
-
-const (
-	SelectionResponse_OK                SelectionResponse_Status = 0
-	SelectionResponse_INVALID_SESSION   SelectionResponse_Status = 1
-	SelectionResponse_INVALID_RANGE     SelectionResponse_Status = 2
-	SelectionResponse_REQUEST_MALFORMED SelectionResponse_Status = 3
-)
-
-// Enum value maps for SelectionResponse_Status.
-var (
-	SelectionResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "INVALID_SESSION",
-		2: "INVALID_RANGE",
-		3: "REQUEST_MALFORMED",
-	}
-	SelectionResponse_Status_value = map[string]int32{
-		"OK":                0,
-		"INVALID_SESSION":   1,
-		"INVALID_RANGE":     2,
-		"REQUEST_MALFORMED": 3,
-	}
-)
-
-func (x SelectionResponse_Status) Enum() *SelectionResponse_Status {
-	p := new(SelectionResponse_Status)
-	*p = x
-	return p
-}
-
-func (x SelectionResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SelectionResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[34].Descriptor()
-}
-
-func (SelectionResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[34]
-}
-
-func (x SelectionResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *SelectionResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = SelectionResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use SelectionResponse_Status.Descriptor instead.
-func (SelectionResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{96, 0}
-}
-
-type StatusBarComponentResponse_Status int32
-
-const (
-	StatusBarComponentResponse_OK                 StatusBarComponentResponse_Status = 0
-	StatusBarComponentResponse_SESSION_NOT_FOUND  StatusBarComponentResponse_Status = 1
-	StatusBarComponentResponse_REQUEST_MALFORMED  StatusBarComponentResponse_Status = 2
-	StatusBarComponentResponse_INVALID_IDENTIFIER StatusBarComponentResponse_Status = 3
-)
-
-// Enum value maps for StatusBarComponentResponse_Status.
-var (
-	StatusBarComponentResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "SESSION_NOT_FOUND",
-		2: "REQUEST_MALFORMED",
-		3: "INVALID_IDENTIFIER",
-	}
-	StatusBarComponentResponse_Status_value = map[string]int32{
-		"OK":                 0,
-		"SESSION_NOT_FOUND":  1,
-		"REQUEST_MALFORMED":  2,
-		"INVALID_IDENTIFIER": 3,
-	}
-)
-
-func (x StatusBarComponentResponse_Status) Enum() *StatusBarComponentResponse_Status {
-	p := new(StatusBarComponentResponse_Status)
-	*p = x
-	return p
-}
-
-func (x StatusBarComponentResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (StatusBarComponentResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[35].Descriptor()
-}
-
-func (StatusBarComponentResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[35]
-}
-
-func (x StatusBarComponentResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *StatusBarComponentResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = StatusBarComponentResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use StatusBarComponentResponse_Status.Descriptor instead.
-func (StatusBarComponentResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{98, 0}
-}
-
-type SetBroadcastDomainsResponse_Status int32
-
-const (
-	SetBroadcastDomainsResponse_OK                             SetBroadcastDomainsResponse_Status = 0
-	SetBroadcastDomainsResponse_SESSION_NOT_FOUND              SetBroadcastDomainsResponse_Status = 1
-	SetBroadcastDomainsResponse_BROADCAST_DOMAINS_NOT_DISJOINT SetBroadcastDomainsResponse_Status = 2
-	SetBroadcastDomainsResponse_SESSIONS_NOT_IN_SAME_WINDOW    SetBroadcastDomainsResponse_Status = 3
-)
-
-// Enum value maps for SetBroadcastDomainsResponse_Status.
-var (
-	SetBroadcastDomainsResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "SESSION_NOT_FOUND",
-		2: "BROADCAST_DOMAINS_NOT_DISJOINT",
-		3: "SESSIONS_NOT_IN_SAME_WINDOW",
-	}
-	SetBroadcastDomainsResponse_Status_value = map[string]int32{
-		"OK":                             0,
-		"SESSION_NOT_FOUND":              1,
-		"BROADCAST_DOMAINS_NOT_DISJOINT": 2,
-		"SESSIONS_NOT_IN_SAME_WINDOW":    3,
-	}
-)
-
-func (x SetBroadcastDomainsResponse_Status) Enum() *SetBroadcastDomainsResponse_Status {
-	p := new(SetBroadcastDomainsResponse_Status)
-	*p = x
-	return p
-}
-
-func (x SetBroadcastDomainsResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SetBroadcastDomainsResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[36].Descriptor()
-}
-
-func (SetBroadcastDomainsResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[36]
-}
-
-func (x SetBroadcastDomainsResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *SetBroadcastDomainsResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = SetBroadcastDomainsResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use SetBroadcastDomainsResponse_Status.Descriptor instead.
-func (SetBroadcastDomainsResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{100, 0}
-}
-
-type CloseResponse_Status int32
-
-const (
-	CloseResponse_OK            CloseResponse_Status = 0
-	CloseResponse_NOT_FOUND     CloseResponse_Status = 1
-	CloseResponse_USER_DECLINED CloseResponse_Status = 2
-)
-
-// Enum value maps for CloseResponse_Status.
-var (
-	CloseResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "NOT_FOUND",
-		2: "USER_DECLINED",
-	}
-	CloseResponse_Status_value = map[string]int32{
-		"OK":            0,
-		"NOT_FOUND":     1,
-		"USER_DECLINED": 2,
-	}
-)
-
-func (x CloseResponse_Status) Enum() *CloseResponse_Status {
-	p := new(CloseResponse_Status)
-	*p = x
-	return p
-}
-
-func (x CloseResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (CloseResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[37].Descriptor()
-}
-
-func (CloseResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[37]
-}
-
-func (x CloseResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *CloseResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = CloseResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use CloseResponse_Status.Descriptor instead.
-func (CloseResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{102, 0}
-}
-
-type InvokeFunctionResponse_Status int32
-
-const (
-	InvokeFunctionResponse_TIMEOUT           InvokeFunctionResponse_Status = 1
-	InvokeFunctionResponse_FAILED            InvokeFunctionResponse_Status = 2
-	InvokeFunctionResponse_REQUEST_MALFORMED InvokeFunctionResponse_Status = 3
-	InvokeFunctionResponse_INVALID_ID        InvokeFunctionResponse_Status = 4
-)
-
-// Enum value maps for InvokeFunctionResponse_Status.
-var (
-	InvokeFunctionResponse_Status_name = map[int32]string{
-		1: "TIMEOUT",
-		2: "FAILED",
-		3: "REQUEST_MALFORMED",
-		4: "INVALID_ID",
-	}
-	InvokeFunctionResponse_Status_value = map[string]int32{
-		"TIMEOUT":           1,
-		"FAILED":            2,
-		"REQUEST_MALFORMED": 3,
-		"INVALID_ID":        4,
-	}
-)
-
-func (x InvokeFunctionResponse_Status) Enum() *InvokeFunctionResponse_Status {
-	p := new(InvokeFunctionResponse_Status)
-	*p = x
-	return p
-}
-
-func (x InvokeFunctionResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (InvokeFunctionResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[38].Descriptor()
-}
-
-func (InvokeFunctionResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[38]
-}
-
-func (x InvokeFunctionResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *InvokeFunctionResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = InvokeFunctionResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use InvokeFunctionResponse_Status.Descriptor instead.
-func (InvokeFunctionResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{104, 0}
-}
-
-type ListPromptsResponse_Status int32
-
-const (
-	ListPromptsResponse_OK                ListPromptsResponse_Status = 0
-	ListPromptsResponse_SESSION_NOT_FOUND ListPromptsResponse_Status = 1
-)
-
-// Enum value maps for ListPromptsResponse_Status.
-var (
-	ListPromptsResponse_Status_name = map[int32]string{
-		0: "OK",
-		1: "SESSION_NOT_FOUND",
-	}
-	ListPromptsResponse_Status_value = map[string]int32{
-		"OK":                0,
-		"SESSION_NOT_FOUND": 1,
-	}
-)
-
-func (x ListPromptsResponse_Status) Enum() *ListPromptsResponse_Status {
-	p := new(ListPromptsResponse_Status)
-	*p = x
-	return p
-}
-
-func (x ListPromptsResponse_Status) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ListPromptsResponse_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_api_proto_enumTypes[39].Descriptor()
-}
-
-func (ListPromptsResponse_Status) Type() protoreflect.EnumType {
-	return &file_api_proto_enumTypes[39]
-}
-
-func (x ListPromptsResponse_Status) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Do not use.
-func (x *ListPromptsResponse_Status) UnmarshalJSON(b []byte) error {
-	num, err := protoimpl.X.UnmarshalJSONEnum(x.Descriptor(), b)
-	if err != nil {
-		return err
-	}
-	*x = ListPromptsResponse_Status(num)
-	return nil
-}
-
-// Deprecated: Use ListPromptsResponse_Status.Descriptor instead.
-func (ListPromptsResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{106, 0}
+	return file_api_proto_rawDescGZIP(), []int{113, 0}
 }
 
 // All requests are wrapped in this message. This encoded message is the entirety of the payload
@@ -3720,6 +4179,5158 @@ func (*ServerOriginatedMessage_ListPromptsResponse) isServerOriginatedMessage_Su
 
 func (*ServerOriginatedMessage_Notification) isServerOriginatedMessage_Submessage() {}
 
+type InvokeFunctionRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Context:
+	//
+	//	*InvokeFunctionRequest_Tab_
+	//	*InvokeFunctionRequest_Session_
+	//	*InvokeFunctionRequest_Window_
+	//	*InvokeFunctionRequest_App_
+	//	*InvokeFunctionRequest_Method_
+	Context       isInvokeFunctionRequest_Context `protobuf_oneof:"context"`
+	Invocation    *string                         `protobuf:"bytes,5,opt,name=invocation" json:"invocation,omitempty"`
+	Timeout       *float64                        `protobuf:"fixed64,6,opt,name=timeout,def=-1" json:"timeout,omitempty"` // If not given a reasonable default value will be used. Negative value means to use the default.
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+// Default values for InvokeFunctionRequest fields.
+const (
+	Default_InvokeFunctionRequest_Timeout = float64(-1)
+)
+
+func (x *InvokeFunctionRequest) Reset() {
+	*x = InvokeFunctionRequest{}
+	mi := &file_api_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvokeFunctionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvokeFunctionRequest) ProtoMessage() {}
+
+func (x *InvokeFunctionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvokeFunctionRequest.ProtoReflect.Descriptor instead.
+func (*InvokeFunctionRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *InvokeFunctionRequest) GetContext() isInvokeFunctionRequest_Context {
+	if x != nil {
+		return x.Context
+	}
+	return nil
+}
+
+func (x *InvokeFunctionRequest) GetTab() *InvokeFunctionRequest_Tab {
+	if x != nil {
+		if x, ok := x.Context.(*InvokeFunctionRequest_Tab_); ok {
+			return x.Tab
+		}
+	}
+	return nil
+}
+
+func (x *InvokeFunctionRequest) GetSession() *InvokeFunctionRequest_Session {
+	if x != nil {
+		if x, ok := x.Context.(*InvokeFunctionRequest_Session_); ok {
+			return x.Session
+		}
+	}
+	return nil
+}
+
+func (x *InvokeFunctionRequest) GetWindow() *InvokeFunctionRequest_Window {
+	if x != nil {
+		if x, ok := x.Context.(*InvokeFunctionRequest_Window_); ok {
+			return x.Window
+		}
+	}
+	return nil
+}
+
+func (x *InvokeFunctionRequest) GetApp() *InvokeFunctionRequest_App {
+	if x != nil {
+		if x, ok := x.Context.(*InvokeFunctionRequest_App_); ok {
+			return x.App
+		}
+	}
+	return nil
+}
+
+func (x *InvokeFunctionRequest) GetMethod() *InvokeFunctionRequest_Method {
+	if x != nil {
+		if x, ok := x.Context.(*InvokeFunctionRequest_Method_); ok {
+			return x.Method
+		}
+	}
+	return nil
+}
+
+func (x *InvokeFunctionRequest) GetInvocation() string {
+	if x != nil && x.Invocation != nil {
+		return *x.Invocation
+	}
+	return ""
+}
+
+func (x *InvokeFunctionRequest) GetTimeout() float64 {
+	if x != nil && x.Timeout != nil {
+		return *x.Timeout
+	}
+	return Default_InvokeFunctionRequest_Timeout
+}
+
+type isInvokeFunctionRequest_Context interface {
+	isInvokeFunctionRequest_Context()
+}
+
+type InvokeFunctionRequest_Tab_ struct {
+	Tab *InvokeFunctionRequest_Tab `protobuf:"bytes,1,opt,name=tab,oneof"`
+}
+
+type InvokeFunctionRequest_Session_ struct {
+	Session *InvokeFunctionRequest_Session `protobuf:"bytes,2,opt,name=session,oneof"`
+}
+
+type InvokeFunctionRequest_Window_ struct {
+	Window *InvokeFunctionRequest_Window `protobuf:"bytes,3,opt,name=window,oneof"`
+}
+
+type InvokeFunctionRequest_App_ struct {
+	App *InvokeFunctionRequest_App `protobuf:"bytes,4,opt,name=app,oneof"`
+}
+
+type InvokeFunctionRequest_Method_ struct {
+	Method *InvokeFunctionRequest_Method `protobuf:"bytes,7,opt,name=method,oneof"`
+}
+
+func (*InvokeFunctionRequest_Tab_) isInvokeFunctionRequest_Context() {}
+
+func (*InvokeFunctionRequest_Session_) isInvokeFunctionRequest_Context() {}
+
+func (*InvokeFunctionRequest_Window_) isInvokeFunctionRequest_Context() {}
+
+func (*InvokeFunctionRequest_App_) isInvokeFunctionRequest_Context() {}
+
+func (*InvokeFunctionRequest_Method_) isInvokeFunctionRequest_Context() {}
+
+type InvokeFunctionResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Disposition:
+	//
+	//	*InvokeFunctionResponse_Error_
+	//	*InvokeFunctionResponse_Success_
+	Disposition   isInvokeFunctionResponse_Disposition `protobuf_oneof:"disposition"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvokeFunctionResponse) Reset() {
+	*x = InvokeFunctionResponse{}
+	mi := &file_api_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvokeFunctionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvokeFunctionResponse) ProtoMessage() {}
+
+func (x *InvokeFunctionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvokeFunctionResponse.ProtoReflect.Descriptor instead.
+func (*InvokeFunctionResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *InvokeFunctionResponse) GetDisposition() isInvokeFunctionResponse_Disposition {
+	if x != nil {
+		return x.Disposition
+	}
+	return nil
+}
+
+func (x *InvokeFunctionResponse) GetError() *InvokeFunctionResponse_Error {
+	if x != nil {
+		if x, ok := x.Disposition.(*InvokeFunctionResponse_Error_); ok {
+			return x.Error
+		}
+	}
+	return nil
+}
+
+func (x *InvokeFunctionResponse) GetSuccess() *InvokeFunctionResponse_Success {
+	if x != nil {
+		if x, ok := x.Disposition.(*InvokeFunctionResponse_Success_); ok {
+			return x.Success
+		}
+	}
+	return nil
+}
+
+type isInvokeFunctionResponse_Disposition interface {
+	isInvokeFunctionResponse_Disposition()
+}
+
+type InvokeFunctionResponse_Error_ struct {
+	Error *InvokeFunctionResponse_Error `protobuf:"bytes,1,opt,name=error,oneof"`
+}
+
+type InvokeFunctionResponse_Success_ struct {
+	Success *InvokeFunctionResponse_Success `protobuf:"bytes,2,opt,name=success,oneof"`
+}
+
+func (*InvokeFunctionResponse_Error_) isInvokeFunctionResponse_Disposition() {}
+
+func (*InvokeFunctionResponse_Success_) isInvokeFunctionResponse_Disposition() {}
+
+type CloseRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Target:
+	//
+	//	*CloseRequest_Tabs
+	//	*CloseRequest_Sessions
+	//	*CloseRequest_Windows
+	Target        isCloseRequest_Target `protobuf_oneof:"target"`
+	Force         *bool                 `protobuf:"varint,4,opt,name=force" json:"force,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CloseRequest) Reset() {
+	*x = CloseRequest{}
+	mi := &file_api_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CloseRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CloseRequest) ProtoMessage() {}
+
+func (x *CloseRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CloseRequest.ProtoReflect.Descriptor instead.
+func (*CloseRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CloseRequest) GetTarget() isCloseRequest_Target {
+	if x != nil {
+		return x.Target
+	}
+	return nil
+}
+
+func (x *CloseRequest) GetTabs() *CloseRequest_CloseTabs {
+	if x != nil {
+		if x, ok := x.Target.(*CloseRequest_Tabs); ok {
+			return x.Tabs
+		}
+	}
+	return nil
+}
+
+func (x *CloseRequest) GetSessions() *CloseRequest_CloseSessions {
+	if x != nil {
+		if x, ok := x.Target.(*CloseRequest_Sessions); ok {
+			return x.Sessions
+		}
+	}
+	return nil
+}
+
+func (x *CloseRequest) GetWindows() *CloseRequest_CloseWindows {
+	if x != nil {
+		if x, ok := x.Target.(*CloseRequest_Windows); ok {
+			return x.Windows
+		}
+	}
+	return nil
+}
+
+func (x *CloseRequest) GetForce() bool {
+	if x != nil && x.Force != nil {
+		return *x.Force
+	}
+	return false
+}
+
+type isCloseRequest_Target interface {
+	isCloseRequest_Target()
+}
+
+type CloseRequest_Tabs struct {
+	Tabs *CloseRequest_CloseTabs `protobuf:"bytes,1,opt,name=tabs,oneof"`
+}
+
+type CloseRequest_Sessions struct {
+	Sessions *CloseRequest_CloseSessions `protobuf:"bytes,2,opt,name=sessions,oneof"`
+}
+
+type CloseRequest_Windows struct {
+	Windows *CloseRequest_CloseWindows `protobuf:"bytes,3,opt,name=windows,oneof"`
+}
+
+func (*CloseRequest_Tabs) isCloseRequest_Target() {}
+
+func (*CloseRequest_Sessions) isCloseRequest_Target() {}
+
+func (*CloseRequest_Windows) isCloseRequest_Target() {}
+
+type CloseResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Statuses      []CloseResponse_Status `protobuf:"varint,1,rep,name=statuses,enum=iterm2.CloseResponse_Status" json:"statuses,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CloseResponse) Reset() {
+	*x = CloseResponse{}
+	mi := &file_api_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CloseResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CloseResponse) ProtoMessage() {}
+
+func (x *CloseResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CloseResponse.ProtoReflect.Descriptor instead.
+func (*CloseResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *CloseResponse) GetStatuses() []CloseResponse_Status {
+	if x != nil {
+		return x.Statuses
+	}
+	return nil
+}
+
+type SetBroadcastDomainsRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	BroadcastDomains []*BroadcastDomain     `protobuf:"bytes,1,rep,name=broadcast_domains,json=broadcastDomains" json:"broadcast_domains,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *SetBroadcastDomainsRequest) Reset() {
+	*x = SetBroadcastDomainsRequest{}
+	mi := &file_api_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetBroadcastDomainsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetBroadcastDomainsRequest) ProtoMessage() {}
+
+func (x *SetBroadcastDomainsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetBroadcastDomainsRequest.ProtoReflect.Descriptor instead.
+func (*SetBroadcastDomainsRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *SetBroadcastDomainsRequest) GetBroadcastDomains() []*BroadcastDomain {
+	if x != nil {
+		return x.BroadcastDomains
+	}
+	return nil
+}
+
+type SetBroadcastDomainsResponse struct {
+	state         protoimpl.MessageState              `protogen:"open.v1"`
+	Status        *SetBroadcastDomainsResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SetBroadcastDomainsResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetBroadcastDomainsResponse) Reset() {
+	*x = SetBroadcastDomainsResponse{}
+	mi := &file_api_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetBroadcastDomainsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetBroadcastDomainsResponse) ProtoMessage() {}
+
+func (x *SetBroadcastDomainsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetBroadcastDomainsResponse.ProtoReflect.Descriptor instead.
+func (*SetBroadcastDomainsResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *SetBroadcastDomainsResponse) GetStatus() SetBroadcastDomainsResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return SetBroadcastDomainsResponse_OK
+}
+
+type StatusBarComponentRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Request:
+	//
+	//	*StatusBarComponentRequest_OpenPopover_
+	Request       isStatusBarComponentRequest_Request `protobuf_oneof:"request"`
+	Identifier    *string                             `protobuf:"bytes,2,opt,name=identifier" json:"identifier,omitempty"` // ID of statusbar component
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StatusBarComponentRequest) Reset() {
+	*x = StatusBarComponentRequest{}
+	mi := &file_api_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StatusBarComponentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StatusBarComponentRequest) ProtoMessage() {}
+
+func (x *StatusBarComponentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StatusBarComponentRequest.ProtoReflect.Descriptor instead.
+func (*StatusBarComponentRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *StatusBarComponentRequest) GetRequest() isStatusBarComponentRequest_Request {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
+func (x *StatusBarComponentRequest) GetOpenPopover() *StatusBarComponentRequest_OpenPopover {
+	if x != nil {
+		if x, ok := x.Request.(*StatusBarComponentRequest_OpenPopover_); ok {
+			return x.OpenPopover
+		}
+	}
+	return nil
+}
+
+func (x *StatusBarComponentRequest) GetIdentifier() string {
+	if x != nil && x.Identifier != nil {
+		return *x.Identifier
+	}
+	return ""
+}
+
+type isStatusBarComponentRequest_Request interface {
+	isStatusBarComponentRequest_Request()
+}
+
+type StatusBarComponentRequest_OpenPopover_ struct {
+	OpenPopover *StatusBarComponentRequest_OpenPopover `protobuf:"bytes,1,opt,name=open_popover,json=openPopover,oneof"`
+}
+
+func (*StatusBarComponentRequest_OpenPopover_) isStatusBarComponentRequest_Request() {}
+
+type StatusBarComponentResponse struct {
+	state         protoimpl.MessageState             `protogen:"open.v1"`
+	Status        *StatusBarComponentResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.StatusBarComponentResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StatusBarComponentResponse) Reset() {
+	*x = StatusBarComponentResponse{}
+	mi := &file_api_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StatusBarComponentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StatusBarComponentResponse) ProtoMessage() {}
+
+func (x *StatusBarComponentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StatusBarComponentResponse.ProtoReflect.Descriptor instead.
+func (*StatusBarComponentResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *StatusBarComponentResponse) GetStatus() StatusBarComponentResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return StatusBarComponentResponse_OK
+}
+
+type WindowedCoordRange struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CoordRange    *CoordRange            `protobuf:"bytes,1,opt,name=coord_range,json=coordRange" json:"coord_range,omitempty"`
+	Columns       *Range                 `protobuf:"bytes,2,opt,name=columns" json:"columns,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WindowedCoordRange) Reset() {
+	*x = WindowedCoordRange{}
+	mi := &file_api_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WindowedCoordRange) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WindowedCoordRange) ProtoMessage() {}
+
+func (x *WindowedCoordRange) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WindowedCoordRange.ProtoReflect.Descriptor instead.
+func (*WindowedCoordRange) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *WindowedCoordRange) GetCoordRange() *CoordRange {
+	if x != nil {
+		return x.CoordRange
+	}
+	return nil
+}
+
+func (x *WindowedCoordRange) GetColumns() *Range {
+	if x != nil {
+		return x.Columns
+	}
+	return nil
+}
+
+type SubSelection struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	WindowedCoordRange *WindowedCoordRange    `protobuf:"bytes,1,opt,name=windowed_coord_range,json=windowedCoordRange" json:"windowed_coord_range,omitempty"`
+	SelectionMode      *SelectionMode         `protobuf:"varint,2,opt,name=selection_mode,json=selectionMode,enum=iterm2.SelectionMode" json:"selection_mode,omitempty"`
+	Connected          *bool                  `protobuf:"varint,3,opt,name=connected" json:"connected,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *SubSelection) Reset() {
+	*x = SubSelection{}
+	mi := &file_api_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubSelection) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubSelection) ProtoMessage() {}
+
+func (x *SubSelection) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubSelection.ProtoReflect.Descriptor instead.
+func (*SubSelection) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *SubSelection) GetWindowedCoordRange() *WindowedCoordRange {
+	if x != nil {
+		return x.WindowedCoordRange
+	}
+	return nil
+}
+
+func (x *SubSelection) GetSelectionMode() SelectionMode {
+	if x != nil && x.SelectionMode != nil {
+		return *x.SelectionMode
+	}
+	return SelectionMode_CHARACTER
+}
+
+func (x *SubSelection) GetConnected() bool {
+	if x != nil && x.Connected != nil {
+		return *x.Connected
+	}
+	return false
+}
+
+type Selection struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SubSelections []*SubSelection        `protobuf:"bytes,1,rep,name=sub_selections,json=subSelections" json:"sub_selections,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Selection) Reset() {
+	*x = Selection{}
+	mi := &file_api_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Selection) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Selection) ProtoMessage() {}
+
+func (x *Selection) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Selection.ProtoReflect.Descriptor instead.
+func (*Selection) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *Selection) GetSubSelections() []*SubSelection {
+	if x != nil {
+		return x.SubSelections
+	}
+	return nil
+}
+
+type SelectionRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Request:
+	//
+	//	*SelectionRequest_GetSelectionRequest_
+	//	*SelectionRequest_SetSelectionRequest_
+	Request       isSelectionRequest_Request `protobuf_oneof:"request"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SelectionRequest) Reset() {
+	*x = SelectionRequest{}
+	mi := &file_api_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SelectionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectionRequest) ProtoMessage() {}
+
+func (x *SelectionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectionRequest.ProtoReflect.Descriptor instead.
+func (*SelectionRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *SelectionRequest) GetRequest() isSelectionRequest_Request {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
+func (x *SelectionRequest) GetGetSelectionRequest() *SelectionRequest_GetSelectionRequest {
+	if x != nil {
+		if x, ok := x.Request.(*SelectionRequest_GetSelectionRequest_); ok {
+			return x.GetSelectionRequest
+		}
+	}
+	return nil
+}
+
+func (x *SelectionRequest) GetSetSelectionRequest() *SelectionRequest_SetSelectionRequest {
+	if x != nil {
+		if x, ok := x.Request.(*SelectionRequest_SetSelectionRequest_); ok {
+			return x.SetSelectionRequest
+		}
+	}
+	return nil
+}
+
+type isSelectionRequest_Request interface {
+	isSelectionRequest_Request()
+}
+
+type SelectionRequest_GetSelectionRequest_ struct {
+	GetSelectionRequest *SelectionRequest_GetSelectionRequest `protobuf:"bytes,1,opt,name=get_selection_request,json=getSelectionRequest,oneof"`
+}
+
+type SelectionRequest_SetSelectionRequest_ struct {
+	SetSelectionRequest *SelectionRequest_SetSelectionRequest `protobuf:"bytes,2,opt,name=set_selection_request,json=setSelectionRequest,oneof"`
+}
+
+func (*SelectionRequest_GetSelectionRequest_) isSelectionRequest_Request() {}
+
+func (*SelectionRequest_SetSelectionRequest_) isSelectionRequest_Request() {}
+
+type SelectionResponse struct {
+	state  protoimpl.MessageState    `protogen:"open.v1"`
+	Status *SelectionResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SelectionResponse_Status" json:"status,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*SelectionResponse_GetSelectionResponse_
+	//	*SelectionResponse_SetSelectionResponse_
+	Response      isSelectionResponse_Response `protobuf_oneof:"response"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SelectionResponse) Reset() {
+	*x = SelectionResponse{}
+	mi := &file_api_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SelectionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectionResponse) ProtoMessage() {}
+
+func (x *SelectionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectionResponse.ProtoReflect.Descriptor instead.
+func (*SelectionResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *SelectionResponse) GetStatus() SelectionResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return SelectionResponse_OK
+}
+
+func (x *SelectionResponse) GetResponse() isSelectionResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *SelectionResponse) GetGetSelectionResponse() *SelectionResponse_GetSelectionResponse {
+	if x != nil {
+		if x, ok := x.Response.(*SelectionResponse_GetSelectionResponse_); ok {
+			return x.GetSelectionResponse
+		}
+	}
+	return nil
+}
+
+func (x *SelectionResponse) GetSetSelectionResponse() *SelectionResponse_SetSelectionResponse {
+	if x != nil {
+		if x, ok := x.Response.(*SelectionResponse_SetSelectionResponse_); ok {
+			return x.SetSelectionResponse
+		}
+	}
+	return nil
+}
+
+type isSelectionResponse_Response interface {
+	isSelectionResponse_Response()
+}
+
+type SelectionResponse_GetSelectionResponse_ struct {
+	GetSelectionResponse *SelectionResponse_GetSelectionResponse `protobuf:"bytes,2,opt,name=get_selection_response,json=getSelectionResponse,oneof"`
+}
+
+type SelectionResponse_SetSelectionResponse_ struct {
+	SetSelectionResponse *SelectionResponse_SetSelectionResponse `protobuf:"bytes,3,opt,name=set_selection_response,json=setSelectionResponse,oneof"`
+}
+
+func (*SelectionResponse_GetSelectionResponse_) isSelectionResponse_Response() {}
+
+func (*SelectionResponse_SetSelectionResponse_) isSelectionResponse_Response() {}
+
+type ColorPresetRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Request:
+	//
+	//	*ColorPresetRequest_ListPresets_
+	//	*ColorPresetRequest_GetPreset_
+	Request       isColorPresetRequest_Request `protobuf_oneof:"request"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ColorPresetRequest) Reset() {
+	*x = ColorPresetRequest{}
+	mi := &file_api_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ColorPresetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ColorPresetRequest) ProtoMessage() {}
+
+func (x *ColorPresetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ColorPresetRequest.ProtoReflect.Descriptor instead.
+func (*ColorPresetRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ColorPresetRequest) GetRequest() isColorPresetRequest_Request {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
+func (x *ColorPresetRequest) GetListPresets() *ColorPresetRequest_ListPresets {
+	if x != nil {
+		if x, ok := x.Request.(*ColorPresetRequest_ListPresets_); ok {
+			return x.ListPresets
+		}
+	}
+	return nil
+}
+
+func (x *ColorPresetRequest) GetGetPreset() *ColorPresetRequest_GetPreset {
+	if x != nil {
+		if x, ok := x.Request.(*ColorPresetRequest_GetPreset_); ok {
+			return x.GetPreset
+		}
+	}
+	return nil
+}
+
+type isColorPresetRequest_Request interface {
+	isColorPresetRequest_Request()
+}
+
+type ColorPresetRequest_ListPresets_ struct {
+	ListPresets *ColorPresetRequest_ListPresets `protobuf:"bytes,1,opt,name=list_presets,json=listPresets,oneof"`
+}
+
+type ColorPresetRequest_GetPreset_ struct {
+	GetPreset *ColorPresetRequest_GetPreset `protobuf:"bytes,2,opt,name=get_preset,json=getPreset,oneof"`
+}
+
+func (*ColorPresetRequest_ListPresets_) isColorPresetRequest_Request() {}
+
+func (*ColorPresetRequest_GetPreset_) isColorPresetRequest_Request() {}
+
+type ColorPresetResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Response:
+	//
+	//	*ColorPresetResponse_ListPresets_
+	//	*ColorPresetResponse_GetPreset_
+	Response      isColorPresetResponse_Response `protobuf_oneof:"response"`
+	Status        *ColorPresetResponse_Status    `protobuf:"varint,3,opt,name=status,enum=iterm2.ColorPresetResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ColorPresetResponse) Reset() {
+	*x = ColorPresetResponse{}
+	mi := &file_api_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ColorPresetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ColorPresetResponse) ProtoMessage() {}
+
+func (x *ColorPresetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ColorPresetResponse.ProtoReflect.Descriptor instead.
+func (*ColorPresetResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ColorPresetResponse) GetResponse() isColorPresetResponse_Response {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *ColorPresetResponse) GetListPresets() *ColorPresetResponse_ListPresets {
+	if x != nil {
+		if x, ok := x.Response.(*ColorPresetResponse_ListPresets_); ok {
+			return x.ListPresets
+		}
+	}
+	return nil
+}
+
+func (x *ColorPresetResponse) GetGetPreset() *ColorPresetResponse_GetPreset {
+	if x != nil {
+		if x, ok := x.Response.(*ColorPresetResponse_GetPreset_); ok {
+			return x.GetPreset
+		}
+	}
+	return nil
+}
+
+func (x *ColorPresetResponse) GetStatus() ColorPresetResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return ColorPresetResponse_OK
+}
+
+type isColorPresetResponse_Response interface {
+	isColorPresetResponse_Response()
+}
+
+type ColorPresetResponse_ListPresets_ struct {
+	ListPresets *ColorPresetResponse_ListPresets `protobuf:"bytes,1,opt,name=list_presets,json=listPresets,oneof"`
+}
+
+type ColorPresetResponse_GetPreset_ struct {
+	GetPreset *ColorPresetResponse_GetPreset `protobuf:"bytes,2,opt,name=get_preset,json=getPreset,oneof"`
+}
+
+func (*ColorPresetResponse_ListPresets_) isColorPresetResponse_Response() {}
+
+func (*ColorPresetResponse_GetPreset_) isColorPresetResponse_Response() {}
+
+type PreferencesRequest struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	Requests      []*PreferencesRequest_Request `protobuf:"bytes,1,rep,name=requests" json:"requests,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PreferencesRequest) Reset() {
+	*x = PreferencesRequest{}
+	mi := &file_api_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PreferencesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PreferencesRequest) ProtoMessage() {}
+
+func (x *PreferencesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PreferencesRequest.ProtoReflect.Descriptor instead.
+func (*PreferencesRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *PreferencesRequest) GetRequests() []*PreferencesRequest_Request {
+	if x != nil {
+		return x.Requests
+	}
+	return nil
+}
+
+type PreferencesResponse struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	Results       []*PreferencesResponse_Result `protobuf:"bytes,1,rep,name=results" json:"results,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PreferencesResponse) Reset() {
+	*x = PreferencesResponse{}
+	mi := &file_api_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PreferencesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PreferencesResponse) ProtoMessage() {}
+
+func (x *PreferencesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PreferencesResponse.ProtoReflect.Descriptor instead.
+func (*PreferencesResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *PreferencesResponse) GetResults() []*PreferencesResponse_Result {
+	if x != nil {
+		return x.Results
+	}
+	return nil
+}
+
+type ReorderTabsRequest struct {
+	state         protoimpl.MessageState           `protogen:"open.v1"`
+	Assignments   []*ReorderTabsRequest_Assignment `protobuf:"bytes,3,rep,name=assignments" json:"assignments,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReorderTabsRequest) Reset() {
+	*x = ReorderTabsRequest{}
+	mi := &file_api_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReorderTabsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReorderTabsRequest) ProtoMessage() {}
+
+func (x *ReorderTabsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReorderTabsRequest.ProtoReflect.Descriptor instead.
+func (*ReorderTabsRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *ReorderTabsRequest) GetAssignments() []*ReorderTabsRequest_Assignment {
+	if x != nil {
+		return x.Assignments
+	}
+	return nil
+}
+
+type ReorderTabsResponse struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	Status        *ReorderTabsResponse_Status `protobuf:"varint,4,opt,name=status,enum=iterm2.ReorderTabsResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReorderTabsResponse) Reset() {
+	*x = ReorderTabsResponse{}
+	mi := &file_api_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReorderTabsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReorderTabsResponse) ProtoMessage() {}
+
+func (x *ReorderTabsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReorderTabsResponse.ProtoReflect.Descriptor instead.
+func (*ReorderTabsResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *ReorderTabsResponse) GetStatus() ReorderTabsResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return ReorderTabsResponse_OK
+}
+
+type TmuxRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Payload:
+	//
+	//	*TmuxRequest_ListConnections_
+	//	*TmuxRequest_SendCommand_
+	//	*TmuxRequest_SetWindowVisible_
+	//	*TmuxRequest_CreateWindow_
+	Payload       isTmuxRequest_Payload `protobuf_oneof:"payload"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TmuxRequest) Reset() {
+	*x = TmuxRequest{}
+	mi := &file_api_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TmuxRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TmuxRequest) ProtoMessage() {}
+
+func (x *TmuxRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TmuxRequest.ProtoReflect.Descriptor instead.
+func (*TmuxRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *TmuxRequest) GetPayload() isTmuxRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *TmuxRequest) GetListConnections() *TmuxRequest_ListConnections {
+	if x != nil {
+		if x, ok := x.Payload.(*TmuxRequest_ListConnections_); ok {
+			return x.ListConnections
+		}
+	}
+	return nil
+}
+
+func (x *TmuxRequest) GetSendCommand() *TmuxRequest_SendCommand {
+	if x != nil {
+		if x, ok := x.Payload.(*TmuxRequest_SendCommand_); ok {
+			return x.SendCommand
+		}
+	}
+	return nil
+}
+
+func (x *TmuxRequest) GetSetWindowVisible() *TmuxRequest_SetWindowVisible {
+	if x != nil {
+		if x, ok := x.Payload.(*TmuxRequest_SetWindowVisible_); ok {
+			return x.SetWindowVisible
+		}
+	}
+	return nil
+}
+
+func (x *TmuxRequest) GetCreateWindow() *TmuxRequest_CreateWindow {
+	if x != nil {
+		if x, ok := x.Payload.(*TmuxRequest_CreateWindow_); ok {
+			return x.CreateWindow
+		}
+	}
+	return nil
+}
+
+type isTmuxRequest_Payload interface {
+	isTmuxRequest_Payload()
+}
+
+type TmuxRequest_ListConnections_ struct {
+	ListConnections *TmuxRequest_ListConnections `protobuf:"bytes,1,opt,name=list_connections,json=listConnections,oneof"`
+}
+
+type TmuxRequest_SendCommand_ struct {
+	SendCommand *TmuxRequest_SendCommand `protobuf:"bytes,2,opt,name=send_command,json=sendCommand,oneof"`
+}
+
+type TmuxRequest_SetWindowVisible_ struct {
+	SetWindowVisible *TmuxRequest_SetWindowVisible `protobuf:"bytes,3,opt,name=set_window_visible,json=setWindowVisible,oneof"`
+}
+
+type TmuxRequest_CreateWindow_ struct {
+	CreateWindow *TmuxRequest_CreateWindow `protobuf:"bytes,4,opt,name=create_window,json=createWindow,oneof"`
+}
+
+func (*TmuxRequest_ListConnections_) isTmuxRequest_Payload() {}
+
+func (*TmuxRequest_SendCommand_) isTmuxRequest_Payload() {}
+
+func (*TmuxRequest_SetWindowVisible_) isTmuxRequest_Payload() {}
+
+func (*TmuxRequest_CreateWindow_) isTmuxRequest_Payload() {}
+
+type TmuxResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Payload:
+	//
+	//	*TmuxResponse_ListConnections_
+	//	*TmuxResponse_SendCommand_
+	//	*TmuxResponse_SetWindowVisible_
+	//	*TmuxResponse_CreateWindow_
+	Payload       isTmuxResponse_Payload `protobuf_oneof:"payload"`
+	Status        *TmuxResponse_Status   `protobuf:"varint,4,opt,name=status,enum=iterm2.TmuxResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TmuxResponse) Reset() {
+	*x = TmuxResponse{}
+	mi := &file_api_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TmuxResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TmuxResponse) ProtoMessage() {}
+
+func (x *TmuxResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TmuxResponse.ProtoReflect.Descriptor instead.
+func (*TmuxResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *TmuxResponse) GetPayload() isTmuxResponse_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *TmuxResponse) GetListConnections() *TmuxResponse_ListConnections {
+	if x != nil {
+		if x, ok := x.Payload.(*TmuxResponse_ListConnections_); ok {
+			return x.ListConnections
+		}
+	}
+	return nil
+}
+
+func (x *TmuxResponse) GetSendCommand() *TmuxResponse_SendCommand {
+	if x != nil {
+		if x, ok := x.Payload.(*TmuxResponse_SendCommand_); ok {
+			return x.SendCommand
+		}
+	}
+	return nil
+}
+
+func (x *TmuxResponse) GetSetWindowVisible() *TmuxResponse_SetWindowVisible {
+	if x != nil {
+		if x, ok := x.Payload.(*TmuxResponse_SetWindowVisible_); ok {
+			return x.SetWindowVisible
+		}
+	}
+	return nil
+}
+
+func (x *TmuxResponse) GetCreateWindow() *TmuxResponse_CreateWindow {
+	if x != nil {
+		if x, ok := x.Payload.(*TmuxResponse_CreateWindow_); ok {
+			return x.CreateWindow
+		}
+	}
+	return nil
+}
+
+func (x *TmuxResponse) GetStatus() TmuxResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return TmuxResponse_OK
+}
+
+type isTmuxResponse_Payload interface {
+	isTmuxResponse_Payload()
+}
+
+type TmuxResponse_ListConnections_ struct {
+	ListConnections *TmuxResponse_ListConnections `protobuf:"bytes,1,opt,name=list_connections,json=listConnections,oneof"`
+}
+
+type TmuxResponse_SendCommand_ struct {
+	SendCommand *TmuxResponse_SendCommand `protobuf:"bytes,2,opt,name=send_command,json=sendCommand,oneof"`
+}
+
+type TmuxResponse_SetWindowVisible_ struct {
+	SetWindowVisible *TmuxResponse_SetWindowVisible `protobuf:"bytes,3,opt,name=set_window_visible,json=setWindowVisible,oneof"`
+}
+
+type TmuxResponse_CreateWindow_ struct {
+	CreateWindow *TmuxResponse_CreateWindow `protobuf:"bytes,5,opt,name=create_window,json=createWindow,oneof"`
+}
+
+func (*TmuxResponse_ListConnections_) isTmuxResponse_Payload() {}
+
+func (*TmuxResponse_SendCommand_) isTmuxResponse_Payload() {}
+
+func (*TmuxResponse_SetWindowVisible_) isTmuxResponse_Payload() {}
+
+func (*TmuxResponse_CreateWindow_) isTmuxResponse_Payload() {}
+
+type GetBroadcastDomainsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBroadcastDomainsRequest) Reset() {
+	*x = GetBroadcastDomainsRequest{}
+	mi := &file_api_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBroadcastDomainsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBroadcastDomainsRequest) ProtoMessage() {}
+
+func (x *GetBroadcastDomainsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBroadcastDomainsRequest.ProtoReflect.Descriptor instead.
+func (*GetBroadcastDomainsRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{23}
+}
+
+type BroadcastDomain struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionIds    []string               `protobuf:"bytes,1,rep,name=session_ids,json=sessionIds" json:"session_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BroadcastDomain) Reset() {
+	*x = BroadcastDomain{}
+	mi := &file_api_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BroadcastDomain) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BroadcastDomain) ProtoMessage() {}
+
+func (x *BroadcastDomain) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BroadcastDomain.ProtoReflect.Descriptor instead.
+func (*BroadcastDomain) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *BroadcastDomain) GetSessionIds() []string {
+	if x != nil {
+		return x.SessionIds
+	}
+	return nil
+}
+
+type GetBroadcastDomainsResponse struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	BroadcastDomains []*BroadcastDomain     `protobuf:"bytes,1,rep,name=broadcast_domains,json=broadcastDomains" json:"broadcast_domains,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *GetBroadcastDomainsResponse) Reset() {
+	*x = GetBroadcastDomainsResponse{}
+	mi := &file_api_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBroadcastDomainsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBroadcastDomainsResponse) ProtoMessage() {}
+
+func (x *GetBroadcastDomainsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBroadcastDomainsResponse.ProtoReflect.Descriptor instead.
+func (*GetBroadcastDomainsResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GetBroadcastDomainsResponse) GetBroadcastDomains() []*BroadcastDomain {
+	if x != nil {
+		return x.BroadcastDomains
+	}
+	return nil
+}
+
+type SetTabLayoutRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The tree structure must exactly match the actual tree structure, including the `vertical`
+	// setting. Only the grid_sizes may change. They must still add up to the same value in every
+	// dimension.
+	Root          *SplitTreeNode `protobuf:"bytes,1,opt,name=root" json:"root,omitempty"`
+	TabId         *string        `protobuf:"bytes,2,opt,name=tab_id,json=tabId" json:"tab_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetTabLayoutRequest) Reset() {
+	*x = SetTabLayoutRequest{}
+	mi := &file_api_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetTabLayoutRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetTabLayoutRequest) ProtoMessage() {}
+
+func (x *SetTabLayoutRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetTabLayoutRequest.ProtoReflect.Descriptor instead.
+func (*SetTabLayoutRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *SetTabLayoutRequest) GetRoot() *SplitTreeNode {
+	if x != nil {
+		return x.Root
+	}
+	return nil
+}
+
+func (x *SetTabLayoutRequest) GetTabId() string {
+	if x != nil && x.TabId != nil {
+		return *x.TabId
+	}
+	return ""
+}
+
+type SetTabLayoutResponse struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Status        *SetTabLayoutResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SetTabLayoutResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetTabLayoutResponse) Reset() {
+	*x = SetTabLayoutResponse{}
+	mi := &file_api_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetTabLayoutResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetTabLayoutResponse) ProtoMessage() {}
+
+func (x *SetTabLayoutResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetTabLayoutResponse.ProtoReflect.Descriptor instead.
+func (*SetTabLayoutResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *SetTabLayoutResponse) GetStatus() SetTabLayoutResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return SetTabLayoutResponse_OK
+}
+
+// Invoke or ask for info about a menu item
+type MenuItemRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Unique identifier of the menu item.
+	Identifier *string `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
+	// If set do not actually invoke it. Just return its state.
+	QueryOnly     *bool `protobuf:"varint,2,opt,name=query_only,json=queryOnly" json:"query_only,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MenuItemRequest) Reset() {
+	*x = MenuItemRequest{}
+	mi := &file_api_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MenuItemRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MenuItemRequest) ProtoMessage() {}
+
+func (x *MenuItemRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MenuItemRequest.ProtoReflect.Descriptor instead.
+func (*MenuItemRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *MenuItemRequest) GetIdentifier() string {
+	if x != nil && x.Identifier != nil {
+		return *x.Identifier
+	}
+	return ""
+}
+
+func (x *MenuItemRequest) GetQueryOnly() bool {
+	if x != nil && x.QueryOnly != nil {
+		return *x.QueryOnly
+	}
+	return false
+}
+
+type MenuItemResponse struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Status        *MenuItemResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.MenuItemResponse_Status" json:"status,omitempty"`
+	Checked       *bool                    `protobuf:"varint,2,opt,name=checked" json:"checked,omitempty"`
+	Enabled       *bool                    `protobuf:"varint,3,opt,name=enabled" json:"enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MenuItemResponse) Reset() {
+	*x = MenuItemResponse{}
+	mi := &file_api_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MenuItemResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MenuItemResponse) ProtoMessage() {}
+
+func (x *MenuItemResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MenuItemResponse.ProtoReflect.Descriptor instead.
+func (*MenuItemResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *MenuItemResponse) GetStatus() MenuItemResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return MenuItemResponse_OK
+}
+
+func (x *MenuItemResponse) GetChecked() bool {
+	if x != nil && x.Checked != nil {
+		return *x.Checked
+	}
+	return false
+}
+
+func (x *MenuItemResponse) GetEnabled() bool {
+	if x != nil && x.Enabled != nil {
+		return *x.Enabled
+	}
+	return false
+}
+
+type RestartSessionRequest struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	SessionId *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"` // "all" not allowed.
+	// If set, then still-running sessions will fail to restart with SESSION_NOT_RESTARTABLE.
+	// If not set, then a still-running session gets killed and restarted.
+	OnlyIfExited  *bool `protobuf:"varint,2,opt,name=only_if_exited,json=onlyIfExited" json:"only_if_exited,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RestartSessionRequest) Reset() {
+	*x = RestartSessionRequest{}
+	mi := &file_api_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RestartSessionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RestartSessionRequest) ProtoMessage() {}
+
+func (x *RestartSessionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RestartSessionRequest.ProtoReflect.Descriptor instead.
+func (*RestartSessionRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *RestartSessionRequest) GetSessionId() string {
+	if x != nil && x.SessionId != nil {
+		return *x.SessionId
+	}
+	return ""
+}
+
+func (x *RestartSessionRequest) GetOnlyIfExited() bool {
+	if x != nil && x.OnlyIfExited != nil {
+		return *x.OnlyIfExited
+	}
+	return false
+}
+
+type RestartSessionResponse struct {
+	state         protoimpl.MessageState         `protogen:"open.v1"`
+	Status        *RestartSessionResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.RestartSessionResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RestartSessionResponse) Reset() {
+	*x = RestartSessionResponse{}
+	mi := &file_api_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RestartSessionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RestartSessionResponse) ProtoMessage() {}
+
+func (x *RestartSessionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RestartSessionResponse.ProtoReflect.Descriptor instead.
+func (*RestartSessionResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *RestartSessionResponse) GetStatus() RestartSessionResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return RestartSessionResponse_OK
+}
+
+// This is the result of an iTerm2-to-script RPC call.
+type ServerOriginatedRPCResultRequest struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	RequestId *string                `protobuf:"bytes,1,opt,name=request_id,json=requestId" json:"request_id,omitempty"`
+	// Types that are valid to be assigned to Result:
+	//
+	//	*ServerOriginatedRPCResultRequest_JsonException
+	//	*ServerOriginatedRPCResultRequest_JsonValue
+	Result        isServerOriginatedRPCResultRequest_Result `protobuf_oneof:"result"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ServerOriginatedRPCResultRequest) Reset() {
+	*x = ServerOriginatedRPCResultRequest{}
+	mi := &file_api_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServerOriginatedRPCResultRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServerOriginatedRPCResultRequest) ProtoMessage() {}
+
+func (x *ServerOriginatedRPCResultRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServerOriginatedRPCResultRequest.ProtoReflect.Descriptor instead.
+func (*ServerOriginatedRPCResultRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *ServerOriginatedRPCResultRequest) GetRequestId() string {
+	if x != nil && x.RequestId != nil {
+		return *x.RequestId
+	}
+	return ""
+}
+
+func (x *ServerOriginatedRPCResultRequest) GetResult() isServerOriginatedRPCResultRequest_Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *ServerOriginatedRPCResultRequest) GetJsonException() string {
+	if x != nil {
+		if x, ok := x.Result.(*ServerOriginatedRPCResultRequest_JsonException); ok {
+			return x.JsonException
+		}
+	}
+	return ""
+}
+
+func (x *ServerOriginatedRPCResultRequest) GetJsonValue() string {
+	if x != nil {
+		if x, ok := x.Result.(*ServerOriginatedRPCResultRequest_JsonValue); ok {
+			return x.JsonValue
+		}
+	}
+	return ""
+}
+
+type isServerOriginatedRPCResultRequest_Result interface {
+	isServerOriginatedRPCResultRequest_Result()
+}
+
+type ServerOriginatedRPCResultRequest_JsonException struct {
+	// Exceptions should be dictionaries with a key of "reason" having a string value describing
+	// what went wrong.
+	JsonException string `protobuf:"bytes,2,opt,name=json_exception,json=jsonException,oneof"`
+}
+
+type ServerOriginatedRPCResultRequest_JsonValue struct {
+	JsonValue string `protobuf:"bytes,3,opt,name=json_value,json=jsonValue,oneof"`
+}
+
+func (*ServerOriginatedRPCResultRequest_JsonException) isServerOriginatedRPCResultRequest_Result() {}
+
+func (*ServerOriginatedRPCResultRequest_JsonValue) isServerOriginatedRPCResultRequest_Result() {}
+
+// This simply acknowledges receipt of ServerOriginatedRPCResultRequest.
+type ServerOriginatedRPCResultResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ServerOriginatedRPCResultResponse) Reset() {
+	*x = ServerOriginatedRPCResultResponse{}
+	mi := &file_api_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServerOriginatedRPCResultResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServerOriginatedRPCResultResponse) ProtoMessage() {}
+
+func (x *ServerOriginatedRPCResultResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServerOriginatedRPCResultResponse.ProtoReflect.Descriptor instead.
+func (*ServerOriginatedRPCResultResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{33}
+}
+
+// Requests a list of all profiles.
+type ListProfilesRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The profile properties to respond with. See SetProfilePropertyRequest for a list of values.
+	// If empty, all properties will be returned.
+	Properties []string `protobuf:"bytes,1,rep,name=properties" json:"properties,omitempty"`
+	// If empty, all profiles will be returned. Otherwise, only profiles with one of the listed
+	// GUIDs will be returned.
+	Guids         []string `protobuf:"bytes,2,rep,name=guids" json:"guids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListProfilesRequest) Reset() {
+	*x = ListProfilesRequest{}
+	mi := &file_api_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListProfilesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListProfilesRequest) ProtoMessage() {}
+
+func (x *ListProfilesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListProfilesRequest.ProtoReflect.Descriptor instead.
+func (*ListProfilesRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *ListProfilesRequest) GetProperties() []string {
+	if x != nil {
+		return x.Properties
+	}
+	return nil
+}
+
+func (x *ListProfilesRequest) GetGuids() []string {
+	if x != nil {
+		return x.Guids
+	}
+	return nil
+}
+
+type ListProfilesResponse struct {
+	state         protoimpl.MessageState          `protogen:"open.v1"`
+	Profiles      []*ListProfilesResponse_Profile `protobuf:"bytes,1,rep,name=profiles" json:"profiles,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListProfilesResponse) Reset() {
+	*x = ListProfilesResponse{}
+	mi := &file_api_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListProfilesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListProfilesResponse) ProtoMessage() {}
+
+func (x *ListProfilesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListProfilesResponse.ProtoReflect.Descriptor instead.
+func (*ListProfilesResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *ListProfilesResponse) GetProfiles() []*ListProfilesResponse_Profile {
+	if x != nil {
+		return x.Profiles
+	}
+	return nil
+}
+
+type FocusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FocusRequest) Reset() {
+	*x = FocusRequest{}
+	mi := &file_api_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FocusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FocusRequest) ProtoMessage() {}
+
+func (x *FocusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FocusRequest.ProtoReflect.Descriptor instead.
+func (*FocusRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{36}
+}
+
+type FocusResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// A collection of notifications that completely describe the state of every tab and window and
+	// the application itself.
+	Notifications []*FocusChangedNotification `protobuf:"bytes,1,rep,name=notifications" json:"notifications,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FocusResponse) Reset() {
+	*x = FocusResponse{}
+	mi := &file_api_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FocusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FocusResponse) ProtoMessage() {}
+
+func (x *FocusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FocusResponse.ProtoReflect.Descriptor instead.
+func (*FocusResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *FocusResponse) GetNotifications() []*FocusChangedNotification {
+	if x != nil {
+		return x.Notifications
+	}
+	return nil
+}
+
+type SavedArrangementRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Not used for LIST
+	Name   *string                         `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Action *SavedArrangementRequest_Action `protobuf:"varint,2,opt,name=action,enum=iterm2.SavedArrangementRequest_Action" json:"action,omitempty"`
+	// If given and the action is SAVE then only the tabs in the identified window are saved.
+	// If given and the action is RESTORE then the arrangement will be restored as tabs in the identified window.
+	// Not used for LIST
+	WindowId      *string `protobuf:"bytes,3,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SavedArrangementRequest) Reset() {
+	*x = SavedArrangementRequest{}
+	mi := &file_api_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SavedArrangementRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SavedArrangementRequest) ProtoMessage() {}
+
+func (x *SavedArrangementRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SavedArrangementRequest.ProtoReflect.Descriptor instead.
+func (*SavedArrangementRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *SavedArrangementRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *SavedArrangementRequest) GetAction() SavedArrangementRequest_Action {
+	if x != nil && x.Action != nil {
+		return *x.Action
+	}
+	return SavedArrangementRequest_RESTORE
+}
+
+func (x *SavedArrangementRequest) GetWindowId() string {
+	if x != nil && x.WindowId != nil {
+		return *x.WindowId
+	}
+	return ""
+}
+
+type SavedArrangementResponse struct {
+	state         protoimpl.MessageState           `protogen:"open.v1"`
+	Status        *SavedArrangementResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SavedArrangementResponse_Status" json:"status,omitempty"`
+	Names         []string                         `protobuf:"bytes,2,rep,name=names" json:"names,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SavedArrangementResponse) Reset() {
+	*x = SavedArrangementResponse{}
+	mi := &file_api_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SavedArrangementResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SavedArrangementResponse) ProtoMessage() {}
+
+func (x *SavedArrangementResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SavedArrangementResponse.ProtoReflect.Descriptor instead.
+func (*SavedArrangementResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *SavedArrangementResponse) GetStatus() SavedArrangementResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return SavedArrangementResponse_OK
+}
+
+func (x *SavedArrangementResponse) GetNames() []string {
+	if x != nil {
+		return x.Names
+	}
+	return nil
+}
+
+type VariableRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Scope:
+	//
+	//	*VariableRequest_SessionId
+	//	*VariableRequest_TabId
+	//	*VariableRequest_App
+	//	*VariableRequest_WindowId
+	Scope         isVariableRequest_Scope `protobuf_oneof:"scope"`
+	Set           []*VariableRequest_Set  `protobuf:"bytes,2,rep,name=set" json:"set,omitempty"`
+	Get           []string                `protobuf:"bytes,3,rep,name=get" json:"get,omitempty"` // Set to special value "*" to get all in a JSON dictionary
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VariableRequest) Reset() {
+	*x = VariableRequest{}
+	mi := &file_api_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VariableRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VariableRequest) ProtoMessage() {}
+
+func (x *VariableRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VariableRequest.ProtoReflect.Descriptor instead.
+func (*VariableRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *VariableRequest) GetScope() isVariableRequest_Scope {
+	if x != nil {
+		return x.Scope
+	}
+	return nil
+}
+
+func (x *VariableRequest) GetSessionId() string {
+	if x != nil {
+		if x, ok := x.Scope.(*VariableRequest_SessionId); ok {
+			return x.SessionId
+		}
+	}
+	return ""
+}
+
+func (x *VariableRequest) GetTabId() string {
+	if x != nil {
+		if x, ok := x.Scope.(*VariableRequest_TabId); ok {
+			return x.TabId
+		}
+	}
+	return ""
+}
+
+func (x *VariableRequest) GetApp() bool {
+	if x != nil {
+		if x, ok := x.Scope.(*VariableRequest_App); ok {
+			return x.App
+		}
+	}
+	return false
+}
+
+func (x *VariableRequest) GetWindowId() string {
+	if x != nil {
+		if x, ok := x.Scope.(*VariableRequest_WindowId); ok {
+			return x.WindowId
+		}
+	}
+	return ""
+}
+
+func (x *VariableRequest) GetSet() []*VariableRequest_Set {
+	if x != nil {
+		return x.Set
+	}
+	return nil
+}
+
+func (x *VariableRequest) GetGet() []string {
+	if x != nil {
+		return x.Get
+	}
+	return nil
+}
+
+type isVariableRequest_Scope interface {
+	isVariableRequest_Scope()
+}
+
+type VariableRequest_SessionId struct {
+	SessionId string `protobuf:"bytes,1,opt,name=session_id,json=sessionId,oneof"` // "all" is allowed only if no gets (only sets allowed)
+}
+
+type VariableRequest_TabId struct {
+	TabId string `protobuf:"bytes,4,opt,name=tab_id,json=tabId,oneof"` // "all" is allowed only if no gets (only sets allowed)
+}
+
+type VariableRequest_App struct {
+	App bool `protobuf:"varint,5,opt,name=app,oneof"`
+}
+
+type VariableRequest_WindowId struct {
+	WindowId string `protobuf:"bytes,6,opt,name=window_id,json=windowId,oneof"` // "all" is allowed only if no gets (only sets allowed)
+}
+
+func (*VariableRequest_SessionId) isVariableRequest_Scope() {}
+
+func (*VariableRequest_TabId) isVariableRequest_Scope() {}
+
+func (*VariableRequest_App) isVariableRequest_Scope() {}
+
+func (*VariableRequest_WindowId) isVariableRequest_Scope() {}
+
+type VariableResponse struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Status        *VariableResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.VariableResponse_Status" json:"status,omitempty"`
+	Values        []string                 `protobuf:"bytes,2,rep,name=values" json:"values,omitempty"` // 1:1 with get field in request.  JSON encoded, with null for unset variables.
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VariableResponse) Reset() {
+	*x = VariableResponse{}
+	mi := &file_api_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VariableResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VariableResponse) ProtoMessage() {}
+
+func (x *VariableResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VariableResponse.ProtoReflect.Descriptor instead.
+func (*VariableResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *VariableResponse) GetStatus() VariableResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return VariableResponse_OK
+}
+
+func (x *VariableResponse) GetValues() []string {
+	if x != nil {
+		return x.Values
+	}
+	return nil
+}
+
+type ActivateRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// To activate the app without changing anything else omit the identifier.
+	//
+	// Types that are valid to be assigned to Identifier:
+	//
+	//	*ActivateRequest_WindowId
+	//	*ActivateRequest_TabId
+	//	*ActivateRequest_SessionId
+	Identifier       isActivateRequest_Identifier `protobuf_oneof:"identifier"`
+	OrderWindowFront *bool                        `protobuf:"varint,4,opt,name=order_window_front,json=orderWindowFront" json:"order_window_front,omitempty"`
+	// This may be enabled if tab_id or session_id is set.
+	SelectTab *bool `protobuf:"varint,5,opt,name=select_tab,json=selectTab" json:"select_tab,omitempty"`
+	// This may be enabled if session_id is set.
+	SelectSession *bool                `protobuf:"varint,6,opt,name=select_session,json=selectSession" json:"select_session,omitempty"`
+	ActivateApp   *ActivateRequest_App `protobuf:"bytes,7,opt,name=activate_app,json=activateApp" json:"activate_app,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ActivateRequest) Reset() {
+	*x = ActivateRequest{}
+	mi := &file_api_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ActivateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ActivateRequest) ProtoMessage() {}
+
+func (x *ActivateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ActivateRequest.ProtoReflect.Descriptor instead.
+func (*ActivateRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *ActivateRequest) GetIdentifier() isActivateRequest_Identifier {
+	if x != nil {
+		return x.Identifier
+	}
+	return nil
+}
+
+func (x *ActivateRequest) GetWindowId() string {
+	if x != nil {
+		if x, ok := x.Identifier.(*ActivateRequest_WindowId); ok {
+			return x.WindowId
+		}
+	}
+	return ""
+}
+
+func (x *ActivateRequest) GetTabId() string {
+	if x != nil {
+		if x, ok := x.Identifier.(*ActivateRequest_TabId); ok {
+			return x.TabId
+		}
+	}
+	return ""
+}
+
+func (x *ActivateRequest) GetSessionId() string {
+	if x != nil {
+		if x, ok := x.Identifier.(*ActivateRequest_SessionId); ok {
+			return x.SessionId
+		}
+	}
+	return ""
+}
+
+func (x *ActivateRequest) GetOrderWindowFront() bool {
+	if x != nil && x.OrderWindowFront != nil {
+		return *x.OrderWindowFront
+	}
+	return false
+}
+
+func (x *ActivateRequest) GetSelectTab() bool {
+	if x != nil && x.SelectTab != nil {
+		return *x.SelectTab
+	}
+	return false
+}
+
+func (x *ActivateRequest) GetSelectSession() bool {
+	if x != nil && x.SelectSession != nil {
+		return *x.SelectSession
+	}
+	return false
+}
+
+func (x *ActivateRequest) GetActivateApp() *ActivateRequest_App {
+	if x != nil {
+		return x.ActivateApp
+	}
+	return nil
+}
+
+type isActivateRequest_Identifier interface {
+	isActivateRequest_Identifier()
+}
+
+type ActivateRequest_WindowId struct {
+	WindowId string `protobuf:"bytes,1,opt,name=window_id,json=windowId,oneof"`
+}
+
+type ActivateRequest_TabId struct {
+	TabId string `protobuf:"bytes,2,opt,name=tab_id,json=tabId,oneof"`
+}
+
+type ActivateRequest_SessionId struct {
+	SessionId string `protobuf:"bytes,3,opt,name=session_id,json=sessionId,oneof"`
+}
+
+func (*ActivateRequest_WindowId) isActivateRequest_Identifier() {}
+
+func (*ActivateRequest_TabId) isActivateRequest_Identifier() {}
+
+func (*ActivateRequest_SessionId) isActivateRequest_Identifier() {}
+
+type ActivateResponse struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Status        *ActivateResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.ActivateResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ActivateResponse) Reset() {
+	*x = ActivateResponse{}
+	mi := &file_api_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ActivateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ActivateResponse) ProtoMessage() {}
+
+func (x *ActivateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ActivateResponse.ProtoReflect.Descriptor instead.
+func (*ActivateResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *ActivateResponse) GetStatus() ActivateResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return ActivateResponse_OK
+}
+
+// Injects bytes as input to the terminal, as though the running program had produced them.
+type InjectRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     []string               `protobuf:"bytes,1,rep,name=session_id,json=sessionId" json:"session_id,omitempty"`
+	Data          []byte                 `protobuf:"bytes,2,opt,name=data" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InjectRequest) Reset() {
+	*x = InjectRequest{}
+	mi := &file_api_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InjectRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InjectRequest) ProtoMessage() {}
+
+func (x *InjectRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InjectRequest.ProtoReflect.Descriptor instead.
+func (*InjectRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *InjectRequest) GetSessionId() []string {
+	if x != nil {
+		return x.SessionId
+	}
+	return nil
+}
+
+func (x *InjectRequest) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type InjectResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// One status per session_id in the request
+	Status        []InjectResponse_Status `protobuf:"varint,1,rep,name=status,enum=iterm2.InjectResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InjectResponse) Reset() {
+	*x = InjectResponse{}
+	mi := &file_api_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InjectResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InjectResponse) ProtoMessage() {}
+
+func (x *InjectResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InjectResponse.ProtoReflect.Descriptor instead.
+func (*InjectResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *InjectResponse) GetStatus() []InjectResponse_Status {
+	if x != nil {
+		return x.Status
+	}
+	return nil
+}
+
+type GetPropertyRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The kind of ID that's set determines the kind of object you're querying.
+	//
+	// Types that are valid to be assigned to Identifier:
+	//
+	//	*GetPropertyRequest_WindowId
+	//	*GetPropertyRequest_SessionId
+	Identifier isGetPropertyRequest_Identifier `protobuf_oneof:"identifier"`
+	// For sessions:
+	// "grid_size" -> { "width": number, "height": number }
+	// "buried" -> boolean
+	// "number_of_lines" -> { "overflow": number, "grid": number, "history": number }
+	//
+	// For windows:
+	// "frame" -> { "origin": { "x": number, "y": number }, "size": { "width": number, "height": number } }
+	// "fullscreen" -> boolean
+	Name          *string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPropertyRequest) Reset() {
+	*x = GetPropertyRequest{}
+	mi := &file_api_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPropertyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPropertyRequest) ProtoMessage() {}
+
+func (x *GetPropertyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPropertyRequest.ProtoReflect.Descriptor instead.
+func (*GetPropertyRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *GetPropertyRequest) GetIdentifier() isGetPropertyRequest_Identifier {
+	if x != nil {
+		return x.Identifier
+	}
+	return nil
+}
+
+func (x *GetPropertyRequest) GetWindowId() string {
+	if x != nil {
+		if x, ok := x.Identifier.(*GetPropertyRequest_WindowId); ok {
+			return x.WindowId
+		}
+	}
+	return ""
+}
+
+func (x *GetPropertyRequest) GetSessionId() string {
+	if x != nil {
+		if x, ok := x.Identifier.(*GetPropertyRequest_SessionId); ok {
+			return x.SessionId
+		}
+	}
+	return ""
+}
+
+func (x *GetPropertyRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+type isGetPropertyRequest_Identifier interface {
+	isGetPropertyRequest_Identifier()
+}
+
+type GetPropertyRequest_WindowId struct {
+	WindowId string `protobuf:"bytes,1,opt,name=window_id,json=windowId,oneof"`
+}
+
+type GetPropertyRequest_SessionId struct {
+	SessionId string `protobuf:"bytes,3,opt,name=session_id,json=sessionId,oneof"` // Does not accept "all". Accepts "active".
+}
+
+func (*GetPropertyRequest_WindowId) isGetPropertyRequest_Identifier() {}
+
+func (*GetPropertyRequest_SessionId) isGetPropertyRequest_Identifier() {}
+
+type GetPropertyResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Name           Example value
+	// -------------  ---------------
+	// frame          { "origin": { "x": 0, "y": 0 }, "size": { "width": 1024, "height": 768 }}
+	// fullscreen     true, false
+	//
+	// For sessions:
+	// grid_size      { "width": 80, "height": 25 }
+	// buried         true
+	Status        *GetPropertyResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.GetPropertyResponse_Status" json:"status,omitempty"`
+	JsonValue     *string                     `protobuf:"bytes,2,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPropertyResponse) Reset() {
+	*x = GetPropertyResponse{}
+	mi := &file_api_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPropertyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPropertyResponse) ProtoMessage() {}
+
+func (x *GetPropertyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPropertyResponse.ProtoReflect.Descriptor instead.
+func (*GetPropertyResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *GetPropertyResponse) GetStatus() GetPropertyResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return GetPropertyResponse_OK
+}
+
+func (x *GetPropertyResponse) GetJsonValue() string {
+	if x != nil && x.JsonValue != nil {
+		return *x.JsonValue
+	}
+	return ""
+}
+
+type SetPropertyRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Eventually you'll be able to set properties on other things besides The kind of ID that's set
+	// determines the kind of object you're updating.
+	//
+	// Types that are valid to be assigned to Identifier:
+	//
+	//	*SetPropertyRequest_WindowId
+	//	*SetPropertyRequest_SessionId
+	Identifier isSetPropertyRequest_Identifier `protobuf_oneof:"identifier"`
+	// For windows:
+	// Name           Example JSON
+	// -------------  ---------------
+	// frame          { "origin": { "x": 0, "y": 0 }, "size": { "width": 1024, "height": 768 }}
+	// fullscreen     true, false
+	//
+	// For sessions:
+	// grid_size      { "width": 80, "height": 25 }
+	// buried         true
+	Name          *string `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+	JsonValue     *string `protobuf:"bytes,4,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetPropertyRequest) Reset() {
+	*x = SetPropertyRequest{}
+	mi := &file_api_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetPropertyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetPropertyRequest) ProtoMessage() {}
+
+func (x *SetPropertyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetPropertyRequest.ProtoReflect.Descriptor instead.
+func (*SetPropertyRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *SetPropertyRequest) GetIdentifier() isSetPropertyRequest_Identifier {
+	if x != nil {
+		return x.Identifier
+	}
+	return nil
+}
+
+func (x *SetPropertyRequest) GetWindowId() string {
+	if x != nil {
+		if x, ok := x.Identifier.(*SetPropertyRequest_WindowId); ok {
+			return x.WindowId
+		}
+	}
+	return ""
+}
+
+func (x *SetPropertyRequest) GetSessionId() string {
+	if x != nil {
+		if x, ok := x.Identifier.(*SetPropertyRequest_SessionId); ok {
+			return x.SessionId
+		}
+	}
+	return ""
+}
+
+func (x *SetPropertyRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *SetPropertyRequest) GetJsonValue() string {
+	if x != nil && x.JsonValue != nil {
+		return *x.JsonValue
+	}
+	return ""
+}
+
+type isSetPropertyRequest_Identifier interface {
+	isSetPropertyRequest_Identifier()
+}
+
+type SetPropertyRequest_WindowId struct {
+	WindowId string `protobuf:"bytes,1,opt,name=window_id,json=windowId,oneof"`
+}
+
+type SetPropertyRequest_SessionId struct {
+	SessionId string `protobuf:"bytes,5,opt,name=session_id,json=sessionId,oneof"` // Accepts "all" and "active"
+}
+
+func (*SetPropertyRequest_WindowId) isSetPropertyRequest_Identifier() {}
+
+func (*SetPropertyRequest_SessionId) isSetPropertyRequest_Identifier() {}
+
+type SetPropertyResponse struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	Status        *SetPropertyResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SetPropertyResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetPropertyResponse) Reset() {
+	*x = SetPropertyResponse{}
+	mi := &file_api_proto_msgTypes[49]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetPropertyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetPropertyResponse) ProtoMessage() {}
+
+func (x *SetPropertyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[49]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetPropertyResponse.ProtoReflect.Descriptor instead.
+func (*SetPropertyResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{49}
+}
+
+func (x *SetPropertyResponse) GetStatus() SetPropertyResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return SetPropertyResponse_OK
+}
+
+// Registers a toolbelt tool that displays a webview with a URL of your choice.
+type RegisterToolRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// This name is displayed to the user.
+	Name *string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	// The tool's identifier should be unique. Prefix it with your app bundle. For example:
+	// com.example.mytool
+	Identifier *string `protobuf:"bytes,2,opt,name=identifier" json:"identifier,omitempty"`
+	// The first time a tool is registered iTerm2 automatically adds it to the
+	// set of visible tools. To show it on subsequent re-registrations, set this
+	// to true. If the toolbelt itself is hidden, it will not be opened.
+	RevealIfAlreadyRegistered *bool                         `protobuf:"varint,5,opt,name=reveal_if_already_registered,json=revealIfAlreadyRegistered,def=0" json:"reveal_if_already_registered,omitempty"`
+	ToolType                  *RegisterToolRequest_ToolType `protobuf:"varint,3,opt,name=tool_type,json=toolType,enum=iterm2.RegisterToolRequest_ToolType,def=1" json:"tool_type,omitempty"`
+	// For web view tools: The URL loaded at startup
+	URL           *string `protobuf:"bytes,4,opt,name=URL" json:"URL,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+// Default values for RegisterToolRequest fields.
+const (
+	Default_RegisterToolRequest_RevealIfAlreadyRegistered = bool(false)
+	Default_RegisterToolRequest_ToolType                  = RegisterToolRequest_WEB_VIEW_TOOL
+)
+
+func (x *RegisterToolRequest) Reset() {
+	*x = RegisterToolRequest{}
+	mi := &file_api_proto_msgTypes[50]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterToolRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterToolRequest) ProtoMessage() {}
+
+func (x *RegisterToolRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[50]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterToolRequest.ProtoReflect.Descriptor instead.
+func (*RegisterToolRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{50}
+}
+
+func (x *RegisterToolRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *RegisterToolRequest) GetIdentifier() string {
+	if x != nil && x.Identifier != nil {
+		return *x.Identifier
+	}
+	return ""
+}
+
+func (x *RegisterToolRequest) GetRevealIfAlreadyRegistered() bool {
+	if x != nil && x.RevealIfAlreadyRegistered != nil {
+		return *x.RevealIfAlreadyRegistered
+	}
+	return Default_RegisterToolRequest_RevealIfAlreadyRegistered
+}
+
+func (x *RegisterToolRequest) GetToolType() RegisterToolRequest_ToolType {
+	if x != nil && x.ToolType != nil {
+		return *x.ToolType
+	}
+	return Default_RegisterToolRequest_ToolType
+}
+
+func (x *RegisterToolRequest) GetURL() string {
+	if x != nil && x.URL != nil {
+		return *x.URL
+	}
+	return ""
+}
+
+// Describes an RPC from iTerm2 to script. I don't want to invent my own type
+// system so this is dynamically typed, which matches Python well enough.
+type RPCRegistrationRequest struct {
+	state     protoimpl.MessageState                         `protogen:"open.v1"`
+	Name      *string                                        `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Arguments []*RPCRegistrationRequest_RPCArgumentSignature `protobuf:"bytes,2,rep,name=arguments" json:"arguments,omitempty"`
+	Defaults  []*RPCRegistrationRequest_RPCArgument          `protobuf:"bytes,4,rep,name=defaults" json:"defaults,omitempty"`
+	// If not specified, iTerm2 decides based on its built-in default.
+	Timeout *float32                     `protobuf:"fixed32,3,opt,name=timeout" json:"timeout,omitempty"`
+	Role    *RPCRegistrationRequest_Role `protobuf:"varint,5,opt,name=role,enum=iterm2.RPCRegistrationRequest_Role,def=1" json:"role,omitempty"`
+	// Types that are valid to be assigned to RoleSpecificAttributes:
+	//
+	//	*RPCRegistrationRequest_SessionTitleAttributes_
+	//	*RPCRegistrationRequest_StatusBarComponentAttributes_
+	//	*RPCRegistrationRequest_ContextMenuAttributes_
+	RoleSpecificAttributes isRPCRegistrationRequest_RoleSpecificAttributes `protobuf_oneof:"RoleSpecificAttributes"`
+	// Deprecated: Marked as deprecated in api.proto.
+	DisplayName   *string `protobuf:"bytes,6,opt,name=display_name,json=displayName" json:"display_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+// Default values for RPCRegistrationRequest fields.
+const (
+	Default_RPCRegistrationRequest_Role = RPCRegistrationRequest_GENERIC
+)
+
+func (x *RPCRegistrationRequest) Reset() {
+	*x = RPCRegistrationRequest{}
+	mi := &file_api_proto_msgTypes[51]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPCRegistrationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPCRegistrationRequest) ProtoMessage() {}
+
+func (x *RPCRegistrationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[51]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPCRegistrationRequest.ProtoReflect.Descriptor instead.
+func (*RPCRegistrationRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51}
+}
+
+func (x *RPCRegistrationRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest) GetArguments() []*RPCRegistrationRequest_RPCArgumentSignature {
+	if x != nil {
+		return x.Arguments
+	}
+	return nil
+}
+
+func (x *RPCRegistrationRequest) GetDefaults() []*RPCRegistrationRequest_RPCArgument {
+	if x != nil {
+		return x.Defaults
+	}
+	return nil
+}
+
+func (x *RPCRegistrationRequest) GetTimeout() float32 {
+	if x != nil && x.Timeout != nil {
+		return *x.Timeout
+	}
+	return 0
+}
+
+func (x *RPCRegistrationRequest) GetRole() RPCRegistrationRequest_Role {
+	if x != nil && x.Role != nil {
+		return *x.Role
+	}
+	return Default_RPCRegistrationRequest_Role
+}
+
+func (x *RPCRegistrationRequest) GetRoleSpecificAttributes() isRPCRegistrationRequest_RoleSpecificAttributes {
+	if x != nil {
+		return x.RoleSpecificAttributes
+	}
+	return nil
+}
+
+func (x *RPCRegistrationRequest) GetSessionTitleAttributes() *RPCRegistrationRequest_SessionTitleAttributes {
+	if x != nil {
+		if x, ok := x.RoleSpecificAttributes.(*RPCRegistrationRequest_SessionTitleAttributes_); ok {
+			return x.SessionTitleAttributes
+		}
+	}
+	return nil
+}
+
+func (x *RPCRegistrationRequest) GetStatusBarComponentAttributes() *RPCRegistrationRequest_StatusBarComponentAttributes {
+	if x != nil {
+		if x, ok := x.RoleSpecificAttributes.(*RPCRegistrationRequest_StatusBarComponentAttributes_); ok {
+			return x.StatusBarComponentAttributes
+		}
+	}
+	return nil
+}
+
+func (x *RPCRegistrationRequest) GetContextMenuAttributes() *RPCRegistrationRequest_ContextMenuAttributes {
+	if x != nil {
+		if x, ok := x.RoleSpecificAttributes.(*RPCRegistrationRequest_ContextMenuAttributes_); ok {
+			return x.ContextMenuAttributes
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in api.proto.
+func (x *RPCRegistrationRequest) GetDisplayName() string {
+	if x != nil && x.DisplayName != nil {
+		return *x.DisplayName
+	}
+	return ""
+}
+
+type isRPCRegistrationRequest_RoleSpecificAttributes interface {
+	isRPCRegistrationRequest_RoleSpecificAttributes()
+}
+
+type RPCRegistrationRequest_SessionTitleAttributes_ struct {
+	SessionTitleAttributes *RPCRegistrationRequest_SessionTitleAttributes `protobuf:"bytes,7,opt,name=session_title_attributes,json=sessionTitleAttributes,oneof"`
+}
+
+type RPCRegistrationRequest_StatusBarComponentAttributes_ struct {
+	StatusBarComponentAttributes *RPCRegistrationRequest_StatusBarComponentAttributes `protobuf:"bytes,8,opt,name=status_bar_component_attributes,json=statusBarComponentAttributes,oneof"`
+}
+
+type RPCRegistrationRequest_ContextMenuAttributes_ struct {
+	ContextMenuAttributes *RPCRegistrationRequest_ContextMenuAttributes `protobuf:"bytes,9,opt,name=context_menu_attributes,json=contextMenuAttributes,oneof"`
+}
+
+func (*RPCRegistrationRequest_SessionTitleAttributes_) isRPCRegistrationRequest_RoleSpecificAttributes() {
+}
+
+func (*RPCRegistrationRequest_StatusBarComponentAttributes_) isRPCRegistrationRequest_RoleSpecificAttributes() {
+}
+
+func (*RPCRegistrationRequest_ContextMenuAttributes_) isRPCRegistrationRequest_RoleSpecificAttributes() {
+}
+
+type RegisterToolResponse struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Status        *RegisterToolResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.RegisterToolResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegisterToolResponse) Reset() {
+	*x = RegisterToolResponse{}
+	mi := &file_api_proto_msgTypes[52]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterToolResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterToolResponse) ProtoMessage() {}
+
+func (x *RegisterToolResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[52]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterToolResponse.ProtoReflect.Descriptor instead.
+func (*RegisterToolResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{52}
+}
+
+func (x *RegisterToolResponse) GetStatus() RegisterToolResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return RegisterToolResponse_OK
+}
+
+type KeystrokePattern struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The keystroke matches the pattern if it has all the required and none of the forbidden modifiers.
+	RequiredModifiers  []Modifiers `protobuf:"varint,1,rep,name=required_modifiers,json=requiredModifiers,enum=iterm2.Modifiers" json:"required_modifiers,omitempty"`
+	ForbiddenModifiers []Modifiers `protobuf:"varint,2,rep,name=forbidden_modifiers,json=forbiddenModifiers,enum=iterm2.Modifiers" json:"forbidden_modifiers,omitempty"`
+	// The pattern matches if the keystroke has any of these keycodes:
+	Keycodes []int32 `protobuf:"varint,3,rep,name=keycodes" json:"keycodes,omitempty"`
+	// The pattern matches if the keystroke equals of any of these characters:
+	Characters []string `protobuf:"bytes,4,rep,name=characters" json:"characters,omitempty"`
+	// The pattern matches if the keystroke equals any of these characters ignoring modifiers.
+	// This is Apple parlance for "ignoring the shift key plus various other undocumented things"
+	CharactersIgnoringModifiers []string `protobuf:"bytes,5,rep,name=characters_ignoring_modifiers,json=charactersIgnoringModifiers" json:"characters_ignoring_modifiers,omitempty"`
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
+}
+
+func (x *KeystrokePattern) Reset() {
+	*x = KeystrokePattern{}
+	mi := &file_api_proto_msgTypes[53]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeystrokePattern) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeystrokePattern) ProtoMessage() {}
+
+func (x *KeystrokePattern) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[53]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeystrokePattern.ProtoReflect.Descriptor instead.
+func (*KeystrokePattern) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{53}
+}
+
+func (x *KeystrokePattern) GetRequiredModifiers() []Modifiers {
+	if x != nil {
+		return x.RequiredModifiers
+	}
+	return nil
+}
+
+func (x *KeystrokePattern) GetForbiddenModifiers() []Modifiers {
+	if x != nil {
+		return x.ForbiddenModifiers
+	}
+	return nil
+}
+
+func (x *KeystrokePattern) GetKeycodes() []int32 {
+	if x != nil {
+		return x.Keycodes
+	}
+	return nil
+}
+
+func (x *KeystrokePattern) GetCharacters() []string {
+	if x != nil {
+		return x.Characters
+	}
+	return nil
+}
+
+func (x *KeystrokePattern) GetCharactersIgnoringModifiers() []string {
+	if x != nil {
+		return x.CharactersIgnoringModifiers
+	}
+	return nil
+}
+
+type KeystrokeMonitorRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// KeystrokeFilterRequest was split from this to make a more sensible API.
+	//
+	// Deprecated: Marked as deprecated in api.proto.
+	PatternsToIgnore []*KeystrokePattern `protobuf:"bytes,1,rep,name=patterns_to_ignore,json=patternsToIgnore" json:"patterns_to_ignore,omitempty"`
+	// If false, then only key-down events are sent. If true, key-down, key-up, and flags-changed events are sent.
+	Advanced      *bool `protobuf:"varint,2,opt,name=advanced" json:"advanced,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *KeystrokeMonitorRequest) Reset() {
+	*x = KeystrokeMonitorRequest{}
+	mi := &file_api_proto_msgTypes[54]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeystrokeMonitorRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeystrokeMonitorRequest) ProtoMessage() {}
+
+func (x *KeystrokeMonitorRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[54]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeystrokeMonitorRequest.ProtoReflect.Descriptor instead.
+func (*KeystrokeMonitorRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{54}
+}
+
+// Deprecated: Marked as deprecated in api.proto.
+func (x *KeystrokeMonitorRequest) GetPatternsToIgnore() []*KeystrokePattern {
+	if x != nil {
+		return x.PatternsToIgnore
+	}
+	return nil
+}
+
+func (x *KeystrokeMonitorRequest) GetAdvanced() bool {
+	if x != nil && x.Advanced != nil {
+		return *x.Advanced
+	}
+	return false
+}
+
+type KeystrokeFilterRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// If a keystroke matches any of these patterns then they will not be handled by the application.
+	// A notification will be posted and the script can handle it as it pleases.
+	PatternsToIgnore []*KeystrokePattern `protobuf:"bytes,1,rep,name=patterns_to_ignore,json=patternsToIgnore" json:"patterns_to_ignore,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *KeystrokeFilterRequest) Reset() {
+	*x = KeystrokeFilterRequest{}
+	mi := &file_api_proto_msgTypes[55]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeystrokeFilterRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeystrokeFilterRequest) ProtoMessage() {}
+
+func (x *KeystrokeFilterRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[55]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeystrokeFilterRequest.ProtoReflect.Descriptor instead.
+func (*KeystrokeFilterRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{55}
+}
+
+func (x *KeystrokeFilterRequest) GetPatternsToIgnore() []*KeystrokePattern {
+	if x != nil {
+		return x.PatternsToIgnore
+	}
+	return nil
+}
+
+type VariableMonitorRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          *string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Scope         *VariableScope         `protobuf:"varint,2,opt,name=scope,enum=iterm2.VariableScope" json:"scope,omitempty"`
+	Identifier    *string                `protobuf:"bytes,3,opt,name=identifier" json:"identifier,omitempty"` // Session, Window, or Tab identifier.
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VariableMonitorRequest) Reset() {
+	*x = VariableMonitorRequest{}
+	mi := &file_api_proto_msgTypes[56]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VariableMonitorRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VariableMonitorRequest) ProtoMessage() {}
+
+func (x *VariableMonitorRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[56]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VariableMonitorRequest.ProtoReflect.Descriptor instead.
+func (*VariableMonitorRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{56}
+}
+
+func (x *VariableMonitorRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *VariableMonitorRequest) GetScope() VariableScope {
+	if x != nil && x.Scope != nil {
+		return *x.Scope
+	}
+	return VariableScope_SESSION
+}
+
+func (x *VariableMonitorRequest) GetIdentifier() string {
+	if x != nil && x.Identifier != nil {
+		return *x.Identifier
+	}
+	return ""
+}
+
+type ProfileChangeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Guid          *string                `protobuf:"bytes,1,opt,name=guid" json:"guid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProfileChangeRequest) Reset() {
+	*x = ProfileChangeRequest{}
+	mi := &file_api_proto_msgTypes[57]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProfileChangeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProfileChangeRequest) ProtoMessage() {}
+
+func (x *ProfileChangeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[57]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProfileChangeRequest.ProtoReflect.Descriptor instead.
+func (*ProfileChangeRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{57}
+}
+
+func (x *ProfileChangeRequest) GetGuid() string {
+	if x != nil && x.Guid != nil {
+		return *x.Guid
+	}
+	return ""
+}
+
+type PromptMonitorRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Modes         []PromptMonitorMode    `protobuf:"varint,1,rep,name=modes,enum=iterm2.PromptMonitorMode" json:"modes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PromptMonitorRequest) Reset() {
+	*x = PromptMonitorRequest{}
+	mi := &file_api_proto_msgTypes[58]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PromptMonitorRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PromptMonitorRequest) ProtoMessage() {}
+
+func (x *PromptMonitorRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[58]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PromptMonitorRequest.ProtoReflect.Descriptor instead.
+func (*PromptMonitorRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{58}
+}
+
+func (x *PromptMonitorRequest) GetModes() []PromptMonitorMode {
+	if x != nil {
+		return x.Modes
+	}
+	return nil
+}
+
+type NotificationRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// See documentation on session IDs. NOTIFY_ON_NEW_SESSION, NOTIFY_ON_TERMINATE_SESSION, and
+	// NOTIFY_ON_LAYOUT_CHANGE do not use the session ID and are posted on all such events.
+	//
+	// NOTE: This is not used for NOTIFY_ON_VARIABLE_CHANGE.
+	Session *string `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	// Set to true to subscribe, false to unsubscribe.
+	Subscribe *bool `protobuf:"varint,2,opt,name=subscribe" json:"subscribe,omitempty"`
+	// When to be notified (or notification to unsubscribe from)
+	NotificationType *NotificationType `protobuf:"varint,3,opt,name=notification_type,json=notificationType,enum=iterm2.NotificationType" json:"notification_type,omitempty"`
+	// Types that are valid to be assigned to Arguments:
+	//
+	//	*NotificationRequest_RpcRegistrationRequest
+	//	*NotificationRequest_KeystrokeMonitorRequest
+	//	*NotificationRequest_VariableMonitorRequest
+	//	*NotificationRequest_ProfileChangeRequest
+	//	*NotificationRequest_KeystrokeFilterRequest
+	//	*NotificationRequest_PromptMonitorRequest
+	Arguments     isNotificationRequest_Arguments `protobuf_oneof:"arguments"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NotificationRequest) Reset() {
+	*x = NotificationRequest{}
+	mi := &file_api_proto_msgTypes[59]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NotificationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NotificationRequest) ProtoMessage() {}
+
+func (x *NotificationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[59]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NotificationRequest.ProtoReflect.Descriptor instead.
+func (*NotificationRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{59}
+}
+
+func (x *NotificationRequest) GetSession() string {
+	if x != nil && x.Session != nil {
+		return *x.Session
+	}
+	return ""
+}
+
+func (x *NotificationRequest) GetSubscribe() bool {
+	if x != nil && x.Subscribe != nil {
+		return *x.Subscribe
+	}
+	return false
+}
+
+func (x *NotificationRequest) GetNotificationType() NotificationType {
+	if x != nil && x.NotificationType != nil {
+		return *x.NotificationType
+	}
+	return NotificationType_NOTIFY_ON_KEYSTROKE
+}
+
+func (x *NotificationRequest) GetArguments() isNotificationRequest_Arguments {
+	if x != nil {
+		return x.Arguments
+	}
+	return nil
+}
+
+func (x *NotificationRequest) GetRpcRegistrationRequest() *RPCRegistrationRequest {
+	if x != nil {
+		if x, ok := x.Arguments.(*NotificationRequest_RpcRegistrationRequest); ok {
+			return x.RpcRegistrationRequest
+		}
+	}
+	return nil
+}
+
+func (x *NotificationRequest) GetKeystrokeMonitorRequest() *KeystrokeMonitorRequest {
+	if x != nil {
+		if x, ok := x.Arguments.(*NotificationRequest_KeystrokeMonitorRequest); ok {
+			return x.KeystrokeMonitorRequest
+		}
+	}
+	return nil
+}
+
+func (x *NotificationRequest) GetVariableMonitorRequest() *VariableMonitorRequest {
+	if x != nil {
+		if x, ok := x.Arguments.(*NotificationRequest_VariableMonitorRequest); ok {
+			return x.VariableMonitorRequest
+		}
+	}
+	return nil
+}
+
+func (x *NotificationRequest) GetProfileChangeRequest() *ProfileChangeRequest {
+	if x != nil {
+		if x, ok := x.Arguments.(*NotificationRequest_ProfileChangeRequest); ok {
+			return x.ProfileChangeRequest
+		}
+	}
+	return nil
+}
+
+func (x *NotificationRequest) GetKeystrokeFilterRequest() *KeystrokeFilterRequest {
+	if x != nil {
+		if x, ok := x.Arguments.(*NotificationRequest_KeystrokeFilterRequest); ok {
+			return x.KeystrokeFilterRequest
+		}
+	}
+	return nil
+}
+
+func (x *NotificationRequest) GetPromptMonitorRequest() *PromptMonitorRequest {
+	if x != nil {
+		if x, ok := x.Arguments.(*NotificationRequest_PromptMonitorRequest); ok {
+			return x.PromptMonitorRequest
+		}
+	}
+	return nil
+}
+
+type isNotificationRequest_Arguments interface {
+	isNotificationRequest_Arguments()
+}
+
+type NotificationRequest_RpcRegistrationRequest struct {
+	RpcRegistrationRequest *RPCRegistrationRequest `protobuf:"bytes,4,opt,name=rpc_registration_request,json=rpcRegistrationRequest,oneof"` // For NOTIFY_ON_SERVER_ORIGINATED_RPC
+}
+
+type NotificationRequest_KeystrokeMonitorRequest struct {
+	KeystrokeMonitorRequest *KeystrokeMonitorRequest `protobuf:"bytes,5,opt,name=keystroke_monitor_request,json=keystrokeMonitorRequest,oneof"`
+}
+
+type NotificationRequest_VariableMonitorRequest struct {
+	VariableMonitorRequest *VariableMonitorRequest `protobuf:"bytes,6,opt,name=variable_monitor_request,json=variableMonitorRequest,oneof"`
+}
+
+type NotificationRequest_ProfileChangeRequest struct {
+	ProfileChangeRequest *ProfileChangeRequest `protobuf:"bytes,7,opt,name=profile_change_request,json=profileChangeRequest,oneof"`
+}
+
+type NotificationRequest_KeystrokeFilterRequest struct {
+	KeystrokeFilterRequest *KeystrokeFilterRequest `protobuf:"bytes,8,opt,name=keystroke_filter_request,json=keystrokeFilterRequest,oneof"`
+}
+
+type NotificationRequest_PromptMonitorRequest struct {
+	PromptMonitorRequest *PromptMonitorRequest `protobuf:"bytes,9,opt,name=prompt_monitor_request,json=promptMonitorRequest,oneof"`
+}
+
+func (*NotificationRequest_RpcRegistrationRequest) isNotificationRequest_Arguments() {}
+
+func (*NotificationRequest_KeystrokeMonitorRequest) isNotificationRequest_Arguments() {}
+
+func (*NotificationRequest_VariableMonitorRequest) isNotificationRequest_Arguments() {}
+
+func (*NotificationRequest_ProfileChangeRequest) isNotificationRequest_Arguments() {}
+
+func (*NotificationRequest_KeystrokeFilterRequest) isNotificationRequest_Arguments() {}
+
+func (*NotificationRequest_PromptMonitorRequest) isNotificationRequest_Arguments() {}
+
+type NotificationResponse struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Status        *NotificationResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.NotificationResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NotificationResponse) Reset() {
+	*x = NotificationResponse{}
+	mi := &file_api_proto_msgTypes[60]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NotificationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NotificationResponse) ProtoMessage() {}
+
+func (x *NotificationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[60]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NotificationResponse.ProtoReflect.Descriptor instead.
+func (*NotificationResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{60}
+}
+
+func (x *NotificationResponse) GetStatus() NotificationResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return NotificationResponse_OK
+}
+
+type Notification struct {
+	state                    protoimpl.MessageState    `protogen:"open.v1"`
+	KeystrokeNotification    *KeystrokeNotification    `protobuf:"bytes,1,opt,name=keystroke_notification,json=keystrokeNotification" json:"keystroke_notification,omitempty"`
+	ScreenUpdateNotification *ScreenUpdateNotification `protobuf:"bytes,2,opt,name=screen_update_notification,json=screenUpdateNotification" json:"screen_update_notification,omitempty"`
+	PromptNotification       *PromptNotification       `protobuf:"bytes,3,opt,name=prompt_notification,json=promptNotification" json:"prompt_notification,omitempty"`
+	// Deprecated: Marked as deprecated in api.proto.
+	LocationChangeNotification       *LocationChangeNotification          `protobuf:"bytes,4,opt,name=location_change_notification,json=locationChangeNotification" json:"location_change_notification,omitempty"`
+	CustomEscapeSequenceNotification *CustomEscapeSequenceNotification    `protobuf:"bytes,5,opt,name=custom_escape_sequence_notification,json=customEscapeSequenceNotification" json:"custom_escape_sequence_notification,omitempty"`
+	NewSessionNotification           *NewSessionNotification              `protobuf:"bytes,6,opt,name=new_session_notification,json=newSessionNotification" json:"new_session_notification,omitempty"`
+	TerminateSessionNotification     *TerminateSessionNotification        `protobuf:"bytes,7,opt,name=terminate_session_notification,json=terminateSessionNotification" json:"terminate_session_notification,omitempty"`
+	LayoutChangedNotification        *LayoutChangedNotification           `protobuf:"bytes,8,opt,name=layout_changed_notification,json=layoutChangedNotification" json:"layout_changed_notification,omitempty"`
+	FocusChangedNotification         *FocusChangedNotification            `protobuf:"bytes,9,opt,name=focus_changed_notification,json=focusChangedNotification" json:"focus_changed_notification,omitempty"`
+	ServerOriginatedRpcNotification  *ServerOriginatedRPCNotification     `protobuf:"bytes,10,opt,name=server_originated_rpc_notification,json=serverOriginatedRpcNotification" json:"server_originated_rpc_notification,omitempty"`
+	BroadcastDomainsChanged          *BroadcastDomainsChangedNotification `protobuf:"bytes,11,opt,name=broadcast_domains_changed,json=broadcastDomainsChanged" json:"broadcast_domains_changed,omitempty"`
+	VariableChangedNotification      *VariableChangedNotification         `protobuf:"bytes,12,opt,name=variable_changed_notification,json=variableChangedNotification" json:"variable_changed_notification,omitempty"`
+	ProfileChangedNotification       *ProfileChangedNotification          `protobuf:"bytes,13,opt,name=profile_changed_notification,json=profileChangedNotification" json:"profile_changed_notification,omitempty"`
+	unknownFields                    protoimpl.UnknownFields
+	sizeCache                        protoimpl.SizeCache
+}
+
+func (x *Notification) Reset() {
+	*x = Notification{}
+	mi := &file_api_proto_msgTypes[61]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Notification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Notification) ProtoMessage() {}
+
+func (x *Notification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[61]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Notification.ProtoReflect.Descriptor instead.
+func (*Notification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{61}
+}
+
+func (x *Notification) GetKeystrokeNotification() *KeystrokeNotification {
+	if x != nil {
+		return x.KeystrokeNotification
+	}
+	return nil
+}
+
+func (x *Notification) GetScreenUpdateNotification() *ScreenUpdateNotification {
+	if x != nil {
+		return x.ScreenUpdateNotification
+	}
+	return nil
+}
+
+func (x *Notification) GetPromptNotification() *PromptNotification {
+	if x != nil {
+		return x.PromptNotification
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in api.proto.
+func (x *Notification) GetLocationChangeNotification() *LocationChangeNotification {
+	if x != nil {
+		return x.LocationChangeNotification
+	}
+	return nil
+}
+
+func (x *Notification) GetCustomEscapeSequenceNotification() *CustomEscapeSequenceNotification {
+	if x != nil {
+		return x.CustomEscapeSequenceNotification
+	}
+	return nil
+}
+
+func (x *Notification) GetNewSessionNotification() *NewSessionNotification {
+	if x != nil {
+		return x.NewSessionNotification
+	}
+	return nil
+}
+
+func (x *Notification) GetTerminateSessionNotification() *TerminateSessionNotification {
+	if x != nil {
+		return x.TerminateSessionNotification
+	}
+	return nil
+}
+
+func (x *Notification) GetLayoutChangedNotification() *LayoutChangedNotification {
+	if x != nil {
+		return x.LayoutChangedNotification
+	}
+	return nil
+}
+
+func (x *Notification) GetFocusChangedNotification() *FocusChangedNotification {
+	if x != nil {
+		return x.FocusChangedNotification
+	}
+	return nil
+}
+
+func (x *Notification) GetServerOriginatedRpcNotification() *ServerOriginatedRPCNotification {
+	if x != nil {
+		return x.ServerOriginatedRpcNotification
+	}
+	return nil
+}
+
+func (x *Notification) GetBroadcastDomainsChanged() *BroadcastDomainsChangedNotification {
+	if x != nil {
+		return x.BroadcastDomainsChanged
+	}
+	return nil
+}
+
+func (x *Notification) GetVariableChangedNotification() *VariableChangedNotification {
+	if x != nil {
+		return x.VariableChangedNotification
+	}
+	return nil
+}
+
+func (x *Notification) GetProfileChangedNotification() *ProfileChangedNotification {
+	if x != nil {
+		return x.ProfileChangedNotification
+	}
+	return nil
+}
+
+type ProfileChangedNotification struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Guid          *string                `protobuf:"bytes,1,opt,name=guid" json:"guid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProfileChangedNotification) Reset() {
+	*x = ProfileChangedNotification{}
+	mi := &file_api_proto_msgTypes[62]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProfileChangedNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProfileChangedNotification) ProtoMessage() {}
+
+func (x *ProfileChangedNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[62]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProfileChangedNotification.ProtoReflect.Descriptor instead.
+func (*ProfileChangedNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{62}
+}
+
+func (x *ProfileChangedNotification) GetGuid() string {
+	if x != nil && x.Guid != nil {
+		return *x.Guid
+	}
+	return ""
+}
+
+type VariableChangedNotification struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Scope         *VariableScope         `protobuf:"varint,1,opt,name=scope,enum=iterm2.VariableScope" json:"scope,omitempty"`
+	Identifier    *string                `protobuf:"bytes,2,opt,name=identifier" json:"identifier,omitempty"` // unset if app scope, otherwise is session, window, or tab ID
+	Name          *string                `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+	JsonNewValue  *string                `protobuf:"bytes,4,opt,name=json_new_value,json=jsonNewValue" json:"json_new_value,omitempty"` // Will be "null" if unset.
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VariableChangedNotification) Reset() {
+	*x = VariableChangedNotification{}
+	mi := &file_api_proto_msgTypes[63]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VariableChangedNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VariableChangedNotification) ProtoMessage() {}
+
+func (x *VariableChangedNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[63]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VariableChangedNotification.ProtoReflect.Descriptor instead.
+func (*VariableChangedNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{63}
+}
+
+func (x *VariableChangedNotification) GetScope() VariableScope {
+	if x != nil && x.Scope != nil {
+		return *x.Scope
+	}
+	return VariableScope_SESSION
+}
+
+func (x *VariableChangedNotification) GetIdentifier() string {
+	if x != nil && x.Identifier != nil {
+		return *x.Identifier
+	}
+	return ""
+}
+
+func (x *VariableChangedNotification) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *VariableChangedNotification) GetJsonNewValue() string {
+	if x != nil && x.JsonNewValue != nil {
+		return *x.JsonNewValue
+	}
+	return ""
+}
+
+type BroadcastDomainsChangedNotification struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	BroadcastDomains []*BroadcastDomain     `protobuf:"bytes,1,rep,name=broadcast_domains,json=broadcastDomains" json:"broadcast_domains,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *BroadcastDomainsChangedNotification) Reset() {
+	*x = BroadcastDomainsChangedNotification{}
+	mi := &file_api_proto_msgTypes[64]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BroadcastDomainsChangedNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BroadcastDomainsChangedNotification) ProtoMessage() {}
+
+func (x *BroadcastDomainsChangedNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[64]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BroadcastDomainsChangedNotification.ProtoReflect.Descriptor instead.
+func (*BroadcastDomainsChangedNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{64}
+}
+
+func (x *BroadcastDomainsChangedNotification) GetBroadcastDomains() []*BroadcastDomain {
+	if x != nil {
+		return x.BroadcastDomains
+	}
+	return nil
+}
+
+type ServerOriginatedRPC struct {
+	state         protoimpl.MessageState             `protogen:"open.v1"`
+	Name          *string                            `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	Arguments     []*ServerOriginatedRPC_RPCArgument `protobuf:"bytes,3,rep,name=arguments" json:"arguments,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ServerOriginatedRPC) Reset() {
+	*x = ServerOriginatedRPC{}
+	mi := &file_api_proto_msgTypes[65]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServerOriginatedRPC) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServerOriginatedRPC) ProtoMessage() {}
+
+func (x *ServerOriginatedRPC) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[65]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServerOriginatedRPC.ProtoReflect.Descriptor instead.
+func (*ServerOriginatedRPC) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{65}
+}
+
+func (x *ServerOriginatedRPC) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *ServerOriginatedRPC) GetArguments() []*ServerOriginatedRPC_RPCArgument {
+	if x != nil {
+		return x.Arguments
+	}
+	return nil
+}
+
+// This is an iTerm2-to-script RPC call. The script must have registered for
+// an RPC matching the signature of `rpc`.
+type ServerOriginatedRPCNotification struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequestId     *string                `protobuf:"bytes,1,opt,name=request_id,json=requestId" json:"request_id,omitempty"`
+	Rpc           *ServerOriginatedRPC   `protobuf:"bytes,2,opt,name=rpc" json:"rpc,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ServerOriginatedRPCNotification) Reset() {
+	*x = ServerOriginatedRPCNotification{}
+	mi := &file_api_proto_msgTypes[66]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServerOriginatedRPCNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServerOriginatedRPCNotification) ProtoMessage() {}
+
+func (x *ServerOriginatedRPCNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[66]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServerOriginatedRPCNotification.ProtoReflect.Descriptor instead.
+func (*ServerOriginatedRPCNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{66}
+}
+
+func (x *ServerOriginatedRPCNotification) GetRequestId() string {
+	if x != nil && x.RequestId != nil {
+		return *x.RequestId
+	}
+	return ""
+}
+
+func (x *ServerOriginatedRPCNotification) GetRpc() *ServerOriginatedRPC {
+	if x != nil {
+		return x.Rpc
+	}
+	return nil
+}
+
+type KeystrokeNotification struct {
+	state                       protoimpl.MessageState        `protogen:"open.v1"`
+	Characters                  *string                       `protobuf:"bytes,1,opt,name=characters" json:"characters,omitempty"`
+	CharactersIgnoringModifiers *string                       `protobuf:"bytes,2,opt,name=charactersIgnoringModifiers" json:"charactersIgnoringModifiers,omitempty"`
+	Modifiers                   []Modifiers                   `protobuf:"varint,3,rep,name=modifiers,enum=iterm2.Modifiers" json:"modifiers,omitempty"`
+	KeyCode                     *int32                        `protobuf:"varint,4,opt,name=keyCode" json:"keyCode,omitempty"`
+	Session                     *string                       `protobuf:"bytes,5,opt,name=session" json:"session,omitempty"`
+	Action                      *KeystrokeNotification_Action `protobuf:"varint,6,opt,name=action,enum=iterm2.KeystrokeNotification_Action" json:"action,omitempty"`
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
+}
+
+func (x *KeystrokeNotification) Reset() {
+	*x = KeystrokeNotification{}
+	mi := &file_api_proto_msgTypes[67]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeystrokeNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeystrokeNotification) ProtoMessage() {}
+
+func (x *KeystrokeNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[67]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeystrokeNotification.ProtoReflect.Descriptor instead.
+func (*KeystrokeNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{67}
+}
+
+func (x *KeystrokeNotification) GetCharacters() string {
+	if x != nil && x.Characters != nil {
+		return *x.Characters
+	}
+	return ""
+}
+
+func (x *KeystrokeNotification) GetCharactersIgnoringModifiers() string {
+	if x != nil && x.CharactersIgnoringModifiers != nil {
+		return *x.CharactersIgnoringModifiers
+	}
+	return ""
+}
+
+func (x *KeystrokeNotification) GetModifiers() []Modifiers {
+	if x != nil {
+		return x.Modifiers
+	}
+	return nil
+}
+
+func (x *KeystrokeNotification) GetKeyCode() int32 {
+	if x != nil && x.KeyCode != nil {
+		return *x.KeyCode
+	}
+	return 0
+}
+
+func (x *KeystrokeNotification) GetSession() string {
+	if x != nil && x.Session != nil {
+		return *x.Session
+	}
+	return ""
+}
+
+func (x *KeystrokeNotification) GetAction() KeystrokeNotification_Action {
+	if x != nil && x.Action != nil {
+		return *x.Action
+	}
+	return KeystrokeNotification_KEY_DOWN
+}
+
+type ScreenUpdateNotification struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Session       *string                `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ScreenUpdateNotification) Reset() {
+	*x = ScreenUpdateNotification{}
+	mi := &file_api_proto_msgTypes[68]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ScreenUpdateNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ScreenUpdateNotification) ProtoMessage() {}
+
+func (x *ScreenUpdateNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[68]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ScreenUpdateNotification.ProtoReflect.Descriptor instead.
+func (*ScreenUpdateNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{68}
+}
+
+func (x *ScreenUpdateNotification) GetSession() string {
+	if x != nil && x.Session != nil {
+		return *x.Session
+	}
+	return ""
+}
+
+type PromptNotificationPrompt struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Placeholder   *string                `protobuf:"bytes,1,opt,name=placeholder" json:"placeholder,omitempty"`
+	Prompt        *GetPromptResponse     `protobuf:"bytes,2,opt,name=prompt" json:"prompt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PromptNotificationPrompt) Reset() {
+	*x = PromptNotificationPrompt{}
+	mi := &file_api_proto_msgTypes[69]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PromptNotificationPrompt) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PromptNotificationPrompt) ProtoMessage() {}
+
+func (x *PromptNotificationPrompt) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[69]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PromptNotificationPrompt.ProtoReflect.Descriptor instead.
+func (*PromptNotificationPrompt) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{69}
+}
+
+func (x *PromptNotificationPrompt) GetPlaceholder() string {
+	if x != nil && x.Placeholder != nil {
+		return *x.Placeholder
+	}
+	return ""
+}
+
+func (x *PromptNotificationPrompt) GetPrompt() *GetPromptResponse {
+	if x != nil {
+		return x.Prompt
+	}
+	return nil
+}
+
+type PromptNotificationCommandStart struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Command       *string                `protobuf:"bytes,1,opt,name=command" json:"command,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PromptNotificationCommandStart) Reset() {
+	*x = PromptNotificationCommandStart{}
+	mi := &file_api_proto_msgTypes[70]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PromptNotificationCommandStart) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PromptNotificationCommandStart) ProtoMessage() {}
+
+func (x *PromptNotificationCommandStart) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[70]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PromptNotificationCommandStart.ProtoReflect.Descriptor instead.
+func (*PromptNotificationCommandStart) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{70}
+}
+
+func (x *PromptNotificationCommandStart) GetCommand() string {
+	if x != nil && x.Command != nil {
+		return *x.Command
+	}
+	return ""
+}
+
+type PromptNotificationCommandEnd struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        *int32                 `protobuf:"varint,1,opt,name=status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PromptNotificationCommandEnd) Reset() {
+	*x = PromptNotificationCommandEnd{}
+	mi := &file_api_proto_msgTypes[71]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PromptNotificationCommandEnd) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PromptNotificationCommandEnd) ProtoMessage() {}
+
+func (x *PromptNotificationCommandEnd) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[71]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PromptNotificationCommandEnd.ProtoReflect.Descriptor instead.
+func (*PromptNotificationCommandEnd) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{71}
+}
+
+func (x *PromptNotificationCommandEnd) GetStatus() int32 {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return 0
+}
+
+type PromptNotification struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Session *string                `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	// Types that are valid to be assigned to Event:
+	//
+	//	*PromptNotification_Prompt
+	//	*PromptNotification_CommandStart
+	//	*PromptNotification_CommandEnd
+	Event          isPromptNotification_Event `protobuf_oneof:"event"`
+	UniquePromptId *string                    `protobuf:"bytes,5,opt,name=unique_prompt_id,json=uniquePromptId" json:"unique_prompt_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *PromptNotification) Reset() {
+	*x = PromptNotification{}
+	mi := &file_api_proto_msgTypes[72]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PromptNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PromptNotification) ProtoMessage() {}
+
+func (x *PromptNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[72]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PromptNotification.ProtoReflect.Descriptor instead.
+func (*PromptNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{72}
+}
+
+func (x *PromptNotification) GetSession() string {
+	if x != nil && x.Session != nil {
+		return *x.Session
+	}
+	return ""
+}
+
+func (x *PromptNotification) GetEvent() isPromptNotification_Event {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *PromptNotification) GetPrompt() *PromptNotificationPrompt {
+	if x != nil {
+		if x, ok := x.Event.(*PromptNotification_Prompt); ok {
+			return x.Prompt
+		}
+	}
+	return nil
+}
+
+func (x *PromptNotification) GetCommandStart() *PromptNotificationCommandStart {
+	if x != nil {
+		if x, ok := x.Event.(*PromptNotification_CommandStart); ok {
+			return x.CommandStart
+		}
+	}
+	return nil
+}
+
+func (x *PromptNotification) GetCommandEnd() *PromptNotificationCommandEnd {
+	if x != nil {
+		if x, ok := x.Event.(*PromptNotification_CommandEnd); ok {
+			return x.CommandEnd
+		}
+	}
+	return nil
+}
+
+func (x *PromptNotification) GetUniquePromptId() string {
+	if x != nil && x.UniquePromptId != nil {
+		return *x.UniquePromptId
+	}
+	return ""
+}
+
+type isPromptNotification_Event interface {
+	isPromptNotification_Event()
+}
+
+type PromptNotification_Prompt struct {
+	Prompt *PromptNotificationPrompt `protobuf:"bytes,2,opt,name=prompt,oneof"`
+}
+
+type PromptNotification_CommandStart struct {
+	CommandStart *PromptNotificationCommandStart `protobuf:"bytes,3,opt,name=command_start,json=commandStart,oneof"`
+}
+
+type PromptNotification_CommandEnd struct {
+	CommandEnd *PromptNotificationCommandEnd `protobuf:"bytes,4,opt,name=command_end,json=commandEnd,oneof"`
+}
+
+func (*PromptNotification_Prompt) isPromptNotification_Event() {}
+
+func (*PromptNotification_CommandStart) isPromptNotification_Event() {}
+
+func (*PromptNotification_CommandEnd) isPromptNotification_Event() {}
+
+type LocationChangeNotification struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HostName      *string                `protobuf:"bytes,1,opt,name=host_name,json=hostName" json:"host_name,omitempty"`
+	UserName      *string                `protobuf:"bytes,2,opt,name=user_name,json=userName" json:"user_name,omitempty"`
+	Directory     *string                `protobuf:"bytes,3,opt,name=directory" json:"directory,omitempty"`
+	Session       *string                `protobuf:"bytes,4,opt,name=session" json:"session,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LocationChangeNotification) Reset() {
+	*x = LocationChangeNotification{}
+	mi := &file_api_proto_msgTypes[73]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocationChangeNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocationChangeNotification) ProtoMessage() {}
+
+func (x *LocationChangeNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[73]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocationChangeNotification.ProtoReflect.Descriptor instead.
+func (*LocationChangeNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{73}
+}
+
+func (x *LocationChangeNotification) GetHostName() string {
+	if x != nil && x.HostName != nil {
+		return *x.HostName
+	}
+	return ""
+}
+
+func (x *LocationChangeNotification) GetUserName() string {
+	if x != nil && x.UserName != nil {
+		return *x.UserName
+	}
+	return ""
+}
+
+func (x *LocationChangeNotification) GetDirectory() string {
+	if x != nil && x.Directory != nil {
+		return *x.Directory
+	}
+	return ""
+}
+
+func (x *LocationChangeNotification) GetSession() string {
+	if x != nil && x.Session != nil {
+		return *x.Session
+	}
+	return ""
+}
+
+// OSC 1337 ; Custom=id=<identity>:<payload> ST
+type CustomEscapeSequenceNotification struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Session        *string                `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	SenderIdentity *string                `protobuf:"bytes,2,opt,name=sender_identity,json=senderIdentity" json:"sender_identity,omitempty"`
+	Payload        *string                `protobuf:"bytes,3,opt,name=payload" json:"payload,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *CustomEscapeSequenceNotification) Reset() {
+	*x = CustomEscapeSequenceNotification{}
+	mi := &file_api_proto_msgTypes[74]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CustomEscapeSequenceNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CustomEscapeSequenceNotification) ProtoMessage() {}
+
+func (x *CustomEscapeSequenceNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[74]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CustomEscapeSequenceNotification.ProtoReflect.Descriptor instead.
+func (*CustomEscapeSequenceNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{74}
+}
+
+func (x *CustomEscapeSequenceNotification) GetSession() string {
+	if x != nil && x.Session != nil {
+		return *x.Session
+	}
+	return ""
+}
+
+func (x *CustomEscapeSequenceNotification) GetSenderIdentity() string {
+	if x != nil && x.SenderIdentity != nil {
+		return *x.SenderIdentity
+	}
+	return ""
+}
+
+func (x *CustomEscapeSequenceNotification) GetPayload() string {
+	if x != nil && x.Payload != nil {
+		return *x.Payload
+	}
+	return ""
+}
+
+// Sent when a new session is created or a closure is undone.
+type NewSessionNotification struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NewSessionNotification) Reset() {
+	*x = NewSessionNotification{}
+	mi := &file_api_proto_msgTypes[75]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NewSessionNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NewSessionNotification) ProtoMessage() {}
+
+func (x *NewSessionNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[75]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NewSessionNotification.ProtoReflect.Descriptor instead.
+func (*NewSessionNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{75}
+}
+
+func (x *NewSessionNotification) GetSessionId() string {
+	if x != nil && x.SessionId != nil {
+		return *x.SessionId
+	}
+	return ""
+}
+
+// Note this is sent when the app becomes/resigns active, the key window changes, the selected tab
+// of a window changes, or the active pane of a tab changes. Note that you may receive duplicate
+// notifications at times. Ignore those that do not signify a change.
+type FocusChangedNotification struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Event:
+	//
+	//	*FocusChangedNotification_ApplicationActive
+	//	*FocusChangedNotification_Window_
+	//	*FocusChangedNotification_SelectedTab
+	//	*FocusChangedNotification_Session
+	Event         isFocusChangedNotification_Event `protobuf_oneof:"event"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FocusChangedNotification) Reset() {
+	*x = FocusChangedNotification{}
+	mi := &file_api_proto_msgTypes[76]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FocusChangedNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FocusChangedNotification) ProtoMessage() {}
+
+func (x *FocusChangedNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[76]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FocusChangedNotification.ProtoReflect.Descriptor instead.
+func (*FocusChangedNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{76}
+}
+
+func (x *FocusChangedNotification) GetEvent() isFocusChangedNotification_Event {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *FocusChangedNotification) GetApplicationActive() bool {
+	if x != nil {
+		if x, ok := x.Event.(*FocusChangedNotification_ApplicationActive); ok {
+			return x.ApplicationActive
+		}
+	}
+	return false
+}
+
+func (x *FocusChangedNotification) GetWindow() *FocusChangedNotification_Window {
+	if x != nil {
+		if x, ok := x.Event.(*FocusChangedNotification_Window_); ok {
+			return x.Window
+		}
+	}
+	return nil
+}
+
+func (x *FocusChangedNotification) GetSelectedTab() string {
+	if x != nil {
+		if x, ok := x.Event.(*FocusChangedNotification_SelectedTab); ok {
+			return x.SelectedTab
+		}
+	}
+	return ""
+}
+
+func (x *FocusChangedNotification) GetSession() string {
+	if x != nil {
+		if x, ok := x.Event.(*FocusChangedNotification_Session); ok {
+			return x.Session
+		}
+	}
+	return ""
+}
+
+type isFocusChangedNotification_Event interface {
+	isFocusChangedNotification_Event()
+}
+
+type FocusChangedNotification_ApplicationActive struct {
+	// true: application became active. false: application resigned active.
+	ApplicationActive bool `protobuf:"varint,1,opt,name=application_active,json=applicationActive,oneof"`
+}
+
+type FocusChangedNotification_Window_ struct {
+	// If set, gives info about a change to window focus.
+	Window *FocusChangedNotification_Window `protobuf:"bytes,2,opt,name=window,oneof"`
+}
+
+type FocusChangedNotification_SelectedTab struct {
+	// If set, selected tab changed to the one identified herein.
+	SelectedTab string `protobuf:"bytes,3,opt,name=selected_tab,json=selectedTab,oneof"`
+}
+
+type FocusChangedNotification_Session struct {
+	// If set, the given session became active in its tab.
+	Session string `protobuf:"bytes,4,opt,name=session,oneof"`
+}
+
+func (*FocusChangedNotification_ApplicationActive) isFocusChangedNotification_Event() {}
+
+func (*FocusChangedNotification_Window_) isFocusChangedNotification_Event() {}
+
+func (*FocusChangedNotification_SelectedTab) isFocusChangedNotification_Event() {}
+
+func (*FocusChangedNotification_Session) isFocusChangedNotification_Event() {}
+
+type TerminateSessionNotification struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TerminateSessionNotification) Reset() {
+	*x = TerminateSessionNotification{}
+	mi := &file_api_proto_msgTypes[77]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TerminateSessionNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TerminateSessionNotification) ProtoMessage() {}
+
+func (x *TerminateSessionNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[77]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TerminateSessionNotification.ProtoReflect.Descriptor instead.
+func (*TerminateSessionNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{77}
+}
+
+func (x *TerminateSessionNotification) GetSessionId() string {
+	if x != nil && x.SessionId != nil {
+		return *x.SessionId
+	}
+	return ""
+}
+
+type LayoutChangedNotification struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	ListSessionsResponse *ListSessionsResponse  `protobuf:"bytes,1,opt,name=list_sessions_response,json=listSessionsResponse" json:"list_sessions_response,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *LayoutChangedNotification) Reset() {
+	*x = LayoutChangedNotification{}
+	mi := &file_api_proto_msgTypes[78]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LayoutChangedNotification) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LayoutChangedNotification) ProtoMessage() {}
+
+func (x *LayoutChangedNotification) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[78]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LayoutChangedNotification.ProtoReflect.Descriptor instead.
+func (*LayoutChangedNotification) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{78}
+}
+
+func (x *LayoutChangedNotification) GetListSessionsResponse() *ListSessionsResponse {
+	if x != nil {
+		return x.ListSessionsResponse
+	}
+	return nil
+}
+
 // Requests the contents of a range of lines.
 type GetBufferRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -3735,7 +9346,7 @@ type GetBufferRequest struct {
 
 func (x *GetBufferRequest) Reset() {
 	*x = GetBufferRequest{}
-	mi := &file_api_proto_msgTypes[2]
+	mi := &file_api_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3747,7 +9358,7 @@ func (x *GetBufferRequest) String() string {
 func (*GetBufferRequest) ProtoMessage() {}
 
 func (x *GetBufferRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[2]
+	mi := &file_api_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3760,7 +9371,7 @@ func (x *GetBufferRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBufferRequest.ProtoReflect.Descriptor instead.
 func (*GetBufferRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{2}
+	return file_api_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *GetBufferRequest) GetSession() string {
@@ -3814,7 +9425,7 @@ const (
 
 func (x *GetBufferResponse) Reset() {
 	*x = GetBufferResponse{}
-	mi := &file_api_proto_msgTypes[3]
+	mi := &file_api_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3826,7 +9437,7 @@ func (x *GetBufferResponse) String() string {
 func (*GetBufferResponse) ProtoMessage() {}
 
 func (x *GetBufferResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[3]
+	mi := &file_api_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3839,7 +9450,7 @@ func (x *GetBufferResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBufferResponse.ProtoReflect.Descriptor instead.
 func (*GetBufferResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{3}
+	return file_api_proto_rawDescGZIP(), []int{80}
 }
 
 func (x *GetBufferResponse) GetStatus() GetBufferResponse_Status {
@@ -3886,6 +9497,713 @@ func (x *GetBufferResponse) GetWindowedCoordRange() *WindowedCoordRange {
 	return nil
 }
 
+// Requests metadata about the current shell prompt.
+type GetPromptRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// See documentation on session IDs. "all" not accepted.
+	Session *string `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	// If given return this ID instead of the last one.
+	UniquePromptId *string `protobuf:"bytes,2,opt,name=unique_prompt_id,json=uniquePromptId" json:"unique_prompt_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GetPromptRequest) Reset() {
+	*x = GetPromptRequest{}
+	mi := &file_api_proto_msgTypes[81]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPromptRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPromptRequest) ProtoMessage() {}
+
+func (x *GetPromptRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[81]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPromptRequest.ProtoReflect.Descriptor instead.
+func (*GetPromptRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{81}
+}
+
+func (x *GetPromptRequest) GetSession() string {
+	if x != nil && x.Session != nil {
+		return *x.Session
+	}
+	return ""
+}
+
+func (x *GetPromptRequest) GetUniquePromptId() string {
+	if x != nil && x.UniquePromptId != nil {
+		return *x.UniquePromptId
+	}
+	return ""
+}
+
+// Responds with metadata about the current shell prompt, if possible.
+type GetPromptResponse struct {
+	state            protoimpl.MessageState    `protogen:"open.v1"`
+	Status           *GetPromptResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.GetPromptResponse_Status,def=0" json:"status,omitempty"`
+	PromptRange      *CoordRange               `protobuf:"bytes,2,opt,name=prompt_range,json=promptRange" json:"prompt_range,omitempty"`
+	CommandRange     *CoordRange               `protobuf:"bytes,3,opt,name=command_range,json=commandRange" json:"command_range,omitempty"`
+	OutputRange      *CoordRange               `protobuf:"bytes,4,opt,name=output_range,json=outputRange" json:"output_range,omitempty"`
+	WorkingDirectory *string                   `protobuf:"bytes,5,opt,name=working_directory,json=workingDirectory" json:"working_directory,omitempty"`
+	Command          *string                   `protobuf:"bytes,6,opt,name=command" json:"command,omitempty"`
+	PromptState      *GetPromptResponse_State  `protobuf:"varint,7,opt,name=prompt_state,json=promptState,enum=iterm2.GetPromptResponse_State" json:"prompt_state,omitempty"`
+	// Exit status. Equivalent to shell's $? variable. Only set if state is FINISHED.
+	ExitStatus     *uint32 `protobuf:"varint,9,opt,name=exit_status,json=exitStatus" json:"exit_status,omitempty"`
+	UniquePromptId *string `protobuf:"bytes,10,opt,name=unique_prompt_id,json=uniquePromptId" json:"unique_prompt_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+// Default values for GetPromptResponse fields.
+const (
+	Default_GetPromptResponse_Status = GetPromptResponse_OK
+)
+
+func (x *GetPromptResponse) Reset() {
+	*x = GetPromptResponse{}
+	mi := &file_api_proto_msgTypes[82]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPromptResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPromptResponse) ProtoMessage() {}
+
+func (x *GetPromptResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[82]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPromptResponse.ProtoReflect.Descriptor instead.
+func (*GetPromptResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{82}
+}
+
+func (x *GetPromptResponse) GetStatus() GetPromptResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return Default_GetPromptResponse_Status
+}
+
+func (x *GetPromptResponse) GetPromptRange() *CoordRange {
+	if x != nil {
+		return x.PromptRange
+	}
+	return nil
+}
+
+func (x *GetPromptResponse) GetCommandRange() *CoordRange {
+	if x != nil {
+		return x.CommandRange
+	}
+	return nil
+}
+
+func (x *GetPromptResponse) GetOutputRange() *CoordRange {
+	if x != nil {
+		return x.OutputRange
+	}
+	return nil
+}
+
+func (x *GetPromptResponse) GetWorkingDirectory() string {
+	if x != nil && x.WorkingDirectory != nil {
+		return *x.WorkingDirectory
+	}
+	return ""
+}
+
+func (x *GetPromptResponse) GetCommand() string {
+	if x != nil && x.Command != nil {
+		return *x.Command
+	}
+	return ""
+}
+
+func (x *GetPromptResponse) GetPromptState() GetPromptResponse_State {
+	if x != nil && x.PromptState != nil {
+		return *x.PromptState
+	}
+	return GetPromptResponse_EDITING
+}
+
+func (x *GetPromptResponse) GetExitStatus() uint32 {
+	if x != nil && x.ExitStatus != nil {
+		return *x.ExitStatus
+	}
+	return 0
+}
+
+func (x *GetPromptResponse) GetUniquePromptId() string {
+	if x != nil && x.UniquePromptId != nil {
+		return *x.UniquePromptId
+	}
+	return ""
+}
+
+type ListPromptsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Must name a specific session. "all" not allowed.
+	Session *string `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	// If unspecified, start at oldest.
+	FirstUniqueId *string `protobuf:"bytes,2,opt,name=first_unique_id,json=firstUniqueId" json:"first_unique_id,omitempty"`
+	// If unspecified, end at newest.
+	LastUniqueId  *string `protobuf:"bytes,3,opt,name=last_unique_id,json=lastUniqueId" json:"last_unique_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPromptsRequest) Reset() {
+	*x = ListPromptsRequest{}
+	mi := &file_api_proto_msgTypes[83]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPromptsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPromptsRequest) ProtoMessage() {}
+
+func (x *ListPromptsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[83]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPromptsRequest.ProtoReflect.Descriptor instead.
+func (*ListPromptsRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{83}
+}
+
+func (x *ListPromptsRequest) GetSession() string {
+	if x != nil && x.Session != nil {
+		return *x.Session
+	}
+	return ""
+}
+
+func (x *ListPromptsRequest) GetFirstUniqueId() string {
+	if x != nil && x.FirstUniqueId != nil {
+		return *x.FirstUniqueId
+	}
+	return ""
+}
+
+func (x *ListPromptsRequest) GetLastUniqueId() string {
+	if x != nil && x.LastUniqueId != nil {
+		return *x.LastUniqueId
+	}
+	return ""
+}
+
+type ListPromptsResponse struct {
+	state  protoimpl.MessageState      `protogen:"open.v1"`
+	Status *ListPromptsResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.ListPromptsResponse_Status,def=0" json:"status,omitempty"`
+	// Chronological list of prompt IDs, suitable for GetPromptRequest.unique_prompt_id.
+	UniquePromptId []string `protobuf:"bytes,2,rep,name=unique_prompt_id,json=uniquePromptId" json:"unique_prompt_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+// Default values for ListPromptsResponse fields.
+const (
+	Default_ListPromptsResponse_Status = ListPromptsResponse_OK
+)
+
+func (x *ListPromptsResponse) Reset() {
+	*x = ListPromptsResponse{}
+	mi := &file_api_proto_msgTypes[84]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPromptsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPromptsResponse) ProtoMessage() {}
+
+func (x *ListPromptsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[84]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPromptsResponse.ProtoReflect.Descriptor instead.
+func (*ListPromptsResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{84}
+}
+
+func (x *ListPromptsResponse) GetStatus() ListPromptsResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return Default_ListPromptsResponse_Status
+}
+
+func (x *ListPromptsResponse) GetUniquePromptId() []string {
+	if x != nil {
+		return x.UniquePromptId
+	}
+	return nil
+}
+
+type GetProfilePropertyRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// See documentation on session IDs
+	Session *string `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	// If not set, all properties will be returned
+	Keys          []string `protobuf:"bytes,2,rep,name=keys" json:"keys,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetProfilePropertyRequest) Reset() {
+	*x = GetProfilePropertyRequest{}
+	mi := &file_api_proto_msgTypes[85]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetProfilePropertyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetProfilePropertyRequest) ProtoMessage() {}
+
+func (x *GetProfilePropertyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[85]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetProfilePropertyRequest.ProtoReflect.Descriptor instead.
+func (*GetProfilePropertyRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{85}
+}
+
+func (x *GetProfilePropertyRequest) GetSession() string {
+	if x != nil && x.Session != nil {
+		return *x.Session
+	}
+	return ""
+}
+
+func (x *GetProfilePropertyRequest) GetKeys() []string {
+	if x != nil {
+		return x.Keys
+	}
+	return nil
+}
+
+type ProfileProperty struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Key           *string                `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	JsonValue     *string                `protobuf:"bytes,2,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProfileProperty) Reset() {
+	*x = ProfileProperty{}
+	mi := &file_api_proto_msgTypes[86]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProfileProperty) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProfileProperty) ProtoMessage() {}
+
+func (x *ProfileProperty) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[86]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProfileProperty.ProtoReflect.Descriptor instead.
+func (*ProfileProperty) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{86}
+}
+
+func (x *ProfileProperty) GetKey() string {
+	if x != nil && x.Key != nil {
+		return *x.Key
+	}
+	return ""
+}
+
+func (x *ProfileProperty) GetJsonValue() string {
+	if x != nil && x.JsonValue != nil {
+		return *x.JsonValue
+	}
+	return ""
+}
+
+type GetProfilePropertyResponse struct {
+	state         protoimpl.MessageState             `protogen:"open.v1"`
+	Status        *GetProfilePropertyResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.GetProfilePropertyResponse_Status,def=0" json:"status,omitempty"`
+	Properties    []*ProfileProperty                 `protobuf:"bytes,3,rep,name=properties" json:"properties,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+// Default values for GetProfilePropertyResponse fields.
+const (
+	Default_GetProfilePropertyResponse_Status = GetProfilePropertyResponse_OK
+)
+
+func (x *GetProfilePropertyResponse) Reset() {
+	*x = GetProfilePropertyResponse{}
+	mi := &file_api_proto_msgTypes[87]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetProfilePropertyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetProfilePropertyResponse) ProtoMessage() {}
+
+func (x *GetProfilePropertyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[87]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetProfilePropertyResponse.ProtoReflect.Descriptor instead.
+func (*GetProfilePropertyResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{87}
+}
+
+func (x *GetProfilePropertyResponse) GetStatus() GetProfilePropertyResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return Default_GetProfilePropertyResponse_Status
+}
+
+func (x *GetProfilePropertyResponse) GetProperties() []*ProfileProperty {
+	if x != nil {
+		return x.Properties
+	}
+	return nil
+}
+
+// Sets a value in a session's copy of the profile without modifying the underlying profile.
+type SetProfilePropertyRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Target:
+	//
+	//	*SetProfilePropertyRequest_Session
+	//	*SetProfilePropertyRequest_GuidList_
+	Target        isSetProfilePropertyRequest_Target      `protobuf_oneof:"target"`
+	Key           *string                                 `protobuf:"bytes,3,opt,name=key" json:"key,omitempty"`                              // deprecated
+	JsonValue     *string                                 `protobuf:"bytes,4,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"` // deprecated
+	Assignments   []*SetProfilePropertyRequest_Assignment `protobuf:"bytes,5,rep,name=assignments" json:"assignments,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetProfilePropertyRequest) Reset() {
+	*x = SetProfilePropertyRequest{}
+	mi := &file_api_proto_msgTypes[88]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetProfilePropertyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetProfilePropertyRequest) ProtoMessage() {}
+
+func (x *SetProfilePropertyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[88]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetProfilePropertyRequest.ProtoReflect.Descriptor instead.
+func (*SetProfilePropertyRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{88}
+}
+
+func (x *SetProfilePropertyRequest) GetTarget() isSetProfilePropertyRequest_Target {
+	if x != nil {
+		return x.Target
+	}
+	return nil
+}
+
+func (x *SetProfilePropertyRequest) GetSession() string {
+	if x != nil {
+		if x, ok := x.Target.(*SetProfilePropertyRequest_Session); ok {
+			return x.Session
+		}
+	}
+	return ""
+}
+
+func (x *SetProfilePropertyRequest) GetGuidList() *SetProfilePropertyRequest_GuidList {
+	if x != nil {
+		if x, ok := x.Target.(*SetProfilePropertyRequest_GuidList_); ok {
+			return x.GuidList
+		}
+	}
+	return nil
+}
+
+func (x *SetProfilePropertyRequest) GetKey() string {
+	if x != nil && x.Key != nil {
+		return *x.Key
+	}
+	return ""
+}
+
+func (x *SetProfilePropertyRequest) GetJsonValue() string {
+	if x != nil && x.JsonValue != nil {
+		return *x.JsonValue
+	}
+	return ""
+}
+
+func (x *SetProfilePropertyRequest) GetAssignments() []*SetProfilePropertyRequest_Assignment {
+	if x != nil {
+		return x.Assignments
+	}
+	return nil
+}
+
+type isSetProfilePropertyRequest_Target interface {
+	isSetProfilePropertyRequest_Target()
+}
+
+type SetProfilePropertyRequest_Session struct {
+	// See documentation on session IDs
+	Session string `protobuf:"bytes,1,opt,name=session,oneof"`
+}
+
+type SetProfilePropertyRequest_GuidList_ struct {
+	GuidList *SetProfilePropertyRequest_GuidList `protobuf:"bytes,2,opt,name=guid_list,json=guidList,oneof"`
+}
+
+func (*SetProfilePropertyRequest_Session) isSetProfilePropertyRequest_Target() {}
+
+func (*SetProfilePropertyRequest_GuidList_) isSetProfilePropertyRequest_Target() {}
+
+type SetProfilePropertyResponse struct {
+	state         protoimpl.MessageState             `protogen:"open.v1"`
+	Status        *SetProfilePropertyResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SetProfilePropertyResponse_Status,def=0" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+// Default values for SetProfilePropertyResponse fields.
+const (
+	Default_SetProfilePropertyResponse_Status = SetProfilePropertyResponse_OK
+)
+
+func (x *SetProfilePropertyResponse) Reset() {
+	*x = SetProfilePropertyResponse{}
+	mi := &file_api_proto_msgTypes[89]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetProfilePropertyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetProfilePropertyResponse) ProtoMessage() {}
+
+func (x *SetProfilePropertyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[89]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetProfilePropertyResponse.ProtoReflect.Descriptor instead.
+func (*SetProfilePropertyResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{89}
+}
+
+func (x *SetProfilePropertyResponse) GetStatus() SetProfilePropertyResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return Default_SetProfilePropertyResponse_Status
+}
+
+type TransactionRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Set to true to begin a new transaction or false to end the current
+	// transaction. The app's main loop will not advance while in a
+	// transaction. This effectively freezes time. Keep transactions short.
+	Begin         *bool `protobuf:"varint,1,opt,name=begin" json:"begin,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TransactionRequest) Reset() {
+	*x = TransactionRequest{}
+	mi := &file_api_proto_msgTypes[90]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TransactionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TransactionRequest) ProtoMessage() {}
+
+func (x *TransactionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[90]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TransactionRequest.ProtoReflect.Descriptor instead.
+func (*TransactionRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{90}
+}
+
+func (x *TransactionRequest) GetBegin() bool {
+	if x != nil && x.Begin != nil {
+		return *x.Begin
+	}
+	return false
+}
+
+type TransactionResponse struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	Status        *TransactionResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.TransactionResponse_Status,def=0" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+// Default values for TransactionResponse fields.
+const (
+	Default_TransactionResponse_Status = TransactionResponse_OK
+)
+
+func (x *TransactionResponse) Reset() {
+	*x = TransactionResponse{}
+	mi := &file_api_proto_msgTypes[91]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TransactionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TransactionResponse) ProtoMessage() {}
+
+func (x *TransactionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[91]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TransactionResponse.ProtoReflect.Descriptor instead.
+func (*TransactionResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{91}
+}
+
+func (x *TransactionResponse) GetStatus() TransactionResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return Default_TransactionResponse_Status
+}
+
 // Describes a range of lines.
 type LineRange struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -3903,7 +10221,7 @@ type LineRange struct {
 
 func (x *LineRange) Reset() {
 	*x = LineRange{}
-	mi := &file_api_proto_msgTypes[4]
+	mi := &file_api_proto_msgTypes[92]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3915,7 +10233,7 @@ func (x *LineRange) String() string {
 func (*LineRange) ProtoMessage() {}
 
 func (x *LineRange) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[4]
+	mi := &file_api_proto_msgTypes[92]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3928,7 +10246,7 @@ func (x *LineRange) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LineRange.ProtoReflect.Descriptor instead.
 func (*LineRange) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{4}
+	return file_api_proto_rawDescGZIP(), []int{92}
 }
 
 func (x *LineRange) GetScreenContentsOnly() bool {
@@ -3952,62 +10270,6 @@ func (x *LineRange) GetWindowedCoordRange() *WindowedCoordRange {
 	return nil
 }
 
-// Describes a cell's location.
-type Coord struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	X     *int32                 `protobuf:"varint,1,opt,name=x" json:"x,omitempty"`
-	// y=0 describes the first line. When the scrollback buffer is full and history is lost, the first
-	// lines become unavailable, but the numbering is stable (so the Nth line is always the Nth line,
-	// even if it's not the Nth *visible* line).
-	Y             *int64 `protobuf:"varint,2,opt,name=y" json:"y,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Coord) Reset() {
-	*x = Coord{}
-	mi := &file_api_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Coord) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Coord) ProtoMessage() {}
-
-func (x *Coord) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Coord.ProtoReflect.Descriptor instead.
-func (*Coord) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *Coord) GetX() int32 {
-	if x != nil && x.X != nil {
-		return *x.X
-	}
-	return 0
-}
-
-func (x *Coord) GetY() int64 {
-	if x != nil && x.Y != nil {
-		return *x.Y
-	}
-	return 0
-}
-
 // Describes a range of values.
 type Range struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -4019,7 +10281,7 @@ type Range struct {
 
 func (x *Range) Reset() {
 	*x = Range{}
-	mi := &file_api_proto_msgTypes[6]
+	mi := &file_api_proto_msgTypes[93]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4031,7 +10293,7 @@ func (x *Range) String() string {
 func (*Range) ProtoMessage() {}
 
 func (x *Range) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[6]
+	mi := &file_api_proto_msgTypes[93]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4044,7 +10306,7 @@ func (x *Range) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Range.ProtoReflect.Descriptor instead.
 func (*Range) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{6}
+	return file_api_proto_rawDescGZIP(), []int{93}
 }
 
 func (x *Range) GetLocation() int64 {
@@ -4077,7 +10339,7 @@ type CoordRange struct {
 
 func (x *CoordRange) Reset() {
 	*x = CoordRange{}
-	mi := &file_api_proto_msgTypes[7]
+	mi := &file_api_proto_msgTypes[94]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4089,7 +10351,7 @@ func (x *CoordRange) String() string {
 func (*CoordRange) ProtoMessage() {}
 
 func (x *CoordRange) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[7]
+	mi := &file_api_proto_msgTypes[94]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4102,7 +10364,7 @@ func (x *CoordRange) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CoordRange.ProtoReflect.Descriptor instead.
 func (*CoordRange) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{7}
+	return file_api_proto_rawDescGZIP(), []int{94}
 }
 
 func (x *CoordRange) GetStart() *Coord {
@@ -4119,141 +10381,33 @@ func (x *CoordRange) GetEnd() *Coord {
 	return nil
 }
 
-type WindowedCoordRange struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CoordRange    *CoordRange            `protobuf:"bytes,1,opt,name=coord_range,json=coordRange" json:"coord_range,omitempty"`
-	Columns       *Range                 `protobuf:"bytes,2,opt,name=columns" json:"columns,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *WindowedCoordRange) Reset() {
-	*x = WindowedCoordRange{}
-	mi := &file_api_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *WindowedCoordRange) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*WindowedCoordRange) ProtoMessage() {}
-
-func (x *WindowedCoordRange) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use WindowedCoordRange.ProtoReflect.Descriptor instead.
-func (*WindowedCoordRange) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *WindowedCoordRange) GetCoordRange() *CoordRange {
-	if x != nil {
-		return x.CoordRange
-	}
-	return nil
-}
-
-func (x *WindowedCoordRange) GetColumns() *Range {
-	if x != nil {
-		return x.Columns
-	}
-	return nil
-}
-
-// Describes the content of a line.
-type LineContents struct {
+// Describes a cell's location.
+type Coord struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	Text  *string                `protobuf:"bytes,1,opt,name=text" json:"text,omitempty"`
-	// Some cells do not contain one code point. Use this to map code points in
-	// `text` to a screen position. If the line has no uninitialized cells at its end, then the
-	// sum of `repeats` equals the width of the display.
-	//
-	// For example, consider a line of text that appears on your display like:
-	//
-	//	xyz compañía
-	//
-	// The corresponding value of `text` would be:
-	//
-	//	xyzcompan~i'a
-	//
-	// Note: ~ and ' are combining marks, but are shown uncombined for illustrative purposes.
-	//
-	// Each code point in "xyz" as well as each of the non-accented letters in compañía takes one
-	// cell.
-	//
-	// The blank following 'z' is an uninitialized cell that has no code points,
-	// so the z and the c in `text` are adjacent. It's unusual for these to occur in the middle
-	// of a line, but it is possible.
-	//
-	// The ñ is composed of the letter n and a combining tilde (U+0303) (indicated in our example
-	// as ~), while í is composed of the letter i and a combining acute accent (U+0301) (indicated in
-	// our example as ').
-	//
-	// To map code points in `text` to screen positions, `code_points_per_cell`
-	// provides the number of code points in each cell. In our example you would
-	// get:
-	//
-	//	num_code_points=1, repeats=3     // x, y, z
-	//	num_code_points=0, repeats=1     // uninitialized cell
-	//	num_code_points=1, repeats=5     // c, o, m, p, a
-	//	num_code_points=2, repeats=2     // n + combining tilde, i + combining acute accent
-	//	num_code_points=1, repeats=1     // a
-	//
-	// Lines usually end with a series of uninitialized cells. These are not included.
-	//
-	// Here is psuedocode to interpret code_points_per_cell:
-	//
-	//	text_index_to_screen_coord = {}
-	//	screen_coord_to_text_index = {}
-	//	text_index = 0
-	//	screen_coord = 0
-	//	for cpps in code_points_per_cell:
-	//	  repeat cpps.repeats times:
-	//	    text_index_to_screen_coord[text_index] = screen_coord
-	//	    screen_coord_to_text_index[screen_coord] = text_index
-	//	    text_index += cpps.num_code_points
-	//	    screen_coord += 1
-	//
-	// Cells with images are omitted.
-	CodePointsPerCell []*CodePointsPerCell       `protobuf:"bytes,2,rep,name=code_points_per_cell,json=codePointsPerCell" json:"code_points_per_cell,omitempty"`
-	Continuation      *LineContents_Continuation `protobuf:"varint,3,opt,name=continuation,enum=iterm2.LineContents_Continuation,def=1" json:"continuation,omitempty"`
-	// This will be 1:1 with cells, but it is run-length encoded by its `repeats` field.
-	Style         []*CellStyle `protobuf:"bytes,4,rep,name=style" json:"style,omitempty"`
+	X     *int32                 `protobuf:"varint,1,opt,name=x" json:"x,omitempty"`
+	// y=0 describes the first line. When the scrollback buffer is full and history is lost, the first
+	// lines become unavailable, but the numbering is stable (so the Nth line is always the Nth line,
+	// even if it's not the Nth *visible* line).
+	Y             *int64 `protobuf:"varint,2,opt,name=y" json:"y,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-// Default values for LineContents fields.
-const (
-	Default_LineContents_Continuation = LineContents_CONTINUATION_HARD_EOL
-)
-
-func (x *LineContents) Reset() {
-	*x = LineContents{}
-	mi := &file_api_proto_msgTypes[9]
+func (x *Coord) Reset() {
+	*x = Coord{}
+	mi := &file_api_proto_msgTypes[95]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *LineContents) String() string {
+func (x *Coord) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*LineContents) ProtoMessage() {}
+func (*Coord) ProtoMessage() {}
 
-func (x *LineContents) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[9]
+func (x *Coord) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[95]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4264,94 +10418,21 @@ func (x *LineContents) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LineContents.ProtoReflect.Descriptor instead.
-func (*LineContents) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{9}
+// Deprecated: Use Coord.ProtoReflect.Descriptor instead.
+func (*Coord) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{95}
 }
 
-func (x *LineContents) GetText() string {
-	if x != nil && x.Text != nil {
-		return *x.Text
+func (x *Coord) GetX() int32 {
+	if x != nil && x.X != nil {
+		return *x.X
 	}
-	return ""
+	return 0
 }
 
-func (x *LineContents) GetCodePointsPerCell() []*CodePointsPerCell {
-	if x != nil {
-		return x.CodePointsPerCell
-	}
-	return nil
-}
-
-func (x *LineContents) GetContinuation() LineContents_Continuation {
-	if x != nil && x.Continuation != nil {
-		return *x.Continuation
-	}
-	return Default_LineContents_Continuation
-}
-
-func (x *LineContents) GetStyle() []*CellStyle {
-	if x != nil {
-		return x.Style
-	}
-	return nil
-}
-
-type CodePointsPerCell struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Number of code points per cell
-	NumCodePoints *int32 `protobuf:"varint,1,opt,name=num_code_points,json=numCodePoints,def=1" json:"num_code_points,omitempty"`
-	// Number of adjacent cells with this number of code points (always one or more).
-	Repeats       *int32 `protobuf:"varint,2,opt,name=repeats" json:"repeats,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-// Default values for CodePointsPerCell fields.
-const (
-	Default_CodePointsPerCell_NumCodePoints = int32(1)
-)
-
-func (x *CodePointsPerCell) Reset() {
-	*x = CodePointsPerCell{}
-	mi := &file_api_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CodePointsPerCell) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CodePointsPerCell) ProtoMessage() {}
-
-func (x *CodePointsPerCell) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CodePointsPerCell.ProtoReflect.Descriptor instead.
-func (*CodePointsPerCell) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *CodePointsPerCell) GetNumCodePoints() int32 {
-	if x != nil && x.NumCodePoints != nil {
-		return *x.NumCodePoints
-	}
-	return Default_CodePointsPerCell_NumCodePoints
-}
-
-func (x *CodePointsPerCell) GetRepeats() int32 {
-	if x != nil && x.Repeats != nil {
-		return *x.Repeats
+func (x *Coord) GetY() int64 {
+	if x != nil && x.Y != nil {
+		return *x.Y
 	}
 	return 0
 }
@@ -4367,7 +10448,7 @@ type RGBColor struct {
 
 func (x *RGBColor) Reset() {
 	*x = RGBColor{}
-	mi := &file_api_proto_msgTypes[11]
+	mi := &file_api_proto_msgTypes[96]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4379,7 +10460,7 @@ func (x *RGBColor) String() string {
 func (*RGBColor) ProtoMessage() {}
 
 func (x *RGBColor) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[11]
+	mi := &file_api_proto_msgTypes[96]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4392,7 +10473,7 @@ func (x *RGBColor) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RGBColor.ProtoReflect.Descriptor instead.
 func (*RGBColor) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{11}
+	return file_api_proto_rawDescGZIP(), []int{96}
 }
 
 func (x *RGBColor) GetRed() uint32 {
@@ -4426,7 +10507,7 @@ type URL struct {
 
 func (x *URL) Reset() {
 	*x = URL{}
-	mi := &file_api_proto_msgTypes[12]
+	mi := &file_api_proto_msgTypes[97]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4438,7 +10519,7 @@ func (x *URL) String() string {
 func (*URL) ProtoMessage() {}
 
 func (x *URL) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[12]
+	mi := &file_api_proto_msgTypes[97]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4451,7 +10532,7 @@ func (x *URL) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use URL.ProtoReflect.Descriptor instead.
 func (*URL) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{12}
+	return file_api_proto_rawDescGZIP(), []int{97}
 }
 
 func (x *URL) GetUrl() string {
@@ -4506,7 +10587,7 @@ type CellStyle struct {
 
 func (x *CellStyle) Reset() {
 	*x = CellStyle{}
-	mi := &file_api_proto_msgTypes[13]
+	mi := &file_api_proto_msgTypes[98]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4518,7 +10599,7 @@ func (x *CellStyle) String() string {
 func (*CellStyle) ProtoMessage() {}
 
 func (x *CellStyle) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[13]
+	mi := &file_api_proto_msgTypes[98]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4531,7 +10612,7 @@ func (x *CellStyle) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CellStyle.ProtoReflect.Descriptor instead.
 func (*CellStyle) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{13}
+	return file_api_proto_rawDescGZIP(), []int{98}
 }
 
 func (x *CellStyle) GetFgColor() isCellStyle_FgColor {
@@ -4774,7 +10855,191 @@ func (*CellStyle_BgRgb) isCellStyle_BgColor() {}
 
 func (*CellStyle_BgAlternatePlacementY) isCellStyle_BgColor() {}
 
-// List Sessions Request/Response
+// Describes the content of a line.
+type LineContents struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Text  *string                `protobuf:"bytes,1,opt,name=text" json:"text,omitempty"`
+	// Some cells do not contain one code point. Use this to map code points in
+	// `text` to a screen position. If the line has no uninitialized cells at its end, then the
+	// sum of `repeats` equals the width of the display.
+	//
+	// For example, consider a line of text that appears on your display like:
+	//
+	//	xyz compañía
+	//
+	// The corresponding value of `text` would be:
+	//
+	//	xyzcompan~i'a
+	//
+	// Note: ~ and ' are combining marks, but are shown uncombined for illustrative purposes.
+	//
+	// Each code point in "xyz" as well as each of the non-accented letters in compañía takes one
+	// cell.
+	//
+	// The blank following 'z' is an uninitialized cell that has no code points,
+	// so the z and the c in `text` are adjacent. It's unusual for these to occur in the middle
+	// of a line, but it is possible.
+	//
+	// The ñ is composed of the letter n and a combining tilde (U+0303) (indicated in our example
+	// as ~), while í is composed of the letter i and a combining acute accent (U+0301) (indicated in
+	// our example as ').
+	//
+	// To map code points in `text` to screen positions, `code_points_per_cell`
+	// provides the number of code points in each cell. In our example you would
+	// get:
+	//
+	//	num_code_points=1, repeats=3     // x, y, z
+	//	num_code_points=0, repeats=1     // uninitialized cell
+	//	num_code_points=1, repeats=5     // c, o, m, p, a
+	//	num_code_points=2, repeats=2     // n + combining tilde, i + combining acute accent
+	//	num_code_points=1, repeats=1     // a
+	//
+	// Lines usually end with a series of uninitialized cells. These are not included.
+	//
+	// Here is psuedocode to interpret code_points_per_cell:
+	//
+	//	text_index_to_screen_coord = {}
+	//	screen_coord_to_text_index = {}
+	//	text_index = 0
+	//	screen_coord = 0
+	//	for cpps in code_points_per_cell:
+	//	  repeat cpps.repeats times:
+	//	    text_index_to_screen_coord[text_index] = screen_coord
+	//	    screen_coord_to_text_index[screen_coord] = text_index
+	//	    text_index += cpps.num_code_points
+	//	    screen_coord += 1
+	//
+	// Cells with images are omitted.
+	CodePointsPerCell []*CodePointsPerCell       `protobuf:"bytes,2,rep,name=code_points_per_cell,json=codePointsPerCell" json:"code_points_per_cell,omitempty"`
+	Continuation      *LineContents_Continuation `protobuf:"varint,3,opt,name=continuation,enum=iterm2.LineContents_Continuation,def=1" json:"continuation,omitempty"`
+	// This will be 1:1 with cells, but it is run-length encoded by its `repeats` field.
+	Style         []*CellStyle `protobuf:"bytes,4,rep,name=style" json:"style,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+// Default values for LineContents fields.
+const (
+	Default_LineContents_Continuation = LineContents_CONTINUATION_HARD_EOL
+)
+
+func (x *LineContents) Reset() {
+	*x = LineContents{}
+	mi := &file_api_proto_msgTypes[99]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LineContents) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LineContents) ProtoMessage() {}
+
+func (x *LineContents) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[99]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LineContents.ProtoReflect.Descriptor instead.
+func (*LineContents) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{99}
+}
+
+func (x *LineContents) GetText() string {
+	if x != nil && x.Text != nil {
+		return *x.Text
+	}
+	return ""
+}
+
+func (x *LineContents) GetCodePointsPerCell() []*CodePointsPerCell {
+	if x != nil {
+		return x.CodePointsPerCell
+	}
+	return nil
+}
+
+func (x *LineContents) GetContinuation() LineContents_Continuation {
+	if x != nil && x.Continuation != nil {
+		return *x.Continuation
+	}
+	return Default_LineContents_Continuation
+}
+
+func (x *LineContents) GetStyle() []*CellStyle {
+	if x != nil {
+		return x.Style
+	}
+	return nil
+}
+
+type CodePointsPerCell struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Number of code points per cell
+	NumCodePoints *int32 `protobuf:"varint,1,opt,name=num_code_points,json=numCodePoints,def=1" json:"num_code_points,omitempty"`
+	// Number of adjacent cells with this number of code points (always one or more).
+	Repeats       *int32 `protobuf:"varint,2,opt,name=repeats" json:"repeats,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+// Default values for CodePointsPerCell fields.
+const (
+	Default_CodePointsPerCell_NumCodePoints = int32(1)
+)
+
+func (x *CodePointsPerCell) Reset() {
+	*x = CodePointsPerCell{}
+	mi := &file_api_proto_msgTypes[100]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CodePointsPerCell) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CodePointsPerCell) ProtoMessage() {}
+
+func (x *CodePointsPerCell) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[100]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CodePointsPerCell.ProtoReflect.Descriptor instead.
+func (*CodePointsPerCell) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{100}
+}
+
+func (x *CodePointsPerCell) GetNumCodePoints() int32 {
+	if x != nil && x.NumCodePoints != nil {
+		return *x.NumCodePoints
+	}
+	return Default_CodePointsPerCell_NumCodePoints
+}
+
+func (x *CodePointsPerCell) GetRepeats() int32 {
+	if x != nil && x.Repeats != nil {
+		return *x.Repeats
+	}
+	return 0
+}
+
 type ListSessionsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -4783,7 +11048,7 @@ type ListSessionsRequest struct {
 
 func (x *ListSessionsRequest) Reset() {
 	*x = ListSessionsRequest{}
-	mi := &file_api_proto_msgTypes[14]
+	mi := &file_api_proto_msgTypes[101]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4795,7 +11060,7 @@ func (x *ListSessionsRequest) String() string {
 func (*ListSessionsRequest) ProtoMessage() {}
 
 func (x *ListSessionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[14]
+	mi := &file_api_proto_msgTypes[101]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4808,7 +11073,115 @@ func (x *ListSessionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSessionsRequest.ProtoReflect.Descriptor instead.
 func (*ListSessionsRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{14}
+	return file_api_proto_rawDescGZIP(), []int{101}
+}
+
+type SendTextRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// See documentation on session IDs
+	Session *string `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	// The text to send. As usual for proto buffers, this should be UTF-8
+	// encoded. It will be converted to the session's encoding before being sent.
+	Text *string `protobuf:"bytes,2,opt,name=text" json:"text,omitempty"`
+	// If set, input will not be broadcast when broadcasting is on.
+	SuppressBroadcast *bool `protobuf:"varint,3,opt,name=suppress_broadcast,json=suppressBroadcast" json:"suppress_broadcast,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *SendTextRequest) Reset() {
+	*x = SendTextRequest{}
+	mi := &file_api_proto_msgTypes[102]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendTextRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendTextRequest) ProtoMessage() {}
+
+func (x *SendTextRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[102]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendTextRequest.ProtoReflect.Descriptor instead.
+func (*SendTextRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{102}
+}
+
+func (x *SendTextRequest) GetSession() string {
+	if x != nil && x.Session != nil {
+		return *x.Session
+	}
+	return ""
+}
+
+func (x *SendTextRequest) GetText() string {
+	if x != nil && x.Text != nil {
+		return *x.Text
+	}
+	return ""
+}
+
+func (x *SendTextRequest) GetSuppressBroadcast() bool {
+	if x != nil && x.SuppressBroadcast != nil {
+		return *x.SuppressBroadcast
+	}
+	return false
+}
+
+type SendTextResponse struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Status        *SendTextResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SendTextResponse_Status" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendTextResponse) Reset() {
+	*x = SendTextResponse{}
+	mi := &file_api_proto_msgTypes[103]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendTextResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendTextResponse) ProtoMessage() {}
+
+func (x *SendTextResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[103]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendTextResponse.ProtoReflect.Descriptor instead.
+func (*SendTextResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{103}
+}
+
+func (x *SendTextResponse) GetStatus() SendTextResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return SendTextResponse_OK
 }
 
 type Size struct {
@@ -4821,7 +11194,7 @@ type Size struct {
 
 func (x *Size) Reset() {
 	*x = Size{}
-	mi := &file_api_proto_msgTypes[15]
+	mi := &file_api_proto_msgTypes[104]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4833,7 +11206,7 @@ func (x *Size) String() string {
 func (*Size) ProtoMessage() {}
 
 func (x *Size) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[15]
+	mi := &file_api_proto_msgTypes[104]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4846,7 +11219,7 @@ func (x *Size) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Size.ProtoReflect.Descriptor instead.
 func (*Size) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{15}
+	return file_api_proto_rawDescGZIP(), []int{104}
 }
 
 func (x *Size) GetWidth() int32 {
@@ -4873,7 +11246,7 @@ type Point struct {
 
 func (x *Point) Reset() {
 	*x = Point{}
-	mi := &file_api_proto_msgTypes[16]
+	mi := &file_api_proto_msgTypes[105]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4885,7 +11258,7 @@ func (x *Point) String() string {
 func (*Point) ProtoMessage() {}
 
 func (x *Point) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[16]
+	mi := &file_api_proto_msgTypes[105]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4898,7 +11271,7 @@ func (x *Point) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Point.ProtoReflect.Descriptor instead.
 func (*Point) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{16}
+	return file_api_proto_rawDescGZIP(), []int{105}
 }
 
 func (x *Point) GetX() int32 {
@@ -4925,7 +11298,7 @@ type Frame struct {
 
 func (x *Frame) Reset() {
 	*x = Frame{}
-	mi := &file_api_proto_msgTypes[17]
+	mi := &file_api_proto_msgTypes[106]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4937,7 +11310,7 @@ func (x *Frame) String() string {
 func (*Frame) ProtoMessage() {}
 
 func (x *Frame) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[17]
+	mi := &file_api_proto_msgTypes[106]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4950,7 +11323,7 @@ func (x *Frame) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Frame.ProtoReflect.Descriptor instead.
 func (*Frame) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{17}
+	return file_api_proto_rawDescGZIP(), []int{106}
 }
 
 func (x *Frame) GetOrigin() *Point {
@@ -4979,7 +11352,7 @@ type SessionSummary struct {
 
 func (x *SessionSummary) Reset() {
 	*x = SessionSummary{}
-	mi := &file_api_proto_msgTypes[18]
+	mi := &file_api_proto_msgTypes[107]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4991,7 +11364,7 @@ func (x *SessionSummary) String() string {
 func (*SessionSummary) ProtoMessage() {}
 
 func (x *SessionSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[18]
+	mi := &file_api_proto_msgTypes[107]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5004,7 +11377,7 @@ func (x *SessionSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionSummary.ProtoReflect.Descriptor instead.
 func (*SessionSummary) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{18}
+	return file_api_proto_rawDescGZIP(), []int{107}
 }
 
 func (x *SessionSummary) GetUniqueIdentifier() string {
@@ -5045,7 +11418,7 @@ type SplitTreeNode struct {
 
 func (x *SplitTreeNode) Reset() {
 	*x = SplitTreeNode{}
-	mi := &file_api_proto_msgTypes[19]
+	mi := &file_api_proto_msgTypes[108]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5057,7 +11430,7 @@ func (x *SplitTreeNode) String() string {
 func (*SplitTreeNode) ProtoMessage() {}
 
 func (x *SplitTreeNode) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[19]
+	mi := &file_api_proto_msgTypes[108]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5070,7 +11443,7 @@ func (x *SplitTreeNode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SplitTreeNode.ProtoReflect.Descriptor instead.
 func (*SplitTreeNode) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{19}
+	return file_api_proto_rawDescGZIP(), []int{108}
 }
 
 func (x *SplitTreeNode) GetVertical() bool {
@@ -5097,7 +11470,7 @@ type ListSessionsResponse struct {
 
 func (x *ListSessionsResponse) Reset() {
 	*x = ListSessionsResponse{}
-	mi := &file_api_proto_msgTypes[20]
+	mi := &file_api_proto_msgTypes[109]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5109,7 +11482,7 @@ func (x *ListSessionsResponse) String() string {
 func (*ListSessionsResponse) ProtoMessage() {}
 
 func (x *ListSessionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[20]
+	mi := &file_api_proto_msgTypes[109]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5122,7 +11495,7 @@ func (x *ListSessionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSessionsResponse.ProtoReflect.Descriptor instead.
 func (*ListSessionsResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{20}
+	return file_api_proto_rawDescGZIP(), []int{109}
 }
 
 func (x *ListSessionsResponse) GetWindows() []*ListSessionsResponse_Window {
@@ -5139,116 +11512,6 @@ func (x *ListSessionsResponse) GetBuriedSessions() []*SessionSummary {
 	return nil
 }
 
-// Send Text Request/Response
-type SendTextRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// See documentation on session IDs
-	Session *string `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
-	// The text to send. As usual for proto buffers, this should be UTF-8
-	// encoded. It will be converted to the session's encoding before being sent.
-	Text *string `protobuf:"bytes,2,opt,name=text" json:"text,omitempty"`
-	// If set, input will not be broadcast when broadcasting is on.
-	SuppressBroadcast *bool `protobuf:"varint,3,opt,name=suppress_broadcast,json=suppressBroadcast" json:"suppress_broadcast,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
-}
-
-func (x *SendTextRequest) Reset() {
-	*x = SendTextRequest{}
-	mi := &file_api_proto_msgTypes[21]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SendTextRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SendTextRequest) ProtoMessage() {}
-
-func (x *SendTextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[21]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SendTextRequest.ProtoReflect.Descriptor instead.
-func (*SendTextRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{21}
-}
-
-func (x *SendTextRequest) GetSession() string {
-	if x != nil && x.Session != nil {
-		return *x.Session
-	}
-	return ""
-}
-
-func (x *SendTextRequest) GetText() string {
-	if x != nil && x.Text != nil {
-		return *x.Text
-	}
-	return ""
-}
-
-func (x *SendTextRequest) GetSuppressBroadcast() bool {
-	if x != nil && x.SuppressBroadcast != nil {
-		return *x.SuppressBroadcast
-	}
-	return false
-}
-
-type SendTextResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Status        *SendTextResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SendTextResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SendTextResponse) Reset() {
-	*x = SendTextResponse{}
-	mi := &file_api_proto_msgTypes[22]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SendTextResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SendTextResponse) ProtoMessage() {}
-
-func (x *SendTextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[22]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SendTextResponse.ProtoReflect.Descriptor instead.
-func (*SendTextResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{22}
-}
-
-func (x *SendTextResponse) GetStatus() SendTextResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return SendTextResponse_OK
-}
-
-// Create Tab Request/Response
 type CreateTabRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Leave unset to use the default profile.
@@ -5269,7 +11532,7 @@ type CreateTabRequest struct {
 
 func (x *CreateTabRequest) Reset() {
 	*x = CreateTabRequest{}
-	mi := &file_api_proto_msgTypes[23]
+	mi := &file_api_proto_msgTypes[110]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5281,7 +11544,7 @@ func (x *CreateTabRequest) String() string {
 func (*CreateTabRequest) ProtoMessage() {}
 
 func (x *CreateTabRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[23]
+	mi := &file_api_proto_msgTypes[110]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5294,7 +11557,7 @@ func (x *CreateTabRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTabRequest.ProtoReflect.Descriptor instead.
 func (*CreateTabRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{23}
+	return file_api_proto_rawDescGZIP(), []int{110}
 }
 
 func (x *CreateTabRequest) GetProfileName() string {
@@ -5333,58 +11596,6 @@ func (x *CreateTabRequest) GetCustomProfileProperties() []*ProfileProperty {
 	return nil
 }
 
-type ProfileProperty struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Key           *string                `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
-	JsonValue     *string                `protobuf:"bytes,2,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ProfileProperty) Reset() {
-	*x = ProfileProperty{}
-	mi := &file_api_proto_msgTypes[24]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ProfileProperty) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ProfileProperty) ProtoMessage() {}
-
-func (x *ProfileProperty) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[24]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ProfileProperty.ProtoReflect.Descriptor instead.
-func (*ProfileProperty) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{24}
-}
-
-func (x *ProfileProperty) GetKey() string {
-	if x != nil && x.Key != nil {
-		return *x.Key
-	}
-	return ""
-}
-
-func (x *ProfileProperty) GetJsonValue() string {
-	if x != nil && x.JsonValue != nil {
-		return *x.JsonValue
-	}
-	return ""
-}
-
 type CreateTabResponse struct {
 	state         protoimpl.MessageState    `protogen:"open.v1"`
 	Status        *CreateTabResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.CreateTabResponse_Status" json:"status,omitempty"`
@@ -5397,7 +11608,7 @@ type CreateTabResponse struct {
 
 func (x *CreateTabResponse) Reset() {
 	*x = CreateTabResponse{}
-	mi := &file_api_proto_msgTypes[25]
+	mi := &file_api_proto_msgTypes[111]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5409,7 +11620,7 @@ func (x *CreateTabResponse) String() string {
 func (*CreateTabResponse) ProtoMessage() {}
 
 func (x *CreateTabResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[25]
+	mi := &file_api_proto_msgTypes[111]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5422,7 +11633,7 @@ func (x *CreateTabResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTabResponse.ProtoReflect.Descriptor instead.
 func (*CreateTabResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{25}
+	return file_api_proto_rawDescGZIP(), []int{111}
 }
 
 func (x *CreateTabResponse) GetStatus() CreateTabResponse_Status {
@@ -5453,1975 +11664,17 @@ func (x *CreateTabResponse) GetSessionId() string {
 	return ""
 }
 
-// Notification struct
-type Notification struct {
-	state                    protoimpl.MessageState    `protogen:"open.v1"`
-	KeystrokeNotification    *KeystrokeNotification    `protobuf:"bytes,1,opt,name=keystroke_notification,json=keystrokeNotification" json:"keystroke_notification,omitempty"`
-	ScreenUpdateNotification *ScreenUpdateNotification `protobuf:"bytes,2,opt,name=screen_update_notification,json=screenUpdateNotification" json:"screen_update_notification,omitempty"`
-	PromptNotification       *PromptNotification       `protobuf:"bytes,3,opt,name=prompt_notification,json=promptNotification" json:"prompt_notification,omitempty"`
-	// Deprecated: Marked as deprecated in api.proto.
-	LocationChangeNotification       *LocationChangeNotification          `protobuf:"bytes,4,opt,name=location_change_notification,json=locationChangeNotification" json:"location_change_notification,omitempty"`
-	CustomEscapeSequenceNotification *CustomEscapeSequenceNotification    `protobuf:"bytes,5,opt,name=custom_escape_sequence_notification,json=customEscapeSequenceNotification" json:"custom_escape_sequence_notification,omitempty"`
-	NewSessionNotification           *NewSessionNotification              `protobuf:"bytes,6,opt,name=new_session_notification,json=newSessionNotification" json:"new_session_notification,omitempty"`
-	TerminateSessionNotification     *TerminateSessionNotification        `protobuf:"bytes,7,opt,name=terminate_session_notification,json=terminateSessionNotification" json:"terminate_session_notification,omitempty"`
-	LayoutChangedNotification        *LayoutChangedNotification           `protobuf:"bytes,8,opt,name=layout_changed_notification,json=layoutChangedNotification" json:"layout_changed_notification,omitempty"`
-	FocusChangedNotification         *FocusChangedNotification            `protobuf:"bytes,9,opt,name=focus_changed_notification,json=focusChangedNotification" json:"focus_changed_notification,omitempty"`
-	ServerOriginatedRpcNotification  *ServerOriginatedRPCNotification     `protobuf:"bytes,10,opt,name=server_originated_rpc_notification,json=serverOriginatedRpcNotification" json:"server_originated_rpc_notification,omitempty"`
-	BroadcastDomainsChanged          *BroadcastDomainsChangedNotification `protobuf:"bytes,11,opt,name=broadcast_domains_changed,json=broadcastDomainsChanged" json:"broadcast_domains_changed,omitempty"`
-	VariableChangedNotification      *VariableChangedNotification         `protobuf:"bytes,12,opt,name=variable_changed_notification,json=variableChangedNotification" json:"variable_changed_notification,omitempty"`
-	ProfileChangedNotification       *ProfileChangedNotification          `protobuf:"bytes,13,opt,name=profile_changed_notification,json=profileChangedNotification" json:"profile_changed_notification,omitempty"`
-	unknownFields                    protoimpl.UnknownFields
-	sizeCache                        protoimpl.SizeCache
-}
-
-func (x *Notification) Reset() {
-	*x = Notification{}
-	mi := &file_api_proto_msgTypes[26]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Notification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Notification) ProtoMessage() {}
-
-func (x *Notification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[26]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Notification.ProtoReflect.Descriptor instead.
-func (*Notification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{26}
-}
-
-func (x *Notification) GetKeystrokeNotification() *KeystrokeNotification {
-	if x != nil {
-		return x.KeystrokeNotification
-	}
-	return nil
-}
-
-func (x *Notification) GetScreenUpdateNotification() *ScreenUpdateNotification {
-	if x != nil {
-		return x.ScreenUpdateNotification
-	}
-	return nil
-}
-
-func (x *Notification) GetPromptNotification() *PromptNotification {
-	if x != nil {
-		return x.PromptNotification
-	}
-	return nil
-}
-
-// Deprecated: Marked as deprecated in api.proto.
-func (x *Notification) GetLocationChangeNotification() *LocationChangeNotification {
-	if x != nil {
-		return x.LocationChangeNotification
-	}
-	return nil
-}
-
-func (x *Notification) GetCustomEscapeSequenceNotification() *CustomEscapeSequenceNotification {
-	if x != nil {
-		return x.CustomEscapeSequenceNotification
-	}
-	return nil
-}
-
-func (x *Notification) GetNewSessionNotification() *NewSessionNotification {
-	if x != nil {
-		return x.NewSessionNotification
-	}
-	return nil
-}
-
-func (x *Notification) GetTerminateSessionNotification() *TerminateSessionNotification {
-	if x != nil {
-		return x.TerminateSessionNotification
-	}
-	return nil
-}
-
-func (x *Notification) GetLayoutChangedNotification() *LayoutChangedNotification {
-	if x != nil {
-		return x.LayoutChangedNotification
-	}
-	return nil
-}
-
-func (x *Notification) GetFocusChangedNotification() *FocusChangedNotification {
-	if x != nil {
-		return x.FocusChangedNotification
-	}
-	return nil
-}
-
-func (x *Notification) GetServerOriginatedRpcNotification() *ServerOriginatedRPCNotification {
-	if x != nil {
-		return x.ServerOriginatedRpcNotification
-	}
-	return nil
-}
-
-func (x *Notification) GetBroadcastDomainsChanged() *BroadcastDomainsChangedNotification {
-	if x != nil {
-		return x.BroadcastDomainsChanged
-	}
-	return nil
-}
-
-func (x *Notification) GetVariableChangedNotification() *VariableChangedNotification {
-	if x != nil {
-		return x.VariableChangedNotification
-	}
-	return nil
-}
-
-func (x *Notification) GetProfileChangedNotification() *ProfileChangedNotification {
-	if x != nil {
-		return x.ProfileChangedNotification
-	}
-	return nil
-}
-
-// Base notification messages - needed for Notification struct above
-type KeystrokeNotification struct {
-	state                       protoimpl.MessageState        `protogen:"open.v1"`
-	Characters                  *string                       `protobuf:"bytes,1,opt,name=characters" json:"characters,omitempty"`
-	CharactersIgnoringModifiers *string                       `protobuf:"bytes,2,opt,name=charactersIgnoringModifiers" json:"charactersIgnoringModifiers,omitempty"`
-	Modifiers                   []Modifiers                   `protobuf:"varint,3,rep,name=modifiers,enum=iterm2.Modifiers" json:"modifiers,omitempty"`
-	KeyCode                     *int32                        `protobuf:"varint,4,opt,name=keyCode" json:"keyCode,omitempty"`
-	Session                     *string                       `protobuf:"bytes,5,opt,name=session" json:"session,omitempty"`
-	Action                      *KeystrokeNotification_Action `protobuf:"varint,6,opt,name=action,enum=iterm2.KeystrokeNotification_Action" json:"action,omitempty"`
-	unknownFields               protoimpl.UnknownFields
-	sizeCache                   protoimpl.SizeCache
-}
-
-func (x *KeystrokeNotification) Reset() {
-	*x = KeystrokeNotification{}
-	mi := &file_api_proto_msgTypes[27]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *KeystrokeNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*KeystrokeNotification) ProtoMessage() {}
-
-func (x *KeystrokeNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[27]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use KeystrokeNotification.ProtoReflect.Descriptor instead.
-func (*KeystrokeNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{27}
-}
-
-func (x *KeystrokeNotification) GetCharacters() string {
-	if x != nil && x.Characters != nil {
-		return *x.Characters
-	}
-	return ""
-}
-
-func (x *KeystrokeNotification) GetCharactersIgnoringModifiers() string {
-	if x != nil && x.CharactersIgnoringModifiers != nil {
-		return *x.CharactersIgnoringModifiers
-	}
-	return ""
-}
-
-func (x *KeystrokeNotification) GetModifiers() []Modifiers {
-	if x != nil {
-		return x.Modifiers
-	}
-	return nil
-}
-
-func (x *KeystrokeNotification) GetKeyCode() int32 {
-	if x != nil && x.KeyCode != nil {
-		return *x.KeyCode
-	}
-	return 0
-}
-
-func (x *KeystrokeNotification) GetSession() string {
-	if x != nil && x.Session != nil {
-		return *x.Session
-	}
-	return ""
-}
-
-func (x *KeystrokeNotification) GetAction() KeystrokeNotification_Action {
-	if x != nil && x.Action != nil {
-		return *x.Action
-	}
-	return KeystrokeNotification_KEY_DOWN
-}
-
-type ScreenUpdateNotification struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Session       *string                `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ScreenUpdateNotification) Reset() {
-	*x = ScreenUpdateNotification{}
-	mi := &file_api_proto_msgTypes[28]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ScreenUpdateNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ScreenUpdateNotification) ProtoMessage() {}
-
-func (x *ScreenUpdateNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[28]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ScreenUpdateNotification.ProtoReflect.Descriptor instead.
-func (*ScreenUpdateNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{28}
-}
-
-func (x *ScreenUpdateNotification) GetSession() string {
-	if x != nil && x.Session != nil {
-		return *x.Session
-	}
-	return ""
-}
-
-type GetPromptResponse struct {
-	state            protoimpl.MessageState    `protogen:"open.v1"`
-	Status           *GetPromptResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.GetPromptResponse_Status,def=0" json:"status,omitempty"`
-	PromptRange      *CoordRange               `protobuf:"bytes,2,opt,name=prompt_range,json=promptRange" json:"prompt_range,omitempty"`
-	CommandRange     *CoordRange               `protobuf:"bytes,3,opt,name=command_range,json=commandRange" json:"command_range,omitempty"`
-	OutputRange      *CoordRange               `protobuf:"bytes,4,opt,name=output_range,json=outputRange" json:"output_range,omitempty"`
-	WorkingDirectory *string                   `protobuf:"bytes,5,opt,name=working_directory,json=workingDirectory" json:"working_directory,omitempty"`
-	Command          *string                   `protobuf:"bytes,6,opt,name=command" json:"command,omitempty"`
-	PromptState      *GetPromptResponse_State  `protobuf:"varint,7,opt,name=prompt_state,json=promptState,enum=iterm2.GetPromptResponse_State" json:"prompt_state,omitempty"`
-	// Exit status. Equivalent to shell's $? variable. Only set if state is FINISHED.
-	ExitStatus     *uint32 `protobuf:"varint,9,opt,name=exit_status,json=exitStatus" json:"exit_status,omitempty"`
-	UniquePromptId *string `protobuf:"bytes,10,opt,name=unique_prompt_id,json=uniquePromptId" json:"unique_prompt_id,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-// Default values for GetPromptResponse fields.
-const (
-	Default_GetPromptResponse_Status = GetPromptResponse_OK
-)
-
-func (x *GetPromptResponse) Reset() {
-	*x = GetPromptResponse{}
-	mi := &file_api_proto_msgTypes[29]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetPromptResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetPromptResponse) ProtoMessage() {}
-
-func (x *GetPromptResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[29]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetPromptResponse.ProtoReflect.Descriptor instead.
-func (*GetPromptResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{29}
-}
-
-func (x *GetPromptResponse) GetStatus() GetPromptResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return Default_GetPromptResponse_Status
-}
-
-func (x *GetPromptResponse) GetPromptRange() *CoordRange {
-	if x != nil {
-		return x.PromptRange
-	}
-	return nil
-}
-
-func (x *GetPromptResponse) GetCommandRange() *CoordRange {
-	if x != nil {
-		return x.CommandRange
-	}
-	return nil
-}
-
-func (x *GetPromptResponse) GetOutputRange() *CoordRange {
-	if x != nil {
-		return x.OutputRange
-	}
-	return nil
-}
-
-func (x *GetPromptResponse) GetWorkingDirectory() string {
-	if x != nil && x.WorkingDirectory != nil {
-		return *x.WorkingDirectory
-	}
-	return ""
-}
-
-func (x *GetPromptResponse) GetCommand() string {
-	if x != nil && x.Command != nil {
-		return *x.Command
-	}
-	return ""
-}
-
-func (x *GetPromptResponse) GetPromptState() GetPromptResponse_State {
-	if x != nil && x.PromptState != nil {
-		return *x.PromptState
-	}
-	return GetPromptResponse_EDITING
-}
-
-func (x *GetPromptResponse) GetExitStatus() uint32 {
-	if x != nil && x.ExitStatus != nil {
-		return *x.ExitStatus
-	}
-	return 0
-}
-
-func (x *GetPromptResponse) GetUniquePromptId() string {
-	if x != nil && x.UniquePromptId != nil {
-		return *x.UniquePromptId
-	}
-	return ""
-}
-
-type PromptNotificationPrompt struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Placeholder   *string                `protobuf:"bytes,1,opt,name=placeholder" json:"placeholder,omitempty"`
-	Prompt        *GetPromptResponse     `protobuf:"bytes,2,opt,name=prompt" json:"prompt,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PromptNotificationPrompt) Reset() {
-	*x = PromptNotificationPrompt{}
-	mi := &file_api_proto_msgTypes[30]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PromptNotificationPrompt) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PromptNotificationPrompt) ProtoMessage() {}
-
-func (x *PromptNotificationPrompt) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[30]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PromptNotificationPrompt.ProtoReflect.Descriptor instead.
-func (*PromptNotificationPrompt) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{30}
-}
-
-func (x *PromptNotificationPrompt) GetPlaceholder() string {
-	if x != nil && x.Placeholder != nil {
-		return *x.Placeholder
-	}
-	return ""
-}
-
-func (x *PromptNotificationPrompt) GetPrompt() *GetPromptResponse {
-	if x != nil {
-		return x.Prompt
-	}
-	return nil
-}
-
-type PromptNotificationCommandStart struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Command       *string                `protobuf:"bytes,1,opt,name=command" json:"command,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PromptNotificationCommandStart) Reset() {
-	*x = PromptNotificationCommandStart{}
-	mi := &file_api_proto_msgTypes[31]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PromptNotificationCommandStart) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PromptNotificationCommandStart) ProtoMessage() {}
-
-func (x *PromptNotificationCommandStart) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[31]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PromptNotificationCommandStart.ProtoReflect.Descriptor instead.
-func (*PromptNotificationCommandStart) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{31}
-}
-
-func (x *PromptNotificationCommandStart) GetCommand() string {
-	if x != nil && x.Command != nil {
-		return *x.Command
-	}
-	return ""
-}
-
-type PromptNotificationCommandEnd struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        *int32                 `protobuf:"varint,1,opt,name=status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PromptNotificationCommandEnd) Reset() {
-	*x = PromptNotificationCommandEnd{}
-	mi := &file_api_proto_msgTypes[32]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PromptNotificationCommandEnd) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PromptNotificationCommandEnd) ProtoMessage() {}
-
-func (x *PromptNotificationCommandEnd) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[32]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PromptNotificationCommandEnd.ProtoReflect.Descriptor instead.
-func (*PromptNotificationCommandEnd) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{32}
-}
-
-func (x *PromptNotificationCommandEnd) GetStatus() int32 {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return 0
-}
-
-type PromptNotification struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	Session *string                `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
-	// Types that are valid to be assigned to Event:
-	//
-	//	*PromptNotification_Prompt
-	//	*PromptNotification_CommandStart
-	//	*PromptNotification_CommandEnd
-	Event          isPromptNotification_Event `protobuf_oneof:"event"`
-	UniquePromptId *string                    `protobuf:"bytes,5,opt,name=unique_prompt_id,json=uniquePromptId" json:"unique_prompt_id,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *PromptNotification) Reset() {
-	*x = PromptNotification{}
-	mi := &file_api_proto_msgTypes[33]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PromptNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PromptNotification) ProtoMessage() {}
-
-func (x *PromptNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[33]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PromptNotification.ProtoReflect.Descriptor instead.
-func (*PromptNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{33}
-}
-
-func (x *PromptNotification) GetSession() string {
-	if x != nil && x.Session != nil {
-		return *x.Session
-	}
-	return ""
-}
-
-func (x *PromptNotification) GetEvent() isPromptNotification_Event {
-	if x != nil {
-		return x.Event
-	}
-	return nil
-}
-
-func (x *PromptNotification) GetPrompt() *PromptNotificationPrompt {
-	if x != nil {
-		if x, ok := x.Event.(*PromptNotification_Prompt); ok {
-			return x.Prompt
-		}
-	}
-	return nil
-}
-
-func (x *PromptNotification) GetCommandStart() *PromptNotificationCommandStart {
-	if x != nil {
-		if x, ok := x.Event.(*PromptNotification_CommandStart); ok {
-			return x.CommandStart
-		}
-	}
-	return nil
-}
-
-func (x *PromptNotification) GetCommandEnd() *PromptNotificationCommandEnd {
-	if x != nil {
-		if x, ok := x.Event.(*PromptNotification_CommandEnd); ok {
-			return x.CommandEnd
-		}
-	}
-	return nil
-}
-
-func (x *PromptNotification) GetUniquePromptId() string {
-	if x != nil && x.UniquePromptId != nil {
-		return *x.UniquePromptId
-	}
-	return ""
-}
-
-type isPromptNotification_Event interface {
-	isPromptNotification_Event()
-}
-
-type PromptNotification_Prompt struct {
-	Prompt *PromptNotificationPrompt `protobuf:"bytes,2,opt,name=prompt,oneof"`
-}
-
-type PromptNotification_CommandStart struct {
-	CommandStart *PromptNotificationCommandStart `protobuf:"bytes,3,opt,name=command_start,json=commandStart,oneof"`
-}
-
-type PromptNotification_CommandEnd struct {
-	CommandEnd *PromptNotificationCommandEnd `protobuf:"bytes,4,opt,name=command_end,json=commandEnd,oneof"`
-}
-
-func (*PromptNotification_Prompt) isPromptNotification_Event() {}
-
-func (*PromptNotification_CommandStart) isPromptNotification_Event() {}
-
-func (*PromptNotification_CommandEnd) isPromptNotification_Event() {}
-
-type LocationChangeNotification struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	HostName      *string                `protobuf:"bytes,1,opt,name=host_name,json=hostName" json:"host_name,omitempty"`
-	UserName      *string                `protobuf:"bytes,2,opt,name=user_name,json=userName" json:"user_name,omitempty"`
-	Directory     *string                `protobuf:"bytes,3,opt,name=directory" json:"directory,omitempty"`
-	Session       *string                `protobuf:"bytes,4,opt,name=session" json:"session,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LocationChangeNotification) Reset() {
-	*x = LocationChangeNotification{}
-	mi := &file_api_proto_msgTypes[34]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LocationChangeNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LocationChangeNotification) ProtoMessage() {}
-
-func (x *LocationChangeNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[34]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LocationChangeNotification.ProtoReflect.Descriptor instead.
-func (*LocationChangeNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{34}
-}
-
-func (x *LocationChangeNotification) GetHostName() string {
-	if x != nil && x.HostName != nil {
-		return *x.HostName
-	}
-	return ""
-}
-
-func (x *LocationChangeNotification) GetUserName() string {
-	if x != nil && x.UserName != nil {
-		return *x.UserName
-	}
-	return ""
-}
-
-func (x *LocationChangeNotification) GetDirectory() string {
-	if x != nil && x.Directory != nil {
-		return *x.Directory
-	}
-	return ""
-}
-
-func (x *LocationChangeNotification) GetSession() string {
-	if x != nil && x.Session != nil {
-		return *x.Session
-	}
-	return ""
-}
-
-type CustomEscapeSequenceNotification struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Session        *string                `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
-	SenderIdentity *string                `protobuf:"bytes,2,opt,name=sender_identity,json=senderIdentity" json:"sender_identity,omitempty"`
-	Payload        *string                `protobuf:"bytes,3,opt,name=payload" json:"payload,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *CustomEscapeSequenceNotification) Reset() {
-	*x = CustomEscapeSequenceNotification{}
-	mi := &file_api_proto_msgTypes[35]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CustomEscapeSequenceNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CustomEscapeSequenceNotification) ProtoMessage() {}
-
-func (x *CustomEscapeSequenceNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[35]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CustomEscapeSequenceNotification.ProtoReflect.Descriptor instead.
-func (*CustomEscapeSequenceNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{35}
-}
-
-func (x *CustomEscapeSequenceNotification) GetSession() string {
-	if x != nil && x.Session != nil {
-		return *x.Session
-	}
-	return ""
-}
-
-func (x *CustomEscapeSequenceNotification) GetSenderIdentity() string {
-	if x != nil && x.SenderIdentity != nil {
-		return *x.SenderIdentity
-	}
-	return ""
-}
-
-func (x *CustomEscapeSequenceNotification) GetPayload() string {
-	if x != nil && x.Payload != nil {
-		return *x.Payload
-	}
-	return ""
-}
-
-type NewSessionNotification struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *NewSessionNotification) Reset() {
-	*x = NewSessionNotification{}
-	mi := &file_api_proto_msgTypes[36]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *NewSessionNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*NewSessionNotification) ProtoMessage() {}
-
-func (x *NewSessionNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[36]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use NewSessionNotification.ProtoReflect.Descriptor instead.
-func (*NewSessionNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{36}
-}
-
-func (x *NewSessionNotification) GetSessionId() string {
-	if x != nil && x.SessionId != nil {
-		return *x.SessionId
-	}
-	return ""
-}
-
-type FocusChangedNotification struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Event:
-	//
-	//	*FocusChangedNotification_ApplicationActive
-	//	*FocusChangedNotification_Window_
-	//	*FocusChangedNotification_SelectedTab
-	//	*FocusChangedNotification_Session
-	Event         isFocusChangedNotification_Event `protobuf_oneof:"event"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *FocusChangedNotification) Reset() {
-	*x = FocusChangedNotification{}
-	mi := &file_api_proto_msgTypes[37]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *FocusChangedNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*FocusChangedNotification) ProtoMessage() {}
-
-func (x *FocusChangedNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[37]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FocusChangedNotification.ProtoReflect.Descriptor instead.
-func (*FocusChangedNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{37}
-}
-
-func (x *FocusChangedNotification) GetEvent() isFocusChangedNotification_Event {
-	if x != nil {
-		return x.Event
-	}
-	return nil
-}
-
-func (x *FocusChangedNotification) GetApplicationActive() bool {
-	if x != nil {
-		if x, ok := x.Event.(*FocusChangedNotification_ApplicationActive); ok {
-			return x.ApplicationActive
-		}
-	}
-	return false
-}
-
-func (x *FocusChangedNotification) GetWindow() *FocusChangedNotification_Window {
-	if x != nil {
-		if x, ok := x.Event.(*FocusChangedNotification_Window_); ok {
-			return x.Window
-		}
-	}
-	return nil
-}
-
-func (x *FocusChangedNotification) GetSelectedTab() string {
-	if x != nil {
-		if x, ok := x.Event.(*FocusChangedNotification_SelectedTab); ok {
-			return x.SelectedTab
-		}
-	}
-	return ""
-}
-
-func (x *FocusChangedNotification) GetSession() string {
-	if x != nil {
-		if x, ok := x.Event.(*FocusChangedNotification_Session); ok {
-			return x.Session
-		}
-	}
-	return ""
-}
-
-type isFocusChangedNotification_Event interface {
-	isFocusChangedNotification_Event()
-}
-
-type FocusChangedNotification_ApplicationActive struct {
-	// true: application became active. false: application resigned active.
-	ApplicationActive bool `protobuf:"varint,1,opt,name=application_active,json=applicationActive,oneof"`
-}
-
-type FocusChangedNotification_Window_ struct {
-	// If set, gives info about a change to window focus.
-	Window *FocusChangedNotification_Window `protobuf:"bytes,2,opt,name=window,oneof"`
-}
-
-type FocusChangedNotification_SelectedTab struct {
-	// If set, selected tab changed to the one identified herein.
-	SelectedTab string `protobuf:"bytes,3,opt,name=selected_tab,json=selectedTab,oneof"`
-}
-
-type FocusChangedNotification_Session struct {
-	// If set, the given session became active in its tab.
-	Session string `protobuf:"bytes,4,opt,name=session,oneof"`
-}
-
-func (*FocusChangedNotification_ApplicationActive) isFocusChangedNotification_Event() {}
-
-func (*FocusChangedNotification_Window_) isFocusChangedNotification_Event() {}
-
-func (*FocusChangedNotification_SelectedTab) isFocusChangedNotification_Event() {}
-
-func (*FocusChangedNotification_Session) isFocusChangedNotification_Event() {}
-
-type TerminateSessionNotification struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TerminateSessionNotification) Reset() {
-	*x = TerminateSessionNotification{}
-	mi := &file_api_proto_msgTypes[38]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TerminateSessionNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TerminateSessionNotification) ProtoMessage() {}
-
-func (x *TerminateSessionNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[38]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TerminateSessionNotification.ProtoReflect.Descriptor instead.
-func (*TerminateSessionNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{38}
-}
-
-func (x *TerminateSessionNotification) GetSessionId() string {
-	if x != nil && x.SessionId != nil {
-		return *x.SessionId
-	}
-	return ""
-}
-
-type LayoutChangedNotification struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	ListSessionsResponse *ListSessionsResponse  `protobuf:"bytes,1,opt,name=list_sessions_response,json=listSessionsResponse" json:"list_sessions_response,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
-}
-
-func (x *LayoutChangedNotification) Reset() {
-	*x = LayoutChangedNotification{}
-	mi := &file_api_proto_msgTypes[39]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LayoutChangedNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LayoutChangedNotification) ProtoMessage() {}
-
-func (x *LayoutChangedNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[39]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LayoutChangedNotification.ProtoReflect.Descriptor instead.
-func (*LayoutChangedNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{39}
-}
-
-func (x *LayoutChangedNotification) GetListSessionsResponse() *ListSessionsResponse {
-	if x != nil {
-		return x.ListSessionsResponse
-	}
-	return nil
-}
-
-type ServerOriginatedRPC struct {
-	state         protoimpl.MessageState             `protogen:"open.v1"`
-	Name          *string                            `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	Arguments     []*ServerOriginatedRPC_RPCArgument `protobuf:"bytes,3,rep,name=arguments" json:"arguments,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ServerOriginatedRPC) Reset() {
-	*x = ServerOriginatedRPC{}
-	mi := &file_api_proto_msgTypes[40]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ServerOriginatedRPC) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ServerOriginatedRPC) ProtoMessage() {}
-
-func (x *ServerOriginatedRPC) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[40]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ServerOriginatedRPC.ProtoReflect.Descriptor instead.
-func (*ServerOriginatedRPC) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{40}
-}
-
-func (x *ServerOriginatedRPC) GetName() string {
-	if x != nil && x.Name != nil {
-		return *x.Name
-	}
-	return ""
-}
-
-func (x *ServerOriginatedRPC) GetArguments() []*ServerOriginatedRPC_RPCArgument {
-	if x != nil {
-		return x.Arguments
-	}
-	return nil
-}
-
-type ServerOriginatedRPCNotification struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RequestId     *string                `protobuf:"bytes,1,opt,name=request_id,json=requestId" json:"request_id,omitempty"`
-	Rpc           *ServerOriginatedRPC   `protobuf:"bytes,2,opt,name=rpc" json:"rpc,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ServerOriginatedRPCNotification) Reset() {
-	*x = ServerOriginatedRPCNotification{}
-	mi := &file_api_proto_msgTypes[41]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ServerOriginatedRPCNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ServerOriginatedRPCNotification) ProtoMessage() {}
-
-func (x *ServerOriginatedRPCNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[41]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ServerOriginatedRPCNotification.ProtoReflect.Descriptor instead.
-func (*ServerOriginatedRPCNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{41}
-}
-
-func (x *ServerOriginatedRPCNotification) GetRequestId() string {
-	if x != nil && x.RequestId != nil {
-		return *x.RequestId
-	}
-	return ""
-}
-
-func (x *ServerOriginatedRPCNotification) GetRpc() *ServerOriginatedRPC {
-	if x != nil {
-		return x.Rpc
-	}
-	return nil
-}
-
-type BroadcastDomain struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionIds    []string               `protobuf:"bytes,1,rep,name=session_ids,json=sessionIds" json:"session_ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *BroadcastDomain) Reset() {
-	*x = BroadcastDomain{}
-	mi := &file_api_proto_msgTypes[42]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BroadcastDomain) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BroadcastDomain) ProtoMessage() {}
-
-func (x *BroadcastDomain) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[42]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BroadcastDomain.ProtoReflect.Descriptor instead.
-func (*BroadcastDomain) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{42}
-}
-
-func (x *BroadcastDomain) GetSessionIds() []string {
-	if x != nil {
-		return x.SessionIds
-	}
-	return nil
-}
-
-type BroadcastDomainsChangedNotification struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	BroadcastDomains []*BroadcastDomain     `protobuf:"bytes,1,rep,name=broadcast_domains,json=broadcastDomains" json:"broadcast_domains,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *BroadcastDomainsChangedNotification) Reset() {
-	*x = BroadcastDomainsChangedNotification{}
-	mi := &file_api_proto_msgTypes[43]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BroadcastDomainsChangedNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BroadcastDomainsChangedNotification) ProtoMessage() {}
-
-func (x *BroadcastDomainsChangedNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[43]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BroadcastDomainsChangedNotification.ProtoReflect.Descriptor instead.
-func (*BroadcastDomainsChangedNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{43}
-}
-
-func (x *BroadcastDomainsChangedNotification) GetBroadcastDomains() []*BroadcastDomain {
-	if x != nil {
-		return x.BroadcastDomains
-	}
-	return nil
-}
-
-type VariableChangedNotification struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Scope         *int32                 `protobuf:"varint,1,opt,name=scope" json:"scope,omitempty"`
-	Identifier    *string                `protobuf:"bytes,2,opt,name=identifier" json:"identifier,omitempty"` // unset if app scope, otherwise is session, window, or tab ID
-	Name          *string                `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
-	JsonNewValue  *string                `protobuf:"bytes,4,opt,name=json_new_value,json=jsonNewValue" json:"json_new_value,omitempty"` // Will be "null" if unset.
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *VariableChangedNotification) Reset() {
-	*x = VariableChangedNotification{}
-	mi := &file_api_proto_msgTypes[44]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *VariableChangedNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*VariableChangedNotification) ProtoMessage() {}
-
-func (x *VariableChangedNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[44]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use VariableChangedNotification.ProtoReflect.Descriptor instead.
-func (*VariableChangedNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{44}
-}
-
-func (x *VariableChangedNotification) GetScope() int32 {
-	if x != nil && x.Scope != nil {
-		return *x.Scope
-	}
-	return 0
-}
-
-func (x *VariableChangedNotification) GetIdentifier() string {
-	if x != nil && x.Identifier != nil {
-		return *x.Identifier
-	}
-	return ""
-}
-
-func (x *VariableChangedNotification) GetName() string {
-	if x != nil && x.Name != nil {
-		return *x.Name
-	}
-	return ""
-}
-
-func (x *VariableChangedNotification) GetJsonNewValue() string {
-	if x != nil && x.JsonNewValue != nil {
-		return *x.JsonNewValue
-	}
-	return ""
-}
-
-type ProfileChangedNotification struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Guid          *string                `protobuf:"bytes,1,opt,name=guid" json:"guid,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ProfileChangedNotification) Reset() {
-	*x = ProfileChangedNotification{}
-	mi := &file_api_proto_msgTypes[45]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ProfileChangedNotification) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ProfileChangedNotification) ProtoMessage() {}
-
-func (x *ProfileChangedNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[45]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ProfileChangedNotification.ProtoReflect.Descriptor instead.
-func (*ProfileChangedNotification) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{45}
-}
-
-func (x *ProfileChangedNotification) GetGuid() string {
-	if x != nil && x.Guid != nil {
-		return *x.Guid
-	}
-	return ""
-}
-
-// These are stub implementations that we need for compilation - the actual API is more complex
-type GetPromptRequest struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Session        *string                `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
-	UniquePromptId *string                `protobuf:"bytes,2,opt,name=unique_prompt_id,json=uniquePromptId" json:"unique_prompt_id,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *GetPromptRequest) Reset() {
-	*x = GetPromptRequest{}
-	mi := &file_api_proto_msgTypes[46]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetPromptRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetPromptRequest) ProtoMessage() {}
-
-func (x *GetPromptRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[46]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetPromptRequest.ProtoReflect.Descriptor instead.
-func (*GetPromptRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{46}
-}
-
-func (x *GetPromptRequest) GetSession() string {
-	if x != nil && x.Session != nil {
-		return *x.Session
-	}
-	return ""
-}
-
-func (x *GetPromptRequest) GetUniquePromptId() string {
-	if x != nil && x.UniquePromptId != nil {
-		return *x.UniquePromptId
-	}
-	return ""
-}
-
-type TransactionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Begin         *bool                  `protobuf:"varint,1,opt,name=begin" json:"begin,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TransactionRequest) Reset() {
-	*x = TransactionRequest{}
-	mi := &file_api_proto_msgTypes[47]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TransactionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TransactionRequest) ProtoMessage() {}
-
-func (x *TransactionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[47]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TransactionRequest.ProtoReflect.Descriptor instead.
-func (*TransactionRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{47}
-}
-
-func (x *TransactionRequest) GetBegin() bool {
-	if x != nil && x.Begin != nil {
-		return *x.Begin
-	}
-	return false
-}
-
-type TransactionResponse struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Status        *TransactionResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.TransactionResponse_Status,def=0" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-// Default values for TransactionResponse fields.
-const (
-	Default_TransactionResponse_Status = TransactionResponse_OK
-)
-
-func (x *TransactionResponse) Reset() {
-	*x = TransactionResponse{}
-	mi := &file_api_proto_msgTypes[48]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TransactionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TransactionResponse) ProtoMessage() {}
-
-func (x *TransactionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[48]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TransactionResponse.ProtoReflect.Descriptor instead.
-func (*TransactionResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{48}
-}
-
-func (x *TransactionResponse) GetStatus() TransactionResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return Default_TransactionResponse_Status
-}
-
-type NotificationRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Session          *string                `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
-	Subscribe        *bool                  `protobuf:"varint,2,opt,name=subscribe" json:"subscribe,omitempty"`
-	NotificationType *int32                 `protobuf:"varint,3,opt,name=notification_type,json=notificationType" json:"notification_type,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *NotificationRequest) Reset() {
-	*x = NotificationRequest{}
-	mi := &file_api_proto_msgTypes[49]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *NotificationRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*NotificationRequest) ProtoMessage() {}
-
-func (x *NotificationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[49]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use NotificationRequest.ProtoReflect.Descriptor instead.
-func (*NotificationRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{49}
-}
-
-func (x *NotificationRequest) GetSession() string {
-	if x != nil && x.Session != nil {
-		return *x.Session
-	}
-	return ""
-}
-
-func (x *NotificationRequest) GetSubscribe() bool {
-	if x != nil && x.Subscribe != nil {
-		return *x.Subscribe
-	}
-	return false
-}
-
-func (x *NotificationRequest) GetNotificationType() int32 {
-	if x != nil && x.NotificationType != nil {
-		return *x.NotificationType
-	}
-	return 0
-}
-
-type NotificationResponse struct {
-	state         protoimpl.MessageState       `protogen:"open.v1"`
-	Status        *NotificationResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.NotificationResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *NotificationResponse) Reset() {
-	*x = NotificationResponse{}
-	mi := &file_api_proto_msgTypes[50]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *NotificationResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*NotificationResponse) ProtoMessage() {}
-
-func (x *NotificationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[50]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use NotificationResponse.ProtoReflect.Descriptor instead.
-func (*NotificationResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{50}
-}
-
-func (x *NotificationResponse) GetStatus() NotificationResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return NotificationResponse_OK
-}
-
-type RegisterToolRequest struct {
-	state                     protoimpl.MessageState `protogen:"open.v1"`
-	Name                      *string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Identifier                *string                `protobuf:"bytes,2,opt,name=identifier" json:"identifier,omitempty"`
-	ToolType                  *int32                 `protobuf:"varint,3,opt,name=tool_type,json=toolType,def=1" json:"tool_type,omitempty"`
-	URL                       *string                `protobuf:"bytes,4,opt,name=URL" json:"URL,omitempty"`
-	RevealIfAlreadyRegistered *bool                  `protobuf:"varint,5,opt,name=reveal_if_already_registered,json=revealIfAlreadyRegistered,def=0" json:"reveal_if_already_registered,omitempty"`
-	unknownFields             protoimpl.UnknownFields
-	sizeCache                 protoimpl.SizeCache
-}
-
-// Default values for RegisterToolRequest fields.
-const (
-	Default_RegisterToolRequest_ToolType                  = int32(1)
-	Default_RegisterToolRequest_RevealIfAlreadyRegistered = bool(false)
-)
-
-func (x *RegisterToolRequest) Reset() {
-	*x = RegisterToolRequest{}
-	mi := &file_api_proto_msgTypes[51]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RegisterToolRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RegisterToolRequest) ProtoMessage() {}
-
-func (x *RegisterToolRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[51]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RegisterToolRequest.ProtoReflect.Descriptor instead.
-func (*RegisterToolRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{51}
-}
-
-func (x *RegisterToolRequest) GetName() string {
-	if x != nil && x.Name != nil {
-		return *x.Name
-	}
-	return ""
-}
-
-func (x *RegisterToolRequest) GetIdentifier() string {
-	if x != nil && x.Identifier != nil {
-		return *x.Identifier
-	}
-	return ""
-}
-
-func (x *RegisterToolRequest) GetToolType() int32 {
-	if x != nil && x.ToolType != nil {
-		return *x.ToolType
-	}
-	return Default_RegisterToolRequest_ToolType
-}
-
-func (x *RegisterToolRequest) GetURL() string {
-	if x != nil && x.URL != nil {
-		return *x.URL
-	}
-	return ""
-}
-
-func (x *RegisterToolRequest) GetRevealIfAlreadyRegistered() bool {
-	if x != nil && x.RevealIfAlreadyRegistered != nil {
-		return *x.RevealIfAlreadyRegistered
-	}
-	return Default_RegisterToolRequest_RevealIfAlreadyRegistered
-}
-
-type RegisterToolResponse struct {
-	state         protoimpl.MessageState       `protogen:"open.v1"`
-	Status        *RegisterToolResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.RegisterToolResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RegisterToolResponse) Reset() {
-	*x = RegisterToolResponse{}
-	mi := &file_api_proto_msgTypes[52]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RegisterToolResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RegisterToolResponse) ProtoMessage() {}
-
-func (x *RegisterToolResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[52]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RegisterToolResponse.ProtoReflect.Descriptor instead.
-func (*RegisterToolResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{52}
-}
-
-func (x *RegisterToolResponse) GetStatus() RegisterToolResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return RegisterToolResponse_OK
-}
-
-type SetProfilePropertyRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Target:
-	//
-	//	*SetProfilePropertyRequest_Session
-	//	*SetProfilePropertyRequest_GuidList_
-	Target        isSetProfilePropertyRequest_Target      `protobuf_oneof:"target"`
-	Key           *string                                 `protobuf:"bytes,3,opt,name=key" json:"key,omitempty"`
-	JsonValue     *string                                 `protobuf:"bytes,4,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
-	Assignments   []*SetProfilePropertyRequest_Assignment `protobuf:"bytes,5,rep,name=assignments" json:"assignments,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SetProfilePropertyRequest) Reset() {
-	*x = SetProfilePropertyRequest{}
-	mi := &file_api_proto_msgTypes[53]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetProfilePropertyRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetProfilePropertyRequest) ProtoMessage() {}
-
-func (x *SetProfilePropertyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[53]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetProfilePropertyRequest.ProtoReflect.Descriptor instead.
-func (*SetProfilePropertyRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{53}
-}
-
-func (x *SetProfilePropertyRequest) GetTarget() isSetProfilePropertyRequest_Target {
-	if x != nil {
-		return x.Target
-	}
-	return nil
-}
-
-func (x *SetProfilePropertyRequest) GetSession() string {
-	if x != nil {
-		if x, ok := x.Target.(*SetProfilePropertyRequest_Session); ok {
-			return x.Session
-		}
-	}
-	return ""
-}
-
-func (x *SetProfilePropertyRequest) GetGuidList() *SetProfilePropertyRequest_GuidList {
-	if x != nil {
-		if x, ok := x.Target.(*SetProfilePropertyRequest_GuidList_); ok {
-			return x.GuidList
-		}
-	}
-	return nil
-}
-
-func (x *SetProfilePropertyRequest) GetKey() string {
-	if x != nil && x.Key != nil {
-		return *x.Key
-	}
-	return ""
-}
-
-func (x *SetProfilePropertyRequest) GetJsonValue() string {
-	if x != nil && x.JsonValue != nil {
-		return *x.JsonValue
-	}
-	return ""
-}
-
-func (x *SetProfilePropertyRequest) GetAssignments() []*SetProfilePropertyRequest_Assignment {
-	if x != nil {
-		return x.Assignments
-	}
-	return nil
-}
-
-type isSetProfilePropertyRequest_Target interface {
-	isSetProfilePropertyRequest_Target()
-}
-
-type SetProfilePropertyRequest_Session struct {
-	Session string `protobuf:"bytes,1,opt,name=session,oneof"`
-}
-
-type SetProfilePropertyRequest_GuidList_ struct {
-	GuidList *SetProfilePropertyRequest_GuidList `protobuf:"bytes,2,opt,name=guid_list,json=guidList,oneof"`
-}
-
-func (*SetProfilePropertyRequest_Session) isSetProfilePropertyRequest_Target() {}
-
-func (*SetProfilePropertyRequest_GuidList_) isSetProfilePropertyRequest_Target() {}
-
-type SetProfilePropertyResponse struct {
-	state         protoimpl.MessageState             `protogen:"open.v1"`
-	Status        *SetProfilePropertyResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SetProfilePropertyResponse_Status,def=0" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-// Default values for SetProfilePropertyResponse fields.
-const (
-	Default_SetProfilePropertyResponse_Status = SetProfilePropertyResponse_OK
-)
-
-func (x *SetProfilePropertyResponse) Reset() {
-	*x = SetProfilePropertyResponse{}
-	mi := &file_api_proto_msgTypes[54]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetProfilePropertyResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetProfilePropertyResponse) ProtoMessage() {}
-
-func (x *SetProfilePropertyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[54]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetProfilePropertyResponse.ProtoReflect.Descriptor instead.
-func (*SetProfilePropertyResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{54}
-}
-
-func (x *SetProfilePropertyResponse) GetStatus() SetProfilePropertyResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return Default_SetProfilePropertyResponse_Status
-}
-
-type GetProfilePropertyRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Session       *string                `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
-	Keys          []string               `protobuf:"bytes,2,rep,name=keys" json:"keys,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetProfilePropertyRequest) Reset() {
-	*x = GetProfilePropertyRequest{}
-	mi := &file_api_proto_msgTypes[55]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetProfilePropertyRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetProfilePropertyRequest) ProtoMessage() {}
-
-func (x *GetProfilePropertyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[55]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetProfilePropertyRequest.ProtoReflect.Descriptor instead.
-func (*GetProfilePropertyRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{55}
-}
-
-func (x *GetProfilePropertyRequest) GetSession() string {
-	if x != nil && x.Session != nil {
-		return *x.Session
-	}
-	return ""
-}
-
-func (x *GetProfilePropertyRequest) GetKeys() []string {
-	if x != nil {
-		return x.Keys
-	}
-	return nil
-}
-
-type GetProfilePropertyResponse struct {
-	state         protoimpl.MessageState             `protogen:"open.v1"`
-	Status        *GetProfilePropertyResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.GetProfilePropertyResponse_Status,def=0" json:"status,omitempty"`
-	Properties    []*ProfileProperty                 `protobuf:"bytes,3,rep,name=properties" json:"properties,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-// Default values for GetProfilePropertyResponse fields.
-const (
-	Default_GetProfilePropertyResponse_Status = GetProfilePropertyResponse_OK
-)
-
-func (x *GetProfilePropertyResponse) Reset() {
-	*x = GetProfilePropertyResponse{}
-	mi := &file_api_proto_msgTypes[56]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetProfilePropertyResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetProfilePropertyResponse) ProtoMessage() {}
-
-func (x *GetProfilePropertyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[56]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetProfilePropertyResponse.ProtoReflect.Descriptor instead.
-func (*GetProfilePropertyResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{56}
-}
-
-func (x *GetProfilePropertyResponse) GetStatus() GetProfilePropertyResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return Default_GetProfilePropertyResponse_Status
-}
-
-func (x *GetProfilePropertyResponse) GetProperties() []*ProfileProperty {
-	if x != nil {
-		return x.Properties
-	}
-	return nil
-}
-
 type SplitPaneRequest struct {
-	state                   protoimpl.MessageState           `protogen:"open.v1"`
-	Session                 *string                          `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
-	SplitDirection          *SplitPaneRequest_SplitDirection `protobuf:"varint,2,opt,name=split_direction,json=splitDirection,enum=iterm2.SplitPaneRequest_SplitDirection" json:"split_direction,omitempty"`
-	Before                  *bool                            `protobuf:"varint,3,opt,name=before,def=0" json:"before,omitempty"`
-	ProfileName             *string                          `protobuf:"bytes,4,opt,name=profile_name,json=profileName" json:"profile_name,omitempty"`
-	CustomProfileProperties []*ProfileProperty               `protobuf:"bytes,5,rep,name=custom_profile_properties,json=customProfileProperties" json:"custom_profile_properties,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// See documentation on session IDs
+	Session        *string                          `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
+	SplitDirection *SplitPaneRequest_SplitDirection `protobuf:"varint,2,opt,name=split_direction,json=splitDirection,enum=iterm2.SplitPaneRequest_SplitDirection" json:"split_direction,omitempty"`
+	// If true, new session is above/left of the session being split. Otherwise, it goes below/right.
+	Before *bool `protobuf:"varint,3,opt,name=before,def=0" json:"before,omitempty"`
+	// Leave unset to use the default profile.
+	ProfileName *string `protobuf:"bytes,4,opt,name=profile_name,json=profileName" json:"profile_name,omitempty"`
+	// Modifies the profile to customize its behavior just for this session.
+	CustomProfileProperties []*ProfileProperty `protobuf:"bytes,5,rep,name=custom_profile_properties,json=customProfileProperties" json:"custom_profile_properties,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -7433,7 +11686,7 @@ const (
 
 func (x *SplitPaneRequest) Reset() {
 	*x = SplitPaneRequest{}
-	mi := &file_api_proto_msgTypes[57]
+	mi := &file_api_proto_msgTypes[112]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7445,7 +11698,7 @@ func (x *SplitPaneRequest) String() string {
 func (*SplitPaneRequest) ProtoMessage() {}
 
 func (x *SplitPaneRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[57]
+	mi := &file_api_proto_msgTypes[112]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7458,7 +11711,7 @@ func (x *SplitPaneRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SplitPaneRequest.ProtoReflect.Descriptor instead.
 func (*SplitPaneRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{57}
+	return file_api_proto_rawDescGZIP(), []int{112}
 }
 
 func (x *SplitPaneRequest) GetSession() string {
@@ -7497,16 +11750,20 @@ func (x *SplitPaneRequest) GetCustomProfileProperties() []*ProfileProperty {
 }
 
 type SplitPaneResponse struct {
-	state         protoimpl.MessageState    `protogen:"open.v1"`
-	Status        *SplitPaneResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SplitPaneResponse_Status" json:"status,omitempty"`
-	SessionId     []string                  `protobuf:"bytes,2,rep,name=session_id,json=sessionId" json:"session_id,omitempty"`
+	state  protoimpl.MessageState    `protogen:"open.v1"`
+	Status *SplitPaneResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SplitPaneResponse_Status" json:"status,omitempty"`
+	// TODO(gln): this will not be set for tmux integration because the split happens only if/when the
+	// tmux server acts on the request.
+	// See documentation on session IDs.
+	// If more than one session was split, there will be multiple session_id's.
+	SessionId     []string `protobuf:"bytes,2,rep,name=session_id,json=sessionId" json:"session_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SplitPaneResponse) Reset() {
 	*x = SplitPaneResponse{}
-	mi := &file_api_proto_msgTypes[58]
+	mi := &file_api_proto_msgTypes[113]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7518,7 +11775,7 @@ func (x *SplitPaneResponse) String() string {
 func (*SplitPaneResponse) ProtoMessage() {}
 
 func (x *SplitPaneResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[58]
+	mi := &file_api_proto_msgTypes[113]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7531,7 +11788,7 @@ func (x *SplitPaneResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SplitPaneResponse.ProtoReflect.Descriptor instead.
 func (*SplitPaneResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{58}
+	return file_api_proto_rawDescGZIP(), []int{113}
 }
 
 func (x *SplitPaneResponse) GetStatus() SplitPaneResponse_Status {
@@ -7548,4028 +11805,28 @@ func (x *SplitPaneResponse) GetSessionId() []string {
 	return nil
 }
 
-type SetPropertyRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Identifier:
-	//
-	//	*SetPropertyRequest_WindowId
-	//	*SetPropertyRequest_SessionId
-	Identifier    isSetPropertyRequest_Identifier `protobuf_oneof:"identifier"`
-	Name          *string                         `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
-	JsonValue     *string                         `protobuf:"bytes,4,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SetPropertyRequest) Reset() {
-	*x = SetPropertyRequest{}
-	mi := &file_api_proto_msgTypes[59]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetPropertyRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetPropertyRequest) ProtoMessage() {}
-
-func (x *SetPropertyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[59]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetPropertyRequest.ProtoReflect.Descriptor instead.
-func (*SetPropertyRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{59}
-}
-
-func (x *SetPropertyRequest) GetIdentifier() isSetPropertyRequest_Identifier {
-	if x != nil {
-		return x.Identifier
-	}
-	return nil
-}
-
-func (x *SetPropertyRequest) GetWindowId() string {
-	if x != nil {
-		if x, ok := x.Identifier.(*SetPropertyRequest_WindowId); ok {
-			return x.WindowId
-		}
-	}
-	return ""
-}
-
-func (x *SetPropertyRequest) GetSessionId() string {
-	if x != nil {
-		if x, ok := x.Identifier.(*SetPropertyRequest_SessionId); ok {
-			return x.SessionId
-		}
-	}
-	return ""
-}
-
-func (x *SetPropertyRequest) GetName() string {
-	if x != nil && x.Name != nil {
-		return *x.Name
-	}
-	return ""
-}
-
-func (x *SetPropertyRequest) GetJsonValue() string {
-	if x != nil && x.JsonValue != nil {
-		return *x.JsonValue
-	}
-	return ""
-}
-
-type isSetPropertyRequest_Identifier interface {
-	isSetPropertyRequest_Identifier()
-}
-
-type SetPropertyRequest_WindowId struct {
-	WindowId string `protobuf:"bytes,1,opt,name=window_id,json=windowId,oneof"`
-}
-
-type SetPropertyRequest_SessionId struct {
-	SessionId string `protobuf:"bytes,5,opt,name=session_id,json=sessionId,oneof"`
-}
-
-func (*SetPropertyRequest_WindowId) isSetPropertyRequest_Identifier() {}
-
-func (*SetPropertyRequest_SessionId) isSetPropertyRequest_Identifier() {}
-
-type SetPropertyResponse struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Status        *SetPropertyResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SetPropertyResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SetPropertyResponse) Reset() {
-	*x = SetPropertyResponse{}
-	mi := &file_api_proto_msgTypes[60]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetPropertyResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetPropertyResponse) ProtoMessage() {}
-
-func (x *SetPropertyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[60]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetPropertyResponse.ProtoReflect.Descriptor instead.
-func (*SetPropertyResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{60}
-}
-
-func (x *SetPropertyResponse) GetStatus() SetPropertyResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return SetPropertyResponse_OK
-}
-
-type GetPropertyRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Identifier:
-	//
-	//	*GetPropertyRequest_WindowId
-	//	*GetPropertyRequest_SessionId
-	Identifier    isGetPropertyRequest_Identifier `protobuf_oneof:"identifier"`
-	Name          *string                         `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetPropertyRequest) Reset() {
-	*x = GetPropertyRequest{}
-	mi := &file_api_proto_msgTypes[61]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetPropertyRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetPropertyRequest) ProtoMessage() {}
-
-func (x *GetPropertyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[61]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetPropertyRequest.ProtoReflect.Descriptor instead.
-func (*GetPropertyRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{61}
-}
-
-func (x *GetPropertyRequest) GetIdentifier() isGetPropertyRequest_Identifier {
-	if x != nil {
-		return x.Identifier
-	}
-	return nil
-}
-
-func (x *GetPropertyRequest) GetWindowId() string {
-	if x != nil {
-		if x, ok := x.Identifier.(*GetPropertyRequest_WindowId); ok {
-			return x.WindowId
-		}
-	}
-	return ""
-}
-
-func (x *GetPropertyRequest) GetSessionId() string {
-	if x != nil {
-		if x, ok := x.Identifier.(*GetPropertyRequest_SessionId); ok {
-			return x.SessionId
-		}
-	}
-	return ""
-}
-
-func (x *GetPropertyRequest) GetName() string {
-	if x != nil && x.Name != nil {
-		return *x.Name
-	}
-	return ""
-}
-
-type isGetPropertyRequest_Identifier interface {
-	isGetPropertyRequest_Identifier()
-}
-
-type GetPropertyRequest_WindowId struct {
-	WindowId string `protobuf:"bytes,1,opt,name=window_id,json=windowId,oneof"`
-}
-
-type GetPropertyRequest_SessionId struct {
-	SessionId string `protobuf:"bytes,3,opt,name=session_id,json=sessionId,oneof"`
-}
-
-func (*GetPropertyRequest_WindowId) isGetPropertyRequest_Identifier() {}
-
-func (*GetPropertyRequest_SessionId) isGetPropertyRequest_Identifier() {}
-
-type GetPropertyResponse struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Status        *GetPropertyResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.GetPropertyResponse_Status" json:"status,omitempty"`
-	JsonValue     *string                     `protobuf:"bytes,2,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetPropertyResponse) Reset() {
-	*x = GetPropertyResponse{}
-	mi := &file_api_proto_msgTypes[62]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetPropertyResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetPropertyResponse) ProtoMessage() {}
-
-func (x *GetPropertyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[62]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetPropertyResponse.ProtoReflect.Descriptor instead.
-func (*GetPropertyResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{62}
-}
-
-func (x *GetPropertyResponse) GetStatus() GetPropertyResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return GetPropertyResponse_OK
-}
-
-func (x *GetPropertyResponse) GetJsonValue() string {
-	if x != nil && x.JsonValue != nil {
-		return *x.JsonValue
-	}
-	return ""
-}
-
-type InjectRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     []string               `protobuf:"bytes,1,rep,name=session_id,json=sessionId" json:"session_id,omitempty"`
-	Data          []byte                 `protobuf:"bytes,2,opt,name=data" json:"data,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *InjectRequest) Reset() {
-	*x = InjectRequest{}
-	mi := &file_api_proto_msgTypes[63]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *InjectRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*InjectRequest) ProtoMessage() {}
-
-func (x *InjectRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[63]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use InjectRequest.ProtoReflect.Descriptor instead.
-func (*InjectRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{63}
-}
-
-func (x *InjectRequest) GetSessionId() []string {
-	if x != nil {
-		return x.SessionId
-	}
-	return nil
-}
-
-func (x *InjectRequest) GetData() []byte {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
-
-type InjectResponse struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Status        []InjectResponse_Status `protobuf:"varint,1,rep,name=status,enum=iterm2.InjectResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *InjectResponse) Reset() {
-	*x = InjectResponse{}
-	mi := &file_api_proto_msgTypes[64]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *InjectResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*InjectResponse) ProtoMessage() {}
-
-func (x *InjectResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[64]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use InjectResponse.ProtoReflect.Descriptor instead.
-func (*InjectResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{64}
-}
-
-func (x *InjectResponse) GetStatus() []InjectResponse_Status {
-	if x != nil {
-		return x.Status
-	}
-	return nil
-}
-
-type ActivateRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Identifier:
-	//
-	//	*ActivateRequest_WindowId
-	//	*ActivateRequest_TabId
-	//	*ActivateRequest_SessionId
-	Identifier       isActivateRequest_Identifier `protobuf_oneof:"identifier"`
-	OrderWindowFront *bool                        `protobuf:"varint,4,opt,name=order_window_front,json=orderWindowFront" json:"order_window_front,omitempty"`
-	SelectTab        *bool                        `protobuf:"varint,5,opt,name=select_tab,json=selectTab" json:"select_tab,omitempty"`
-	SelectSession    *bool                        `protobuf:"varint,6,opt,name=select_session,json=selectSession" json:"select_session,omitempty"`
-	ActivateApp      *ActivateRequest_App         `protobuf:"bytes,7,opt,name=activate_app,json=activateApp" json:"activate_app,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *ActivateRequest) Reset() {
-	*x = ActivateRequest{}
-	mi := &file_api_proto_msgTypes[65]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ActivateRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ActivateRequest) ProtoMessage() {}
-
-func (x *ActivateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[65]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ActivateRequest.ProtoReflect.Descriptor instead.
-func (*ActivateRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{65}
-}
-
-func (x *ActivateRequest) GetIdentifier() isActivateRequest_Identifier {
-	if x != nil {
-		return x.Identifier
-	}
-	return nil
-}
-
-func (x *ActivateRequest) GetWindowId() string {
-	if x != nil {
-		if x, ok := x.Identifier.(*ActivateRequest_WindowId); ok {
-			return x.WindowId
-		}
-	}
-	return ""
-}
-
-func (x *ActivateRequest) GetTabId() string {
-	if x != nil {
-		if x, ok := x.Identifier.(*ActivateRequest_TabId); ok {
-			return x.TabId
-		}
-	}
-	return ""
-}
-
-func (x *ActivateRequest) GetSessionId() string {
-	if x != nil {
-		if x, ok := x.Identifier.(*ActivateRequest_SessionId); ok {
-			return x.SessionId
-		}
-	}
-	return ""
-}
-
-func (x *ActivateRequest) GetOrderWindowFront() bool {
-	if x != nil && x.OrderWindowFront != nil {
-		return *x.OrderWindowFront
-	}
-	return false
-}
-
-func (x *ActivateRequest) GetSelectTab() bool {
-	if x != nil && x.SelectTab != nil {
-		return *x.SelectTab
-	}
-	return false
-}
-
-func (x *ActivateRequest) GetSelectSession() bool {
-	if x != nil && x.SelectSession != nil {
-		return *x.SelectSession
-	}
-	return false
-}
-
-func (x *ActivateRequest) GetActivateApp() *ActivateRequest_App {
-	if x != nil {
-		return x.ActivateApp
-	}
-	return nil
-}
-
-type isActivateRequest_Identifier interface {
-	isActivateRequest_Identifier()
-}
-
-type ActivateRequest_WindowId struct {
-	WindowId string `protobuf:"bytes,1,opt,name=window_id,json=windowId,oneof"`
-}
-
-type ActivateRequest_TabId struct {
-	TabId string `protobuf:"bytes,2,opt,name=tab_id,json=tabId,oneof"`
-}
-
-type ActivateRequest_SessionId struct {
-	SessionId string `protobuf:"bytes,3,opt,name=session_id,json=sessionId,oneof"`
-}
-
-func (*ActivateRequest_WindowId) isActivateRequest_Identifier() {}
-
-func (*ActivateRequest_TabId) isActivateRequest_Identifier() {}
-
-func (*ActivateRequest_SessionId) isActivateRequest_Identifier() {}
-
-type ActivateResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Status        *ActivateResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.ActivateResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ActivateResponse) Reset() {
-	*x = ActivateResponse{}
-	mi := &file_api_proto_msgTypes[66]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ActivateResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ActivateResponse) ProtoMessage() {}
-
-func (x *ActivateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[66]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ActivateResponse.ProtoReflect.Descriptor instead.
-func (*ActivateResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{66}
-}
-
-func (x *ActivateResponse) GetStatus() ActivateResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return ActivateResponse_OK
-}
-
-type VariableRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Scope:
-	//
-	//	*VariableRequest_SessionId
-	//	*VariableRequest_TabId
-	//	*VariableRequest_App
-	//	*VariableRequest_WindowId
-	Scope         isVariableRequest_Scope `protobuf_oneof:"scope"`
-	Set           []*VariableRequest_Set  `protobuf:"bytes,2,rep,name=set" json:"set,omitempty"`
-	Get           []string                `protobuf:"bytes,3,rep,name=get" json:"get,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *VariableRequest) Reset() {
-	*x = VariableRequest{}
-	mi := &file_api_proto_msgTypes[67]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *VariableRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*VariableRequest) ProtoMessage() {}
-
-func (x *VariableRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[67]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use VariableRequest.ProtoReflect.Descriptor instead.
-func (*VariableRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{67}
-}
-
-func (x *VariableRequest) GetScope() isVariableRequest_Scope {
-	if x != nil {
-		return x.Scope
-	}
-	return nil
-}
-
-func (x *VariableRequest) GetSessionId() string {
-	if x != nil {
-		if x, ok := x.Scope.(*VariableRequest_SessionId); ok {
-			return x.SessionId
-		}
-	}
-	return ""
-}
-
-func (x *VariableRequest) GetTabId() string {
-	if x != nil {
-		if x, ok := x.Scope.(*VariableRequest_TabId); ok {
-			return x.TabId
-		}
-	}
-	return ""
-}
-
-func (x *VariableRequest) GetApp() bool {
-	if x != nil {
-		if x, ok := x.Scope.(*VariableRequest_App); ok {
-			return x.App
-		}
-	}
-	return false
-}
-
-func (x *VariableRequest) GetWindowId() string {
-	if x != nil {
-		if x, ok := x.Scope.(*VariableRequest_WindowId); ok {
-			return x.WindowId
-		}
-	}
-	return ""
-}
-
-func (x *VariableRequest) GetSet() []*VariableRequest_Set {
-	if x != nil {
-		return x.Set
-	}
-	return nil
-}
-
-func (x *VariableRequest) GetGet() []string {
-	if x != nil {
-		return x.Get
-	}
-	return nil
-}
-
-type isVariableRequest_Scope interface {
-	isVariableRequest_Scope()
-}
-
-type VariableRequest_SessionId struct {
-	SessionId string `protobuf:"bytes,1,opt,name=session_id,json=sessionId,oneof"`
-}
-
-type VariableRequest_TabId struct {
-	TabId string `protobuf:"bytes,4,opt,name=tab_id,json=tabId,oneof"`
-}
-
-type VariableRequest_App struct {
-	App bool `protobuf:"varint,5,opt,name=app,oneof"`
-}
-
-type VariableRequest_WindowId struct {
-	WindowId string `protobuf:"bytes,6,opt,name=window_id,json=windowId,oneof"`
-}
-
-func (*VariableRequest_SessionId) isVariableRequest_Scope() {}
-
-func (*VariableRequest_TabId) isVariableRequest_Scope() {}
-
-func (*VariableRequest_App) isVariableRequest_Scope() {}
-
-func (*VariableRequest_WindowId) isVariableRequest_Scope() {}
-
-type VariableResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Status        *VariableResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.VariableResponse_Status" json:"status,omitempty"`
-	Values        []string                 `protobuf:"bytes,2,rep,name=values" json:"values,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *VariableResponse) Reset() {
-	*x = VariableResponse{}
-	mi := &file_api_proto_msgTypes[68]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *VariableResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*VariableResponse) ProtoMessage() {}
-
-func (x *VariableResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[68]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use VariableResponse.ProtoReflect.Descriptor instead.
-func (*VariableResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{68}
-}
-
-func (x *VariableResponse) GetStatus() VariableResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return VariableResponse_OK
-}
-
-func (x *VariableResponse) GetValues() []string {
-	if x != nil {
-		return x.Values
-	}
-	return nil
-}
-
-type SavedArrangementRequest struct {
-	state         protoimpl.MessageState          `protogen:"open.v1"`
-	Name          *string                         `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Action        *SavedArrangementRequest_Action `protobuf:"varint,2,opt,name=action,enum=iterm2.SavedArrangementRequest_Action" json:"action,omitempty"`
-	WindowId      *string                         `protobuf:"bytes,3,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SavedArrangementRequest) Reset() {
-	*x = SavedArrangementRequest{}
-	mi := &file_api_proto_msgTypes[69]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SavedArrangementRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SavedArrangementRequest) ProtoMessage() {}
-
-func (x *SavedArrangementRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[69]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SavedArrangementRequest.ProtoReflect.Descriptor instead.
-func (*SavedArrangementRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{69}
-}
-
-func (x *SavedArrangementRequest) GetName() string {
-	if x != nil && x.Name != nil {
-		return *x.Name
-	}
-	return ""
-}
-
-func (x *SavedArrangementRequest) GetAction() SavedArrangementRequest_Action {
-	if x != nil && x.Action != nil {
-		return *x.Action
-	}
-	return SavedArrangementRequest_RESTORE
-}
-
-func (x *SavedArrangementRequest) GetWindowId() string {
-	if x != nil && x.WindowId != nil {
-		return *x.WindowId
-	}
-	return ""
-}
-
-type SavedArrangementResponse struct {
-	state         protoimpl.MessageState           `protogen:"open.v1"`
-	Status        *SavedArrangementResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SavedArrangementResponse_Status" json:"status,omitempty"`
-	Names         []string                         `protobuf:"bytes,2,rep,name=names" json:"names,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SavedArrangementResponse) Reset() {
-	*x = SavedArrangementResponse{}
-	mi := &file_api_proto_msgTypes[70]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SavedArrangementResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SavedArrangementResponse) ProtoMessage() {}
-
-func (x *SavedArrangementResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[70]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SavedArrangementResponse.ProtoReflect.Descriptor instead.
-func (*SavedArrangementResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{70}
-}
-
-func (x *SavedArrangementResponse) GetStatus() SavedArrangementResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return SavedArrangementResponse_OK
-}
-
-func (x *SavedArrangementResponse) GetNames() []string {
-	if x != nil {
-		return x.Names
-	}
-	return nil
-}
-
-type FocusRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *FocusRequest) Reset() {
-	*x = FocusRequest{}
-	mi := &file_api_proto_msgTypes[71]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *FocusRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*FocusRequest) ProtoMessage() {}
-
-func (x *FocusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[71]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FocusRequest.ProtoReflect.Descriptor instead.
-func (*FocusRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{71}
-}
-
-type FocusResponse struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Notifications []*FocusChangedNotification `protobuf:"bytes,1,rep,name=notifications" json:"notifications,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *FocusResponse) Reset() {
-	*x = FocusResponse{}
-	mi := &file_api_proto_msgTypes[72]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *FocusResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*FocusResponse) ProtoMessage() {}
-
-func (x *FocusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[72]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FocusResponse.ProtoReflect.Descriptor instead.
-func (*FocusResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{72}
-}
-
-func (x *FocusResponse) GetNotifications() []*FocusChangedNotification {
-	if x != nil {
-		return x.Notifications
-	}
-	return nil
-}
-
-type ListProfilesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Properties    []string               `protobuf:"bytes,1,rep,name=properties" json:"properties,omitempty"`
-	Guids         []string               `protobuf:"bytes,2,rep,name=guids" json:"guids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListProfilesRequest) Reset() {
-	*x = ListProfilesRequest{}
-	mi := &file_api_proto_msgTypes[73]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListProfilesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListProfilesRequest) ProtoMessage() {}
-
-func (x *ListProfilesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[73]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListProfilesRequest.ProtoReflect.Descriptor instead.
-func (*ListProfilesRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{73}
-}
-
-func (x *ListProfilesRequest) GetProperties() []string {
-	if x != nil {
-		return x.Properties
-	}
-	return nil
-}
-
-func (x *ListProfilesRequest) GetGuids() []string {
-	if x != nil {
-		return x.Guids
-	}
-	return nil
-}
-
-type ListProfilesResponse struct {
-	state         protoimpl.MessageState          `protogen:"open.v1"`
-	Profiles      []*ListProfilesResponse_Profile `protobuf:"bytes,1,rep,name=profiles" json:"profiles,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListProfilesResponse) Reset() {
-	*x = ListProfilesResponse{}
-	mi := &file_api_proto_msgTypes[74]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListProfilesResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListProfilesResponse) ProtoMessage() {}
-
-func (x *ListProfilesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[74]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListProfilesResponse.ProtoReflect.Descriptor instead.
-func (*ListProfilesResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{74}
-}
-
-func (x *ListProfilesResponse) GetProfiles() []*ListProfilesResponse_Profile {
-	if x != nil {
-		return x.Profiles
-	}
-	return nil
-}
-
-type ServerOriginatedRPCResultRequest struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	RequestId *string                `protobuf:"bytes,1,opt,name=request_id,json=requestId" json:"request_id,omitempty"`
-	// Types that are valid to be assigned to Result:
-	//
-	//	*ServerOriginatedRPCResultRequest_JsonException
-	//	*ServerOriginatedRPCResultRequest_JsonValue
-	Result        isServerOriginatedRPCResultRequest_Result `protobuf_oneof:"result"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ServerOriginatedRPCResultRequest) Reset() {
-	*x = ServerOriginatedRPCResultRequest{}
-	mi := &file_api_proto_msgTypes[75]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ServerOriginatedRPCResultRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ServerOriginatedRPCResultRequest) ProtoMessage() {}
-
-func (x *ServerOriginatedRPCResultRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[75]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ServerOriginatedRPCResultRequest.ProtoReflect.Descriptor instead.
-func (*ServerOriginatedRPCResultRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{75}
-}
-
-func (x *ServerOriginatedRPCResultRequest) GetRequestId() string {
-	if x != nil && x.RequestId != nil {
-		return *x.RequestId
-	}
-	return ""
-}
-
-func (x *ServerOriginatedRPCResultRequest) GetResult() isServerOriginatedRPCResultRequest_Result {
-	if x != nil {
-		return x.Result
-	}
-	return nil
-}
-
-func (x *ServerOriginatedRPCResultRequest) GetJsonException() string {
-	if x != nil {
-		if x, ok := x.Result.(*ServerOriginatedRPCResultRequest_JsonException); ok {
-			return x.JsonException
-		}
-	}
-	return ""
-}
-
-func (x *ServerOriginatedRPCResultRequest) GetJsonValue() string {
-	if x != nil {
-		if x, ok := x.Result.(*ServerOriginatedRPCResultRequest_JsonValue); ok {
-			return x.JsonValue
-		}
-	}
-	return ""
-}
-
-type isServerOriginatedRPCResultRequest_Result interface {
-	isServerOriginatedRPCResultRequest_Result()
-}
-
-type ServerOriginatedRPCResultRequest_JsonException struct {
-	JsonException string `protobuf:"bytes,2,opt,name=json_exception,json=jsonException,oneof"`
-}
-
-type ServerOriginatedRPCResultRequest_JsonValue struct {
-	JsonValue string `protobuf:"bytes,3,opt,name=json_value,json=jsonValue,oneof"`
-}
-
-func (*ServerOriginatedRPCResultRequest_JsonException) isServerOriginatedRPCResultRequest_Result() {}
-
-func (*ServerOriginatedRPCResultRequest_JsonValue) isServerOriginatedRPCResultRequest_Result() {}
-
-type ServerOriginatedRPCResultResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ServerOriginatedRPCResultResponse) Reset() {
-	*x = ServerOriginatedRPCResultResponse{}
-	mi := &file_api_proto_msgTypes[76]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ServerOriginatedRPCResultResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ServerOriginatedRPCResultResponse) ProtoMessage() {}
-
-func (x *ServerOriginatedRPCResultResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[76]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ServerOriginatedRPCResultResponse.ProtoReflect.Descriptor instead.
-func (*ServerOriginatedRPCResultResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{76}
-}
-
-type RestartSessionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
-	OnlyIfExited  *bool                  `protobuf:"varint,2,opt,name=only_if_exited,json=onlyIfExited" json:"only_if_exited,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RestartSessionRequest) Reset() {
-	*x = RestartSessionRequest{}
-	mi := &file_api_proto_msgTypes[77]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RestartSessionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RestartSessionRequest) ProtoMessage() {}
-
-func (x *RestartSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[77]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RestartSessionRequest.ProtoReflect.Descriptor instead.
-func (*RestartSessionRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{77}
-}
-
-func (x *RestartSessionRequest) GetSessionId() string {
-	if x != nil && x.SessionId != nil {
-		return *x.SessionId
-	}
-	return ""
-}
-
-func (x *RestartSessionRequest) GetOnlyIfExited() bool {
-	if x != nil && x.OnlyIfExited != nil {
-		return *x.OnlyIfExited
-	}
-	return false
-}
-
-type RestartSessionResponse struct {
-	state         protoimpl.MessageState         `protogen:"open.v1"`
-	Status        *RestartSessionResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.RestartSessionResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RestartSessionResponse) Reset() {
-	*x = RestartSessionResponse{}
-	mi := &file_api_proto_msgTypes[78]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RestartSessionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RestartSessionResponse) ProtoMessage() {}
-
-func (x *RestartSessionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[78]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RestartSessionResponse.ProtoReflect.Descriptor instead.
-func (*RestartSessionResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{78}
-}
-
-func (x *RestartSessionResponse) GetStatus() RestartSessionResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return RestartSessionResponse_OK
-}
-
-type MenuItemRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Identifier    *string                `protobuf:"bytes,1,opt,name=identifier" json:"identifier,omitempty"`
-	QueryOnly     *bool                  `protobuf:"varint,2,opt,name=query_only,json=queryOnly" json:"query_only,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *MenuItemRequest) Reset() {
-	*x = MenuItemRequest{}
-	mi := &file_api_proto_msgTypes[79]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *MenuItemRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MenuItemRequest) ProtoMessage() {}
-
-func (x *MenuItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[79]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use MenuItemRequest.ProtoReflect.Descriptor instead.
-func (*MenuItemRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{79}
-}
-
-func (x *MenuItemRequest) GetIdentifier() string {
-	if x != nil && x.Identifier != nil {
-		return *x.Identifier
-	}
-	return ""
-}
-
-func (x *MenuItemRequest) GetQueryOnly() bool {
-	if x != nil && x.QueryOnly != nil {
-		return *x.QueryOnly
-	}
-	return false
-}
-
-type MenuItemResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Status        *MenuItemResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.MenuItemResponse_Status" json:"status,omitempty"`
-	Checked       *bool                    `protobuf:"varint,2,opt,name=checked" json:"checked,omitempty"`
-	Enabled       *bool                    `protobuf:"varint,3,opt,name=enabled" json:"enabled,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *MenuItemResponse) Reset() {
-	*x = MenuItemResponse{}
-	mi := &file_api_proto_msgTypes[80]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *MenuItemResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MenuItemResponse) ProtoMessage() {}
-
-func (x *MenuItemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[80]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use MenuItemResponse.ProtoReflect.Descriptor instead.
-func (*MenuItemResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{80}
-}
-
-func (x *MenuItemResponse) GetStatus() MenuItemResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return MenuItemResponse_OK
-}
-
-func (x *MenuItemResponse) GetChecked() bool {
-	if x != nil && x.Checked != nil {
-		return *x.Checked
-	}
-	return false
-}
-
-func (x *MenuItemResponse) GetEnabled() bool {
-	if x != nil && x.Enabled != nil {
-		return *x.Enabled
-	}
-	return false
-}
-
-type SetTabLayoutRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Root          *SplitTreeNode         `protobuf:"bytes,1,opt,name=root" json:"root,omitempty"`
-	TabId         *string                `protobuf:"bytes,2,opt,name=tab_id,json=tabId" json:"tab_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SetTabLayoutRequest) Reset() {
-	*x = SetTabLayoutRequest{}
-	mi := &file_api_proto_msgTypes[81]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetTabLayoutRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetTabLayoutRequest) ProtoMessage() {}
-
-func (x *SetTabLayoutRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[81]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetTabLayoutRequest.ProtoReflect.Descriptor instead.
-func (*SetTabLayoutRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{81}
-}
-
-func (x *SetTabLayoutRequest) GetRoot() *SplitTreeNode {
-	if x != nil {
-		return x.Root
-	}
-	return nil
-}
-
-func (x *SetTabLayoutRequest) GetTabId() string {
-	if x != nil && x.TabId != nil {
-		return *x.TabId
-	}
-	return ""
-}
-
-type SetTabLayoutResponse struct {
-	state         protoimpl.MessageState       `protogen:"open.v1"`
-	Status        *SetTabLayoutResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SetTabLayoutResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SetTabLayoutResponse) Reset() {
-	*x = SetTabLayoutResponse{}
-	mi := &file_api_proto_msgTypes[82]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetTabLayoutResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetTabLayoutResponse) ProtoMessage() {}
-
-func (x *SetTabLayoutResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[82]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetTabLayoutResponse.ProtoReflect.Descriptor instead.
-func (*SetTabLayoutResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{82}
-}
-
-func (x *SetTabLayoutResponse) GetStatus() SetTabLayoutResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return SetTabLayoutResponse_OK
-}
-
-type GetBroadcastDomainsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetBroadcastDomainsRequest) Reset() {
-	*x = GetBroadcastDomainsRequest{}
-	mi := &file_api_proto_msgTypes[83]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetBroadcastDomainsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetBroadcastDomainsRequest) ProtoMessage() {}
-
-func (x *GetBroadcastDomainsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[83]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetBroadcastDomainsRequest.ProtoReflect.Descriptor instead.
-func (*GetBroadcastDomainsRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{83}
-}
-
-type GetBroadcastDomainsResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	BroadcastDomains []*BroadcastDomain     `protobuf:"bytes,1,rep,name=broadcast_domains,json=broadcastDomains" json:"broadcast_domains,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *GetBroadcastDomainsResponse) Reset() {
-	*x = GetBroadcastDomainsResponse{}
-	mi := &file_api_proto_msgTypes[84]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetBroadcastDomainsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetBroadcastDomainsResponse) ProtoMessage() {}
-
-func (x *GetBroadcastDomainsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[84]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetBroadcastDomainsResponse.ProtoReflect.Descriptor instead.
-func (*GetBroadcastDomainsResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{84}
-}
-
-func (x *GetBroadcastDomainsResponse) GetBroadcastDomains() []*BroadcastDomain {
-	if x != nil {
-		return x.BroadcastDomains
-	}
-	return nil
-}
-
-type TmuxRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Payload:
-	//
-	//	*TmuxRequest_ListConnections_
-	//	*TmuxRequest_SendCommand_
-	//	*TmuxRequest_SetWindowVisible_
-	//	*TmuxRequest_CreateWindow_
-	Payload       isTmuxRequest_Payload `protobuf_oneof:"payload"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TmuxRequest) Reset() {
-	*x = TmuxRequest{}
-	mi := &file_api_proto_msgTypes[85]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TmuxRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TmuxRequest) ProtoMessage() {}
-
-func (x *TmuxRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[85]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TmuxRequest.ProtoReflect.Descriptor instead.
-func (*TmuxRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{85}
-}
-
-func (x *TmuxRequest) GetPayload() isTmuxRequest_Payload {
-	if x != nil {
-		return x.Payload
-	}
-	return nil
-}
-
-func (x *TmuxRequest) GetListConnections() *TmuxRequest_ListConnections {
-	if x != nil {
-		if x, ok := x.Payload.(*TmuxRequest_ListConnections_); ok {
-			return x.ListConnections
-		}
-	}
-	return nil
-}
-
-func (x *TmuxRequest) GetSendCommand() *TmuxRequest_SendCommand {
-	if x != nil {
-		if x, ok := x.Payload.(*TmuxRequest_SendCommand_); ok {
-			return x.SendCommand
-		}
-	}
-	return nil
-}
-
-func (x *TmuxRequest) GetSetWindowVisible() *TmuxRequest_SetWindowVisible {
-	if x != nil {
-		if x, ok := x.Payload.(*TmuxRequest_SetWindowVisible_); ok {
-			return x.SetWindowVisible
-		}
-	}
-	return nil
-}
-
-func (x *TmuxRequest) GetCreateWindow() *TmuxRequest_CreateWindow {
-	if x != nil {
-		if x, ok := x.Payload.(*TmuxRequest_CreateWindow_); ok {
-			return x.CreateWindow
-		}
-	}
-	return nil
-}
-
-type isTmuxRequest_Payload interface {
-	isTmuxRequest_Payload()
-}
-
-type TmuxRequest_ListConnections_ struct {
-	ListConnections *TmuxRequest_ListConnections `protobuf:"bytes,1,opt,name=list_connections,json=listConnections,oneof"`
-}
-
-type TmuxRequest_SendCommand_ struct {
-	SendCommand *TmuxRequest_SendCommand `protobuf:"bytes,2,opt,name=send_command,json=sendCommand,oneof"`
-}
-
-type TmuxRequest_SetWindowVisible_ struct {
-	SetWindowVisible *TmuxRequest_SetWindowVisible `protobuf:"bytes,3,opt,name=set_window_visible,json=setWindowVisible,oneof"`
-}
-
-type TmuxRequest_CreateWindow_ struct {
-	CreateWindow *TmuxRequest_CreateWindow `protobuf:"bytes,4,opt,name=create_window,json=createWindow,oneof"`
-}
-
-func (*TmuxRequest_ListConnections_) isTmuxRequest_Payload() {}
-
-func (*TmuxRequest_SendCommand_) isTmuxRequest_Payload() {}
-
-func (*TmuxRequest_SetWindowVisible_) isTmuxRequest_Payload() {}
-
-func (*TmuxRequest_CreateWindow_) isTmuxRequest_Payload() {}
-
-type TmuxResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Payload:
-	//
-	//	*TmuxResponse_ListConnections_
-	//	*TmuxResponse_SendCommand_
-	//	*TmuxResponse_SetWindowVisible_
-	//	*TmuxResponse_CreateWindow_
-	Payload       isTmuxResponse_Payload `protobuf_oneof:"payload"`
-	Status        *TmuxResponse_Status   `protobuf:"varint,4,opt,name=status,enum=iterm2.TmuxResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TmuxResponse) Reset() {
-	*x = TmuxResponse{}
-	mi := &file_api_proto_msgTypes[86]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TmuxResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TmuxResponse) ProtoMessage() {}
-
-func (x *TmuxResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[86]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TmuxResponse.ProtoReflect.Descriptor instead.
-func (*TmuxResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{86}
-}
-
-func (x *TmuxResponse) GetPayload() isTmuxResponse_Payload {
-	if x != nil {
-		return x.Payload
-	}
-	return nil
-}
-
-func (x *TmuxResponse) GetListConnections() *TmuxResponse_ListConnections {
-	if x != nil {
-		if x, ok := x.Payload.(*TmuxResponse_ListConnections_); ok {
-			return x.ListConnections
-		}
-	}
-	return nil
-}
-
-func (x *TmuxResponse) GetSendCommand() *TmuxResponse_SendCommand {
-	if x != nil {
-		if x, ok := x.Payload.(*TmuxResponse_SendCommand_); ok {
-			return x.SendCommand
-		}
-	}
-	return nil
-}
-
-func (x *TmuxResponse) GetSetWindowVisible() *TmuxResponse_SetWindowVisible {
-	if x != nil {
-		if x, ok := x.Payload.(*TmuxResponse_SetWindowVisible_); ok {
-			return x.SetWindowVisible
-		}
-	}
-	return nil
-}
-
-func (x *TmuxResponse) GetCreateWindow() *TmuxResponse_CreateWindow {
-	if x != nil {
-		if x, ok := x.Payload.(*TmuxResponse_CreateWindow_); ok {
-			return x.CreateWindow
-		}
-	}
-	return nil
-}
-
-func (x *TmuxResponse) GetStatus() TmuxResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return TmuxResponse_OK
-}
-
-type isTmuxResponse_Payload interface {
-	isTmuxResponse_Payload()
-}
-
-type TmuxResponse_ListConnections_ struct {
-	ListConnections *TmuxResponse_ListConnections `protobuf:"bytes,1,opt,name=list_connections,json=listConnections,oneof"`
-}
-
-type TmuxResponse_SendCommand_ struct {
-	SendCommand *TmuxResponse_SendCommand `protobuf:"bytes,2,opt,name=send_command,json=sendCommand,oneof"`
-}
-
-type TmuxResponse_SetWindowVisible_ struct {
-	SetWindowVisible *TmuxResponse_SetWindowVisible `protobuf:"bytes,3,opt,name=set_window_visible,json=setWindowVisible,oneof"`
-}
-
-type TmuxResponse_CreateWindow_ struct {
-	CreateWindow *TmuxResponse_CreateWindow `protobuf:"bytes,5,opt,name=create_window,json=createWindow,oneof"`
-}
-
-func (*TmuxResponse_ListConnections_) isTmuxResponse_Payload() {}
-
-func (*TmuxResponse_SendCommand_) isTmuxResponse_Payload() {}
-
-func (*TmuxResponse_SetWindowVisible_) isTmuxResponse_Payload() {}
-
-func (*TmuxResponse_CreateWindow_) isTmuxResponse_Payload() {}
-
-type ReorderTabsRequest struct {
-	state         protoimpl.MessageState           `protogen:"open.v1"`
-	Assignments   []*ReorderTabsRequest_Assignment `protobuf:"bytes,3,rep,name=assignments" json:"assignments,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReorderTabsRequest) Reset() {
-	*x = ReorderTabsRequest{}
-	mi := &file_api_proto_msgTypes[87]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReorderTabsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReorderTabsRequest) ProtoMessage() {}
-
-func (x *ReorderTabsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[87]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReorderTabsRequest.ProtoReflect.Descriptor instead.
-func (*ReorderTabsRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{87}
-}
-
-func (x *ReorderTabsRequest) GetAssignments() []*ReorderTabsRequest_Assignment {
-	if x != nil {
-		return x.Assignments
-	}
-	return nil
-}
-
-type ReorderTabsResponse struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Status        *ReorderTabsResponse_Status `protobuf:"varint,4,opt,name=status,enum=iterm2.ReorderTabsResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReorderTabsResponse) Reset() {
-	*x = ReorderTabsResponse{}
-	mi := &file_api_proto_msgTypes[88]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReorderTabsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReorderTabsResponse) ProtoMessage() {}
-
-func (x *ReorderTabsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[88]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReorderTabsResponse.ProtoReflect.Descriptor instead.
-func (*ReorderTabsResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{88}
-}
-
-func (x *ReorderTabsResponse) GetStatus() ReorderTabsResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return ReorderTabsResponse_OK
-}
-
-type PreferencesRequest struct {
-	state         protoimpl.MessageState        `protogen:"open.v1"`
-	Requests      []*PreferencesRequest_Request `protobuf:"bytes,1,rep,name=requests" json:"requests,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PreferencesRequest) Reset() {
-	*x = PreferencesRequest{}
-	mi := &file_api_proto_msgTypes[89]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PreferencesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PreferencesRequest) ProtoMessage() {}
-
-func (x *PreferencesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[89]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PreferencesRequest.ProtoReflect.Descriptor instead.
-func (*PreferencesRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{89}
-}
-
-func (x *PreferencesRequest) GetRequests() []*PreferencesRequest_Request {
-	if x != nil {
-		return x.Requests
-	}
-	return nil
-}
-
-type PreferencesResponse struct {
-	state         protoimpl.MessageState        `protogen:"open.v1"`
-	Results       []*PreferencesResponse_Result `protobuf:"bytes,1,rep,name=results" json:"results,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PreferencesResponse) Reset() {
-	*x = PreferencesResponse{}
-	mi := &file_api_proto_msgTypes[90]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PreferencesResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PreferencesResponse) ProtoMessage() {}
-
-func (x *PreferencesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[90]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PreferencesResponse.ProtoReflect.Descriptor instead.
-func (*PreferencesResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{90}
-}
-
-func (x *PreferencesResponse) GetResults() []*PreferencesResponse_Result {
-	if x != nil {
-		return x.Results
-	}
-	return nil
-}
-
-type ColorPresetRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Request:
-	//
-	//	*ColorPresetRequest_ListPresets_
-	//	*ColorPresetRequest_GetPreset_
-	Request       isColorPresetRequest_Request `protobuf_oneof:"request"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ColorPresetRequest) Reset() {
-	*x = ColorPresetRequest{}
-	mi := &file_api_proto_msgTypes[91]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ColorPresetRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ColorPresetRequest) ProtoMessage() {}
-
-func (x *ColorPresetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[91]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ColorPresetRequest.ProtoReflect.Descriptor instead.
-func (*ColorPresetRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{91}
-}
-
-func (x *ColorPresetRequest) GetRequest() isColorPresetRequest_Request {
-	if x != nil {
-		return x.Request
-	}
-	return nil
-}
-
-func (x *ColorPresetRequest) GetListPresets() *ColorPresetRequest_ListPresets {
-	if x != nil {
-		if x, ok := x.Request.(*ColorPresetRequest_ListPresets_); ok {
-			return x.ListPresets
-		}
-	}
-	return nil
-}
-
-func (x *ColorPresetRequest) GetGetPreset() *ColorPresetRequest_GetPreset {
-	if x != nil {
-		if x, ok := x.Request.(*ColorPresetRequest_GetPreset_); ok {
-			return x.GetPreset
-		}
-	}
-	return nil
-}
-
-type isColorPresetRequest_Request interface {
-	isColorPresetRequest_Request()
-}
-
-type ColorPresetRequest_ListPresets_ struct {
-	ListPresets *ColorPresetRequest_ListPresets `protobuf:"bytes,1,opt,name=list_presets,json=listPresets,oneof"`
-}
-
-type ColorPresetRequest_GetPreset_ struct {
-	GetPreset *ColorPresetRequest_GetPreset `protobuf:"bytes,2,opt,name=get_preset,json=getPreset,oneof"`
-}
-
-func (*ColorPresetRequest_ListPresets_) isColorPresetRequest_Request() {}
-
-func (*ColorPresetRequest_GetPreset_) isColorPresetRequest_Request() {}
-
-type ColorPresetResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Response:
-	//
-	//	*ColorPresetResponse_ListPresets_
-	//	*ColorPresetResponse_GetPreset_
-	Response      isColorPresetResponse_Response `protobuf_oneof:"response"`
-	Status        *ColorPresetResponse_Status    `protobuf:"varint,3,opt,name=status,enum=iterm2.ColorPresetResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ColorPresetResponse) Reset() {
-	*x = ColorPresetResponse{}
-	mi := &file_api_proto_msgTypes[92]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ColorPresetResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ColorPresetResponse) ProtoMessage() {}
-
-func (x *ColorPresetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[92]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ColorPresetResponse.ProtoReflect.Descriptor instead.
-func (*ColorPresetResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{92}
-}
-
-func (x *ColorPresetResponse) GetResponse() isColorPresetResponse_Response {
-	if x != nil {
-		return x.Response
-	}
-	return nil
-}
-
-func (x *ColorPresetResponse) GetListPresets() *ColorPresetResponse_ListPresets {
-	if x != nil {
-		if x, ok := x.Response.(*ColorPresetResponse_ListPresets_); ok {
-			return x.ListPresets
-		}
-	}
-	return nil
-}
-
-func (x *ColorPresetResponse) GetGetPreset() *ColorPresetResponse_GetPreset {
-	if x != nil {
-		if x, ok := x.Response.(*ColorPresetResponse_GetPreset_); ok {
-			return x.GetPreset
-		}
-	}
-	return nil
-}
-
-func (x *ColorPresetResponse) GetStatus() ColorPresetResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return ColorPresetResponse_OK
-}
-
-type isColorPresetResponse_Response interface {
-	isColorPresetResponse_Response()
-}
-
-type ColorPresetResponse_ListPresets_ struct {
-	ListPresets *ColorPresetResponse_ListPresets `protobuf:"bytes,1,opt,name=list_presets,json=listPresets,oneof"`
-}
-
-type ColorPresetResponse_GetPreset_ struct {
-	GetPreset *ColorPresetResponse_GetPreset `protobuf:"bytes,2,opt,name=get_preset,json=getPreset,oneof"`
-}
-
-func (*ColorPresetResponse_ListPresets_) isColorPresetResponse_Response() {}
-
-func (*ColorPresetResponse_GetPreset_) isColorPresetResponse_Response() {}
-
-type SubSelection struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	WindowedCoordRange *WindowedCoordRange    `protobuf:"bytes,1,opt,name=windowed_coord_range,json=windowedCoordRange" json:"windowed_coord_range,omitempty"`
-	SelectionMode      *SelectionMode         `protobuf:"varint,2,opt,name=selection_mode,json=selectionMode,enum=iterm2.SelectionMode" json:"selection_mode,omitempty"`
-	Connected          *bool                  `protobuf:"varint,3,opt,name=connected" json:"connected,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
-}
-
-func (x *SubSelection) Reset() {
-	*x = SubSelection{}
-	mi := &file_api_proto_msgTypes[93]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SubSelection) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SubSelection) ProtoMessage() {}
-
-func (x *SubSelection) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[93]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SubSelection.ProtoReflect.Descriptor instead.
-func (*SubSelection) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{93}
-}
-
-func (x *SubSelection) GetWindowedCoordRange() *WindowedCoordRange {
-	if x != nil {
-		return x.WindowedCoordRange
-	}
-	return nil
-}
-
-func (x *SubSelection) GetSelectionMode() SelectionMode {
-	if x != nil && x.SelectionMode != nil {
-		return *x.SelectionMode
-	}
-	return SelectionMode_CHARACTER
-}
-
-func (x *SubSelection) GetConnected() bool {
-	if x != nil && x.Connected != nil {
-		return *x.Connected
-	}
-	return false
-}
-
-type Selection struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SubSelections []*SubSelection        `protobuf:"bytes,1,rep,name=sub_selections,json=subSelections" json:"sub_selections,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Selection) Reset() {
-	*x = Selection{}
-	mi := &file_api_proto_msgTypes[94]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Selection) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Selection) ProtoMessage() {}
-
-func (x *Selection) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[94]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Selection.ProtoReflect.Descriptor instead.
-func (*Selection) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{94}
-}
-
-func (x *Selection) GetSubSelections() []*SubSelection {
-	if x != nil {
-		return x.SubSelections
-	}
-	return nil
-}
-
-type SelectionRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Request:
-	//
-	//	*SelectionRequest_GetSelectionRequest_
-	//	*SelectionRequest_SetSelectionRequest_
-	Request       isSelectionRequest_Request `protobuf_oneof:"request"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SelectionRequest) Reset() {
-	*x = SelectionRequest{}
-	mi := &file_api_proto_msgTypes[95]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SelectionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SelectionRequest) ProtoMessage() {}
-
-func (x *SelectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[95]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SelectionRequest.ProtoReflect.Descriptor instead.
-func (*SelectionRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{95}
-}
-
-func (x *SelectionRequest) GetRequest() isSelectionRequest_Request {
-	if x != nil {
-		return x.Request
-	}
-	return nil
-}
-
-func (x *SelectionRequest) GetGetSelectionRequest() *SelectionRequest_GetSelectionRequest {
-	if x != nil {
-		if x, ok := x.Request.(*SelectionRequest_GetSelectionRequest_); ok {
-			return x.GetSelectionRequest
-		}
-	}
-	return nil
-}
-
-func (x *SelectionRequest) GetSetSelectionRequest() *SelectionRequest_SetSelectionRequest {
-	if x != nil {
-		if x, ok := x.Request.(*SelectionRequest_SetSelectionRequest_); ok {
-			return x.SetSelectionRequest
-		}
-	}
-	return nil
-}
-
-type isSelectionRequest_Request interface {
-	isSelectionRequest_Request()
-}
-
-type SelectionRequest_GetSelectionRequest_ struct {
-	GetSelectionRequest *SelectionRequest_GetSelectionRequest `protobuf:"bytes,1,opt,name=get_selection_request,json=getSelectionRequest,oneof"`
-}
-
-type SelectionRequest_SetSelectionRequest_ struct {
-	SetSelectionRequest *SelectionRequest_SetSelectionRequest `protobuf:"bytes,2,opt,name=set_selection_request,json=setSelectionRequest,oneof"`
-}
-
-func (*SelectionRequest_GetSelectionRequest_) isSelectionRequest_Request() {}
-
-func (*SelectionRequest_SetSelectionRequest_) isSelectionRequest_Request() {}
-
-type SelectionResponse struct {
-	state  protoimpl.MessageState    `protogen:"open.v1"`
-	Status *SelectionResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SelectionResponse_Status" json:"status,omitempty"`
-	// Types that are valid to be assigned to Response:
-	//
-	//	*SelectionResponse_GetSelectionResponse_
-	//	*SelectionResponse_SetSelectionResponse_
-	Response      isSelectionResponse_Response `protobuf_oneof:"response"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SelectionResponse) Reset() {
-	*x = SelectionResponse{}
-	mi := &file_api_proto_msgTypes[96]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SelectionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SelectionResponse) ProtoMessage() {}
-
-func (x *SelectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[96]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SelectionResponse.ProtoReflect.Descriptor instead.
-func (*SelectionResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{96}
-}
-
-func (x *SelectionResponse) GetStatus() SelectionResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return SelectionResponse_OK
-}
-
-func (x *SelectionResponse) GetResponse() isSelectionResponse_Response {
-	if x != nil {
-		return x.Response
-	}
-	return nil
-}
-
-func (x *SelectionResponse) GetGetSelectionResponse() *SelectionResponse_GetSelectionResponse {
-	if x != nil {
-		if x, ok := x.Response.(*SelectionResponse_GetSelectionResponse_); ok {
-			return x.GetSelectionResponse
-		}
-	}
-	return nil
-}
-
-func (x *SelectionResponse) GetSetSelectionResponse() *SelectionResponse_SetSelectionResponse {
-	if x != nil {
-		if x, ok := x.Response.(*SelectionResponse_SetSelectionResponse_); ok {
-			return x.SetSelectionResponse
-		}
-	}
-	return nil
-}
-
-type isSelectionResponse_Response interface {
-	isSelectionResponse_Response()
-}
-
-type SelectionResponse_GetSelectionResponse_ struct {
-	GetSelectionResponse *SelectionResponse_GetSelectionResponse `protobuf:"bytes,2,opt,name=get_selection_response,json=getSelectionResponse,oneof"`
-}
-
-type SelectionResponse_SetSelectionResponse_ struct {
-	SetSelectionResponse *SelectionResponse_SetSelectionResponse `protobuf:"bytes,3,opt,name=set_selection_response,json=setSelectionResponse,oneof"`
-}
-
-func (*SelectionResponse_GetSelectionResponse_) isSelectionResponse_Response() {}
-
-func (*SelectionResponse_SetSelectionResponse_) isSelectionResponse_Response() {}
-
-type StatusBarComponentRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Request:
-	//
-	//	*StatusBarComponentRequest_OpenPopover_
-	Request       isStatusBarComponentRequest_Request `protobuf_oneof:"request"`
-	Identifier    *string                             `protobuf:"bytes,2,opt,name=identifier" json:"identifier,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StatusBarComponentRequest) Reset() {
-	*x = StatusBarComponentRequest{}
-	mi := &file_api_proto_msgTypes[97]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StatusBarComponentRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatusBarComponentRequest) ProtoMessage() {}
-
-func (x *StatusBarComponentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[97]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StatusBarComponentRequest.ProtoReflect.Descriptor instead.
-func (*StatusBarComponentRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{97}
-}
-
-func (x *StatusBarComponentRequest) GetRequest() isStatusBarComponentRequest_Request {
-	if x != nil {
-		return x.Request
-	}
-	return nil
-}
-
-func (x *StatusBarComponentRequest) GetOpenPopover() *StatusBarComponentRequest_OpenPopover {
-	if x != nil {
-		if x, ok := x.Request.(*StatusBarComponentRequest_OpenPopover_); ok {
-			return x.OpenPopover
-		}
-	}
-	return nil
-}
-
-func (x *StatusBarComponentRequest) GetIdentifier() string {
-	if x != nil && x.Identifier != nil {
-		return *x.Identifier
-	}
-	return ""
-}
-
-type isStatusBarComponentRequest_Request interface {
-	isStatusBarComponentRequest_Request()
-}
-
-type StatusBarComponentRequest_OpenPopover_ struct {
-	OpenPopover *StatusBarComponentRequest_OpenPopover `protobuf:"bytes,1,opt,name=open_popover,json=openPopover,oneof"`
-}
-
-func (*StatusBarComponentRequest_OpenPopover_) isStatusBarComponentRequest_Request() {}
-
-type StatusBarComponentResponse struct {
-	state         protoimpl.MessageState             `protogen:"open.v1"`
-	Status        *StatusBarComponentResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.StatusBarComponentResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StatusBarComponentResponse) Reset() {
-	*x = StatusBarComponentResponse{}
-	mi := &file_api_proto_msgTypes[98]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StatusBarComponentResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatusBarComponentResponse) ProtoMessage() {}
-
-func (x *StatusBarComponentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[98]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StatusBarComponentResponse.ProtoReflect.Descriptor instead.
-func (*StatusBarComponentResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{98}
-}
-
-func (x *StatusBarComponentResponse) GetStatus() StatusBarComponentResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return StatusBarComponentResponse_OK
-}
-
-type SetBroadcastDomainsRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	BroadcastDomains []*BroadcastDomain     `protobuf:"bytes,1,rep,name=broadcast_domains,json=broadcastDomains" json:"broadcast_domains,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *SetBroadcastDomainsRequest) Reset() {
-	*x = SetBroadcastDomainsRequest{}
-	mi := &file_api_proto_msgTypes[99]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetBroadcastDomainsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetBroadcastDomainsRequest) ProtoMessage() {}
-
-func (x *SetBroadcastDomainsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[99]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetBroadcastDomainsRequest.ProtoReflect.Descriptor instead.
-func (*SetBroadcastDomainsRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{99}
-}
-
-func (x *SetBroadcastDomainsRequest) GetBroadcastDomains() []*BroadcastDomain {
-	if x != nil {
-		return x.BroadcastDomains
-	}
-	return nil
-}
-
-type SetBroadcastDomainsResponse struct {
-	state         protoimpl.MessageState              `protogen:"open.v1"`
-	Status        *SetBroadcastDomainsResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.SetBroadcastDomainsResponse_Status" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SetBroadcastDomainsResponse) Reset() {
-	*x = SetBroadcastDomainsResponse{}
-	mi := &file_api_proto_msgTypes[100]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetBroadcastDomainsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetBroadcastDomainsResponse) ProtoMessage() {}
-
-func (x *SetBroadcastDomainsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[100]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetBroadcastDomainsResponse.ProtoReflect.Descriptor instead.
-func (*SetBroadcastDomainsResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{100}
-}
-
-func (x *SetBroadcastDomainsResponse) GetStatus() SetBroadcastDomainsResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return SetBroadcastDomainsResponse_OK
-}
-
-type CloseRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Target:
-	//
-	//	*CloseRequest_Tabs
-	//	*CloseRequest_Sessions
-	//	*CloseRequest_Windows
-	Target        isCloseRequest_Target `protobuf_oneof:"target"`
-	Force         *bool                 `protobuf:"varint,4,opt,name=force" json:"force,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CloseRequest) Reset() {
-	*x = CloseRequest{}
-	mi := &file_api_proto_msgTypes[101]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CloseRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CloseRequest) ProtoMessage() {}
-
-func (x *CloseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[101]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CloseRequest.ProtoReflect.Descriptor instead.
-func (*CloseRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{101}
-}
-
-func (x *CloseRequest) GetTarget() isCloseRequest_Target {
-	if x != nil {
-		return x.Target
-	}
-	return nil
-}
-
-func (x *CloseRequest) GetTabs() *CloseRequest_CloseTabs {
-	if x != nil {
-		if x, ok := x.Target.(*CloseRequest_Tabs); ok {
-			return x.Tabs
-		}
-	}
-	return nil
-}
-
-func (x *CloseRequest) GetSessions() *CloseRequest_CloseSessions {
-	if x != nil {
-		if x, ok := x.Target.(*CloseRequest_Sessions); ok {
-			return x.Sessions
-		}
-	}
-	return nil
-}
-
-func (x *CloseRequest) GetWindows() *CloseRequest_CloseWindows {
-	if x != nil {
-		if x, ok := x.Target.(*CloseRequest_Windows); ok {
-			return x.Windows
-		}
-	}
-	return nil
-}
-
-func (x *CloseRequest) GetForce() bool {
-	if x != nil && x.Force != nil {
-		return *x.Force
-	}
-	return false
-}
-
-type isCloseRequest_Target interface {
-	isCloseRequest_Target()
-}
-
-type CloseRequest_Tabs struct {
-	Tabs *CloseRequest_CloseTabs `protobuf:"bytes,1,opt,name=tabs,oneof"`
-}
-
-type CloseRequest_Sessions struct {
-	Sessions *CloseRequest_CloseSessions `protobuf:"bytes,2,opt,name=sessions,oneof"`
-}
-
-type CloseRequest_Windows struct {
-	Windows *CloseRequest_CloseWindows `protobuf:"bytes,3,opt,name=windows,oneof"`
-}
-
-func (*CloseRequest_Tabs) isCloseRequest_Target() {}
-
-func (*CloseRequest_Sessions) isCloseRequest_Target() {}
-
-func (*CloseRequest_Windows) isCloseRequest_Target() {}
-
-type CloseResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Statuses      []CloseResponse_Status `protobuf:"varint,1,rep,name=statuses,enum=iterm2.CloseResponse_Status" json:"statuses,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CloseResponse) Reset() {
-	*x = CloseResponse{}
-	mi := &file_api_proto_msgTypes[102]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CloseResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CloseResponse) ProtoMessage() {}
-
-func (x *CloseResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[102]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CloseResponse.ProtoReflect.Descriptor instead.
-func (*CloseResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{102}
-}
-
-func (x *CloseResponse) GetStatuses() []CloseResponse_Status {
-	if x != nil {
-		return x.Statuses
-	}
-	return nil
-}
-
-type InvokeFunctionRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Context:
-	//
-	//	*InvokeFunctionRequest_Tab_
-	//	*InvokeFunctionRequest_Session_
-	//	*InvokeFunctionRequest_Window_
-	//	*InvokeFunctionRequest_App_
-	//	*InvokeFunctionRequest_Method_
-	Context       isInvokeFunctionRequest_Context `protobuf_oneof:"context"`
-	Invocation    *string                         `protobuf:"bytes,5,opt,name=invocation" json:"invocation,omitempty"`
-	Timeout       *float64                        `protobuf:"fixed64,6,opt,name=timeout,def=-1" json:"timeout,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-// Default values for InvokeFunctionRequest fields.
-const (
-	Default_InvokeFunctionRequest_Timeout = float64(-1)
-)
-
-func (x *InvokeFunctionRequest) Reset() {
-	*x = InvokeFunctionRequest{}
-	mi := &file_api_proto_msgTypes[103]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *InvokeFunctionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*InvokeFunctionRequest) ProtoMessage() {}
-
-func (x *InvokeFunctionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[103]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use InvokeFunctionRequest.ProtoReflect.Descriptor instead.
-func (*InvokeFunctionRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{103}
-}
-
-func (x *InvokeFunctionRequest) GetContext() isInvokeFunctionRequest_Context {
-	if x != nil {
-		return x.Context
-	}
-	return nil
-}
-
-func (x *InvokeFunctionRequest) GetTab() *InvokeFunctionRequest_Tab {
-	if x != nil {
-		if x, ok := x.Context.(*InvokeFunctionRequest_Tab_); ok {
-			return x.Tab
-		}
-	}
-	return nil
-}
-
-func (x *InvokeFunctionRequest) GetSession() *InvokeFunctionRequest_Session {
-	if x != nil {
-		if x, ok := x.Context.(*InvokeFunctionRequest_Session_); ok {
-			return x.Session
-		}
-	}
-	return nil
-}
-
-func (x *InvokeFunctionRequest) GetWindow() *InvokeFunctionRequest_Window {
-	if x != nil {
-		if x, ok := x.Context.(*InvokeFunctionRequest_Window_); ok {
-			return x.Window
-		}
-	}
-	return nil
-}
-
-func (x *InvokeFunctionRequest) GetApp() *InvokeFunctionRequest_App {
-	if x != nil {
-		if x, ok := x.Context.(*InvokeFunctionRequest_App_); ok {
-			return x.App
-		}
-	}
-	return nil
-}
-
-func (x *InvokeFunctionRequest) GetMethod() *InvokeFunctionRequest_Method {
-	if x != nil {
-		if x, ok := x.Context.(*InvokeFunctionRequest_Method_); ok {
-			return x.Method
-		}
-	}
-	return nil
-}
-
-func (x *InvokeFunctionRequest) GetInvocation() string {
-	if x != nil && x.Invocation != nil {
-		return *x.Invocation
-	}
-	return ""
-}
-
-func (x *InvokeFunctionRequest) GetTimeout() float64 {
-	if x != nil && x.Timeout != nil {
-		return *x.Timeout
-	}
-	return Default_InvokeFunctionRequest_Timeout
-}
-
-type isInvokeFunctionRequest_Context interface {
-	isInvokeFunctionRequest_Context()
-}
-
-type InvokeFunctionRequest_Tab_ struct {
-	Tab *InvokeFunctionRequest_Tab `protobuf:"bytes,1,opt,name=tab,oneof"`
-}
-
-type InvokeFunctionRequest_Session_ struct {
-	Session *InvokeFunctionRequest_Session `protobuf:"bytes,2,opt,name=session,oneof"`
-}
-
-type InvokeFunctionRequest_Window_ struct {
-	Window *InvokeFunctionRequest_Window `protobuf:"bytes,3,opt,name=window,oneof"`
-}
-
-type InvokeFunctionRequest_App_ struct {
-	App *InvokeFunctionRequest_App `protobuf:"bytes,4,opt,name=app,oneof"`
-}
-
-type InvokeFunctionRequest_Method_ struct {
-	Method *InvokeFunctionRequest_Method `protobuf:"bytes,7,opt,name=method,oneof"`
-}
-
-func (*InvokeFunctionRequest_Tab_) isInvokeFunctionRequest_Context() {}
-
-func (*InvokeFunctionRequest_Session_) isInvokeFunctionRequest_Context() {}
-
-func (*InvokeFunctionRequest_Window_) isInvokeFunctionRequest_Context() {}
-
-func (*InvokeFunctionRequest_App_) isInvokeFunctionRequest_Context() {}
-
-func (*InvokeFunctionRequest_Method_) isInvokeFunctionRequest_Context() {}
-
-type InvokeFunctionResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Disposition:
-	//
-	//	*InvokeFunctionResponse_Error_
-	//	*InvokeFunctionResponse_Success_
-	Disposition   isInvokeFunctionResponse_Disposition `protobuf_oneof:"disposition"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *InvokeFunctionResponse) Reset() {
-	*x = InvokeFunctionResponse{}
-	mi := &file_api_proto_msgTypes[104]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *InvokeFunctionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*InvokeFunctionResponse) ProtoMessage() {}
-
-func (x *InvokeFunctionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[104]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use InvokeFunctionResponse.ProtoReflect.Descriptor instead.
-func (*InvokeFunctionResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{104}
-}
-
-func (x *InvokeFunctionResponse) GetDisposition() isInvokeFunctionResponse_Disposition {
-	if x != nil {
-		return x.Disposition
-	}
-	return nil
-}
-
-func (x *InvokeFunctionResponse) GetError() *InvokeFunctionResponse_Error {
-	if x != nil {
-		if x, ok := x.Disposition.(*InvokeFunctionResponse_Error_); ok {
-			return x.Error
-		}
-	}
-	return nil
-}
-
-func (x *InvokeFunctionResponse) GetSuccess() *InvokeFunctionResponse_Success {
-	if x != nil {
-		if x, ok := x.Disposition.(*InvokeFunctionResponse_Success_); ok {
-			return x.Success
-		}
-	}
-	return nil
-}
-
-type isInvokeFunctionResponse_Disposition interface {
-	isInvokeFunctionResponse_Disposition()
-}
-
-type InvokeFunctionResponse_Error_ struct {
-	Error *InvokeFunctionResponse_Error `protobuf:"bytes,1,opt,name=error,oneof"`
-}
-
-type InvokeFunctionResponse_Success_ struct {
-	Success *InvokeFunctionResponse_Success `protobuf:"bytes,2,opt,name=success,oneof"`
-}
-
-func (*InvokeFunctionResponse_Error_) isInvokeFunctionResponse_Disposition() {}
-
-func (*InvokeFunctionResponse_Success_) isInvokeFunctionResponse_Disposition() {}
-
-type ListPromptsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Session       *string                `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
-	FirstUniqueId *string                `protobuf:"bytes,2,opt,name=first_unique_id,json=firstUniqueId" json:"first_unique_id,omitempty"`
-	LastUniqueId  *string                `protobuf:"bytes,3,opt,name=last_unique_id,json=lastUniqueId" json:"last_unique_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListPromptsRequest) Reset() {
-	*x = ListPromptsRequest{}
-	mi := &file_api_proto_msgTypes[105]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListPromptsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListPromptsRequest) ProtoMessage() {}
-
-func (x *ListPromptsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[105]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListPromptsRequest.ProtoReflect.Descriptor instead.
-func (*ListPromptsRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{105}
-}
-
-func (x *ListPromptsRequest) GetSession() string {
-	if x != nil && x.Session != nil {
-		return *x.Session
-	}
-	return ""
-}
-
-func (x *ListPromptsRequest) GetFirstUniqueId() string {
-	if x != nil && x.FirstUniqueId != nil {
-		return *x.FirstUniqueId
-	}
-	return ""
-}
-
-func (x *ListPromptsRequest) GetLastUniqueId() string {
-	if x != nil && x.LastUniqueId != nil {
-		return *x.LastUniqueId
-	}
-	return ""
-}
-
-type ListPromptsResponse struct {
-	state          protoimpl.MessageState      `protogen:"open.v1"`
-	Status         *ListPromptsResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.ListPromptsResponse_Status,def=0" json:"status,omitempty"`
-	UniquePromptId []string                    `protobuf:"bytes,2,rep,name=unique_prompt_id,json=uniquePromptId" json:"unique_prompt_id,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-// Default values for ListPromptsResponse fields.
-const (
-	Default_ListPromptsResponse_Status = ListPromptsResponse_OK
-)
-
-func (x *ListPromptsResponse) Reset() {
-	*x = ListPromptsResponse{}
-	mi := &file_api_proto_msgTypes[106]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListPromptsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListPromptsResponse) ProtoMessage() {}
-
-func (x *ListPromptsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[106]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListPromptsResponse.ProtoReflect.Descriptor instead.
-func (*ListPromptsResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{106}
-}
-
-func (x *ListPromptsResponse) GetStatus() ListPromptsResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return Default_ListPromptsResponse_Status
-}
-
-func (x *ListPromptsResponse) GetUniquePromptId() []string {
-	if x != nil {
-		return x.UniquePromptId
-	}
-	return nil
-}
-
-type SplitTreeNode_SplitTreeLink struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Child:
-	//
-	//	*SplitTreeNode_SplitTreeLink_Session
-	//	*SplitTreeNode_SplitTreeLink_Node
-	Child         isSplitTreeNode_SplitTreeLink_Child `protobuf_oneof:"child"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SplitTreeNode_SplitTreeLink) Reset() {
-	*x = SplitTreeNode_SplitTreeLink{}
-	mi := &file_api_proto_msgTypes[107]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SplitTreeNode_SplitTreeLink) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SplitTreeNode_SplitTreeLink) ProtoMessage() {}
-
-func (x *SplitTreeNode_SplitTreeLink) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[107]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SplitTreeNode_SplitTreeLink.ProtoReflect.Descriptor instead.
-func (*SplitTreeNode_SplitTreeLink) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{19, 0}
-}
-
-func (x *SplitTreeNode_SplitTreeLink) GetChild() isSplitTreeNode_SplitTreeLink_Child {
-	if x != nil {
-		return x.Child
-	}
-	return nil
-}
-
-func (x *SplitTreeNode_SplitTreeLink) GetSession() *SessionSummary {
-	if x != nil {
-		if x, ok := x.Child.(*SplitTreeNode_SplitTreeLink_Session); ok {
-			return x.Session
-		}
-	}
-	return nil
-}
-
-func (x *SplitTreeNode_SplitTreeLink) GetNode() *SplitTreeNode {
-	if x != nil {
-		if x, ok := x.Child.(*SplitTreeNode_SplitTreeLink_Node); ok {
-			return x.Node
-		}
-	}
-	return nil
-}
-
-type isSplitTreeNode_SplitTreeLink_Child interface {
-	isSplitTreeNode_SplitTreeLink_Child()
-}
-
-type SplitTreeNode_SplitTreeLink_Session struct {
-	Session *SessionSummary `protobuf:"bytes,1,opt,name=session,oneof"`
-}
-
-type SplitTreeNode_SplitTreeLink_Node struct {
-	Node *SplitTreeNode `protobuf:"bytes,2,opt,name=node,oneof"`
-}
-
-func (*SplitTreeNode_SplitTreeLink_Session) isSplitTreeNode_SplitTreeLink_Child() {}
-
-func (*SplitTreeNode_SplitTreeLink_Node) isSplitTreeNode_SplitTreeLink_Child() {}
-
-type ListSessionsResponse_Window struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Tabs          []*ListSessionsResponse_Tab `protobuf:"bytes,1,rep,name=tabs" json:"tabs,omitempty"`
-	WindowId      *string                     `protobuf:"bytes,2,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
-	Frame         *Frame                      `protobuf:"bytes,3,opt,name=frame" json:"frame,omitempty"`
-	Number        *int32                      `protobuf:"varint,4,opt,name=number" json:"number,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListSessionsResponse_Window) Reset() {
-	*x = ListSessionsResponse_Window{}
-	mi := &file_api_proto_msgTypes[108]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListSessionsResponse_Window) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListSessionsResponse_Window) ProtoMessage() {}
-
-func (x *ListSessionsResponse_Window) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[108]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListSessionsResponse_Window.ProtoReflect.Descriptor instead.
-func (*ListSessionsResponse_Window) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{20, 0}
-}
-
-func (x *ListSessionsResponse_Window) GetTabs() []*ListSessionsResponse_Tab {
-	if x != nil {
-		return x.Tabs
-	}
-	return nil
-}
-
-func (x *ListSessionsResponse_Window) GetWindowId() string {
-	if x != nil && x.WindowId != nil {
-		return *x.WindowId
-	}
-	return ""
-}
-
-func (x *ListSessionsResponse_Window) GetFrame() *Frame {
-	if x != nil {
-		return x.Frame
-	}
-	return nil
-}
-
-func (x *ListSessionsResponse_Window) GetNumber() int32 {
-	if x != nil && x.Number != nil {
-		return *x.Number
-	}
-	return 0
-}
-
-type ListSessionsResponse_Tab struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Root              *SplitTreeNode         `protobuf:"bytes,3,opt,name=root" json:"root,omitempty"`
-	TabId             *string                `protobuf:"bytes,2,opt,name=tab_id,json=tabId" json:"tab_id,omitempty"`
-	TmuxWindowId      *string                `protobuf:"bytes,4,opt,name=tmux_window_id,json=tmuxWindowId" json:"tmux_window_id,omitempty"`
-	TmuxConnectionId  *string                `protobuf:"bytes,5,opt,name=tmux_connection_id,json=tmuxConnectionId" json:"tmux_connection_id,omitempty"`
-	MinimizedSessions []*SessionSummary      `protobuf:"bytes,6,rep,name=minimized_sessions,json=minimizedSessions" json:"minimized_sessions,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
-}
-
-func (x *ListSessionsResponse_Tab) Reset() {
-	*x = ListSessionsResponse_Tab{}
-	mi := &file_api_proto_msgTypes[109]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListSessionsResponse_Tab) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListSessionsResponse_Tab) ProtoMessage() {}
-
-func (x *ListSessionsResponse_Tab) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[109]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListSessionsResponse_Tab.ProtoReflect.Descriptor instead.
-func (*ListSessionsResponse_Tab) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{20, 1}
-}
-
-func (x *ListSessionsResponse_Tab) GetRoot() *SplitTreeNode {
-	if x != nil {
-		return x.Root
-	}
-	return nil
-}
-
-func (x *ListSessionsResponse_Tab) GetTabId() string {
-	if x != nil && x.TabId != nil {
-		return *x.TabId
-	}
-	return ""
-}
-
-func (x *ListSessionsResponse_Tab) GetTmuxWindowId() string {
-	if x != nil && x.TmuxWindowId != nil {
-		return *x.TmuxWindowId
-	}
-	return ""
-}
-
-func (x *ListSessionsResponse_Tab) GetTmuxConnectionId() string {
-	if x != nil && x.TmuxConnectionId != nil {
-		return *x.TmuxConnectionId
-	}
-	return ""
-}
-
-func (x *ListSessionsResponse_Tab) GetMinimizedSessions() []*SessionSummary {
-	if x != nil {
-		return x.MinimizedSessions
-	}
-	return nil
-}
-
-type FocusChangedNotification_Window struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Describes how to interpret window_id.
-	WindowStatus *FocusChangedNotification_Window_WindowStatus `protobuf:"varint,1,opt,name=window_status,json=windowStatus,enum=iterm2.FocusChangedNotification_Window_WindowStatus" json:"window_status,omitempty"`
-	// The affected window_id
-	WindowId      *string `protobuf:"bytes,2,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *FocusChangedNotification_Window) Reset() {
-	*x = FocusChangedNotification_Window{}
-	mi := &file_api_proto_msgTypes[110]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *FocusChangedNotification_Window) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*FocusChangedNotification_Window) ProtoMessage() {}
-
-func (x *FocusChangedNotification_Window) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[110]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FocusChangedNotification_Window.ProtoReflect.Descriptor instead.
-func (*FocusChangedNotification_Window) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{37, 0}
-}
-
-func (x *FocusChangedNotification_Window) GetWindowStatus() FocusChangedNotification_Window_WindowStatus {
-	if x != nil && x.WindowStatus != nil {
-		return *x.WindowStatus
-	}
-	return FocusChangedNotification_Window_TERMINAL_WINDOW_BECAME_KEY
-}
-
-func (x *FocusChangedNotification_Window) GetWindowId() string {
-	if x != nil && x.WindowId != nil {
-		return *x.WindowId
-	}
-	return ""
-}
-
-type ServerOriginatedRPC_RPCArgument struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          *string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	JsonValue     *string                `protobuf:"bytes,2,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ServerOriginatedRPC_RPCArgument) Reset() {
-	*x = ServerOriginatedRPC_RPCArgument{}
-	mi := &file_api_proto_msgTypes[111]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ServerOriginatedRPC_RPCArgument) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ServerOriginatedRPC_RPCArgument) ProtoMessage() {}
-
-func (x *ServerOriginatedRPC_RPCArgument) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[111]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ServerOriginatedRPC_RPCArgument.ProtoReflect.Descriptor instead.
-func (*ServerOriginatedRPC_RPCArgument) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{40, 0}
-}
-
-func (x *ServerOriginatedRPC_RPCArgument) GetName() string {
-	if x != nil && x.Name != nil {
-		return *x.Name
-	}
-	return ""
-}
-
-func (x *ServerOriginatedRPC_RPCArgument) GetJsonValue() string {
-	if x != nil && x.JsonValue != nil {
-		return *x.JsonValue
-	}
-	return ""
-}
-
-type SetProfilePropertyRequest_GuidList struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Guids         []string               `protobuf:"bytes,1,rep,name=guids" json:"guids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SetProfilePropertyRequest_GuidList) Reset() {
-	*x = SetProfilePropertyRequest_GuidList{}
-	mi := &file_api_proto_msgTypes[112]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetProfilePropertyRequest_GuidList) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetProfilePropertyRequest_GuidList) ProtoMessage() {}
-
-func (x *SetProfilePropertyRequest_GuidList) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[112]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetProfilePropertyRequest_GuidList.ProtoReflect.Descriptor instead.
-func (*SetProfilePropertyRequest_GuidList) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{53, 0}
-}
-
-func (x *SetProfilePropertyRequest_GuidList) GetGuids() []string {
-	if x != nil {
-		return x.Guids
-	}
-	return nil
-}
-
-type SetProfilePropertyRequest_Assignment struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Key           *string                `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
-	JsonValue     *string                `protobuf:"bytes,2,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SetProfilePropertyRequest_Assignment) Reset() {
-	*x = SetProfilePropertyRequest_Assignment{}
-	mi := &file_api_proto_msgTypes[113]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SetProfilePropertyRequest_Assignment) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SetProfilePropertyRequest_Assignment) ProtoMessage() {}
-
-func (x *SetProfilePropertyRequest_Assignment) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[113]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SetProfilePropertyRequest_Assignment.ProtoReflect.Descriptor instead.
-func (*SetProfilePropertyRequest_Assignment) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{53, 1}
-}
-
-func (x *SetProfilePropertyRequest_Assignment) GetKey() string {
-	if x != nil && x.Key != nil {
-		return *x.Key
-	}
-	return ""
-}
-
-func (x *SetProfilePropertyRequest_Assignment) GetJsonValue() string {
-	if x != nil && x.JsonValue != nil {
-		return *x.JsonValue
-	}
-	return ""
-}
-
-type ActivateRequest_App struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	RaiseAllWindows   *bool                  `protobuf:"varint,1,opt,name=raise_all_windows,json=raiseAllWindows" json:"raise_all_windows,omitempty"`
-	IgnoringOtherApps *bool                  `protobuf:"varint,2,opt,name=ignoring_other_apps,json=ignoringOtherApps" json:"ignoring_other_apps,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
-}
-
-func (x *ActivateRequest_App) Reset() {
-	*x = ActivateRequest_App{}
-	mi := &file_api_proto_msgTypes[114]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ActivateRequest_App) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ActivateRequest_App) ProtoMessage() {}
-
-func (x *ActivateRequest_App) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[114]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ActivateRequest_App.ProtoReflect.Descriptor instead.
-func (*ActivateRequest_App) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{65, 0}
-}
-
-func (x *ActivateRequest_App) GetRaiseAllWindows() bool {
-	if x != nil && x.RaiseAllWindows != nil {
-		return *x.RaiseAllWindows
-	}
-	return false
-}
-
-func (x *ActivateRequest_App) GetIgnoringOtherApps() bool {
-	if x != nil && x.IgnoringOtherApps != nil {
-		return *x.IgnoringOtherApps
-	}
-	return false
-}
-
-type VariableRequest_Set struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          *string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Value         *string                `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *VariableRequest_Set) Reset() {
-	*x = VariableRequest_Set{}
-	mi := &file_api_proto_msgTypes[115]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *VariableRequest_Set) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*VariableRequest_Set) ProtoMessage() {}
-
-func (x *VariableRequest_Set) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[115]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use VariableRequest_Set.ProtoReflect.Descriptor instead.
-func (*VariableRequest_Set) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{67, 0}
-}
-
-func (x *VariableRequest_Set) GetName() string {
-	if x != nil && x.Name != nil {
-		return *x.Name
-	}
-	return ""
-}
-
-func (x *VariableRequest_Set) GetValue() string {
-	if x != nil && x.Value != nil {
-		return *x.Value
-	}
-	return ""
-}
-
-type ListProfilesResponse_Profile struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Properties    []*ProfileProperty     `protobuf:"bytes,1,rep,name=properties" json:"properties,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListProfilesResponse_Profile) Reset() {
-	*x = ListProfilesResponse_Profile{}
-	mi := &file_api_proto_msgTypes[116]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListProfilesResponse_Profile) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListProfilesResponse_Profile) ProtoMessage() {}
-
-func (x *ListProfilesResponse_Profile) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[116]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListProfilesResponse_Profile.ProtoReflect.Descriptor instead.
-func (*ListProfilesResponse_Profile) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{74, 0}
-}
-
-func (x *ListProfilesResponse_Profile) GetProperties() []*ProfileProperty {
-	if x != nil {
-		return x.Properties
-	}
-	return nil
-}
-
-type TmuxRequest_ListConnections struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TmuxRequest_ListConnections) Reset() {
-	*x = TmuxRequest_ListConnections{}
-	mi := &file_api_proto_msgTypes[117]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TmuxRequest_ListConnections) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TmuxRequest_ListConnections) ProtoMessage() {}
-
-func (x *TmuxRequest_ListConnections) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[117]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TmuxRequest_ListConnections.ProtoReflect.Descriptor instead.
-func (*TmuxRequest_ListConnections) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{85, 0}
-}
-
-type TmuxRequest_SendCommand struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ConnectionId  *string                `protobuf:"bytes,1,opt,name=connection_id,json=connectionId" json:"connection_id,omitempty"`
-	Command       *string                `protobuf:"bytes,2,opt,name=command" json:"command,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TmuxRequest_SendCommand) Reset() {
-	*x = TmuxRequest_SendCommand{}
-	mi := &file_api_proto_msgTypes[118]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TmuxRequest_SendCommand) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TmuxRequest_SendCommand) ProtoMessage() {}
-
-func (x *TmuxRequest_SendCommand) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[118]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TmuxRequest_SendCommand.ProtoReflect.Descriptor instead.
-func (*TmuxRequest_SendCommand) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{85, 1}
-}
-
-func (x *TmuxRequest_SendCommand) GetConnectionId() string {
-	if x != nil && x.ConnectionId != nil {
-		return *x.ConnectionId
-	}
-	return ""
-}
-
-func (x *TmuxRequest_SendCommand) GetCommand() string {
-	if x != nil && x.Command != nil {
-		return *x.Command
-	}
-	return ""
-}
-
-type TmuxRequest_SetWindowVisible struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ConnectionId  *string                `protobuf:"bytes,1,opt,name=connection_id,json=connectionId" json:"connection_id,omitempty"`
-	WindowId      *string                `protobuf:"bytes,2,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
-	Visible       *bool                  `protobuf:"varint,3,opt,name=visible" json:"visible,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TmuxRequest_SetWindowVisible) Reset() {
-	*x = TmuxRequest_SetWindowVisible{}
-	mi := &file_api_proto_msgTypes[119]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TmuxRequest_SetWindowVisible) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TmuxRequest_SetWindowVisible) ProtoMessage() {}
-
-func (x *TmuxRequest_SetWindowVisible) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[119]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TmuxRequest_SetWindowVisible.ProtoReflect.Descriptor instead.
-func (*TmuxRequest_SetWindowVisible) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{85, 2}
-}
-
-func (x *TmuxRequest_SetWindowVisible) GetConnectionId() string {
-	if x != nil && x.ConnectionId != nil {
-		return *x.ConnectionId
-	}
-	return ""
-}
-
-func (x *TmuxRequest_SetWindowVisible) GetWindowId() string {
-	if x != nil && x.WindowId != nil {
-		return *x.WindowId
-	}
-	return ""
-}
-
-func (x *TmuxRequest_SetWindowVisible) GetVisible() bool {
-	if x != nil && x.Visible != nil {
-		return *x.Visible
-	}
-	return false
-}
-
-type TmuxRequest_CreateWindow struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ConnectionId  *string                `protobuf:"bytes,1,opt,name=connection_id,json=connectionId" json:"connection_id,omitempty"`
-	Affinity      *string                `protobuf:"bytes,2,opt,name=affinity" json:"affinity,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TmuxRequest_CreateWindow) Reset() {
-	*x = TmuxRequest_CreateWindow{}
-	mi := &file_api_proto_msgTypes[120]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TmuxRequest_CreateWindow) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TmuxRequest_CreateWindow) ProtoMessage() {}
-
-func (x *TmuxRequest_CreateWindow) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[120]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TmuxRequest_CreateWindow.ProtoReflect.Descriptor instead.
-func (*TmuxRequest_CreateWindow) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{85, 3}
-}
-
-func (x *TmuxRequest_CreateWindow) GetConnectionId() string {
-	if x != nil && x.ConnectionId != nil {
-		return *x.ConnectionId
-	}
-	return ""
-}
-
-func (x *TmuxRequest_CreateWindow) GetAffinity() string {
-	if x != nil && x.Affinity != nil {
-		return *x.Affinity
-	}
-	return ""
-}
-
-type TmuxResponse_ListConnections struct {
-	state         protoimpl.MessageState                     `protogen:"open.v1"`
-	Connections   []*TmuxResponse_ListConnections_Connection `protobuf:"bytes,1,rep,name=connections" json:"connections,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TmuxResponse_ListConnections) Reset() {
-	*x = TmuxResponse_ListConnections{}
-	mi := &file_api_proto_msgTypes[121]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TmuxResponse_ListConnections) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TmuxResponse_ListConnections) ProtoMessage() {}
-
-func (x *TmuxResponse_ListConnections) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[121]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TmuxResponse_ListConnections.ProtoReflect.Descriptor instead.
-func (*TmuxResponse_ListConnections) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{86, 0}
-}
-
-func (x *TmuxResponse_ListConnections) GetConnections() []*TmuxResponse_ListConnections_Connection {
-	if x != nil {
-		return x.Connections
-	}
-	return nil
-}
-
-type TmuxResponse_SendCommand struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Output        *string                `protobuf:"bytes,1,opt,name=output" json:"output,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TmuxResponse_SendCommand) Reset() {
-	*x = TmuxResponse_SendCommand{}
-	mi := &file_api_proto_msgTypes[122]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TmuxResponse_SendCommand) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TmuxResponse_SendCommand) ProtoMessage() {}
-
-func (x *TmuxResponse_SendCommand) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[122]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TmuxResponse_SendCommand.ProtoReflect.Descriptor instead.
-func (*TmuxResponse_SendCommand) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{86, 1}
-}
-
-func (x *TmuxResponse_SendCommand) GetOutput() string {
-	if x != nil && x.Output != nil {
-		return *x.Output
-	}
-	return ""
-}
-
-type TmuxResponse_SetWindowVisible struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TmuxResponse_SetWindowVisible) Reset() {
-	*x = TmuxResponse_SetWindowVisible{}
-	mi := &file_api_proto_msgTypes[123]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TmuxResponse_SetWindowVisible) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TmuxResponse_SetWindowVisible) ProtoMessage() {}
-
-func (x *TmuxResponse_SetWindowVisible) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[123]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TmuxResponse_SetWindowVisible.ProtoReflect.Descriptor instead.
-func (*TmuxResponse_SetWindowVisible) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{86, 2}
-}
-
-type TmuxResponse_CreateWindow struct {
+type InvokeFunctionRequest_Tab struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TabId         *string                `protobuf:"bytes,1,opt,name=tab_id,json=tabId" json:"tab_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TmuxResponse_CreateWindow) Reset() {
-	*x = TmuxResponse_CreateWindow{}
-	mi := &file_api_proto_msgTypes[124]
+func (x *InvokeFunctionRequest_Tab) Reset() {
+	*x = InvokeFunctionRequest_Tab{}
+	mi := &file_api_proto_msgTypes[114]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TmuxResponse_CreateWindow) String() string {
+func (x *InvokeFunctionRequest_Tab) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TmuxResponse_CreateWindow) ProtoMessage() {}
+func (*InvokeFunctionRequest_Tab) ProtoMessage() {}
 
-func (x *TmuxResponse_CreateWindow) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[124]
+func (x *InvokeFunctionRequest_Tab) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[114]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -11580,93 +11837,40 @@ func (x *TmuxResponse_CreateWindow) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TmuxResponse_CreateWindow.ProtoReflect.Descriptor instead.
-func (*TmuxResponse_CreateWindow) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{86, 3}
+// Deprecated: Use InvokeFunctionRequest_Tab.ProtoReflect.Descriptor instead.
+func (*InvokeFunctionRequest_Tab) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{2, 0}
 }
 
-func (x *TmuxResponse_CreateWindow) GetTabId() string {
+func (x *InvokeFunctionRequest_Tab) GetTabId() string {
 	if x != nil && x.TabId != nil {
 		return *x.TabId
 	}
 	return ""
 }
 
-type TmuxResponse_ListConnections_Connection struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	ConnectionId    *string                `protobuf:"bytes,1,opt,name=connection_id,json=connectionId" json:"connection_id,omitempty"`
-	OwningSessionId *string                `protobuf:"bytes,2,opt,name=owning_session_id,json=owningSessionId" json:"owning_session_id,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
-}
-
-func (x *TmuxResponse_ListConnections_Connection) Reset() {
-	*x = TmuxResponse_ListConnections_Connection{}
-	mi := &file_api_proto_msgTypes[125]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TmuxResponse_ListConnections_Connection) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TmuxResponse_ListConnections_Connection) ProtoMessage() {}
-
-func (x *TmuxResponse_ListConnections_Connection) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[125]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TmuxResponse_ListConnections_Connection.ProtoReflect.Descriptor instead.
-func (*TmuxResponse_ListConnections_Connection) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{86, 0, 0}
-}
-
-func (x *TmuxResponse_ListConnections_Connection) GetConnectionId() string {
-	if x != nil && x.ConnectionId != nil {
-		return *x.ConnectionId
-	}
-	return ""
-}
-
-func (x *TmuxResponse_ListConnections_Connection) GetOwningSessionId() string {
-	if x != nil && x.OwningSessionId != nil {
-		return *x.OwningSessionId
-	}
-	return ""
-}
-
-type ReorderTabsRequest_Assignment struct {
+type InvokeFunctionRequest_Session struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	WindowId      *string                `protobuf:"bytes,1,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
-	TabIds        []string               `protobuf:"bytes,2,rep,name=tab_ids,json=tabIds" json:"tab_ids,omitempty"`
+	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReorderTabsRequest_Assignment) Reset() {
-	*x = ReorderTabsRequest_Assignment{}
-	mi := &file_api_proto_msgTypes[126]
+func (x *InvokeFunctionRequest_Session) Reset() {
+	*x = InvokeFunctionRequest_Session{}
+	mi := &file_api_proto_msgTypes[115]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ReorderTabsRequest_Assignment) String() string {
+func (x *InvokeFunctionRequest_Session) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ReorderTabsRequest_Assignment) ProtoMessage() {}
+func (*InvokeFunctionRequest_Session) ProtoMessage() {}
 
-func (x *ReorderTabsRequest_Assignment) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[126]
+func (x *InvokeFunctionRequest_Session) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[115]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -11677,23 +11881,866 @@ func (x *ReorderTabsRequest_Assignment) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReorderTabsRequest_Assignment.ProtoReflect.Descriptor instead.
-func (*ReorderTabsRequest_Assignment) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{87, 0}
+// Deprecated: Use InvokeFunctionRequest_Session.ProtoReflect.Descriptor instead.
+func (*InvokeFunctionRequest_Session) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{2, 1}
 }
 
-func (x *ReorderTabsRequest_Assignment) GetWindowId() string {
+func (x *InvokeFunctionRequest_Session) GetSessionId() string {
+	if x != nil && x.SessionId != nil {
+		return *x.SessionId
+	}
+	return ""
+}
+
+type InvokeFunctionRequest_Window struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WindowId      *string                `protobuf:"bytes,1,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvokeFunctionRequest_Window) Reset() {
+	*x = InvokeFunctionRequest_Window{}
+	mi := &file_api_proto_msgTypes[116]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvokeFunctionRequest_Window) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvokeFunctionRequest_Window) ProtoMessage() {}
+
+func (x *InvokeFunctionRequest_Window) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[116]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvokeFunctionRequest_Window.ProtoReflect.Descriptor instead.
+func (*InvokeFunctionRequest_Window) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{2, 2}
+}
+
+func (x *InvokeFunctionRequest_Window) GetWindowId() string {
 	if x != nil && x.WindowId != nil {
 		return *x.WindowId
 	}
 	return ""
 }
 
-func (x *ReorderTabsRequest_Assignment) GetTabIds() []string {
+type InvokeFunctionRequest_App struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvokeFunctionRequest_App) Reset() {
+	*x = InvokeFunctionRequest_App{}
+	mi := &file_api_proto_msgTypes[117]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvokeFunctionRequest_App) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvokeFunctionRequest_App) ProtoMessage() {}
+
+func (x *InvokeFunctionRequest_App) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[117]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvokeFunctionRequest_App.ProtoReflect.Descriptor instead.
+func (*InvokeFunctionRequest_App) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{2, 3}
+}
+
+type InvokeFunctionRequest_Method struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The following methods are defined:
+	// window.set_title(title: String)
+	// session.set_name(name: String)
+	// session.run_tmux_command(command: String) throws  // Throws an exception if this is not a tmux session
+	// session.set_status_bar_component_unread_count(identifier: String, count: Int)
+	// session.stop_coprocess() -> Bool  // returns whether there was a coprocess to stop
+	// session.get_coprocess() -> String?  // returns the name of the command, or nil
+	// session.run_coprocess(commandLine: String, mute: Bool) -> Bool  // returns whether it attempted to start the coprocess. It'll fail only if there is already a coprocess.
+	// tab.set_title(title: String)
+	// tab.select_pane_in_direction(direction: String) throws -> String  // direction is 'left', 'right', 'above', or 'below'. If successful, it will return the ID of the newly active session. If you can't go that way, it returns null. Throws an exception if the direction is invalid.
+	Receiver      *string `protobuf:"bytes,1,opt,name=receiver" json:"receiver,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvokeFunctionRequest_Method) Reset() {
+	*x = InvokeFunctionRequest_Method{}
+	mi := &file_api_proto_msgTypes[118]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvokeFunctionRequest_Method) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvokeFunctionRequest_Method) ProtoMessage() {}
+
+func (x *InvokeFunctionRequest_Method) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[118]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvokeFunctionRequest_Method.ProtoReflect.Descriptor instead.
+func (*InvokeFunctionRequest_Method) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{2, 4}
+}
+
+func (x *InvokeFunctionRequest_Method) GetReceiver() string {
+	if x != nil && x.Receiver != nil {
+		return *x.Receiver
+	}
+	return ""
+}
+
+type InvokeFunctionResponse_Error struct {
+	state         protoimpl.MessageState         `protogen:"open.v1"`
+	Status        *InvokeFunctionResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.InvokeFunctionResponse_Status" json:"status,omitempty"`
+	ErrorReason   *string                        `protobuf:"bytes,2,opt,name=error_reason,json=errorReason" json:"error_reason,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvokeFunctionResponse_Error) Reset() {
+	*x = InvokeFunctionResponse_Error{}
+	mi := &file_api_proto_msgTypes[119]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvokeFunctionResponse_Error) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvokeFunctionResponse_Error) ProtoMessage() {}
+
+func (x *InvokeFunctionResponse_Error) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[119]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvokeFunctionResponse_Error.ProtoReflect.Descriptor instead.
+func (*InvokeFunctionResponse_Error) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{3, 0}
+}
+
+func (x *InvokeFunctionResponse_Error) GetStatus() InvokeFunctionResponse_Status {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return InvokeFunctionResponse_TIMEOUT
+}
+
+func (x *InvokeFunctionResponse_Error) GetErrorReason() string {
+	if x != nil && x.ErrorReason != nil {
+		return *x.ErrorReason
+	}
+	return ""
+}
+
+type InvokeFunctionResponse_Success struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JsonResult    *string                `protobuf:"bytes,1,opt,name=json_result,json=jsonResult" json:"json_result,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvokeFunctionResponse_Success) Reset() {
+	*x = InvokeFunctionResponse_Success{}
+	mi := &file_api_proto_msgTypes[120]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvokeFunctionResponse_Success) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvokeFunctionResponse_Success) ProtoMessage() {}
+
+func (x *InvokeFunctionResponse_Success) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[120]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvokeFunctionResponse_Success.ProtoReflect.Descriptor instead.
+func (*InvokeFunctionResponse_Success) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{3, 1}
+}
+
+func (x *InvokeFunctionResponse_Success) GetJsonResult() string {
+	if x != nil && x.JsonResult != nil {
+		return *x.JsonResult
+	}
+	return ""
+}
+
+type CloseRequest_CloseTabs struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TabIds        []string               `protobuf:"bytes,1,rep,name=tab_ids,json=tabIds" json:"tab_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CloseRequest_CloseTabs) Reset() {
+	*x = CloseRequest_CloseTabs{}
+	mi := &file_api_proto_msgTypes[121]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CloseRequest_CloseTabs) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CloseRequest_CloseTabs) ProtoMessage() {}
+
+func (x *CloseRequest_CloseTabs) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[121]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CloseRequest_CloseTabs.ProtoReflect.Descriptor instead.
+func (*CloseRequest_CloseTabs) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{4, 0}
+}
+
+func (x *CloseRequest_CloseTabs) GetTabIds() []string {
 	if x != nil {
 		return x.TabIds
 	}
 	return nil
+}
+
+type CloseRequest_CloseSessions struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionIds    []string               `protobuf:"bytes,1,rep,name=session_ids,json=sessionIds" json:"session_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CloseRequest_CloseSessions) Reset() {
+	*x = CloseRequest_CloseSessions{}
+	mi := &file_api_proto_msgTypes[122]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CloseRequest_CloseSessions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CloseRequest_CloseSessions) ProtoMessage() {}
+
+func (x *CloseRequest_CloseSessions) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[122]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CloseRequest_CloseSessions.ProtoReflect.Descriptor instead.
+func (*CloseRequest_CloseSessions) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{4, 1}
+}
+
+func (x *CloseRequest_CloseSessions) GetSessionIds() []string {
+	if x != nil {
+		return x.SessionIds
+	}
+	return nil
+}
+
+type CloseRequest_CloseWindows struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WindowIds     []string               `protobuf:"bytes,1,rep,name=window_ids,json=windowIds" json:"window_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CloseRequest_CloseWindows) Reset() {
+	*x = CloseRequest_CloseWindows{}
+	mi := &file_api_proto_msgTypes[123]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CloseRequest_CloseWindows) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CloseRequest_CloseWindows) ProtoMessage() {}
+
+func (x *CloseRequest_CloseWindows) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[123]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CloseRequest_CloseWindows.ProtoReflect.Descriptor instead.
+func (*CloseRequest_CloseWindows) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{4, 2}
+}
+
+func (x *CloseRequest_CloseWindows) GetWindowIds() []string {
+	if x != nil {
+		return x.WindowIds
+	}
+	return nil
+}
+
+type StatusBarComponentRequest_OpenPopover struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
+	Html          *string                `protobuf:"bytes,2,opt,name=html" json:"html,omitempty"` // HTML to show in a popover that opens from the component.
+	Size          *Size                  `protobuf:"bytes,3,opt,name=size" json:"size,omitempty"` // Size in points of the content area of the popover.
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StatusBarComponentRequest_OpenPopover) Reset() {
+	*x = StatusBarComponentRequest_OpenPopover{}
+	mi := &file_api_proto_msgTypes[124]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StatusBarComponentRequest_OpenPopover) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StatusBarComponentRequest_OpenPopover) ProtoMessage() {}
+
+func (x *StatusBarComponentRequest_OpenPopover) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[124]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StatusBarComponentRequest_OpenPopover.ProtoReflect.Descriptor instead.
+func (*StatusBarComponentRequest_OpenPopover) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{8, 0}
+}
+
+func (x *StatusBarComponentRequest_OpenPopover) GetSessionId() string {
+	if x != nil && x.SessionId != nil {
+		return *x.SessionId
+	}
+	return ""
+}
+
+func (x *StatusBarComponentRequest_OpenPopover) GetHtml() string {
+	if x != nil && x.Html != nil {
+		return *x.Html
+	}
+	return ""
+}
+
+func (x *StatusBarComponentRequest_OpenPopover) GetSize() *Size {
+	if x != nil {
+		return x.Size
+	}
+	return nil
+}
+
+type SelectionRequest_GetSelectionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SelectionRequest_GetSelectionRequest) Reset() {
+	*x = SelectionRequest_GetSelectionRequest{}
+	mi := &file_api_proto_msgTypes[125]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SelectionRequest_GetSelectionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectionRequest_GetSelectionRequest) ProtoMessage() {}
+
+func (x *SelectionRequest_GetSelectionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[125]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectionRequest_GetSelectionRequest.ProtoReflect.Descriptor instead.
+func (*SelectionRequest_GetSelectionRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{13, 0}
+}
+
+func (x *SelectionRequest_GetSelectionRequest) GetSessionId() string {
+	if x != nil && x.SessionId != nil {
+		return *x.SessionId
+	}
+	return ""
+}
+
+type SelectionRequest_SetSelectionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
+	Selection     *Selection             `protobuf:"bytes,2,opt,name=selection" json:"selection,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SelectionRequest_SetSelectionRequest) Reset() {
+	*x = SelectionRequest_SetSelectionRequest{}
+	mi := &file_api_proto_msgTypes[126]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SelectionRequest_SetSelectionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectionRequest_SetSelectionRequest) ProtoMessage() {}
+
+func (x *SelectionRequest_SetSelectionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[126]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectionRequest_SetSelectionRequest.ProtoReflect.Descriptor instead.
+func (*SelectionRequest_SetSelectionRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{13, 1}
+}
+
+func (x *SelectionRequest_SetSelectionRequest) GetSessionId() string {
+	if x != nil && x.SessionId != nil {
+		return *x.SessionId
+	}
+	return ""
+}
+
+func (x *SelectionRequest_SetSelectionRequest) GetSelection() *Selection {
+	if x != nil {
+		return x.Selection
+	}
+	return nil
+}
+
+type SelectionResponse_GetSelectionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Selection     *Selection             `protobuf:"bytes,2,opt,name=selection" json:"selection,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SelectionResponse_GetSelectionResponse) Reset() {
+	*x = SelectionResponse_GetSelectionResponse{}
+	mi := &file_api_proto_msgTypes[127]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SelectionResponse_GetSelectionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectionResponse_GetSelectionResponse) ProtoMessage() {}
+
+func (x *SelectionResponse_GetSelectionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[127]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectionResponse_GetSelectionResponse.ProtoReflect.Descriptor instead.
+func (*SelectionResponse_GetSelectionResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{14, 0}
+}
+
+func (x *SelectionResponse_GetSelectionResponse) GetSelection() *Selection {
+	if x != nil {
+		return x.Selection
+	}
+	return nil
+}
+
+type SelectionResponse_SetSelectionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SelectionResponse_SetSelectionResponse) Reset() {
+	*x = SelectionResponse_SetSelectionResponse{}
+	mi := &file_api_proto_msgTypes[128]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SelectionResponse_SetSelectionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SelectionResponse_SetSelectionResponse) ProtoMessage() {}
+
+func (x *SelectionResponse_SetSelectionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[128]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SelectionResponse_SetSelectionResponse.ProtoReflect.Descriptor instead.
+func (*SelectionResponse_SetSelectionResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{14, 1}
+}
+
+type ColorPresetRequest_ListPresets struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ColorPresetRequest_ListPresets) Reset() {
+	*x = ColorPresetRequest_ListPresets{}
+	mi := &file_api_proto_msgTypes[129]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ColorPresetRequest_ListPresets) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ColorPresetRequest_ListPresets) ProtoMessage() {}
+
+func (x *ColorPresetRequest_ListPresets) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[129]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ColorPresetRequest_ListPresets.ProtoReflect.Descriptor instead.
+func (*ColorPresetRequest_ListPresets) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{15, 0}
+}
+
+type ColorPresetRequest_GetPreset struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          *string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ColorPresetRequest_GetPreset) Reset() {
+	*x = ColorPresetRequest_GetPreset{}
+	mi := &file_api_proto_msgTypes[130]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ColorPresetRequest_GetPreset) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ColorPresetRequest_GetPreset) ProtoMessage() {}
+
+func (x *ColorPresetRequest_GetPreset) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[130]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ColorPresetRequest_GetPreset.ProtoReflect.Descriptor instead.
+func (*ColorPresetRequest_GetPreset) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{15, 1}
+}
+
+func (x *ColorPresetRequest_GetPreset) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+type ColorPresetResponse_ListPresets struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          []string               `protobuf:"bytes,1,rep,name=name" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ColorPresetResponse_ListPresets) Reset() {
+	*x = ColorPresetResponse_ListPresets{}
+	mi := &file_api_proto_msgTypes[131]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ColorPresetResponse_ListPresets) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ColorPresetResponse_ListPresets) ProtoMessage() {}
+
+func (x *ColorPresetResponse_ListPresets) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[131]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ColorPresetResponse_ListPresets.ProtoReflect.Descriptor instead.
+func (*ColorPresetResponse_ListPresets) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{16, 0}
+}
+
+func (x *ColorPresetResponse_ListPresets) GetName() []string {
+	if x != nil {
+		return x.Name
+	}
+	return nil
+}
+
+type ColorPresetResponse_GetPreset struct {
+	state         protoimpl.MessageState                        `protogen:"open.v1"`
+	ColorSettings []*ColorPresetResponse_GetPreset_ColorSetting `protobuf:"bytes,1,rep,name=color_settings,json=colorSettings" json:"color_settings,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ColorPresetResponse_GetPreset) Reset() {
+	*x = ColorPresetResponse_GetPreset{}
+	mi := &file_api_proto_msgTypes[132]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ColorPresetResponse_GetPreset) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ColorPresetResponse_GetPreset) ProtoMessage() {}
+
+func (x *ColorPresetResponse_GetPreset) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[132]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ColorPresetResponse_GetPreset.ProtoReflect.Descriptor instead.
+func (*ColorPresetResponse_GetPreset) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{16, 1}
+}
+
+func (x *ColorPresetResponse_GetPreset) GetColorSettings() []*ColorPresetResponse_GetPreset_ColorSetting {
+	if x != nil {
+		return x.ColorSettings
+	}
+	return nil
+}
+
+type ColorPresetResponse_GetPreset_ColorSetting struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Red           *float32               `protobuf:"fixed32,1,opt,name=red" json:"red,omitempty"`
+	Green         *float32               `protobuf:"fixed32,2,opt,name=green" json:"green,omitempty"`
+	Blue          *float32               `protobuf:"fixed32,3,opt,name=blue" json:"blue,omitempty"`
+	Alpha         *float32               `protobuf:"fixed32,4,opt,name=alpha" json:"alpha,omitempty"`
+	ColorSpace    *string                `protobuf:"bytes,5,opt,name=color_space,json=colorSpace" json:"color_space,omitempty"`
+	Key           *string                `protobuf:"bytes,6,opt,name=key" json:"key,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ColorPresetResponse_GetPreset_ColorSetting) Reset() {
+	*x = ColorPresetResponse_GetPreset_ColorSetting{}
+	mi := &file_api_proto_msgTypes[133]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ColorPresetResponse_GetPreset_ColorSetting) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ColorPresetResponse_GetPreset_ColorSetting) ProtoMessage() {}
+
+func (x *ColorPresetResponse_GetPreset_ColorSetting) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[133]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ColorPresetResponse_GetPreset_ColorSetting.ProtoReflect.Descriptor instead.
+func (*ColorPresetResponse_GetPreset_ColorSetting) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{16, 1, 0}
+}
+
+func (x *ColorPresetResponse_GetPreset_ColorSetting) GetRed() float32 {
+	if x != nil && x.Red != nil {
+		return *x.Red
+	}
+	return 0
+}
+
+func (x *ColorPresetResponse_GetPreset_ColorSetting) GetGreen() float32 {
+	if x != nil && x.Green != nil {
+		return *x.Green
+	}
+	return 0
+}
+
+func (x *ColorPresetResponse_GetPreset_ColorSetting) GetBlue() float32 {
+	if x != nil && x.Blue != nil {
+		return *x.Blue
+	}
+	return 0
+}
+
+func (x *ColorPresetResponse_GetPreset_ColorSetting) GetAlpha() float32 {
+	if x != nil && x.Alpha != nil {
+		return *x.Alpha
+	}
+	return 0
+}
+
+func (x *ColorPresetResponse_GetPreset_ColorSetting) GetColorSpace() string {
+	if x != nil && x.ColorSpace != nil {
+		return *x.ColorSpace
+	}
+	return ""
+}
+
+func (x *ColorPresetResponse_GetPreset_ColorSetting) GetKey() string {
+	if x != nil && x.Key != nil {
+		return *x.Key
+	}
+	return ""
 }
 
 type PreferencesRequest_Request struct {
@@ -11711,7 +12758,7 @@ type PreferencesRequest_Request struct {
 
 func (x *PreferencesRequest_Request) Reset() {
 	*x = PreferencesRequest_Request{}
-	mi := &file_api_proto_msgTypes[127]
+	mi := &file_api_proto_msgTypes[134]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -11723,7 +12770,7 @@ func (x *PreferencesRequest_Request) String() string {
 func (*PreferencesRequest_Request) ProtoMessage() {}
 
 func (x *PreferencesRequest_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[127]
+	mi := &file_api_proto_msgTypes[134]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -11736,7 +12783,7 @@ func (x *PreferencesRequest_Request) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PreferencesRequest_Request.ProtoReflect.Descriptor instead.
 func (*PreferencesRequest_Request) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{89, 0}
+	return file_api_proto_rawDescGZIP(), []int{17, 0}
 }
 
 func (x *PreferencesRequest_Request) GetRequest() isPreferencesRequest_Request_Request {
@@ -11820,7 +12867,7 @@ type PreferencesRequest_Request_SetPreference struct {
 
 func (x *PreferencesRequest_Request_SetPreference) Reset() {
 	*x = PreferencesRequest_Request_SetPreference{}
-	mi := &file_api_proto_msgTypes[128]
+	mi := &file_api_proto_msgTypes[135]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -11832,7 +12879,7 @@ func (x *PreferencesRequest_Request_SetPreference) String() string {
 func (*PreferencesRequest_Request_SetPreference) ProtoMessage() {}
 
 func (x *PreferencesRequest_Request_SetPreference) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[128]
+	mi := &file_api_proto_msgTypes[135]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -11845,7 +12892,7 @@ func (x *PreferencesRequest_Request_SetPreference) ProtoReflect() protoreflect.M
 
 // Deprecated: Use PreferencesRequest_Request_SetPreference.ProtoReflect.Descriptor instead.
 func (*PreferencesRequest_Request_SetPreference) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{89, 0, 0}
+	return file_api_proto_rawDescGZIP(), []int{17, 0, 0}
 }
 
 func (x *PreferencesRequest_Request_SetPreference) GetKey() string {
@@ -11871,7 +12918,7 @@ type PreferencesRequest_Request_GetPreference struct {
 
 func (x *PreferencesRequest_Request_GetPreference) Reset() {
 	*x = PreferencesRequest_Request_GetPreference{}
-	mi := &file_api_proto_msgTypes[129]
+	mi := &file_api_proto_msgTypes[136]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -11883,7 +12930,7 @@ func (x *PreferencesRequest_Request_GetPreference) String() string {
 func (*PreferencesRequest_Request_GetPreference) ProtoMessage() {}
 
 func (x *PreferencesRequest_Request_GetPreference) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[129]
+	mi := &file_api_proto_msgTypes[136]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -11896,7 +12943,7 @@ func (x *PreferencesRequest_Request_GetPreference) ProtoReflect() protoreflect.M
 
 // Deprecated: Use PreferencesRequest_Request_GetPreference.ProtoReflect.Descriptor instead.
 func (*PreferencesRequest_Request_GetPreference) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{89, 0, 1}
+	return file_api_proto_rawDescGZIP(), []int{17, 0, 1}
 }
 
 func (x *PreferencesRequest_Request_GetPreference) GetKey() string {
@@ -11915,7 +12962,7 @@ type PreferencesRequest_Request_SetDefaultProfile struct {
 
 func (x *PreferencesRequest_Request_SetDefaultProfile) Reset() {
 	*x = PreferencesRequest_Request_SetDefaultProfile{}
-	mi := &file_api_proto_msgTypes[130]
+	mi := &file_api_proto_msgTypes[137]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -11927,7 +12974,7 @@ func (x *PreferencesRequest_Request_SetDefaultProfile) String() string {
 func (*PreferencesRequest_Request_SetDefaultProfile) ProtoMessage() {}
 
 func (x *PreferencesRequest_Request_SetDefaultProfile) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[130]
+	mi := &file_api_proto_msgTypes[137]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -11940,7 +12987,7 @@ func (x *PreferencesRequest_Request_SetDefaultProfile) ProtoReflect() protorefle
 
 // Deprecated: Use PreferencesRequest_Request_SetDefaultProfile.ProtoReflect.Descriptor instead.
 func (*PreferencesRequest_Request_SetDefaultProfile) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{89, 0, 2}
+	return file_api_proto_rawDescGZIP(), []int{17, 0, 2}
 }
 
 func (x *PreferencesRequest_Request_SetDefaultProfile) GetGuid() string {
@@ -11958,7 +13005,7 @@ type PreferencesRequest_Request_GetDefaultProfile struct {
 
 func (x *PreferencesRequest_Request_GetDefaultProfile) Reset() {
 	*x = PreferencesRequest_Request_GetDefaultProfile{}
-	mi := &file_api_proto_msgTypes[131]
+	mi := &file_api_proto_msgTypes[138]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -11970,7 +13017,7 @@ func (x *PreferencesRequest_Request_GetDefaultProfile) String() string {
 func (*PreferencesRequest_Request_GetDefaultProfile) ProtoMessage() {}
 
 func (x *PreferencesRequest_Request_GetDefaultProfile) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[131]
+	mi := &file_api_proto_msgTypes[138]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -11983,7 +13030,7 @@ func (x *PreferencesRequest_Request_GetDefaultProfile) ProtoReflect() protorefle
 
 // Deprecated: Use PreferencesRequest_Request_GetDefaultProfile.ProtoReflect.Descriptor instead.
 func (*PreferencesRequest_Request_GetDefaultProfile) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{89, 0, 3}
+	return file_api_proto_rawDescGZIP(), []int{17, 0, 3}
 }
 
 type PreferencesResponse_Result struct {
@@ -12002,7 +13049,7 @@ type PreferencesResponse_Result struct {
 
 func (x *PreferencesResponse_Result) Reset() {
 	*x = PreferencesResponse_Result{}
-	mi := &file_api_proto_msgTypes[132]
+	mi := &file_api_proto_msgTypes[139]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -12014,7 +13061,7 @@ func (x *PreferencesResponse_Result) String() string {
 func (*PreferencesResponse_Result) ProtoMessage() {}
 
 func (x *PreferencesResponse_Result) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[132]
+	mi := &file_api_proto_msgTypes[139]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -12027,7 +13074,7 @@ func (x *PreferencesResponse_Result) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PreferencesResponse_Result.ProtoReflect.Descriptor instead.
 func (*PreferencesResponse_Result) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{90, 0}
+	return file_api_proto_rawDescGZIP(), []int{18, 0}
 }
 
 func (x *PreferencesResponse_Result) GetResult() isPreferencesResponse_Result_Result {
@@ -12125,7 +13172,7 @@ type PreferencesResponse_Result_SetPreferenceResult struct {
 
 func (x *PreferencesResponse_Result_SetPreferenceResult) Reset() {
 	*x = PreferencesResponse_Result_SetPreferenceResult{}
-	mi := &file_api_proto_msgTypes[133]
+	mi := &file_api_proto_msgTypes[140]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -12137,7 +13184,7 @@ func (x *PreferencesResponse_Result_SetPreferenceResult) String() string {
 func (*PreferencesResponse_Result_SetPreferenceResult) ProtoMessage() {}
 
 func (x *PreferencesResponse_Result_SetPreferenceResult) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[133]
+	mi := &file_api_proto_msgTypes[140]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -12150,7 +13197,7 @@ func (x *PreferencesResponse_Result_SetPreferenceResult) ProtoReflect() protoref
 
 // Deprecated: Use PreferencesResponse_Result_SetPreferenceResult.ProtoReflect.Descriptor instead.
 func (*PreferencesResponse_Result_SetPreferenceResult) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{90, 0, 0}
+	return file_api_proto_rawDescGZIP(), []int{18, 0, 0}
 }
 
 func (x *PreferencesResponse_Result_SetPreferenceResult) GetStatus() PreferencesResponse_Result_SetPreferenceResult_Status {
@@ -12162,14 +13209,14 @@ func (x *PreferencesResponse_Result_SetPreferenceResult) GetStatus() Preferences
 
 type PreferencesResponse_Result_GetPreferenceResult struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	JsonValue     *string                `protobuf:"bytes,1,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
+	JsonValue     *string                `protobuf:"bytes,1,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"` // Will be unset if no value assigned. Will always be set if there is a default value.
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PreferencesResponse_Result_GetPreferenceResult) Reset() {
 	*x = PreferencesResponse_Result_GetPreferenceResult{}
-	mi := &file_api_proto_msgTypes[134]
+	mi := &file_api_proto_msgTypes[141]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -12181,7 +13228,7 @@ func (x *PreferencesResponse_Result_GetPreferenceResult) String() string {
 func (*PreferencesResponse_Result_GetPreferenceResult) ProtoMessage() {}
 
 func (x *PreferencesResponse_Result_GetPreferenceResult) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[134]
+	mi := &file_api_proto_msgTypes[141]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -12194,7 +13241,7 @@ func (x *PreferencesResponse_Result_GetPreferenceResult) ProtoReflect() protoref
 
 // Deprecated: Use PreferencesResponse_Result_GetPreferenceResult.ProtoReflect.Descriptor instead.
 func (*PreferencesResponse_Result_GetPreferenceResult) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{90, 0, 1}
+	return file_api_proto_rawDescGZIP(), []int{18, 0, 1}
 }
 
 func (x *PreferencesResponse_Result_GetPreferenceResult) GetJsonValue() string {
@@ -12213,7 +13260,7 @@ type PreferencesResponse_Result_SetDefaultProfileResult struct {
 
 func (x *PreferencesResponse_Result_SetDefaultProfileResult) Reset() {
 	*x = PreferencesResponse_Result_SetDefaultProfileResult{}
-	mi := &file_api_proto_msgTypes[135]
+	mi := &file_api_proto_msgTypes[142]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -12225,7 +13272,7 @@ func (x *PreferencesResponse_Result_SetDefaultProfileResult) String() string {
 func (*PreferencesResponse_Result_SetDefaultProfileResult) ProtoMessage() {}
 
 func (x *PreferencesResponse_Result_SetDefaultProfileResult) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[135]
+	mi := &file_api_proto_msgTypes[142]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -12238,7 +13285,7 @@ func (x *PreferencesResponse_Result_SetDefaultProfileResult) ProtoReflect() prot
 
 // Deprecated: Use PreferencesResponse_Result_SetDefaultProfileResult.ProtoReflect.Descriptor instead.
 func (*PreferencesResponse_Result_SetDefaultProfileResult) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{90, 0, 2}
+	return file_api_proto_rawDescGZIP(), []int{18, 0, 2}
 }
 
 func (x *PreferencesResponse_Result_SetDefaultProfileResult) GetStatus() PreferencesResponse_Result_SetDefaultProfileResult_Status {
@@ -12256,7 +13303,7 @@ type PreferencesResponse_Result_UnrecognizedResult struct {
 
 func (x *PreferencesResponse_Result_UnrecognizedResult) Reset() {
 	*x = PreferencesResponse_Result_UnrecognizedResult{}
-	mi := &file_api_proto_msgTypes[136]
+	mi := &file_api_proto_msgTypes[143]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -12268,7 +13315,7 @@ func (x *PreferencesResponse_Result_UnrecognizedResult) String() string {
 func (*PreferencesResponse_Result_UnrecognizedResult) ProtoMessage() {}
 
 func (x *PreferencesResponse_Result_UnrecognizedResult) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[136]
+	mi := &file_api_proto_msgTypes[143]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -12281,7 +13328,7 @@ func (x *PreferencesResponse_Result_UnrecognizedResult) ProtoReflect() protorefl
 
 // Deprecated: Use PreferencesResponse_Result_UnrecognizedResult.ProtoReflect.Descriptor instead.
 func (*PreferencesResponse_Result_UnrecognizedResult) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{90, 0, 3}
+	return file_api_proto_rawDescGZIP(), []int{18, 0, 3}
 }
 
 type PreferencesResponse_Result_GetDefaultProfileResult struct {
@@ -12293,7 +13340,7 @@ type PreferencesResponse_Result_GetDefaultProfileResult struct {
 
 func (x *PreferencesResponse_Result_GetDefaultProfileResult) Reset() {
 	*x = PreferencesResponse_Result_GetDefaultProfileResult{}
-	mi := &file_api_proto_msgTypes[137]
+	mi := &file_api_proto_msgTypes[144]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -12305,7 +13352,7 @@ func (x *PreferencesResponse_Result_GetDefaultProfileResult) String() string {
 func (*PreferencesResponse_Result_GetDefaultProfileResult) ProtoMessage() {}
 
 func (x *PreferencesResponse_Result_GetDefaultProfileResult) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[137]
+	mi := &file_api_proto_msgTypes[144]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -12318,7 +13365,7 @@ func (x *PreferencesResponse_Result_GetDefaultProfileResult) ProtoReflect() prot
 
 // Deprecated: Use PreferencesResponse_Result_GetDefaultProfileResult.ProtoReflect.Descriptor instead.
 func (*PreferencesResponse_Result_GetDefaultProfileResult) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{90, 0, 4}
+	return file_api_proto_rawDescGZIP(), []int{18, 0, 4}
 }
 
 func (x *PreferencesResponse_Result_GetDefaultProfileResult) GetGuid() string {
@@ -12328,736 +13375,29 @@ func (x *PreferencesResponse_Result_GetDefaultProfileResult) GetGuid() string {
 	return ""
 }
 
-type ColorPresetRequest_ListPresets struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ColorPresetRequest_ListPresets) Reset() {
-	*x = ColorPresetRequest_ListPresets{}
-	mi := &file_api_proto_msgTypes[138]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ColorPresetRequest_ListPresets) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ColorPresetRequest_ListPresets) ProtoMessage() {}
-
-func (x *ColorPresetRequest_ListPresets) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[138]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ColorPresetRequest_ListPresets.ProtoReflect.Descriptor instead.
-func (*ColorPresetRequest_ListPresets) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{91, 0}
-}
-
-type ColorPresetRequest_GetPreset struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          *string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ColorPresetRequest_GetPreset) Reset() {
-	*x = ColorPresetRequest_GetPreset{}
-	mi := &file_api_proto_msgTypes[139]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ColorPresetRequest_GetPreset) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ColorPresetRequest_GetPreset) ProtoMessage() {}
-
-func (x *ColorPresetRequest_GetPreset) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[139]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ColorPresetRequest_GetPreset.ProtoReflect.Descriptor instead.
-func (*ColorPresetRequest_GetPreset) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{91, 1}
-}
-
-func (x *ColorPresetRequest_GetPreset) GetName() string {
-	if x != nil && x.Name != nil {
-		return *x.Name
-	}
-	return ""
-}
-
-type ColorPresetResponse_ListPresets struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          []string               `protobuf:"bytes,1,rep,name=name" json:"name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ColorPresetResponse_ListPresets) Reset() {
-	*x = ColorPresetResponse_ListPresets{}
-	mi := &file_api_proto_msgTypes[140]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ColorPresetResponse_ListPresets) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ColorPresetResponse_ListPresets) ProtoMessage() {}
-
-func (x *ColorPresetResponse_ListPresets) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[140]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ColorPresetResponse_ListPresets.ProtoReflect.Descriptor instead.
-func (*ColorPresetResponse_ListPresets) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{92, 0}
-}
-
-func (x *ColorPresetResponse_ListPresets) GetName() []string {
-	if x != nil {
-		return x.Name
-	}
-	return nil
-}
-
-type ColorPresetResponse_GetPreset struct {
-	state         protoimpl.MessageState                        `protogen:"open.v1"`
-	ColorSettings []*ColorPresetResponse_GetPreset_ColorSetting `protobuf:"bytes,1,rep,name=color_settings,json=colorSettings" json:"color_settings,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ColorPresetResponse_GetPreset) Reset() {
-	*x = ColorPresetResponse_GetPreset{}
-	mi := &file_api_proto_msgTypes[141]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ColorPresetResponse_GetPreset) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ColorPresetResponse_GetPreset) ProtoMessage() {}
-
-func (x *ColorPresetResponse_GetPreset) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[141]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ColorPresetResponse_GetPreset.ProtoReflect.Descriptor instead.
-func (*ColorPresetResponse_GetPreset) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{92, 1}
-}
-
-func (x *ColorPresetResponse_GetPreset) GetColorSettings() []*ColorPresetResponse_GetPreset_ColorSetting {
-	if x != nil {
-		return x.ColorSettings
-	}
-	return nil
-}
-
-type ColorPresetResponse_GetPreset_ColorSetting struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Red           *float32               `protobuf:"fixed32,1,opt,name=red" json:"red,omitempty"`
-	Green         *float32               `protobuf:"fixed32,2,opt,name=green" json:"green,omitempty"`
-	Blue          *float32               `protobuf:"fixed32,3,opt,name=blue" json:"blue,omitempty"`
-	Alpha         *float32               `protobuf:"fixed32,4,opt,name=alpha" json:"alpha,omitempty"`
-	ColorSpace    *string                `protobuf:"bytes,5,opt,name=color_space,json=colorSpace" json:"color_space,omitempty"`
-	Key           *string                `protobuf:"bytes,6,opt,name=key" json:"key,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ColorPresetResponse_GetPreset_ColorSetting) Reset() {
-	*x = ColorPresetResponse_GetPreset_ColorSetting{}
-	mi := &file_api_proto_msgTypes[142]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ColorPresetResponse_GetPreset_ColorSetting) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ColorPresetResponse_GetPreset_ColorSetting) ProtoMessage() {}
-
-func (x *ColorPresetResponse_GetPreset_ColorSetting) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[142]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ColorPresetResponse_GetPreset_ColorSetting.ProtoReflect.Descriptor instead.
-func (*ColorPresetResponse_GetPreset_ColorSetting) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{92, 1, 0}
-}
-
-func (x *ColorPresetResponse_GetPreset_ColorSetting) GetRed() float32 {
-	if x != nil && x.Red != nil {
-		return *x.Red
-	}
-	return 0
-}
-
-func (x *ColorPresetResponse_GetPreset_ColorSetting) GetGreen() float32 {
-	if x != nil && x.Green != nil {
-		return *x.Green
-	}
-	return 0
-}
-
-func (x *ColorPresetResponse_GetPreset_ColorSetting) GetBlue() float32 {
-	if x != nil && x.Blue != nil {
-		return *x.Blue
-	}
-	return 0
-}
-
-func (x *ColorPresetResponse_GetPreset_ColorSetting) GetAlpha() float32 {
-	if x != nil && x.Alpha != nil {
-		return *x.Alpha
-	}
-	return 0
-}
-
-func (x *ColorPresetResponse_GetPreset_ColorSetting) GetColorSpace() string {
-	if x != nil && x.ColorSpace != nil {
-		return *x.ColorSpace
-	}
-	return ""
-}
-
-func (x *ColorPresetResponse_GetPreset_ColorSetting) GetKey() string {
-	if x != nil && x.Key != nil {
-		return *x.Key
-	}
-	return ""
-}
-
-type SelectionRequest_GetSelectionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SelectionRequest_GetSelectionRequest) Reset() {
-	*x = SelectionRequest_GetSelectionRequest{}
-	mi := &file_api_proto_msgTypes[143]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SelectionRequest_GetSelectionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SelectionRequest_GetSelectionRequest) ProtoMessage() {}
-
-func (x *SelectionRequest_GetSelectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[143]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SelectionRequest_GetSelectionRequest.ProtoReflect.Descriptor instead.
-func (*SelectionRequest_GetSelectionRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{95, 0}
-}
-
-func (x *SelectionRequest_GetSelectionRequest) GetSessionId() string {
-	if x != nil && x.SessionId != nil {
-		return *x.SessionId
-	}
-	return ""
-}
-
-type SelectionRequest_SetSelectionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
-	Selection     *Selection             `protobuf:"bytes,2,opt,name=selection" json:"selection,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SelectionRequest_SetSelectionRequest) Reset() {
-	*x = SelectionRequest_SetSelectionRequest{}
-	mi := &file_api_proto_msgTypes[144]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SelectionRequest_SetSelectionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SelectionRequest_SetSelectionRequest) ProtoMessage() {}
-
-func (x *SelectionRequest_SetSelectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[144]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SelectionRequest_SetSelectionRequest.ProtoReflect.Descriptor instead.
-func (*SelectionRequest_SetSelectionRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{95, 1}
-}
-
-func (x *SelectionRequest_SetSelectionRequest) GetSessionId() string {
-	if x != nil && x.SessionId != nil {
-		return *x.SessionId
-	}
-	return ""
-}
-
-func (x *SelectionRequest_SetSelectionRequest) GetSelection() *Selection {
-	if x != nil {
-		return x.Selection
-	}
-	return nil
-}
-
-type SelectionResponse_GetSelectionResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Selection     *Selection             `protobuf:"bytes,2,opt,name=selection" json:"selection,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SelectionResponse_GetSelectionResponse) Reset() {
-	*x = SelectionResponse_GetSelectionResponse{}
-	mi := &file_api_proto_msgTypes[145]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SelectionResponse_GetSelectionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SelectionResponse_GetSelectionResponse) ProtoMessage() {}
-
-func (x *SelectionResponse_GetSelectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[145]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SelectionResponse_GetSelectionResponse.ProtoReflect.Descriptor instead.
-func (*SelectionResponse_GetSelectionResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{96, 0}
-}
-
-func (x *SelectionResponse_GetSelectionResponse) GetSelection() *Selection {
-	if x != nil {
-		return x.Selection
-	}
-	return nil
-}
-
-type SelectionResponse_SetSelectionResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SelectionResponse_SetSelectionResponse) Reset() {
-	*x = SelectionResponse_SetSelectionResponse{}
-	mi := &file_api_proto_msgTypes[146]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SelectionResponse_SetSelectionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SelectionResponse_SetSelectionResponse) ProtoMessage() {}
-
-func (x *SelectionResponse_SetSelectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[146]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SelectionResponse_SetSelectionResponse.ProtoReflect.Descriptor instead.
-func (*SelectionResponse_SetSelectionResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{96, 1}
-}
-
-type StatusBarComponentRequest_OpenPopover struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
-	Html          *string                `protobuf:"bytes,2,opt,name=html" json:"html,omitempty"`
-	Size          *Size                  `protobuf:"bytes,3,opt,name=size" json:"size,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StatusBarComponentRequest_OpenPopover) Reset() {
-	*x = StatusBarComponentRequest_OpenPopover{}
-	mi := &file_api_proto_msgTypes[147]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StatusBarComponentRequest_OpenPopover) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatusBarComponentRequest_OpenPopover) ProtoMessage() {}
-
-func (x *StatusBarComponentRequest_OpenPopover) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[147]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StatusBarComponentRequest_OpenPopover.ProtoReflect.Descriptor instead.
-func (*StatusBarComponentRequest_OpenPopover) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{97, 0}
-}
-
-func (x *StatusBarComponentRequest_OpenPopover) GetSessionId() string {
-	if x != nil && x.SessionId != nil {
-		return *x.SessionId
-	}
-	return ""
-}
-
-func (x *StatusBarComponentRequest_OpenPopover) GetHtml() string {
-	if x != nil && x.Html != nil {
-		return *x.Html
-	}
-	return ""
-}
-
-func (x *StatusBarComponentRequest_OpenPopover) GetSize() *Size {
-	if x != nil {
-		return x.Size
-	}
-	return nil
-}
-
-type CloseRequest_CloseTabs struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TabIds        []string               `protobuf:"bytes,1,rep,name=tab_ids,json=tabIds" json:"tab_ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CloseRequest_CloseTabs) Reset() {
-	*x = CloseRequest_CloseTabs{}
-	mi := &file_api_proto_msgTypes[148]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CloseRequest_CloseTabs) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CloseRequest_CloseTabs) ProtoMessage() {}
-
-func (x *CloseRequest_CloseTabs) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[148]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CloseRequest_CloseTabs.ProtoReflect.Descriptor instead.
-func (*CloseRequest_CloseTabs) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{101, 0}
-}
-
-func (x *CloseRequest_CloseTabs) GetTabIds() []string {
-	if x != nil {
-		return x.TabIds
-	}
-	return nil
-}
-
-type CloseRequest_CloseSessions struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionIds    []string               `protobuf:"bytes,1,rep,name=session_ids,json=sessionIds" json:"session_ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CloseRequest_CloseSessions) Reset() {
-	*x = CloseRequest_CloseSessions{}
-	mi := &file_api_proto_msgTypes[149]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CloseRequest_CloseSessions) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CloseRequest_CloseSessions) ProtoMessage() {}
-
-func (x *CloseRequest_CloseSessions) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[149]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CloseRequest_CloseSessions.ProtoReflect.Descriptor instead.
-func (*CloseRequest_CloseSessions) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{101, 1}
-}
-
-func (x *CloseRequest_CloseSessions) GetSessionIds() []string {
-	if x != nil {
-		return x.SessionIds
-	}
-	return nil
-}
-
-type CloseRequest_CloseWindows struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	WindowIds     []string               `protobuf:"bytes,1,rep,name=window_ids,json=windowIds" json:"window_ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CloseRequest_CloseWindows) Reset() {
-	*x = CloseRequest_CloseWindows{}
-	mi := &file_api_proto_msgTypes[150]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CloseRequest_CloseWindows) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CloseRequest_CloseWindows) ProtoMessage() {}
-
-func (x *CloseRequest_CloseWindows) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[150]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CloseRequest_CloseWindows.ProtoReflect.Descriptor instead.
-func (*CloseRequest_CloseWindows) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{101, 2}
-}
-
-func (x *CloseRequest_CloseWindows) GetWindowIds() []string {
-	if x != nil {
-		return x.WindowIds
-	}
-	return nil
-}
-
-type InvokeFunctionRequest_Tab struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TabId         *string                `protobuf:"bytes,1,opt,name=tab_id,json=tabId" json:"tab_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *InvokeFunctionRequest_Tab) Reset() {
-	*x = InvokeFunctionRequest_Tab{}
-	mi := &file_api_proto_msgTypes[151]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *InvokeFunctionRequest_Tab) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*InvokeFunctionRequest_Tab) ProtoMessage() {}
-
-func (x *InvokeFunctionRequest_Tab) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[151]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use InvokeFunctionRequest_Tab.ProtoReflect.Descriptor instead.
-func (*InvokeFunctionRequest_Tab) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{103, 0}
-}
-
-func (x *InvokeFunctionRequest_Tab) GetTabId() string {
-	if x != nil && x.TabId != nil {
-		return *x.TabId
-	}
-	return ""
-}
-
-type InvokeFunctionRequest_Session struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId" json:"session_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *InvokeFunctionRequest_Session) Reset() {
-	*x = InvokeFunctionRequest_Session{}
-	mi := &file_api_proto_msgTypes[152]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *InvokeFunctionRequest_Session) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*InvokeFunctionRequest_Session) ProtoMessage() {}
-
-func (x *InvokeFunctionRequest_Session) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[152]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use InvokeFunctionRequest_Session.ProtoReflect.Descriptor instead.
-func (*InvokeFunctionRequest_Session) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{103, 1}
-}
-
-func (x *InvokeFunctionRequest_Session) GetSessionId() string {
-	if x != nil && x.SessionId != nil {
-		return *x.SessionId
-	}
-	return ""
-}
-
-type InvokeFunctionRequest_Window struct {
+type ReorderTabsRequest_Assignment struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	WindowId      *string                `protobuf:"bytes,1,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
+	TabIds        []string               `protobuf:"bytes,2,rep,name=tab_ids,json=tabIds" json:"tab_ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *InvokeFunctionRequest_Window) Reset() {
-	*x = InvokeFunctionRequest_Window{}
-	mi := &file_api_proto_msgTypes[153]
+func (x *ReorderTabsRequest_Assignment) Reset() {
+	*x = ReorderTabsRequest_Assignment{}
+	mi := &file_api_proto_msgTypes[145]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *InvokeFunctionRequest_Window) String() string {
+func (x *ReorderTabsRequest_Assignment) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*InvokeFunctionRequest_Window) ProtoMessage() {}
+func (*ReorderTabsRequest_Assignment) ProtoMessage() {}
 
-func (x *InvokeFunctionRequest_Window) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[153]
+func (x *ReorderTabsRequest_Assignment) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[145]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -13068,38 +13408,417 @@ func (x *InvokeFunctionRequest_Window) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use InvokeFunctionRequest_Window.ProtoReflect.Descriptor instead.
-func (*InvokeFunctionRequest_Window) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{103, 2}
+// Deprecated: Use ReorderTabsRequest_Assignment.ProtoReflect.Descriptor instead.
+func (*ReorderTabsRequest_Assignment) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{19, 0}
 }
 
-func (x *InvokeFunctionRequest_Window) GetWindowId() string {
+func (x *ReorderTabsRequest_Assignment) GetWindowId() string {
 	if x != nil && x.WindowId != nil {
 		return *x.WindowId
 	}
 	return ""
 }
 
-type InvokeFunctionRequest_App struct {
+func (x *ReorderTabsRequest_Assignment) GetTabIds() []string {
+	if x != nil {
+		return x.TabIds
+	}
+	return nil
+}
+
+type TmuxRequest_ListConnections struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *InvokeFunctionRequest_App) Reset() {
-	*x = InvokeFunctionRequest_App{}
+func (x *TmuxRequest_ListConnections) Reset() {
+	*x = TmuxRequest_ListConnections{}
+	mi := &file_api_proto_msgTypes[146]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TmuxRequest_ListConnections) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TmuxRequest_ListConnections) ProtoMessage() {}
+
+func (x *TmuxRequest_ListConnections) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[146]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TmuxRequest_ListConnections.ProtoReflect.Descriptor instead.
+func (*TmuxRequest_ListConnections) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{21, 0}
+}
+
+type TmuxRequest_SendCommand struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ConnectionId  *string                `protobuf:"bytes,1,opt,name=connection_id,json=connectionId" json:"connection_id,omitempty"`
+	Command       *string                `protobuf:"bytes,2,opt,name=command" json:"command,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TmuxRequest_SendCommand) Reset() {
+	*x = TmuxRequest_SendCommand{}
+	mi := &file_api_proto_msgTypes[147]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TmuxRequest_SendCommand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TmuxRequest_SendCommand) ProtoMessage() {}
+
+func (x *TmuxRequest_SendCommand) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[147]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TmuxRequest_SendCommand.ProtoReflect.Descriptor instead.
+func (*TmuxRequest_SendCommand) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{21, 1}
+}
+
+func (x *TmuxRequest_SendCommand) GetConnectionId() string {
+	if x != nil && x.ConnectionId != nil {
+		return *x.ConnectionId
+	}
+	return ""
+}
+
+func (x *TmuxRequest_SendCommand) GetCommand() string {
+	if x != nil && x.Command != nil {
+		return *x.Command
+	}
+	return ""
+}
+
+type TmuxRequest_SetWindowVisible struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ConnectionId  *string                `protobuf:"bytes,1,opt,name=connection_id,json=connectionId" json:"connection_id,omitempty"`
+	WindowId      *string                `protobuf:"bytes,2,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
+	Visible       *bool                  `protobuf:"varint,3,opt,name=visible" json:"visible,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TmuxRequest_SetWindowVisible) Reset() {
+	*x = TmuxRequest_SetWindowVisible{}
+	mi := &file_api_proto_msgTypes[148]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TmuxRequest_SetWindowVisible) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TmuxRequest_SetWindowVisible) ProtoMessage() {}
+
+func (x *TmuxRequest_SetWindowVisible) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[148]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TmuxRequest_SetWindowVisible.ProtoReflect.Descriptor instead.
+func (*TmuxRequest_SetWindowVisible) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{21, 2}
+}
+
+func (x *TmuxRequest_SetWindowVisible) GetConnectionId() string {
+	if x != nil && x.ConnectionId != nil {
+		return *x.ConnectionId
+	}
+	return ""
+}
+
+func (x *TmuxRequest_SetWindowVisible) GetWindowId() string {
+	if x != nil && x.WindowId != nil {
+		return *x.WindowId
+	}
+	return ""
+}
+
+func (x *TmuxRequest_SetWindowVisible) GetVisible() bool {
+	if x != nil && x.Visible != nil {
+		return *x.Visible
+	}
+	return false
+}
+
+type TmuxRequest_CreateWindow struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ConnectionId  *string                `protobuf:"bytes,1,opt,name=connection_id,json=connectionId" json:"connection_id,omitempty"`
+	Affinity      *string                `protobuf:"bytes,2,opt,name=affinity" json:"affinity,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TmuxRequest_CreateWindow) Reset() {
+	*x = TmuxRequest_CreateWindow{}
+	mi := &file_api_proto_msgTypes[149]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TmuxRequest_CreateWindow) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TmuxRequest_CreateWindow) ProtoMessage() {}
+
+func (x *TmuxRequest_CreateWindow) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[149]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TmuxRequest_CreateWindow.ProtoReflect.Descriptor instead.
+func (*TmuxRequest_CreateWindow) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{21, 3}
+}
+
+func (x *TmuxRequest_CreateWindow) GetConnectionId() string {
+	if x != nil && x.ConnectionId != nil {
+		return *x.ConnectionId
+	}
+	return ""
+}
+
+func (x *TmuxRequest_CreateWindow) GetAffinity() string {
+	if x != nil && x.Affinity != nil {
+		return *x.Affinity
+	}
+	return ""
+}
+
+type TmuxResponse_ListConnections struct {
+	state         protoimpl.MessageState                     `protogen:"open.v1"`
+	Connections   []*TmuxResponse_ListConnections_Connection `protobuf:"bytes,1,rep,name=connections" json:"connections,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TmuxResponse_ListConnections) Reset() {
+	*x = TmuxResponse_ListConnections{}
+	mi := &file_api_proto_msgTypes[150]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TmuxResponse_ListConnections) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TmuxResponse_ListConnections) ProtoMessage() {}
+
+func (x *TmuxResponse_ListConnections) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[150]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TmuxResponse_ListConnections.ProtoReflect.Descriptor instead.
+func (*TmuxResponse_ListConnections) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{22, 0}
+}
+
+func (x *TmuxResponse_ListConnections) GetConnections() []*TmuxResponse_ListConnections_Connection {
+	if x != nil {
+		return x.Connections
+	}
+	return nil
+}
+
+type TmuxResponse_SendCommand struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// If not set, an error occurred.
+	Output        *string `protobuf:"bytes,1,opt,name=output" json:"output,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TmuxResponse_SendCommand) Reset() {
+	*x = TmuxResponse_SendCommand{}
+	mi := &file_api_proto_msgTypes[151]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TmuxResponse_SendCommand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TmuxResponse_SendCommand) ProtoMessage() {}
+
+func (x *TmuxResponse_SendCommand) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[151]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TmuxResponse_SendCommand.ProtoReflect.Descriptor instead.
+func (*TmuxResponse_SendCommand) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{22, 1}
+}
+
+func (x *TmuxResponse_SendCommand) GetOutput() string {
+	if x != nil && x.Output != nil {
+		return *x.Output
+	}
+	return ""
+}
+
+type TmuxResponse_SetWindowVisible struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TmuxResponse_SetWindowVisible) Reset() {
+	*x = TmuxResponse_SetWindowVisible{}
+	mi := &file_api_proto_msgTypes[152]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TmuxResponse_SetWindowVisible) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TmuxResponse_SetWindowVisible) ProtoMessage() {}
+
+func (x *TmuxResponse_SetWindowVisible) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[152]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TmuxResponse_SetWindowVisible.ProtoReflect.Descriptor instead.
+func (*TmuxResponse_SetWindowVisible) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{22, 2}
+}
+
+type TmuxResponse_CreateWindow struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// This is an iTerm2 tab ID.
+	TabId         *string `protobuf:"bytes,1,opt,name=tab_id,json=tabId" json:"tab_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TmuxResponse_CreateWindow) Reset() {
+	*x = TmuxResponse_CreateWindow{}
+	mi := &file_api_proto_msgTypes[153]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TmuxResponse_CreateWindow) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TmuxResponse_CreateWindow) ProtoMessage() {}
+
+func (x *TmuxResponse_CreateWindow) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[153]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TmuxResponse_CreateWindow.ProtoReflect.Descriptor instead.
+func (*TmuxResponse_CreateWindow) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{22, 3}
+}
+
+func (x *TmuxResponse_CreateWindow) GetTabId() string {
+	if x != nil && x.TabId != nil {
+		return *x.TabId
+	}
+	return ""
+}
+
+type TmuxResponse_ListConnections_Connection struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	ConnectionId    *string                `protobuf:"bytes,1,opt,name=connection_id,json=connectionId" json:"connection_id,omitempty"`
+	OwningSessionId *string                `protobuf:"bytes,2,opt,name=owning_session_id,json=owningSessionId" json:"owning_session_id,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *TmuxResponse_ListConnections_Connection) Reset() {
+	*x = TmuxResponse_ListConnections_Connection{}
 	mi := &file_api_proto_msgTypes[154]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *InvokeFunctionRequest_App) String() string {
+func (x *TmuxResponse_ListConnections_Connection) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*InvokeFunctionRequest_App) ProtoMessage() {}
+func (*TmuxResponse_ListConnections_Connection) ProtoMessage() {}
 
-func (x *InvokeFunctionRequest_App) ProtoReflect() protoreflect.Message {
+func (x *TmuxResponse_ListConnections_Connection) ProtoReflect() protoreflect.Message {
 	mi := &file_api_proto_msgTypes[154]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -13111,32 +13830,46 @@ func (x *InvokeFunctionRequest_App) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use InvokeFunctionRequest_App.ProtoReflect.Descriptor instead.
-func (*InvokeFunctionRequest_App) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{103, 3}
+// Deprecated: Use TmuxResponse_ListConnections_Connection.ProtoReflect.Descriptor instead.
+func (*TmuxResponse_ListConnections_Connection) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{22, 0, 0}
 }
 
-type InvokeFunctionRequest_Method struct {
+func (x *TmuxResponse_ListConnections_Connection) GetConnectionId() string {
+	if x != nil && x.ConnectionId != nil {
+		return *x.ConnectionId
+	}
+	return ""
+}
+
+func (x *TmuxResponse_ListConnections_Connection) GetOwningSessionId() string {
+	if x != nil && x.OwningSessionId != nil {
+		return *x.OwningSessionId
+	}
+	return ""
+}
+
+type ListProfilesResponse_Profile struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Receiver      *string                `protobuf:"bytes,1,opt,name=receiver" json:"receiver,omitempty"`
+	Properties    []*ProfileProperty     `protobuf:"bytes,1,rep,name=properties" json:"properties,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *InvokeFunctionRequest_Method) Reset() {
-	*x = InvokeFunctionRequest_Method{}
+func (x *ListProfilesResponse_Profile) Reset() {
+	*x = ListProfilesResponse_Profile{}
 	mi := &file_api_proto_msgTypes[155]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *InvokeFunctionRequest_Method) String() string {
+func (x *ListProfilesResponse_Profile) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*InvokeFunctionRequest_Method) ProtoMessage() {}
+func (*ListProfilesResponse_Profile) ProtoMessage() {}
 
-func (x *InvokeFunctionRequest_Method) ProtoReflect() protoreflect.Message {
+func (x *ListProfilesResponse_Profile) ProtoReflect() protoreflect.Message {
 	mi := &file_api_proto_msgTypes[155]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -13148,91 +13881,93 @@ func (x *InvokeFunctionRequest_Method) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use InvokeFunctionRequest_Method.ProtoReflect.Descriptor instead.
-func (*InvokeFunctionRequest_Method) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{103, 4}
+// Deprecated: Use ListProfilesResponse_Profile.ProtoReflect.Descriptor instead.
+func (*ListProfilesResponse_Profile) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{35, 0}
 }
 
-func (x *InvokeFunctionRequest_Method) GetReceiver() string {
-	if x != nil && x.Receiver != nil {
-		return *x.Receiver
-	}
-	return ""
-}
-
-type InvokeFunctionResponse_Error struct {
-	state         protoimpl.MessageState         `protogen:"open.v1"`
-	Status        *InvokeFunctionResponse_Status `protobuf:"varint,1,opt,name=status,enum=iterm2.InvokeFunctionResponse_Status" json:"status,omitempty"`
-	ErrorReason   *string                        `protobuf:"bytes,2,opt,name=error_reason,json=errorReason" json:"error_reason,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *InvokeFunctionResponse_Error) Reset() {
-	*x = InvokeFunctionResponse_Error{}
-	mi := &file_api_proto_msgTypes[156]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *InvokeFunctionResponse_Error) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*InvokeFunctionResponse_Error) ProtoMessage() {}
-
-func (x *InvokeFunctionResponse_Error) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_msgTypes[156]
+func (x *ListProfilesResponse_Profile) GetProperties() []*ProfileProperty {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
+		return x.Properties
 	}
-	return mi.MessageOf(x)
+	return nil
 }
 
-// Deprecated: Use InvokeFunctionResponse_Error.ProtoReflect.Descriptor instead.
-func (*InvokeFunctionResponse_Error) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{104, 0}
-}
-
-func (x *InvokeFunctionResponse_Error) GetStatus() InvokeFunctionResponse_Status {
-	if x != nil && x.Status != nil {
-		return *x.Status
-	}
-	return InvokeFunctionResponse_TIMEOUT
-}
-
-func (x *InvokeFunctionResponse_Error) GetErrorReason() string {
-	if x != nil && x.ErrorReason != nil {
-		return *x.ErrorReason
-	}
-	return ""
-}
-
-type InvokeFunctionResponse_Success struct {
+type VariableRequest_Set struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	JsonResult    *string                `protobuf:"bytes,1,opt,name=json_result,json=jsonResult" json:"json_result,omitempty"`
+	Name          *string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Value         *string                `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"` // JSON encoded
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *InvokeFunctionResponse_Success) Reset() {
-	*x = InvokeFunctionResponse_Success{}
+func (x *VariableRequest_Set) Reset() {
+	*x = VariableRequest_Set{}
+	mi := &file_api_proto_msgTypes[156]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VariableRequest_Set) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VariableRequest_Set) ProtoMessage() {}
+
+func (x *VariableRequest_Set) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[156]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VariableRequest_Set.ProtoReflect.Descriptor instead.
+func (*VariableRequest_Set) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{40, 0}
+}
+
+func (x *VariableRequest_Set) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *VariableRequest_Set) GetValue() string {
+	if x != nil && x.Value != nil {
+		return *x.Value
+	}
+	return ""
+}
+
+// Activate the app?
+type ActivateRequest_App struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	RaiseAllWindows   *bool                  `protobuf:"varint,1,opt,name=raise_all_windows,json=raiseAllWindows" json:"raise_all_windows,omitempty"`
+	IgnoringOtherApps *bool                  `protobuf:"varint,2,opt,name=ignoring_other_apps,json=ignoringOtherApps" json:"ignoring_other_apps,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ActivateRequest_App) Reset() {
+	*x = ActivateRequest_App{}
 	mi := &file_api_proto_msgTypes[157]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *InvokeFunctionResponse_Success) String() string {
+func (x *ActivateRequest_App) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*InvokeFunctionResponse_Success) ProtoMessage() {}
+func (*ActivateRequest_App) ProtoMessage() {}
 
-func (x *InvokeFunctionResponse_Success) ProtoReflect() protoreflect.Message {
+func (x *ActivateRequest_App) ProtoReflect() protoreflect.Message {
 	mi := &file_api_proto_msgTypes[157]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -13244,16 +13979,890 @@ func (x *InvokeFunctionResponse_Success) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use InvokeFunctionResponse_Success.ProtoReflect.Descriptor instead.
-func (*InvokeFunctionResponse_Success) Descriptor() ([]byte, []int) {
-	return file_api_proto_rawDescGZIP(), []int{104, 1}
+// Deprecated: Use ActivateRequest_App.ProtoReflect.Descriptor instead.
+func (*ActivateRequest_App) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{42, 0}
 }
 
-func (x *InvokeFunctionResponse_Success) GetJsonResult() string {
-	if x != nil && x.JsonResult != nil {
-		return *x.JsonResult
+func (x *ActivateRequest_App) GetRaiseAllWindows() bool {
+	if x != nil && x.RaiseAllWindows != nil {
+		return *x.RaiseAllWindows
+	}
+	return false
+}
+
+func (x *ActivateRequest_App) GetIgnoringOtherApps() bool {
+	if x != nil && x.IgnoringOtherApps != nil {
+		return *x.IgnoringOtherApps
+	}
+	return false
+}
+
+type RPCRegistrationRequest_RPCArgumentSignature struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          *string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RPCRegistrationRequest_RPCArgumentSignature) Reset() {
+	*x = RPCRegistrationRequest_RPCArgumentSignature{}
+	mi := &file_api_proto_msgTypes[158]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPCRegistrationRequest_RPCArgumentSignature) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPCRegistrationRequest_RPCArgumentSignature) ProtoMessage() {}
+
+func (x *RPCRegistrationRequest_RPCArgumentSignature) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[158]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPCRegistrationRequest_RPCArgumentSignature.ProtoReflect.Descriptor instead.
+func (*RPCRegistrationRequest_RPCArgumentSignature) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51, 0}
+}
+
+func (x *RPCRegistrationRequest_RPCArgumentSignature) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
 	}
 	return ""
+}
+
+type RPCRegistrationRequest_RPCArgument struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          *string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Path          *string                `protobuf:"bytes,2,opt,name=path" json:"path,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RPCRegistrationRequest_RPCArgument) Reset() {
+	*x = RPCRegistrationRequest_RPCArgument{}
+	mi := &file_api_proto_msgTypes[159]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPCRegistrationRequest_RPCArgument) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPCRegistrationRequest_RPCArgument) ProtoMessage() {}
+
+func (x *RPCRegistrationRequest_RPCArgument) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[159]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPCRegistrationRequest_RPCArgument.ProtoReflect.Descriptor instead.
+func (*RPCRegistrationRequest_RPCArgument) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51, 1}
+}
+
+func (x *RPCRegistrationRequest_RPCArgument) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest_RPCArgument) GetPath() string {
+	if x != nil && x.Path != nil {
+		return *x.Path
+	}
+	return ""
+}
+
+type RPCRegistrationRequest_SessionTitleAttributes struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Used by SESSION_TITLE to control name in Preferences menu
+	DisplayName *string `protobuf:"bytes,1,opt,name=display_name,json=displayName" json:"display_name,omitempty"`
+	// Identifies this title provider uniquely. Must not conflict with other title providers.
+	// Use a backwards domain name identifying yourself and the feature, like "com.example.featurename"
+	UniqueIdentifier *string `protobuf:"bytes,6,opt,name=unique_identifier,json=uniqueIdentifier" json:"unique_identifier,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *RPCRegistrationRequest_SessionTitleAttributes) Reset() {
+	*x = RPCRegistrationRequest_SessionTitleAttributes{}
+	mi := &file_api_proto_msgTypes[160]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPCRegistrationRequest_SessionTitleAttributes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPCRegistrationRequest_SessionTitleAttributes) ProtoMessage() {}
+
+func (x *RPCRegistrationRequest_SessionTitleAttributes) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[160]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPCRegistrationRequest_SessionTitleAttributes.ProtoReflect.Descriptor instead.
+func (*RPCRegistrationRequest_SessionTitleAttributes) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51, 2}
+}
+
+func (x *RPCRegistrationRequest_SessionTitleAttributes) GetDisplayName() string {
+	if x != nil && x.DisplayName != nil {
+		return *x.DisplayName
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest_SessionTitleAttributes) GetUniqueIdentifier() string {
+	if x != nil && x.UniqueIdentifier != nil {
+		return *x.UniqueIdentifier
+	}
+	return ""
+}
+
+type RPCRegistrationRequest_StatusBarComponentAttributes struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Used by STATUS_BAR_COMPONENT
+	ShortDescription    *string                                                     `protobuf:"bytes,1,opt,name=short_description,json=shortDescription" json:"short_description,omitempty"`
+	DetailedDescription *string                                                     `protobuf:"bytes,2,opt,name=detailed_description,json=detailedDescription" json:"detailed_description,omitempty"`
+	Knobs               []*RPCRegistrationRequest_StatusBarComponentAttributes_Knob `protobuf:"bytes,3,rep,name=knobs" json:"knobs,omitempty"`
+	Exemplar            *string                                                     `protobuf:"bytes,4,opt,name=exemplar" json:"exemplar,omitempty"`
+	UpdateCadence       *float32                                                    `protobuf:"fixed32,5,opt,name=update_cadence,json=updateCadence" json:"update_cadence,omitempty"`
+	// Identifies this component uniquely. Must not conflict with other components.
+	// Use a backwards domain name identifying yourself and the feature, like "com.example.featurename"
+	UniqueIdentifier *string                                                     `protobuf:"bytes,6,opt,name=unique_identifier,json=uniqueIdentifier" json:"unique_identifier,omitempty"`
+	Icons            []*RPCRegistrationRequest_StatusBarComponentAttributes_Icon `protobuf:"bytes,7,rep,name=icons" json:"icons,omitempty"`
+	Format           *RPCRegistrationRequest_StatusBarComponentAttributes_Format `protobuf:"varint,8,opt,name=format,enum=iterm2.RPCRegistrationRequest_StatusBarComponentAttributes_Format,def=0" json:"format,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+// Default values for RPCRegistrationRequest_StatusBarComponentAttributes fields.
+const (
+	Default_RPCRegistrationRequest_StatusBarComponentAttributes_Format = RPCRegistrationRequest_StatusBarComponentAttributes_PLAIN_TEXT
+)
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) Reset() {
+	*x = RPCRegistrationRequest_StatusBarComponentAttributes{}
+	mi := &file_api_proto_msgTypes[161]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPCRegistrationRequest_StatusBarComponentAttributes) ProtoMessage() {}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[161]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPCRegistrationRequest_StatusBarComponentAttributes.ProtoReflect.Descriptor instead.
+func (*RPCRegistrationRequest_StatusBarComponentAttributes) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51, 3}
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) GetShortDescription() string {
+	if x != nil && x.ShortDescription != nil {
+		return *x.ShortDescription
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) GetDetailedDescription() string {
+	if x != nil && x.DetailedDescription != nil {
+		return *x.DetailedDescription
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) GetKnobs() []*RPCRegistrationRequest_StatusBarComponentAttributes_Knob {
+	if x != nil {
+		return x.Knobs
+	}
+	return nil
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) GetExemplar() string {
+	if x != nil && x.Exemplar != nil {
+		return *x.Exemplar
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) GetUpdateCadence() float32 {
+	if x != nil && x.UpdateCadence != nil {
+		return *x.UpdateCadence
+	}
+	return 0
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) GetUniqueIdentifier() string {
+	if x != nil && x.UniqueIdentifier != nil {
+		return *x.UniqueIdentifier
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) GetIcons() []*RPCRegistrationRequest_StatusBarComponentAttributes_Icon {
+	if x != nil {
+		return x.Icons
+	}
+	return nil
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes) GetFormat() RPCRegistrationRequest_StatusBarComponentAttributes_Format {
+	if x != nil && x.Format != nil {
+		return *x.Format
+	}
+	return Default_RPCRegistrationRequest_StatusBarComponentAttributes_Format
+}
+
+type RPCRegistrationRequest_ContextMenuAttributes struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	DisplayName      *string                `protobuf:"bytes,1,opt,name=display_name,json=displayName" json:"display_name,omitempty"`
+	UniqueIdentifier *string                `protobuf:"bytes,2,opt,name=unique_identifier,json=uniqueIdentifier" json:"unique_identifier,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *RPCRegistrationRequest_ContextMenuAttributes) Reset() {
+	*x = RPCRegistrationRequest_ContextMenuAttributes{}
+	mi := &file_api_proto_msgTypes[162]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPCRegistrationRequest_ContextMenuAttributes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPCRegistrationRequest_ContextMenuAttributes) ProtoMessage() {}
+
+func (x *RPCRegistrationRequest_ContextMenuAttributes) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[162]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPCRegistrationRequest_ContextMenuAttributes.ProtoReflect.Descriptor instead.
+func (*RPCRegistrationRequest_ContextMenuAttributes) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51, 4}
+}
+
+func (x *RPCRegistrationRequest_ContextMenuAttributes) GetDisplayName() string {
+	if x != nil && x.DisplayName != nil {
+		return *x.DisplayName
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest_ContextMenuAttributes) GetUniqueIdentifier() string {
+	if x != nil && x.UniqueIdentifier != nil {
+		return *x.UniqueIdentifier
+	}
+	return ""
+}
+
+type RPCRegistrationRequest_StatusBarComponentAttributes_Knob struct {
+	state            protoimpl.MessageState                                         `protogen:"open.v1"`
+	Name             *string                                                        `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Type             *RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type `protobuf:"varint,2,opt,name=type,enum=iterm2.RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type" json:"type,omitempty"`
+	Placeholder      *string                                                        `protobuf:"bytes,3,opt,name=placeholder" json:"placeholder,omitempty"`
+	JsonDefaultValue *string                                                        `protobuf:"bytes,4,opt,name=json_default_value,json=jsonDefaultValue" json:"json_default_value,omitempty"`
+	Key              *string                                                        `protobuf:"bytes,5,opt,name=key" json:"key,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Knob) Reset() {
+	*x = RPCRegistrationRequest_StatusBarComponentAttributes_Knob{}
+	mi := &file_api_proto_msgTypes[163]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Knob) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPCRegistrationRequest_StatusBarComponentAttributes_Knob) ProtoMessage() {}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Knob) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[163]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPCRegistrationRequest_StatusBarComponentAttributes_Knob.ProtoReflect.Descriptor instead.
+func (*RPCRegistrationRequest_StatusBarComponentAttributes_Knob) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51, 3, 0}
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Knob) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Knob) GetType() RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type {
+	if x != nil && x.Type != nil {
+		return *x.Type
+	}
+	return RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Checkbox
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Knob) GetPlaceholder() string {
+	if x != nil && x.Placeholder != nil {
+		return *x.Placeholder
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Knob) GetJsonDefaultValue() string {
+	if x != nil && x.JsonDefaultValue != nil {
+		return *x.JsonDefaultValue
+	}
+	return ""
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Knob) GetKey() string {
+	if x != nil && x.Key != nil {
+		return *x.Key
+	}
+	return ""
+}
+
+type RPCRegistrationRequest_StatusBarComponentAttributes_Icon struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          []byte                 `protobuf:"bytes,1,opt,name=data" json:"data,omitempty"`
+	Scale         *float32               `protobuf:"fixed32,2,opt,name=scale" json:"scale,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Icon) Reset() {
+	*x = RPCRegistrationRequest_StatusBarComponentAttributes_Icon{}
+	mi := &file_api_proto_msgTypes[164]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Icon) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPCRegistrationRequest_StatusBarComponentAttributes_Icon) ProtoMessage() {}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Icon) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[164]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPCRegistrationRequest_StatusBarComponentAttributes_Icon.ProtoReflect.Descriptor instead.
+func (*RPCRegistrationRequest_StatusBarComponentAttributes_Icon) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{51, 3, 1}
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Icon) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *RPCRegistrationRequest_StatusBarComponentAttributes_Icon) GetScale() float32 {
+	if x != nil && x.Scale != nil {
+		return *x.Scale
+	}
+	return 0
+}
+
+type ServerOriginatedRPC_RPCArgument struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          *string                `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	JsonValue     *string                `protobuf:"bytes,2,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ServerOriginatedRPC_RPCArgument) Reset() {
+	*x = ServerOriginatedRPC_RPCArgument{}
+	mi := &file_api_proto_msgTypes[165]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServerOriginatedRPC_RPCArgument) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServerOriginatedRPC_RPCArgument) ProtoMessage() {}
+
+func (x *ServerOriginatedRPC_RPCArgument) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[165]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServerOriginatedRPC_RPCArgument.ProtoReflect.Descriptor instead.
+func (*ServerOriginatedRPC_RPCArgument) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{65, 0}
+}
+
+func (x *ServerOriginatedRPC_RPCArgument) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *ServerOriginatedRPC_RPCArgument) GetJsonValue() string {
+	if x != nil && x.JsonValue != nil {
+		return *x.JsonValue
+	}
+	return ""
+}
+
+type FocusChangedNotification_Window struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Describes how to interpret window_id.
+	WindowStatus *FocusChangedNotification_Window_WindowStatus `protobuf:"varint,1,opt,name=window_status,json=windowStatus,enum=iterm2.FocusChangedNotification_Window_WindowStatus" json:"window_status,omitempty"`
+	// The affected window_id
+	WindowId      *string `protobuf:"bytes,2,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FocusChangedNotification_Window) Reset() {
+	*x = FocusChangedNotification_Window{}
+	mi := &file_api_proto_msgTypes[166]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FocusChangedNotification_Window) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FocusChangedNotification_Window) ProtoMessage() {}
+
+func (x *FocusChangedNotification_Window) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[166]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FocusChangedNotification_Window.ProtoReflect.Descriptor instead.
+func (*FocusChangedNotification_Window) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{76, 0}
+}
+
+func (x *FocusChangedNotification_Window) GetWindowStatus() FocusChangedNotification_Window_WindowStatus {
+	if x != nil && x.WindowStatus != nil {
+		return *x.WindowStatus
+	}
+	return FocusChangedNotification_Window_TERMINAL_WINDOW_BECAME_KEY
+}
+
+func (x *FocusChangedNotification_Window) GetWindowId() string {
+	if x != nil && x.WindowId != nil {
+		return *x.WindowId
+	}
+	return ""
+}
+
+type SetProfilePropertyRequest_GuidList struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Guids         []string               `protobuf:"bytes,1,rep,name=guids" json:"guids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetProfilePropertyRequest_GuidList) Reset() {
+	*x = SetProfilePropertyRequest_GuidList{}
+	mi := &file_api_proto_msgTypes[167]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetProfilePropertyRequest_GuidList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetProfilePropertyRequest_GuidList) ProtoMessage() {}
+
+func (x *SetProfilePropertyRequest_GuidList) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[167]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetProfilePropertyRequest_GuidList.ProtoReflect.Descriptor instead.
+func (*SetProfilePropertyRequest_GuidList) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{88, 0}
+}
+
+func (x *SetProfilePropertyRequest_GuidList) GetGuids() []string {
+	if x != nil {
+		return x.Guids
+	}
+	return nil
+}
+
+type SetProfilePropertyRequest_Assignment struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Key           *string                `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	JsonValue     *string                `protobuf:"bytes,2,opt,name=json_value,json=jsonValue" json:"json_value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetProfilePropertyRequest_Assignment) Reset() {
+	*x = SetProfilePropertyRequest_Assignment{}
+	mi := &file_api_proto_msgTypes[168]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetProfilePropertyRequest_Assignment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetProfilePropertyRequest_Assignment) ProtoMessage() {}
+
+func (x *SetProfilePropertyRequest_Assignment) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[168]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetProfilePropertyRequest_Assignment.ProtoReflect.Descriptor instead.
+func (*SetProfilePropertyRequest_Assignment) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{88, 1}
+}
+
+func (x *SetProfilePropertyRequest_Assignment) GetKey() string {
+	if x != nil && x.Key != nil {
+		return *x.Key
+	}
+	return ""
+}
+
+func (x *SetProfilePropertyRequest_Assignment) GetJsonValue() string {
+	if x != nil && x.JsonValue != nil {
+		return *x.JsonValue
+	}
+	return ""
+}
+
+type SplitTreeNode_SplitTreeLink struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Child:
+	//
+	//	*SplitTreeNode_SplitTreeLink_Session
+	//	*SplitTreeNode_SplitTreeLink_Node
+	Child         isSplitTreeNode_SplitTreeLink_Child `protobuf_oneof:"child"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SplitTreeNode_SplitTreeLink) Reset() {
+	*x = SplitTreeNode_SplitTreeLink{}
+	mi := &file_api_proto_msgTypes[169]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SplitTreeNode_SplitTreeLink) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SplitTreeNode_SplitTreeLink) ProtoMessage() {}
+
+func (x *SplitTreeNode_SplitTreeLink) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[169]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SplitTreeNode_SplitTreeLink.ProtoReflect.Descriptor instead.
+func (*SplitTreeNode_SplitTreeLink) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{108, 0}
+}
+
+func (x *SplitTreeNode_SplitTreeLink) GetChild() isSplitTreeNode_SplitTreeLink_Child {
+	if x != nil {
+		return x.Child
+	}
+	return nil
+}
+
+func (x *SplitTreeNode_SplitTreeLink) GetSession() *SessionSummary {
+	if x != nil {
+		if x, ok := x.Child.(*SplitTreeNode_SplitTreeLink_Session); ok {
+			return x.Session
+		}
+	}
+	return nil
+}
+
+func (x *SplitTreeNode_SplitTreeLink) GetNode() *SplitTreeNode {
+	if x != nil {
+		if x, ok := x.Child.(*SplitTreeNode_SplitTreeLink_Node); ok {
+			return x.Node
+		}
+	}
+	return nil
+}
+
+type isSplitTreeNode_SplitTreeLink_Child interface {
+	isSplitTreeNode_SplitTreeLink_Child()
+}
+
+type SplitTreeNode_SplitTreeLink_Session struct {
+	Session *SessionSummary `protobuf:"bytes,1,opt,name=session,oneof"`
+}
+
+type SplitTreeNode_SplitTreeLink_Node struct {
+	Node *SplitTreeNode `protobuf:"bytes,2,opt,name=node,oneof"`
+}
+
+func (*SplitTreeNode_SplitTreeLink_Session) isSplitTreeNode_SplitTreeLink_Child() {}
+
+func (*SplitTreeNode_SplitTreeLink_Node) isSplitTreeNode_SplitTreeLink_Child() {}
+
+type ListSessionsResponse_Window struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	Tabs          []*ListSessionsResponse_Tab `protobuf:"bytes,1,rep,name=tabs" json:"tabs,omitempty"`
+	WindowId      *string                     `protobuf:"bytes,2,opt,name=window_id,json=windowId" json:"window_id,omitempty"`
+	Frame         *Frame                      `protobuf:"bytes,3,opt,name=frame" json:"frame,omitempty"`
+	Number        *int32                      `protobuf:"varint,4,opt,name=number" json:"number,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSessionsResponse_Window) Reset() {
+	*x = ListSessionsResponse_Window{}
+	mi := &file_api_proto_msgTypes[170]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSessionsResponse_Window) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSessionsResponse_Window) ProtoMessage() {}
+
+func (x *ListSessionsResponse_Window) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[170]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSessionsResponse_Window.ProtoReflect.Descriptor instead.
+func (*ListSessionsResponse_Window) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{109, 0}
+}
+
+func (x *ListSessionsResponse_Window) GetTabs() []*ListSessionsResponse_Tab {
+	if x != nil {
+		return x.Tabs
+	}
+	return nil
+}
+
+func (x *ListSessionsResponse_Window) GetWindowId() string {
+	if x != nil && x.WindowId != nil {
+		return *x.WindowId
+	}
+	return ""
+}
+
+func (x *ListSessionsResponse_Window) GetFrame() *Frame {
+	if x != nil {
+		return x.Frame
+	}
+	return nil
+}
+
+func (x *ListSessionsResponse_Window) GetNumber() int32 {
+	if x != nil && x.Number != nil {
+		return *x.Number
+	}
+	return 0
+}
+
+type ListSessionsResponse_Tab struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Root              *SplitTreeNode         `protobuf:"bytes,3,opt,name=root" json:"root,omitempty"`
+	TabId             *string                `protobuf:"bytes,2,opt,name=tab_id,json=tabId" json:"tab_id,omitempty"`
+	TmuxWindowId      *string                `protobuf:"bytes,4,opt,name=tmux_window_id,json=tmuxWindowId" json:"tmux_window_id,omitempty"`
+	TmuxConnectionId  *string                `protobuf:"bytes,5,opt,name=tmux_connection_id,json=tmuxConnectionId" json:"tmux_connection_id,omitempty"`
+	MinimizedSessions []*SessionSummary      `protobuf:"bytes,6,rep,name=minimized_sessions,json=minimizedSessions" json:"minimized_sessions,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ListSessionsResponse_Tab) Reset() {
+	*x = ListSessionsResponse_Tab{}
+	mi := &file_api_proto_msgTypes[171]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSessionsResponse_Tab) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSessionsResponse_Tab) ProtoMessage() {}
+
+func (x *ListSessionsResponse_Tab) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_msgTypes[171]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSessionsResponse_Tab.ProtoReflect.Descriptor instead.
+func (*ListSessionsResponse_Tab) Descriptor() ([]byte, []int) {
+	return file_api_proto_rawDescGZIP(), []int{109, 1}
+}
+
+func (x *ListSessionsResponse_Tab) GetRoot() *SplitTreeNode {
+	if x != nil {
+		return x.Root
+	}
+	return nil
+}
+
+func (x *ListSessionsResponse_Tab) GetTabId() string {
+	if x != nil && x.TabId != nil {
+		return *x.TabId
+	}
+	return ""
+}
+
+func (x *ListSessionsResponse_Tab) GetTmuxWindowId() string {
+	if x != nil && x.TmuxWindowId != nil {
+		return *x.TmuxWindowId
+	}
+	return ""
+}
+
+func (x *ListSessionsResponse_Tab) GetTmuxConnectionId() string {
+	if x != nil && x.TmuxConnectionId != nil {
+		return *x.TmuxConnectionId
+	}
+	return ""
+}
+
+func (x *ListSessionsResponse_Tab) GetMinimizedSessions() []*SessionSummary {
+	if x != nil {
+		return x.MinimizedSessions
+	}
+	return nil
 }
 
 var File_api_proto protoreflect.FileDescriptor
@@ -13338,159 +14947,539 @@ const file_api_proto_rawDesc = "" +
 	"\x15list_prompts_response\x18\x85\x01 \x01(\v2\x1b.iterm2.ListPromptsResponseH\x00R\x13listPromptsResponse\x12;\n" +
 	"\fnotification\x18\xe8\a \x01(\v2\x14.iterm2.NotificationH\x00R\fnotificationB\f\n" +
 	"\n" +
-	"submessage\"\x85\x01\n" +
-	"\x10GetBufferRequest\x12\x18\n" +
-	"\asession\x18\x01 \x01(\tR\asession\x120\n" +
+	"submessage\"\xad\x04\n" +
+	"\x15InvokeFunctionRequest\x125\n" +
+	"\x03tab\x18\x01 \x01(\v2!.iterm2.InvokeFunctionRequest.TabH\x00R\x03tab\x12A\n" +
+	"\asession\x18\x02 \x01(\v2%.iterm2.InvokeFunctionRequest.SessionH\x00R\asession\x12>\n" +
+	"\x06window\x18\x03 \x01(\v2$.iterm2.InvokeFunctionRequest.WindowH\x00R\x06window\x125\n" +
+	"\x03app\x18\x04 \x01(\v2!.iterm2.InvokeFunctionRequest.AppH\x00R\x03app\x12>\n" +
+	"\x06method\x18\a \x01(\v2$.iterm2.InvokeFunctionRequest.MethodH\x00R\x06method\x12\x1e\n" +
 	"\n" +
-	"line_range\x18\x02 \x01(\v2\x11.iterm2.LineRangeR\tlineRange\x12%\n" +
-	"\x0einclude_styles\x18\x03 \x01(\bR\rincludeStyles\"\xb2\x03\n" +
-	"\x11GetBufferResponse\x12<\n" +
-	"\x06status\x18\x01 \x01(\x0e2 .iterm2.GetBufferResponse.Status:\x02OKR\x06status\x12'\n" +
-	"\x05range\x18\x02 \x01(\v2\r.iterm2.RangeB\x02\x18\x01R\x05range\x120\n" +
-	"\bcontents\x18\x03 \x03(\v2\x14.iterm2.LineContentsR\bcontents\x12%\n" +
-	"\x06cursor\x18\x04 \x01(\v2\r.iterm2.CoordR\x06cursor\x127\n" +
-	"\x16num_lines_above_screen\x18\x05 \x01(\x03B\x02\x18\x01R\x13numLinesAboveScreen\x12L\n" +
-	"\x14windowed_coord_range\x18\x06 \x01(\v2\x1a.iterm2.WindowedCoordRangeR\x12windowedCoordRange\"V\n" +
+	"invocation\x18\x05 \x01(\tR\n" +
+	"invocation\x12\x1c\n" +
+	"\atimeout\x18\x06 \x01(\x01:\x02-1R\atimeout\x1a\x1c\n" +
+	"\x03Tab\x12\x15\n" +
+	"\x06tab_id\x18\x01 \x01(\tR\x05tabId\x1a(\n" +
+	"\aSession\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x1a%\n" +
+	"\x06Window\x12\x1b\n" +
+	"\twindow_id\x18\x01 \x01(\tR\bwindowId\x1a\x05\n" +
+	"\x03App\x1a$\n" +
+	"\x06Method\x12\x1a\n" +
+	"\breceiver\x18\x01 \x01(\tR\breceiverB\t\n" +
+	"\acontext\"\x8a\x03\n" +
+	"\x16InvokeFunctionResponse\x12<\n" +
+	"\x05error\x18\x01 \x01(\v2$.iterm2.InvokeFunctionResponse.ErrorH\x00R\x05error\x12B\n" +
+	"\asuccess\x18\x02 \x01(\v2&.iterm2.InvokeFunctionResponse.SuccessH\x00R\asuccess\x1ai\n" +
+	"\x05Error\x12=\n" +
+	"\x06status\x18\x01 \x01(\x0e2%.iterm2.InvokeFunctionResponse.StatusR\x06status\x12!\n" +
+	"\ferror_reason\x18\x02 \x01(\tR\verrorReason\x1a*\n" +
+	"\aSuccess\x12\x1f\n" +
+	"\vjson_result\x18\x01 \x01(\tR\n" +
+	"jsonResult\"H\n" +
+	"\x06Status\x12\v\n" +
+	"\aTIMEOUT\x10\x01\x12\n" +
+	"\n" +
+	"\x06FAILED\x10\x02\x12\x15\n" +
+	"\x11REQUEST_MALFORMED\x10\x03\x12\x0e\n" +
+	"\n" +
+	"INVALID_ID\x10\x04B\r\n" +
+	"\vdisposition\"\xec\x02\n" +
+	"\fCloseRequest\x124\n" +
+	"\x04tabs\x18\x01 \x01(\v2\x1e.iterm2.CloseRequest.CloseTabsH\x00R\x04tabs\x12@\n" +
+	"\bsessions\x18\x02 \x01(\v2\".iterm2.CloseRequest.CloseSessionsH\x00R\bsessions\x12=\n" +
+	"\awindows\x18\x03 \x01(\v2!.iterm2.CloseRequest.CloseWindowsH\x00R\awindows\x12\x14\n" +
+	"\x05force\x18\x04 \x01(\bR\x05force\x1a$\n" +
+	"\tCloseTabs\x12\x17\n" +
+	"\atab_ids\x18\x01 \x03(\tR\x06tabIds\x1a0\n" +
+	"\rCloseSessions\x12\x1f\n" +
+	"\vsession_ids\x18\x01 \x03(\tR\n" +
+	"sessionIds\x1a-\n" +
+	"\fCloseWindows\x12\x1d\n" +
+	"\n" +
+	"window_ids\x18\x01 \x03(\tR\twindowIdsB\b\n" +
+	"\x06target\"}\n" +
+	"\rCloseResponse\x128\n" +
+	"\bstatuses\x18\x01 \x03(\x0e2\x1c.iterm2.CloseResponse.StatusR\bstatuses\"2\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\r\n" +
+	"\tNOT_FOUND\x10\x01\x12\x11\n" +
+	"\rUSER_DECLINED\x10\x02\"b\n" +
+	"\x1aSetBroadcastDomainsRequest\x12D\n" +
+	"\x11broadcast_domains\x18\x01 \x03(\v2\x17.iterm2.BroadcastDomainR\x10broadcastDomains\"\xcf\x01\n" +
+	"\x1bSetBroadcastDomainsResponse\x12B\n" +
+	"\x06status\x18\x01 \x01(\x0e2*.iterm2.SetBroadcastDomainsResponse.StatusR\x06status\"l\n" +
 	"\x06Status\x12\x06\n" +
 	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11SESSION_NOT_FOUND\x10\x01\x12\x16\n" +
-	"\x12INVALID_LINE_RANGE\x10\x02\x12\x15\n" +
-	"\x11REQUEST_MALFORMED\x10\x03\"\xb2\x01\n" +
-	"\tLineRange\x120\n" +
-	"\x14screen_contents_only\x18\x01 \x01(\bR\x12screenContentsOnly\x12%\n" +
-	"\x0etrailing_lines\x18\x02 \x01(\x05R\rtrailingLines\x12L\n" +
-	"\x14windowed_coord_range\x18\x03 \x01(\v2\x1a.iterm2.WindowedCoordRangeR\x12windowedCoordRange\"#\n" +
-	"\x05Coord\x12\f\n" +
-	"\x01x\x18\x01 \x01(\x05R\x01x\x12\f\n" +
-	"\x01y\x18\x02 \x01(\x03R\x01y\";\n" +
-	"\x05Range\x12\x1a\n" +
-	"\blocation\x18\x01 \x01(\x03R\blocation\x12\x16\n" +
-	"\x06length\x18\x02 \x01(\x03R\x06length\"R\n" +
+	"\x11SESSION_NOT_FOUND\x10\x01\x12\"\n" +
+	"\x1eBROADCAST_DOMAINS_NOT_DISJOINT\x10\x02\x12\x1f\n" +
+	"\x1bSESSIONS_NOT_IN_SAME_WINDOW\x10\x03\"\xfe\x01\n" +
+	"\x19StatusBarComponentRequest\x12R\n" +
+	"\fopen_popover\x18\x01 \x01(\v2-.iterm2.StatusBarComponentRequest.OpenPopoverH\x00R\vopenPopover\x12\x1e\n" +
 	"\n" +
-	"CoordRange\x12#\n" +
-	"\x05start\x18\x01 \x01(\v2\r.iterm2.CoordR\x05start\x12\x1f\n" +
-	"\x03end\x18\x02 \x01(\v2\r.iterm2.CoordR\x03end\"r\n" +
+	"identifier\x18\x02 \x01(\tR\n" +
+	"identifier\x1ab\n" +
+	"\vOpenPopover\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x12\n" +
+	"\x04html\x18\x02 \x01(\tR\x04html\x12 \n" +
+	"\x04size\x18\x03 \x01(\v2\f.iterm2.SizeR\x04sizeB\t\n" +
+	"\arequest\"\xb7\x01\n" +
+	"\x1aStatusBarComponentResponse\x12A\n" +
+	"\x06status\x18\x01 \x01(\x0e2).iterm2.StatusBarComponentResponse.StatusR\x06status\"V\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x15\n" +
+	"\x11SESSION_NOT_FOUND\x10\x01\x12\x15\n" +
+	"\x11REQUEST_MALFORMED\x10\x02\x12\x16\n" +
+	"\x12INVALID_IDENTIFIER\x10\x03\"r\n" +
 	"\x12WindowedCoordRange\x123\n" +
 	"\vcoord_range\x18\x01 \x01(\v2\x12.iterm2.CoordRangeR\n" +
 	"coordRange\x12'\n" +
-	"\acolumns\x18\x02 \x01(\v2\r.iterm2.RangeR\acolumns\"\xbb\x02\n" +
-	"\fLineContents\x12\x12\n" +
-	"\x04text\x18\x01 \x01(\tR\x04text\x12J\n" +
-	"\x14code_points_per_cell\x18\x02 \x03(\v2\x19.iterm2.CodePointsPerCellR\x11codePointsPerCell\x12\\\n" +
-	"\fcontinuation\x18\x03 \x01(\x0e2!.iterm2.LineContents.Continuation:\x15CONTINUATION_HARD_EOLR\fcontinuation\x12'\n" +
-	"\x05style\x18\x04 \x03(\v2\x11.iterm2.CellStyleR\x05style\"D\n" +
-	"\fContinuation\x12\x19\n" +
-	"\x15CONTINUATION_HARD_EOL\x10\x01\x12\x19\n" +
-	"\x15CONTINUATION_SOFT_EOL\x10\x02\"X\n" +
-	"\x11CodePointsPerCell\x12)\n" +
-	"\x0fnum_code_points\x18\x01 \x01(\x05:\x011R\rnumCodePoints\x12\x18\n" +
-	"\arepeats\x18\x02 \x01(\x05R\arepeats\"F\n" +
-	"\bRGBColor\x12\x10\n" +
-	"\x03red\x18\x01 \x01(\rR\x03red\x12\x14\n" +
-	"\x05green\x18\x02 \x01(\rR\x05green\x12\x12\n" +
-	"\x04blue\x18\x03 \x01(\rR\x04blue\"7\n" +
-	"\x03URL\x12\x10\n" +
-	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1e\n" +
+	"\acolumns\x18\x02 \x01(\v2\r.iterm2.RangeR\acolumns\"\xb8\x01\n" +
+	"\fSubSelection\x12L\n" +
+	"\x14windowed_coord_range\x18\x01 \x01(\v2\x1a.iterm2.WindowedCoordRangeR\x12windowedCoordRange\x12<\n" +
+	"\x0eselection_mode\x18\x02 \x01(\x0e2\x15.iterm2.SelectionModeR\rselectionMode\x12\x1c\n" +
+	"\tconnected\x18\x03 \x01(\bR\tconnected\"H\n" +
+	"\tSelection\x12;\n" +
+	"\x0esub_selections\x18\x01 \x03(\v2\x14.iterm2.SubSelectionR\rsubSelections\"\x82\x03\n" +
+	"\x10SelectionRequest\x12b\n" +
+	"\x15get_selection_request\x18\x01 \x01(\v2,.iterm2.SelectionRequest.GetSelectionRequestH\x00R\x13getSelectionRequest\x12b\n" +
+	"\x15set_selection_request\x18\x02 \x01(\v2,.iterm2.SelectionRequest.SetSelectionRequestH\x00R\x13setSelectionRequest\x1a4\n" +
+	"\x13GetSelectionRequest\x12\x1d\n" +
 	"\n" +
-	"identifier\x18\x02 \x01(\tR\n" +
-	"identifier\"\xd0\x06\n" +
-	"\tCellStyle\x12 \n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x1ae\n" +
+	"\x13SetSelectionRequest\x12\x1d\n" +
 	"\n" +
-	"fgStandard\x18\x01 \x01(\rH\x00R\n" +
-	"fgStandard\x12:\n" +
-	"\vfgAlternate\x18\x02 \x01(\x0e2\x16.iterm2.AlternateColorH\x00R\vfgAlternate\x12(\n" +
-	"\x05fgRgb\x18\x03 \x01(\v2\x10.iterm2.RGBColorH\x00R\x05fgRgb\x126\n" +
-	"\x15fgAlternatePlacementX\x18\x04 \x01(\rH\x00R\x15fgAlternatePlacementX\x12 \n" +
-	"\n" +
-	"bgStandard\x18\x05 \x01(\rH\x01R\n" +
-	"bgStandard\x12:\n" +
-	"\vbgAlternate\x18\x06 \x01(\x0e2\x16.iterm2.AlternateColorH\x01R\vbgAlternate\x12(\n" +
-	"\x05bgRgb\x18\a \x01(\v2\x10.iterm2.RGBColorH\x01R\x05bgRgb\x126\n" +
-	"\x15bgAlternatePlacementY\x18\b \x01(\rH\x01R\x15bgAlternatePlacementY\x12\x12\n" +
-	"\x04bold\x18\t \x01(\bR\x04bold\x12\x14\n" +
-	"\x05faint\x18\n" +
-	" \x01(\bR\x05faint\x12\x16\n" +
-	"\x06italic\x18\v \x01(\bR\x06italic\x12\x14\n" +
-	"\x05blink\x18\f \x01(\bR\x05blink\x12\x1c\n" +
-	"\tunderline\x18\r \x01(\bR\tunderline\x12$\n" +
-	"\rstrikethrough\x18\x0e \x01(\bR\rstrikethrough\x12\x1c\n" +
-	"\tinvisible\x18\x0f \x01(\bR\tinvisible\x12\x18\n" +
-	"\ainverse\x18\x10 \x01(\bR\ainverse\x12\x18\n" +
-	"\aguarded\x18\x11 \x01(\bR\aguarded\x122\n" +
-	"\x05image\x18\x12 \x01(\x0e2\x1c.iterm2.ImagePlaceholderTypeR\x05image\x128\n" +
-	"\x0eunderlineColor\x18\x13 \x01(\v2\x10.iterm2.RGBColorR\x0eunderlineColor\x12\x18\n" +
-	"\ablockID\x18\x14 \x01(\tR\ablockID\x12\x1d\n" +
-	"\x03url\x18\x15 \x01(\v2\v.iterm2.URLR\x03url\x12\x18\n" +
-	"\arepeats\x18\x16 \x01(\rR\arepeatsB\t\n" +
-	"\afgColorB\t\n" +
-	"\abgColor\"\x15\n" +
-	"\x13ListSessionsRequest\"4\n" +
-	"\x04Size\x12\x14\n" +
-	"\x05width\x18\x01 \x01(\x05R\x05width\x12\x16\n" +
-	"\x06height\x18\x02 \x01(\x05R\x06height\"#\n" +
-	"\x05Point\x12\f\n" +
-	"\x01x\x18\x01 \x01(\x05R\x01x\x12\f\n" +
-	"\x01y\x18\x02 \x01(\x05R\x01y\"P\n" +
-	"\x05Frame\x12%\n" +
-	"\x06origin\x18\x01 \x01(\v2\r.iterm2.PointR\x06origin\x12 \n" +
-	"\x04size\x18\x02 \x01(\v2\f.iterm2.SizeR\x04size\"\xa3\x01\n" +
-	"\x0eSessionSummary\x12+\n" +
-	"\x11unique_identifier\x18\x01 \x01(\tR\x10uniqueIdentifier\x12#\n" +
-	"\x05frame\x18\x02 \x01(\v2\r.iterm2.FrameR\x05frame\x12)\n" +
-	"\tgrid_size\x18\x03 \x01(\v2\f.iterm2.SizeR\bgridSize\x12\x14\n" +
-	"\x05title\x18\x04 \x01(\tR\x05title\"\xe1\x01\n" +
-	"\rSplitTreeNode\x12\x1a\n" +
-	"\bvertical\x18\x01 \x01(\bR\bvertical\x129\n" +
-	"\x05links\x18\x02 \x03(\v2#.iterm2.SplitTreeNode.SplitTreeLinkR\x05links\x1ay\n" +
-	"\rSplitTreeLink\x122\n" +
-	"\asession\x18\x01 \x01(\v2\x16.iterm2.SessionSummaryH\x00R\asession\x12+\n" +
-	"\x04node\x18\x02 \x01(\v2\x15.iterm2.SplitTreeNodeH\x00R\x04nodeB\a\n" +
-	"\x05child\"\x96\x04\n" +
-	"\x14ListSessionsResponse\x12=\n" +
-	"\awindows\x18\x01 \x03(\v2#.iterm2.ListSessionsResponse.WindowR\awindows\x12?\n" +
-	"\x0fburied_sessions\x18\x02 \x03(\v2\x16.iterm2.SessionSummaryR\x0eburiedSessions\x1a\x98\x01\n" +
-	"\x06Window\x124\n" +
-	"\x04tabs\x18\x01 \x03(\v2 .iterm2.ListSessionsResponse.TabR\x04tabs\x12\x1b\n" +
-	"\twindow_id\x18\x02 \x01(\tR\bwindowId\x12#\n" +
-	"\x05frame\x18\x03 \x01(\v2\r.iterm2.FrameR\x05frame\x12\x16\n" +
-	"\x06number\x18\x04 \x01(\x05R\x06number\x1a\xe2\x01\n" +
-	"\x03Tab\x12)\n" +
-	"\x04root\x18\x03 \x01(\v2\x15.iterm2.SplitTreeNodeR\x04root\x12\x15\n" +
-	"\x06tab_id\x18\x02 \x01(\tR\x05tabId\x12$\n" +
-	"\x0etmux_window_id\x18\x04 \x01(\tR\ftmuxWindowId\x12,\n" +
-	"\x12tmux_connection_id\x18\x05 \x01(\tR\x10tmuxConnectionId\x12E\n" +
-	"\x12minimized_sessions\x18\x06 \x03(\v2\x16.iterm2.SessionSummaryR\x11minimizedSessions\"n\n" +
-	"\x0fSendTextRequest\x12\x18\n" +
-	"\asession\x18\x01 \x01(\tR\asession\x12\x12\n" +
-	"\x04text\x18\x02 \x01(\tR\x04text\x12-\n" +
-	"\x12suppress_broadcast\x18\x03 \x01(\bR\x11suppressBroadcast\"t\n" +
-	"\x10SendTextResponse\x127\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x1f.iterm2.SendTextResponse.StatusR\x06status\"'\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12/\n" +
+	"\tselection\x18\x02 \x01(\v2\x11.iterm2.SelectionR\tselectionB\t\n" +
+	"\arequest\"\xdb\x03\n" +
+	"\x11SelectionResponse\x128\n" +
+	"\x06status\x18\x01 \x01(\x0e2 .iterm2.SelectionResponse.StatusR\x06status\x12f\n" +
+	"\x16get_selection_response\x18\x02 \x01(\v2..iterm2.SelectionResponse.GetSelectionResponseH\x00R\x14getSelectionResponse\x12f\n" +
+	"\x16set_selection_response\x18\x03 \x01(\v2..iterm2.SelectionResponse.SetSelectionResponseH\x00R\x14setSelectionResponse\x1aG\n" +
+	"\x14GetSelectionResponse\x12/\n" +
+	"\tselection\x18\x02 \x01(\v2\x11.iterm2.SelectionR\tselection\x1a\x16\n" +
+	"\x14SetSelectionResponse\"O\n" +
 	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11SESSION_NOT_FOUND\x10\x01\"\xe2\x01\n" +
-	"\x10CreateTabRequest\x12!\n" +
-	"\fprofile_name\x18\x01 \x01(\tR\vprofileName\x12\x1b\n" +
-	"\twindow_id\x18\x02 \x01(\tR\bwindowId\x12\x1b\n" +
-	"\ttab_index\x18\x03 \x01(\rR\btabIndex\x12\x1c\n" +
-	"\acommand\x18\x04 \x01(\tB\x02\x18\x01R\acommand\x12S\n" +
-	"\x19custom_profile_properties\x18\x05 \x03(\v2\x17.iterm2.ProfilePropertyR\x17customProfileProperties\"B\n" +
-	"\x0fProfileProperty\x12\x10\n" +
+	"\x02OK\x10\x00\x12\x13\n" +
+	"\x0fINVALID_SESSION\x10\x01\x12\x11\n" +
+	"\rINVALID_RANGE\x10\x02\x12\x15\n" +
+	"\x11REQUEST_MALFORMED\x10\x03B\n" +
+	"\n" +
+	"\bresponse\"\xe3\x01\n" +
+	"\x12ColorPresetRequest\x12K\n" +
+	"\flist_presets\x18\x01 \x01(\v2&.iterm2.ColorPresetRequest.ListPresetsH\x00R\vlistPresets\x12E\n" +
+	"\n" +
+	"get_preset\x18\x02 \x01(\v2$.iterm2.ColorPresetRequest.GetPresetH\x00R\tgetPreset\x1a\r\n" +
+	"\vListPresets\x1a\x1f\n" +
+	"\tGetPreset\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04nameB\t\n" +
+	"\arequest\"\xd4\x04\n" +
+	"\x13ColorPresetResponse\x12L\n" +
+	"\flist_presets\x18\x01 \x01(\v2'.iterm2.ColorPresetResponse.ListPresetsH\x00R\vlistPresets\x12F\n" +
+	"\n" +
+	"get_preset\x18\x02 \x01(\v2%.iterm2.ColorPresetResponse.GetPresetH\x00R\tgetPreset\x12:\n" +
+	"\x06status\x18\x03 \x01(\x0e2\".iterm2.ColorPresetResponse.StatusR\x06status\x1a!\n" +
+	"\vListPresets\x12\x12\n" +
+	"\x04name\x18\x01 \x03(\tR\x04name\x1a\xfc\x01\n" +
+	"\tGetPreset\x12Y\n" +
+	"\x0ecolor_settings\x18\x01 \x03(\v22.iterm2.ColorPresetResponse.GetPreset.ColorSettingR\rcolorSettings\x1a\x93\x01\n" +
+	"\fColorSetting\x12\x10\n" +
+	"\x03red\x18\x01 \x01(\x02R\x03red\x12\x14\n" +
+	"\x05green\x18\x02 \x01(\x02R\x05green\x12\x12\n" +
+	"\x04blue\x18\x03 \x01(\x02R\x04blue\x12\x14\n" +
+	"\x05alpha\x18\x04 \x01(\x02R\x05alpha\x12\x1f\n" +
+	"\vcolor_space\x18\x05 \x01(\tR\n" +
+	"colorSpace\x12\x10\n" +
+	"\x03key\x18\x06 \x01(\tR\x03key\"=\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x14\n" +
+	"\x10PRESET_NOT_FOUND\x10\x01\x12\x15\n" +
+	"\x11REQUEST_MALFORMED\x10\x02B\n" +
+	"\n" +
+	"\bresponse\"\xd0\x05\n" +
+	"\x12PreferencesRequest\x12>\n" +
+	"\brequests\x18\x01 \x03(\v2\".iterm2.PreferencesRequest.RequestR\brequests\x1a\xf9\x04\n" +
+	"\aRequest\x12h\n" +
+	"\x16set_preference_request\x18\x01 \x01(\v20.iterm2.PreferencesRequest.Request.SetPreferenceH\x00R\x14setPreferenceRequest\x12h\n" +
+	"\x16get_preference_request\x18\x02 \x01(\v20.iterm2.PreferencesRequest.Request.GetPreferenceH\x00R\x14getPreferenceRequest\x12u\n" +
+	"\x1bset_default_profile_request\x18\x03 \x01(\v24.iterm2.PreferencesRequest.Request.SetDefaultProfileH\x00R\x18setDefaultProfileRequest\x12u\n" +
+	"\x1bget_default_profile_request\x18\x04 \x01(\v24.iterm2.PreferencesRequest.Request.GetDefaultProfileH\x00R\x18getDefaultProfileRequest\x1a@\n" +
+	"\rSetPreference\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x1d\n" +
 	"\n" +
-	"json_value\x18\x02 \x01(\tR\tjsonValue\"\x94\x02\n" +
-	"\x11CreateTabResponse\x128\n" +
-	"\x06status\x18\x01 \x01(\x0e2 .iterm2.CreateTabResponse.StatusR\x06status\x12\x1b\n" +
-	"\twindow_id\x18\x02 \x01(\tR\bwindowId\x12\x15\n" +
-	"\x06tab_id\x18\x03 \x01(\x05R\x05tabId\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x04 \x01(\tR\tsessionId\"r\n" +
+	"json_value\x18\x02 \x01(\tR\tjsonValue\x1a!\n" +
+	"\rGetPreference\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x1a'\n" +
+	"\x11SetDefaultProfile\x12\x12\n" +
+	"\x04guid\x18\x01 \x01(\tR\x04guid\x1a\x13\n" +
+	"\x11GetDefaultProfileB\t\n" +
+	"\arequest\"\xda\b\n" +
+	"\x13PreferencesResponse\x12<\n" +
+	"\aresults\x18\x01 \x03(\v2\".iterm2.PreferencesResponse.ResultR\aresults\x1a\x84\b\n" +
+	"\x06Result\x12j\n" +
+	"\x14unrecognized_request\x18\x01 \x01(\v25.iterm2.PreferencesResponse.Result.UnrecognizedResultH\x00R\x13unrecognizedRequest\x12l\n" +
+	"\x15set_preference_result\x18\x02 \x01(\v26.iterm2.PreferencesResponse.Result.SetPreferenceResultH\x00R\x13setPreferenceResult\x12l\n" +
+	"\x15get_preference_result\x18\x03 \x01(\v26.iterm2.PreferencesResponse.Result.GetPreferenceResultH\x00R\x13getPreferenceResult\x12y\n" +
+	"\x1aset_default_profile_result\x18\x04 \x01(\v2:.iterm2.PreferencesResponse.Result.SetDefaultProfileResultH\x00R\x17setDefaultProfileResult\x12y\n" +
+	"\x1aget_default_profile_result\x18\x05 \x01(\v2:.iterm2.PreferencesResponse.Result.GetDefaultProfileResultH\x00R\x17getDefaultProfileResult\x1a\x9f\x01\n" +
+	"\x13SetPreferenceResult\x12U\n" +
+	"\x06status\x18\x01 \x01(\x0e2=.iterm2.PreferencesResponse.Result.SetPreferenceResult.StatusR\x06status\"1\n" +
 	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x18\n" +
-	"\x14INVALID_PROFILE_NAME\x10\x01\x12\x15\n" +
-	"\x11INVALID_WINDOW_ID\x10\x02\x12\x15\n" +
-	"\x11INVALID_TAB_INDEX\x10\x03\x12\x18\n" +
-	"\x14MISSING_SUBSTITUTION\x10\x04\"\xab\n" +
+	"\x02OK\x10\x00\x12\f\n" +
+	"\bBAD_JSON\x10\x01\x12\x11\n" +
+	"\rINVALID_VALUE\x10\x02\x1a4\n" +
+	"\x13GetPreferenceResult\x12\x1d\n" +
+	"\n" +
+	"json_value\x18\x01 \x01(\tR\tjsonValue\x1a\x94\x01\n" +
+	"\x17SetDefaultProfileResult\x12Y\n" +
+	"\x06status\x18\x01 \x01(\x0e2A.iterm2.PreferencesResponse.Result.SetDefaultProfileResult.StatusR\x06status\"\x1e\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\f\n" +
+	"\bBAD_GUID\x10\x01\x1a\x14\n" +
+	"\x12UnrecognizedResult\x1a-\n" +
+	"\x17GetDefaultProfileResult\x12\x12\n" +
+	"\x04guid\x18\x01 \x01(\tR\x04guidB\b\n" +
+	"\x06result\"\xa1\x01\n" +
+	"\x12ReorderTabsRequest\x12G\n" +
+	"\vassignments\x18\x03 \x03(\v2%.iterm2.ReorderTabsRequest.AssignmentR\vassignments\x1aB\n" +
+	"\n" +
+	"Assignment\x12\x1b\n" +
+	"\twindow_id\x18\x01 \x01(\tR\bwindowId\x12\x17\n" +
+	"\atab_ids\x18\x02 \x03(\tR\x06tabIds\"\xa6\x01\n" +
+	"\x13ReorderTabsResponse\x12:\n" +
+	"\x06status\x18\x04 \x01(\x0e2\".iterm2.ReorderTabsResponse.StatusR\x06status\"S\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x16\n" +
+	"\x12INVALID_ASSIGNMENT\x10\x01\x12\x15\n" +
+	"\x11INVALID_WINDOW_ID\x10\x02\x12\x12\n" +
+	"\x0eINVALID_TAB_ID\x10\x03\"\xf1\x04\n" +
+	"\vTmuxRequest\x12P\n" +
+	"\x10list_connections\x18\x01 \x01(\v2#.iterm2.TmuxRequest.ListConnectionsH\x00R\x0flistConnections\x12D\n" +
+	"\fsend_command\x18\x02 \x01(\v2\x1f.iterm2.TmuxRequest.SendCommandH\x00R\vsendCommand\x12T\n" +
+	"\x12set_window_visible\x18\x03 \x01(\v2$.iterm2.TmuxRequest.SetWindowVisibleH\x00R\x10setWindowVisible\x12G\n" +
+	"\rcreate_window\x18\x04 \x01(\v2 .iterm2.TmuxRequest.CreateWindowH\x00R\fcreateWindow\x1a\x11\n" +
+	"\x0fListConnections\x1aL\n" +
+	"\vSendCommand\x12#\n" +
+	"\rconnection_id\x18\x01 \x01(\tR\fconnectionId\x12\x18\n" +
+	"\acommand\x18\x02 \x01(\tR\acommand\x1an\n" +
+	"\x10SetWindowVisible\x12#\n" +
+	"\rconnection_id\x18\x01 \x01(\tR\fconnectionId\x12\x1b\n" +
+	"\twindow_id\x18\x02 \x01(\tR\bwindowId\x12\x18\n" +
+	"\avisible\x18\x03 \x01(\bR\avisible\x1aO\n" +
+	"\fCreateWindow\x12#\n" +
+	"\rconnection_id\x18\x01 \x01(\tR\fconnectionId\x12\x1a\n" +
+	"\baffinity\x18\x02 \x01(\tR\baffinityB\t\n" +
+	"\apayload\"\x8a\x06\n" +
+	"\fTmuxResponse\x12Q\n" +
+	"\x10list_connections\x18\x01 \x01(\v2$.iterm2.TmuxResponse.ListConnectionsH\x00R\x0flistConnections\x12E\n" +
+	"\fsend_command\x18\x02 \x01(\v2 .iterm2.TmuxResponse.SendCommandH\x00R\vsendCommand\x12U\n" +
+	"\x12set_window_visible\x18\x03 \x01(\v2%.iterm2.TmuxResponse.SetWindowVisibleH\x00R\x10setWindowVisible\x12H\n" +
+	"\rcreate_window\x18\x05 \x01(\v2!.iterm2.TmuxResponse.CreateWindowH\x00R\fcreateWindow\x123\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x1b.iterm2.TmuxResponse.StatusR\x06status\x1a\xc3\x01\n" +
+	"\x0fListConnections\x12Q\n" +
+	"\vconnections\x18\x01 \x03(\v2/.iterm2.TmuxResponse.ListConnections.ConnectionR\vconnections\x1a]\n" +
+	"\n" +
+	"Connection\x12#\n" +
+	"\rconnection_id\x18\x01 \x01(\tR\fconnectionId\x12*\n" +
+	"\x11owning_session_id\x18\x02 \x01(\tR\x0fowningSessionId\x1a%\n" +
+	"\vSendCommand\x12\x16\n" +
+	"\x06output\x18\x01 \x01(\tR\x06output\x1a\x12\n" +
+	"\x10SetWindowVisible\x1a%\n" +
+	"\fCreateWindow\x12\x15\n" +
+	"\x06tab_id\x18\x01 \x01(\tR\x05tabId\"W\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x13\n" +
+	"\x0fINVALID_REQUEST\x10\x01\x12\x19\n" +
+	"\x15INVALID_CONNECTION_ID\x10\x02\x12\x15\n" +
+	"\x11INVALID_WINDOW_ID\x10\x03B\t\n" +
+	"\apayload\"\x1c\n" +
+	"\x1aGetBroadcastDomainsRequest\"2\n" +
+	"\x0fBroadcastDomain\x12\x1f\n" +
+	"\vsession_ids\x18\x01 \x03(\tR\n" +
+	"sessionIds\"c\n" +
+	"\x1bGetBroadcastDomainsResponse\x12D\n" +
+	"\x11broadcast_domains\x18\x01 \x03(\v2\x17.iterm2.BroadcastDomainR\x10broadcastDomains\"W\n" +
+	"\x13SetTabLayoutRequest\x12)\n" +
+	"\x04root\x18\x01 \x01(\v2\x15.iterm2.SplitTreeNodeR\x04root\x12\x15\n" +
+	"\x06tab_id\x18\x02 \x01(\tR\x05tabId\"\x97\x01\n" +
+	"\x14SetTabLayoutResponse\x12;\n" +
+	"\x06status\x18\x01 \x01(\x0e2#.iterm2.SetTabLayoutResponse.StatusR\x06status\"B\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x0e\n" +
+	"\n" +
+	"BAD_TAB_ID\x10\x01\x12\x0e\n" +
+	"\n" +
+	"WRONG_TREE\x10\x02\x12\x10\n" +
+	"\fINVALID_SIZE\x10\x03\"P\n" +
+	"\x0fMenuItemRequest\x12\x1e\n" +
+	"\n" +
+	"identifier\x18\x01 \x01(\tR\n" +
+	"identifier\x12\x1d\n" +
+	"\n" +
+	"query_only\x18\x02 \x01(\bR\tqueryOnly\"\xb3\x01\n" +
+	"\x10MenuItemResponse\x127\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1f.iterm2.MenuItemResponse.StatusR\x06status\x12\x18\n" +
+	"\achecked\x18\x02 \x01(\bR\achecked\x12\x18\n" +
+	"\aenabled\x18\x03 \x01(\bR\aenabled\"2\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x12\n" +
+	"\x0eBAD_IDENTIFIER\x10\x01\x12\f\n" +
+	"\bDISABLED\x10\x02\"\\\n" +
+	"\x15RestartSessionRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12$\n" +
+	"\x0eonly_if_exited\x18\x02 \x01(\bR\fonlyIfExited\"\x9d\x01\n" +
+	"\x16RestartSessionResponse\x12=\n" +
+	"\x06status\x18\x01 \x01(\x0e2%.iterm2.RestartSessionResponse.StatusR\x06status\"D\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x15\n" +
+	"\x11SESSION_NOT_FOUND\x10\x01\x12\x1b\n" +
+	"\x17SESSION_NOT_RESTARTABLE\x10\x02\"\x95\x01\n" +
+	" ServerOriginatedRPCResultRequest\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\x12'\n" +
+	"\x0ejson_exception\x18\x02 \x01(\tH\x00R\rjsonException\x12\x1f\n" +
+	"\n" +
+	"json_value\x18\x03 \x01(\tH\x00R\tjsonValueB\b\n" +
+	"\x06result\"#\n" +
+	"!ServerOriginatedRPCResultResponse\"K\n" +
+	"\x13ListProfilesRequest\x12\x1e\n" +
+	"\n" +
+	"properties\x18\x01 \x03(\tR\n" +
+	"properties\x12\x14\n" +
+	"\x05guids\x18\x02 \x03(\tR\x05guids\"\x9c\x01\n" +
+	"\x14ListProfilesResponse\x12@\n" +
+	"\bprofiles\x18\x01 \x03(\v2$.iterm2.ListProfilesResponse.ProfileR\bprofiles\x1aB\n" +
+	"\aProfile\x127\n" +
+	"\n" +
+	"properties\x18\x01 \x03(\v2\x17.iterm2.ProfilePropertyR\n" +
+	"properties\"\x0e\n" +
+	"\fFocusRequest\"W\n" +
+	"\rFocusResponse\x12F\n" +
+	"\rnotifications\x18\x01 \x03(\v2 .iterm2.FocusChangedNotificationR\rnotifications\"\xb5\x01\n" +
+	"\x17SavedArrangementRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12>\n" +
+	"\x06action\x18\x02 \x01(\x0e2&.iterm2.SavedArrangementRequest.ActionR\x06action\x12\x1b\n" +
+	"\twindow_id\x18\x03 \x01(\tR\bwindowId\")\n" +
+	"\x06Action\x12\v\n" +
+	"\aRESTORE\x10\x00\x12\b\n" +
+	"\x04SAVE\x10\x01\x12\b\n" +
+	"\x04LIST\x10\x02\"\xcb\x01\n" +
+	"\x18SavedArrangementResponse\x12?\n" +
+	"\x06status\x18\x01 \x01(\x0e2'.iterm2.SavedArrangementResponse.StatusR\x06status\x12\x14\n" +
+	"\x05names\x18\x02 \x03(\tR\x05names\"X\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x19\n" +
+	"\x15ARRANGEMENT_NOT_FOUND\x10\x01\x12\x14\n" +
+	"\x10WINDOW_NOT_FOUND\x10\x02\x12\x15\n" +
+	"\x11REQUEST_MALFORMED\x10\x03\"\xf9\x01\n" +
+	"\x0fVariableRequest\x12\x1f\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tH\x00R\tsessionId\x12\x17\n" +
+	"\x06tab_id\x18\x04 \x01(\tH\x00R\x05tabId\x12\x12\n" +
+	"\x03app\x18\x05 \x01(\bH\x00R\x03app\x12\x1d\n" +
+	"\twindow_id\x18\x06 \x01(\tH\x00R\bwindowId\x12-\n" +
+	"\x03set\x18\x02 \x03(\v2\x1b.iterm2.VariableRequest.SetR\x03set\x12\x10\n" +
+	"\x03get\x18\x03 \x03(\tR\x03get\x1a/\n" +
+	"\x03Set\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05valueB\a\n" +
+	"\x05scope\"\xf5\x01\n" +
+	"\x10VariableResponse\x127\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1f.iterm2.VariableResponse.StatusR\x06status\x12\x16\n" +
+	"\x06values\x18\x02 \x03(\tR\x06values\"\x8f\x01\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x15\n" +
+	"\x11SESSION_NOT_FOUND\x10\x01\x12\x10\n" +
+	"\fINVALID_NAME\x10\x02\x12\x11\n" +
+	"\rMISSING_SCOPE\x10\x03\x12\x11\n" +
+	"\rTAB_NOT_FOUND\x10\x04\x12\x18\n" +
+	"\x14MULTI_GET_DISALLOWED\x10\x05\x12\x14\n" +
+	"\x10WINDOW_NOT_FOUND\x10\x06\"\x8f\x03\n" +
+	"\x0fActivateRequest\x12\x1d\n" +
+	"\twindow_id\x18\x01 \x01(\tH\x00R\bwindowId\x12\x17\n" +
+	"\x06tab_id\x18\x02 \x01(\tH\x00R\x05tabId\x12\x1f\n" +
+	"\n" +
+	"session_id\x18\x03 \x01(\tH\x00R\tsessionId\x12,\n" +
+	"\x12order_window_front\x18\x04 \x01(\bR\x10orderWindowFront\x12\x1d\n" +
+	"\n" +
+	"select_tab\x18\x05 \x01(\bR\tselectTab\x12%\n" +
+	"\x0eselect_session\x18\x06 \x01(\bR\rselectSession\x12>\n" +
+	"\factivate_app\x18\a \x01(\v2\x1b.iterm2.ActivateRequest.AppR\vactivateApp\x1aa\n" +
+	"\x03App\x12*\n" +
+	"\x11raise_all_windows\x18\x01 \x01(\bR\x0fraiseAllWindows\x12.\n" +
+	"\x13ignoring_other_apps\x18\x02 \x01(\bR\x11ignoringOtherAppsB\f\n" +
+	"\n" +
+	"identifier\"\x85\x01\n" +
+	"\x10ActivateResponse\x127\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1f.iterm2.ActivateResponse.StatusR\x06status\"8\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x12\n" +
+	"\x0eBAD_IDENTIFIER\x10\x01\x12\x12\n" +
+	"\x0eINVALID_OPTION\x10\x02\"B\n" +
+	"\rInjectRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x03(\tR\tsessionId\x12\x12\n" +
+	"\x04data\x18\x02 \x01(\fR\x04data\"p\n" +
+	"\x0eInjectResponse\x125\n" +
+	"\x06status\x18\x01 \x03(\x0e2\x1d.iterm2.InjectResponse.StatusR\x06status\"'\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x15\n" +
+	"\x11SESSION_NOT_FOUND\x10\x01\"v\n" +
+	"\x12GetPropertyRequest\x12\x1d\n" +
+	"\twindow_id\x18\x01 \x01(\tH\x00R\bwindowId\x12\x1f\n" +
+	"\n" +
+	"session_id\x18\x03 \x01(\tH\x00R\tsessionId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04nameB\f\n" +
+	"\n" +
+	"identifier\"\xad\x01\n" +
+	"\x13GetPropertyResponse\x12:\n" +
+	"\x06status\x18\x01 \x01(\x0e2\".iterm2.GetPropertyResponse.StatusR\x06status\x12\x1d\n" +
+	"\n" +
+	"json_value\x18\x02 \x01(\tR\tjsonValue\";\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x15\n" +
+	"\x11UNRECOGNIZED_NAME\x10\x01\x12\x12\n" +
+	"\x0eINVALID_TARGET\x10\x02\"\x95\x01\n" +
+	"\x12SetPropertyRequest\x12\x1d\n" +
+	"\twindow_id\x18\x01 \x01(\tH\x00R\bwindowId\x12\x1f\n" +
+	"\n" +
+	"session_id\x18\x05 \x01(\tH\x00R\tsessionId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"json_value\x18\x04 \x01(\tR\tjsonValueB\f\n" +
+	"\n" +
+	"identifier\"\xcb\x01\n" +
+	"\x13SetPropertyResponse\x12:\n" +
+	"\x06status\x18\x01 \x01(\x0e2\".iterm2.SetPropertyResponse.StatusR\x06status\"x\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x15\n" +
+	"\x11UNRECOGNIZED_NAME\x10\x01\x12\x11\n" +
+	"\rINVALID_VALUE\x10\x02\x12\x12\n" +
+	"\x0eINVALID_TARGET\x10\x03\x12\f\n" +
+	"\bDEFERRED\x10\x04\x12\x0e\n" +
+	"\n" +
+	"IMPOSSIBLE\x10\x05\x12\n" +
+	"\n" +
+	"\x06FAILED\x10\x06\"\x94\x02\n" +
+	"\x13RegisterToolRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1e\n" +
+	"\n" +
+	"identifier\x18\x02 \x01(\tR\n" +
+	"identifier\x12F\n" +
+	"\x1creveal_if_already_registered\x18\x05 \x01(\b:\x05falseR\x19revealIfAlreadyRegistered\x12P\n" +
+	"\ttool_type\x18\x03 \x01(\x0e2$.iterm2.RegisterToolRequest.ToolType:\rWEB_VIEW_TOOLR\btoolType\x12\x10\n" +
+	"\x03URL\x18\x04 \x01(\tR\x03URL\"\x1d\n" +
+	"\bToolType\x12\x11\n" +
+	"\rWEB_VIEW_TOOL\x10\x01\"\xd9\x0f\n" +
+	"\x16RPCRegistrationRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12Q\n" +
+	"\targuments\x18\x02 \x03(\v23.iterm2.RPCRegistrationRequest.RPCArgumentSignatureR\targuments\x12F\n" +
+	"\bdefaults\x18\x04 \x03(\v2*.iterm2.RPCRegistrationRequest.RPCArgumentR\bdefaults\x12\x18\n" +
+	"\atimeout\x18\x03 \x01(\x02R\atimeout\x12@\n" +
+	"\x04role\x18\x05 \x01(\x0e2#.iterm2.RPCRegistrationRequest.Role:\aGENERICR\x04role\x12q\n" +
+	"\x18session_title_attributes\x18\a \x01(\v25.iterm2.RPCRegistrationRequest.SessionTitleAttributesH\x00R\x16sessionTitleAttributes\x12\x84\x01\n" +
+	"\x1fstatus_bar_component_attributes\x18\b \x01(\v2;.iterm2.RPCRegistrationRequest.StatusBarComponentAttributesH\x00R\x1cstatusBarComponentAttributes\x12n\n" +
+	"\x17context_menu_attributes\x18\t \x01(\v24.iterm2.RPCRegistrationRequest.ContextMenuAttributesH\x00R\x15contextMenuAttributes\x12%\n" +
+	"\fdisplay_name\x18\x06 \x01(\tB\x02\x18\x01R\vdisplayName\x1a*\n" +
+	"\x14RPCArgumentSignature\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x1a5\n" +
+	"\vRPCArgument\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
+	"\x04path\x18\x02 \x01(\tR\x04path\x1ah\n" +
+	"\x16SessionTitleAttributes\x12!\n" +
+	"\fdisplay_name\x18\x01 \x01(\tR\vdisplayName\x12+\n" +
+	"\x11unique_identifier\x18\x06 \x01(\tR\x10uniqueIdentifier\x1a\xfe\x06\n" +
+	"\x1cStatusBarComponentAttributes\x12+\n" +
+	"\x11short_description\x18\x01 \x01(\tR\x10shortDescription\x121\n" +
+	"\x14detailed_description\x18\x02 \x01(\tR\x13detailedDescription\x12V\n" +
+	"\x05knobs\x18\x03 \x03(\v2@.iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.KnobR\x05knobs\x12\x1a\n" +
+	"\bexemplar\x18\x04 \x01(\tR\bexemplar\x12%\n" +
+	"\x0eupdate_cadence\x18\x05 \x01(\x02R\rupdateCadence\x12+\n" +
+	"\x11unique_identifier\x18\x06 \x01(\tR\x10uniqueIdentifier\x12V\n" +
+	"\x05icons\x18\a \x03(\v2@.iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.IconR\x05icons\x12f\n" +
+	"\x06format\x18\b \x01(\x0e2B.iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Format:\n" +
+	"PLAIN_TEXTR\x06format\x1a\x9f\x02\n" +
+	"\x04Knob\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12Y\n" +
+	"\x04type\x18\x02 \x01(\x0e2E.iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Knob.TypeR\x04type\x12 \n" +
+	"\vplaceholder\x18\x03 \x01(\tR\vplaceholder\x12,\n" +
+	"\x12json_default_value\x18\x04 \x01(\tR\x10jsonDefaultValue\x12\x10\n" +
+	"\x03key\x18\x05 \x01(\tR\x03key\"F\n" +
+	"\x04Type\x12\f\n" +
+	"\bCheckbox\x10\x01\x12\n" +
+	"\n" +
+	"\x06String\x10\x02\x12\x19\n" +
+	"\x15PositiveFloatingPoint\x10\x03\x12\t\n" +
+	"\x05Color\x10\x04\x1a0\n" +
+	"\x04Icon\x12\x12\n" +
+	"\x04data\x18\x01 \x01(\fR\x04data\x12\x14\n" +
+	"\x05scale\x18\x02 \x01(\x02R\x05scale\"\"\n" +
+	"\x06Format\x12\x0e\n" +
+	"\n" +
+	"PLAIN_TEXT\x10\x00\x12\b\n" +
+	"\x04HTML\x10\x01\x1ag\n" +
+	"\x15ContextMenuAttributes\x12!\n" +
+	"\fdisplay_name\x18\x01 \x01(\tR\vdisplayName\x12+\n" +
+	"\x11unique_identifier\x18\x02 \x01(\tR\x10uniqueIdentifier\"R\n" +
+	"\x04Role\x12\v\n" +
+	"\aGENERIC\x10\x01\x12\x11\n" +
+	"\rSESSION_TITLE\x10\x02\x12\x18\n" +
+	"\x14STATUS_BAR_COMPONENT\x10\x03\x12\x10\n" +
+	"\fCONTEXT_MENU\x10\x04B\x18\n" +
+	"\x16RoleSpecificAttributes\"\x93\x01\n" +
+	"\x14RegisterToolResponse\x12;\n" +
+	"\x06status\x18\x01 \x01(\x0e2#.iterm2.RegisterToolResponse.StatusR\x06status\">\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x15\n" +
+	"\x11REQUEST_MALFORMED\x10\x01\x12\x15\n" +
+	"\x11PERMISSION_DENIED\x10\x02\"\x98\x02\n" +
+	"\x10KeystrokePattern\x12@\n" +
+	"\x12required_modifiers\x18\x01 \x03(\x0e2\x11.iterm2.ModifiersR\x11requiredModifiers\x12B\n" +
+	"\x13forbidden_modifiers\x18\x02 \x03(\x0e2\x11.iterm2.ModifiersR\x12forbiddenModifiers\x12\x1a\n" +
+	"\bkeycodes\x18\x03 \x03(\x05R\bkeycodes\x12\x1e\n" +
+	"\n" +
+	"characters\x18\x04 \x03(\tR\n" +
+	"characters\x12B\n" +
+	"\x1dcharacters_ignoring_modifiers\x18\x05 \x03(\tR\x1bcharactersIgnoringModifiers\"\x81\x01\n" +
+	"\x17KeystrokeMonitorRequest\x12J\n" +
+	"\x12patterns_to_ignore\x18\x01 \x03(\v2\x18.iterm2.KeystrokePatternB\x02\x18\x01R\x10patternsToIgnore\x12\x1a\n" +
+	"\badvanced\x18\x02 \x01(\bR\badvanced\"`\n" +
+	"\x16KeystrokeFilterRequest\x12F\n" +
+	"\x12patterns_to_ignore\x18\x01 \x03(\v2\x18.iterm2.KeystrokePatternR\x10patternsToIgnore\"y\n" +
+	"\x16VariableMonitorRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12+\n" +
+	"\x05scope\x18\x02 \x01(\x0e2\x15.iterm2.VariableScopeR\x05scope\x12\x1e\n" +
+	"\n" +
+	"identifier\x18\x03 \x01(\tR\n" +
+	"identifier\"*\n" +
+	"\x14ProfileChangeRequest\x12\x12\n" +
+	"\x04guid\x18\x01 \x01(\tR\x04guid\"G\n" +
+	"\x14PromptMonitorRequest\x12/\n" +
+	"\x05modes\x18\x01 \x03(\x0e2\x19.iterm2.PromptMonitorModeR\x05modes\"\xc0\x05\n" +
+	"\x13NotificationRequest\x12\x18\n" +
+	"\asession\x18\x01 \x01(\tR\asession\x12\x1c\n" +
+	"\tsubscribe\x18\x02 \x01(\bR\tsubscribe\x12E\n" +
+	"\x11notification_type\x18\x03 \x01(\x0e2\x18.iterm2.NotificationTypeR\x10notificationType\x12Z\n" +
+	"\x18rpc_registration_request\x18\x04 \x01(\v2\x1e.iterm2.RPCRegistrationRequestH\x00R\x16rpcRegistrationRequest\x12]\n" +
+	"\x19keystroke_monitor_request\x18\x05 \x01(\v2\x1f.iterm2.KeystrokeMonitorRequestH\x00R\x17keystrokeMonitorRequest\x12Z\n" +
+	"\x18variable_monitor_request\x18\x06 \x01(\v2\x1e.iterm2.VariableMonitorRequestH\x00R\x16variableMonitorRequest\x12T\n" +
+	"\x16profile_change_request\x18\a \x01(\v2\x1c.iterm2.ProfileChangeRequestH\x00R\x14profileChangeRequest\x12Z\n" +
+	"\x18keystroke_filter_request\x18\b \x01(\v2\x1e.iterm2.KeystrokeFilterRequestH\x00R\x16keystrokeFilterRequest\x12T\n" +
+	"\x16prompt_monitor_request\x18\t \x01(\v2\x1c.iterm2.PromptMonitorRequestH\x00R\x14promptMonitorRequestB\v\n" +
+	"\targuments\"\xfd\x01\n" +
+	"\x14NotificationResponse\x12;\n" +
+	"\x06status\x18\x01 \x01(\x0e2#.iterm2.NotificationResponse.StatusR\x06status\"\xa7\x01\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x15\n" +
+	"\x11SESSION_NOT_FOUND\x10\x01\x12\x15\n" +
+	"\x11REQUEST_MALFORMED\x10\x02\x12\x12\n" +
+	"\x0eNOT_SUBSCRIBED\x10\x03\x12\x16\n" +
+	"\x12ALREADY_SUBSCRIBED\x10\x04\x12#\n" +
+	"\x1fDUPLICATE_SERVER_ORIGINATED_RPC\x10\x05\x12\x16\n" +
+	"\x12INVALID_IDENTIFIER\x10\x06\"\xab\n" +
 	"\n" +
 	"\fNotification\x12T\n" +
 	"\x16keystroke_notification\x18\x01 \x01(\v2\x1d.iterm2.KeystrokeNotificationR\x15keystrokeNotification\x12^\n" +
@@ -13506,7 +15495,29 @@ const file_api_proto_rawDesc = "" +
 	" \x01(\v2'.iterm2.ServerOriginatedRPCNotificationR\x1fserverOriginatedRpcNotification\x12g\n" +
 	"\x19broadcast_domains_changed\x18\v \x01(\v2+.iterm2.BroadcastDomainsChangedNotificationR\x17broadcastDomainsChanged\x12g\n" +
 	"\x1dvariable_changed_notification\x18\f \x01(\v2#.iterm2.VariableChangedNotificationR\x1bvariableChangedNotification\x12d\n" +
-	"\x1cprofile_changed_notification\x18\r \x01(\v2\".iterm2.ProfileChangedNotificationR\x1aprofileChangedNotification\"\xd3\x02\n" +
+	"\x1cprofile_changed_notification\x18\r \x01(\v2\".iterm2.ProfileChangedNotificationR\x1aprofileChangedNotification\"0\n" +
+	"\x1aProfileChangedNotification\x12\x12\n" +
+	"\x04guid\x18\x01 \x01(\tR\x04guid\"\xa4\x01\n" +
+	"\x1bVariableChangedNotification\x12+\n" +
+	"\x05scope\x18\x01 \x01(\x0e2\x15.iterm2.VariableScopeR\x05scope\x12\x1e\n" +
+	"\n" +
+	"identifier\x18\x02 \x01(\tR\n" +
+	"identifier\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12$\n" +
+	"\x0ejson_new_value\x18\x04 \x01(\tR\fjsonNewValue\"k\n" +
+	"#BroadcastDomainsChangedNotification\x12D\n" +
+	"\x11broadcast_domains\x18\x01 \x03(\v2\x17.iterm2.BroadcastDomainR\x10broadcastDomains\"\xb2\x01\n" +
+	"\x13ServerOriginatedRPC\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12E\n" +
+	"\targuments\x18\x03 \x03(\v2'.iterm2.ServerOriginatedRPC.RPCArgumentR\targuments\x1a@\n" +
+	"\vRPCArgument\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"json_value\x18\x02 \x01(\tR\tjsonValue\"o\n" +
+	"\x1fServerOriginatedRPCNotification\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\x12-\n" +
+	"\x03rpc\x18\x02 \x01(\v2\x1b.iterm2.ServerOriginatedRPCR\x03rpc\"\xd3\x02\n" +
 	"\x15KeystrokeNotification\x12\x1e\n" +
 	"\n" +
 	"characters\x18\x01 \x01(\tR\n" +
@@ -13522,28 +15533,7 @@ const file_api_proto_rawDesc = "" +
 	"\x06KEY_UP\x10\x01\x12\x11\n" +
 	"\rFLAGS_CHANGED\x10\x02\"4\n" +
 	"\x18ScreenUpdateNotification\x12\x18\n" +
-	"\asession\x18\x01 \x01(\tR\asession\"\xd7\x04\n" +
-	"\x11GetPromptResponse\x12<\n" +
-	"\x06status\x18\x01 \x01(\x0e2 .iterm2.GetPromptResponse.Status:\x02OKR\x06status\x125\n" +
-	"\fprompt_range\x18\x02 \x01(\v2\x12.iterm2.CoordRangeR\vpromptRange\x127\n" +
-	"\rcommand_range\x18\x03 \x01(\v2\x12.iterm2.CoordRangeR\fcommandRange\x125\n" +
-	"\foutput_range\x18\x04 \x01(\v2\x12.iterm2.CoordRangeR\voutputRange\x12+\n" +
-	"\x11working_directory\x18\x05 \x01(\tR\x10workingDirectory\x12\x18\n" +
-	"\acommand\x18\x06 \x01(\tR\acommand\x12B\n" +
-	"\fprompt_state\x18\a \x01(\x0e2\x1f.iterm2.GetPromptResponse.StateR\vpromptState\x12\x1f\n" +
-	"\vexit_status\x18\t \x01(\rR\n" +
-	"exitStatus\x12(\n" +
-	"\x10unique_prompt_id\x18\n" +
-	" \x01(\tR\x0euniquePromptId\"V\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11SESSION_NOT_FOUND\x10\x01\x12\x15\n" +
-	"\x11REQUEST_MALFORMED\x10\x02\x12\x16\n" +
-	"\x12PROMPT_UNAVAILABLE\x10\x03\"/\n" +
-	"\x05State\x12\v\n" +
-	"\aEDITING\x10\x00\x12\v\n" +
-	"\aRUNNING\x10\x01\x12\f\n" +
-	"\bFINISHED\x10\x02\"o\n" +
+	"\asession\x18\x01 \x01(\tR\asession\"o\n" +
 	"\x18PromptNotificationPrompt\x12 \n" +
 	"\vplaceholder\x18\x01 \x01(\tR\vplaceholder\x121\n" +
 	"\x06prompt\x18\x02 \x01(\v2\x19.iterm2.GetPromptResponseR\x06prompt\":\n" +
@@ -13588,71 +15578,75 @@ const file_api_proto_rawDesc = "" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\"o\n" +
 	"\x19LayoutChangedNotification\x12R\n" +
-	"\x16list_sessions_response\x18\x01 \x01(\v2\x1c.iterm2.ListSessionsResponseR\x14listSessionsResponse\"\xb2\x01\n" +
-	"\x13ServerOriginatedRPC\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12E\n" +
-	"\targuments\x18\x03 \x03(\v2'.iterm2.ServerOriginatedRPC.RPCArgumentR\targuments\x1a@\n" +
-	"\vRPCArgument\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
+	"\x16list_sessions_response\x18\x01 \x01(\v2\x1c.iterm2.ListSessionsResponseR\x14listSessionsResponse\"\x85\x01\n" +
+	"\x10GetBufferRequest\x12\x18\n" +
+	"\asession\x18\x01 \x01(\tR\asession\x120\n" +
 	"\n" +
-	"json_value\x18\x02 \x01(\tR\tjsonValue\"o\n" +
-	"\x1fServerOriginatedRPCNotification\x12\x1d\n" +
-	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\x12-\n" +
-	"\x03rpc\x18\x02 \x01(\v2\x1b.iterm2.ServerOriginatedRPCR\x03rpc\"2\n" +
-	"\x0fBroadcastDomain\x12\x1f\n" +
-	"\vsession_ids\x18\x01 \x03(\tR\n" +
-	"sessionIds\"k\n" +
-	"#BroadcastDomainsChangedNotification\x12D\n" +
-	"\x11broadcast_domains\x18\x01 \x03(\v2\x17.iterm2.BroadcastDomainR\x10broadcastDomains\"\x8d\x01\n" +
-	"\x1bVariableChangedNotification\x12\x14\n" +
-	"\x05scope\x18\x01 \x01(\x05R\x05scope\x12\x1e\n" +
-	"\n" +
-	"identifier\x18\x02 \x01(\tR\n" +
-	"identifier\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12$\n" +
-	"\x0ejson_new_value\x18\x04 \x01(\tR\fjsonNewValue\"0\n" +
-	"\x1aProfileChangedNotification\x12\x12\n" +
-	"\x04guid\x18\x01 \x01(\tR\x04guid\"V\n" +
+	"line_range\x18\x02 \x01(\v2\x11.iterm2.LineRangeR\tlineRange\x12%\n" +
+	"\x0einclude_styles\x18\x03 \x01(\bR\rincludeStyles\"\xb2\x03\n" +
+	"\x11GetBufferResponse\x12<\n" +
+	"\x06status\x18\x01 \x01(\x0e2 .iterm2.GetBufferResponse.Status:\x02OKR\x06status\x12'\n" +
+	"\x05range\x18\x02 \x01(\v2\r.iterm2.RangeB\x02\x18\x01R\x05range\x120\n" +
+	"\bcontents\x18\x03 \x03(\v2\x14.iterm2.LineContentsR\bcontents\x12%\n" +
+	"\x06cursor\x18\x04 \x01(\v2\r.iterm2.CoordR\x06cursor\x127\n" +
+	"\x16num_lines_above_screen\x18\x05 \x01(\x03B\x02\x18\x01R\x13numLinesAboveScreen\x12L\n" +
+	"\x14windowed_coord_range\x18\x06 \x01(\v2\x1a.iterm2.WindowedCoordRangeR\x12windowedCoordRange\"V\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x15\n" +
+	"\x11SESSION_NOT_FOUND\x10\x01\x12\x16\n" +
+	"\x12INVALID_LINE_RANGE\x10\x02\x12\x15\n" +
+	"\x11REQUEST_MALFORMED\x10\x03\"V\n" +
 	"\x10GetPromptRequest\x12\x18\n" +
 	"\asession\x18\x01 \x01(\tR\asession\x12(\n" +
-	"\x10unique_prompt_id\x18\x02 \x01(\tR\x0euniquePromptId\"*\n" +
-	"\x12TransactionRequest\x12\x14\n" +
-	"\x05begin\x18\x01 \x01(\bR\x05begin\"\x97\x01\n" +
-	"\x13TransactionResponse\x12>\n" +
-	"\x06status\x18\x01 \x01(\x0e2\".iterm2.TransactionResponse.Status:\x02OKR\x06status\"@\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x12\n" +
-	"\x0eNO_TRANSACTION\x10\x01\x12\x1a\n" +
-	"\x16ALREADY_IN_TRANSACTION\x10\x02\"z\n" +
-	"\x13NotificationRequest\x12\x18\n" +
-	"\asession\x18\x01 \x01(\tR\asession\x12\x1c\n" +
-	"\tsubscribe\x18\x02 \x01(\bR\tsubscribe\x12+\n" +
-	"\x11notification_type\x18\x03 \x01(\x05R\x10notificationType\"\xfd\x01\n" +
-	"\x14NotificationResponse\x12;\n" +
-	"\x06status\x18\x01 \x01(\x0e2#.iterm2.NotificationResponse.StatusR\x06status\"\xa7\x01\n" +
+	"\x10unique_prompt_id\x18\x02 \x01(\tR\x0euniquePromptId\"\xd7\x04\n" +
+	"\x11GetPromptResponse\x12<\n" +
+	"\x06status\x18\x01 \x01(\x0e2 .iterm2.GetPromptResponse.Status:\x02OKR\x06status\x125\n" +
+	"\fprompt_range\x18\x02 \x01(\v2\x12.iterm2.CoordRangeR\vpromptRange\x127\n" +
+	"\rcommand_range\x18\x03 \x01(\v2\x12.iterm2.CoordRangeR\fcommandRange\x125\n" +
+	"\foutput_range\x18\x04 \x01(\v2\x12.iterm2.CoordRangeR\voutputRange\x12+\n" +
+	"\x11working_directory\x18\x05 \x01(\tR\x10workingDirectory\x12\x18\n" +
+	"\acommand\x18\x06 \x01(\tR\acommand\x12B\n" +
+	"\fprompt_state\x18\a \x01(\x0e2\x1f.iterm2.GetPromptResponse.StateR\vpromptState\x12\x1f\n" +
+	"\vexit_status\x18\t \x01(\rR\n" +
+	"exitStatus\x12(\n" +
+	"\x10unique_prompt_id\x18\n" +
+	" \x01(\tR\x0euniquePromptId\"V\n" +
 	"\x06Status\x12\x06\n" +
 	"\x02OK\x10\x00\x12\x15\n" +
 	"\x11SESSION_NOT_FOUND\x10\x01\x12\x15\n" +
-	"\x11REQUEST_MALFORMED\x10\x02\x12\x12\n" +
-	"\x0eNOT_SUBSCRIBED\x10\x03\x12\x16\n" +
-	"\x12ALREADY_SUBSCRIBED\x10\x04\x12#\n" +
-	"\x1fDUPLICATE_SERVER_ORIGINATED_RPC\x10\x05\x12\x16\n" +
-	"\x12INVALID_IDENTIFIER\x10\x06\"\xc3\x01\n" +
-	"\x13RegisterToolRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1e\n" +
-	"\n" +
-	"identifier\x18\x02 \x01(\tR\n" +
-	"identifier\x12\x1e\n" +
-	"\ttool_type\x18\x03 \x01(\x05:\x011R\btoolType\x12\x10\n" +
-	"\x03URL\x18\x04 \x01(\tR\x03URL\x12F\n" +
-	"\x1creveal_if_already_registered\x18\x05 \x01(\b:\x05falseR\x19revealIfAlreadyRegistered\"\x93\x01\n" +
-	"\x14RegisterToolResponse\x12;\n" +
-	"\x06status\x18\x01 \x01(\x0e2#.iterm2.RegisterToolResponse.StatusR\x06status\">\n" +
+	"\x11REQUEST_MALFORMED\x10\x02\x12\x16\n" +
+	"\x12PROMPT_UNAVAILABLE\x10\x03\"/\n" +
+	"\x05State\x12\v\n" +
+	"\aEDITING\x10\x00\x12\v\n" +
+	"\aRUNNING\x10\x01\x12\f\n" +
+	"\bFINISHED\x10\x02\"|\n" +
+	"\x12ListPromptsRequest\x12\x18\n" +
+	"\asession\x18\x01 \x01(\tR\asession\x12&\n" +
+	"\x0ffirst_unique_id\x18\x02 \x01(\tR\rfirstUniqueId\x12$\n" +
+	"\x0elast_unique_id\x18\x03 \x01(\tR\flastUniqueId\"\xa8\x01\n" +
+	"\x13ListPromptsResponse\x12>\n" +
+	"\x06status\x18\x01 \x01(\x0e2\".iterm2.ListPromptsResponse.Status:\x02OKR\x06status\x12(\n" +
+	"\x10unique_prompt_id\x18\x02 \x03(\tR\x0euniquePromptId\"'\n" +
 	"\x06Status\x12\x06\n" +
 	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11REQUEST_MALFORMED\x10\x01\x12\x15\n" +
-	"\x11PERMISSION_DENIED\x10\x02\"\xee\x02\n" +
+	"\x11SESSION_NOT_FOUND\x10\x01\"I\n" +
+	"\x19GetProfilePropertyRequest\x12\x18\n" +
+	"\asession\x18\x01 \x01(\tR\asession\x12\x12\n" +
+	"\x04keys\x18\x02 \x03(\tR\x04keys\"B\n" +
+	"\x0fProfileProperty\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x1d\n" +
+	"\n" +
+	"json_value\x18\x02 \x01(\tR\tjsonValue\"\xe7\x01\n" +
+	"\x1aGetProfilePropertyResponse\x12E\n" +
+	"\x06status\x18\x01 \x01(\x0e2).iterm2.GetProfilePropertyResponse.Status:\x02OKR\x06status\x127\n" +
+	"\n" +
+	"properties\x18\x03 \x03(\v2\x17.iterm2.ProfilePropertyR\n" +
+	"properties\"I\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x15\n" +
+	"\x11SESSION_NOT_FOUND\x10\x01\x12\x15\n" +
+	"\x11REQUEST_MALFORMED\x10\x02\x12\t\n" +
+	"\x05ERROR\x10\x03\"\xee\x02\n" +
 	"\x19SetProfilePropertyRequest\x12\x1a\n" +
 	"\asession\x18\x01 \x01(\tH\x00R\asession\x12I\n" +
 	"\tguid_list\x18\x02 \x01(\v2*.iterm2.SetProfilePropertyRequest.GuidListH\x00R\bguidList\x12\x10\n" +
@@ -13674,20 +15668,142 @@ const file_api_proto_rawDesc = "" +
 	"\x02OK\x10\x00\x12\x15\n" +
 	"\x11SESSION_NOT_FOUND\x10\x01\x12\x15\n" +
 	"\x11REQUEST_MALFORMED\x10\x02\x12\f\n" +
-	"\bBAD_GUID\x10\x03\"I\n" +
-	"\x19GetProfilePropertyRequest\x12\x18\n" +
-	"\asession\x18\x01 \x01(\tR\asession\x12\x12\n" +
-	"\x04keys\x18\x02 \x03(\tR\x04keys\"\xe7\x01\n" +
-	"\x1aGetProfilePropertyResponse\x12E\n" +
-	"\x06status\x18\x01 \x01(\x0e2).iterm2.GetProfilePropertyResponse.Status:\x02OKR\x06status\x127\n" +
+	"\bBAD_GUID\x10\x03\"*\n" +
+	"\x12TransactionRequest\x12\x14\n" +
+	"\x05begin\x18\x01 \x01(\bR\x05begin\"\x97\x01\n" +
+	"\x13TransactionResponse\x12>\n" +
+	"\x06status\x18\x01 \x01(\x0e2\".iterm2.TransactionResponse.Status:\x02OKR\x06status\"@\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x12\n" +
+	"\x0eNO_TRANSACTION\x10\x01\x12\x1a\n" +
+	"\x16ALREADY_IN_TRANSACTION\x10\x02\"\xb2\x01\n" +
+	"\tLineRange\x120\n" +
+	"\x14screen_contents_only\x18\x01 \x01(\bR\x12screenContentsOnly\x12%\n" +
+	"\x0etrailing_lines\x18\x02 \x01(\x05R\rtrailingLines\x12L\n" +
+	"\x14windowed_coord_range\x18\x03 \x01(\v2\x1a.iterm2.WindowedCoordRangeR\x12windowedCoordRange\";\n" +
+	"\x05Range\x12\x1a\n" +
+	"\blocation\x18\x01 \x01(\x03R\blocation\x12\x16\n" +
+	"\x06length\x18\x02 \x01(\x03R\x06length\"R\n" +
 	"\n" +
-	"properties\x18\x03 \x03(\v2\x17.iterm2.ProfilePropertyR\n" +
-	"properties\"I\n" +
+	"CoordRange\x12#\n" +
+	"\x05start\x18\x01 \x01(\v2\r.iterm2.CoordR\x05start\x12\x1f\n" +
+	"\x03end\x18\x02 \x01(\v2\r.iterm2.CoordR\x03end\"#\n" +
+	"\x05Coord\x12\f\n" +
+	"\x01x\x18\x01 \x01(\x05R\x01x\x12\f\n" +
+	"\x01y\x18\x02 \x01(\x03R\x01y\"F\n" +
+	"\bRGBColor\x12\x10\n" +
+	"\x03red\x18\x01 \x01(\rR\x03red\x12\x14\n" +
+	"\x05green\x18\x02 \x01(\rR\x05green\x12\x12\n" +
+	"\x04blue\x18\x03 \x01(\rR\x04blue\"7\n" +
+	"\x03URL\x12\x10\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1e\n" +
+	"\n" +
+	"identifier\x18\x02 \x01(\tR\n" +
+	"identifier\"\xd0\x06\n" +
+	"\tCellStyle\x12 \n" +
+	"\n" +
+	"fgStandard\x18\x01 \x01(\rH\x00R\n" +
+	"fgStandard\x12:\n" +
+	"\vfgAlternate\x18\x02 \x01(\x0e2\x16.iterm2.AlternateColorH\x00R\vfgAlternate\x12(\n" +
+	"\x05fgRgb\x18\x03 \x01(\v2\x10.iterm2.RGBColorH\x00R\x05fgRgb\x126\n" +
+	"\x15fgAlternatePlacementX\x18\x04 \x01(\rH\x00R\x15fgAlternatePlacementX\x12 \n" +
+	"\n" +
+	"bgStandard\x18\x05 \x01(\rH\x01R\n" +
+	"bgStandard\x12:\n" +
+	"\vbgAlternate\x18\x06 \x01(\x0e2\x16.iterm2.AlternateColorH\x01R\vbgAlternate\x12(\n" +
+	"\x05bgRgb\x18\a \x01(\v2\x10.iterm2.RGBColorH\x01R\x05bgRgb\x126\n" +
+	"\x15bgAlternatePlacementY\x18\b \x01(\rH\x01R\x15bgAlternatePlacementY\x12\x12\n" +
+	"\x04bold\x18\t \x01(\bR\x04bold\x12\x14\n" +
+	"\x05faint\x18\n" +
+	" \x01(\bR\x05faint\x12\x16\n" +
+	"\x06italic\x18\v \x01(\bR\x06italic\x12\x14\n" +
+	"\x05blink\x18\f \x01(\bR\x05blink\x12\x1c\n" +
+	"\tunderline\x18\r \x01(\bR\tunderline\x12$\n" +
+	"\rstrikethrough\x18\x0e \x01(\bR\rstrikethrough\x12\x1c\n" +
+	"\tinvisible\x18\x0f \x01(\bR\tinvisible\x12\x18\n" +
+	"\ainverse\x18\x10 \x01(\bR\ainverse\x12\x18\n" +
+	"\aguarded\x18\x11 \x01(\bR\aguarded\x122\n" +
+	"\x05image\x18\x12 \x01(\x0e2\x1c.iterm2.ImagePlaceholderTypeR\x05image\x128\n" +
+	"\x0eunderlineColor\x18\x13 \x01(\v2\x10.iterm2.RGBColorR\x0eunderlineColor\x12\x18\n" +
+	"\ablockID\x18\x14 \x01(\tR\ablockID\x12\x1d\n" +
+	"\x03url\x18\x15 \x01(\v2\v.iterm2.URLR\x03url\x12\x18\n" +
+	"\arepeats\x18\x16 \x01(\rR\arepeatsB\t\n" +
+	"\afgColorB\t\n" +
+	"\abgColor\"\xbb\x02\n" +
+	"\fLineContents\x12\x12\n" +
+	"\x04text\x18\x01 \x01(\tR\x04text\x12J\n" +
+	"\x14code_points_per_cell\x18\x02 \x03(\v2\x19.iterm2.CodePointsPerCellR\x11codePointsPerCell\x12\\\n" +
+	"\fcontinuation\x18\x03 \x01(\x0e2!.iterm2.LineContents.Continuation:\x15CONTINUATION_HARD_EOLR\fcontinuation\x12'\n" +
+	"\x05style\x18\x04 \x03(\v2\x11.iterm2.CellStyleR\x05style\"D\n" +
+	"\fContinuation\x12\x19\n" +
+	"\x15CONTINUATION_HARD_EOL\x10\x01\x12\x19\n" +
+	"\x15CONTINUATION_SOFT_EOL\x10\x02\"X\n" +
+	"\x11CodePointsPerCell\x12)\n" +
+	"\x0fnum_code_points\x18\x01 \x01(\x05:\x011R\rnumCodePoints\x12\x18\n" +
+	"\arepeats\x18\x02 \x01(\x05R\arepeats\"\x15\n" +
+	"\x13ListSessionsRequest\"n\n" +
+	"\x0fSendTextRequest\x12\x18\n" +
+	"\asession\x18\x01 \x01(\tR\asession\x12\x12\n" +
+	"\x04text\x18\x02 \x01(\tR\x04text\x12-\n" +
+	"\x12suppress_broadcast\x18\x03 \x01(\bR\x11suppressBroadcast\"t\n" +
+	"\x10SendTextResponse\x127\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1f.iterm2.SendTextResponse.StatusR\x06status\"'\n" +
 	"\x06Status\x12\x06\n" +
 	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11SESSION_NOT_FOUND\x10\x01\x12\x15\n" +
-	"\x11REQUEST_MALFORMED\x10\x02\x12\t\n" +
-	"\x05ERROR\x10\x03\"\xc5\x02\n" +
+	"\x11SESSION_NOT_FOUND\x10\x01\"4\n" +
+	"\x04Size\x12\x14\n" +
+	"\x05width\x18\x01 \x01(\x05R\x05width\x12\x16\n" +
+	"\x06height\x18\x02 \x01(\x05R\x06height\"#\n" +
+	"\x05Point\x12\f\n" +
+	"\x01x\x18\x01 \x01(\x05R\x01x\x12\f\n" +
+	"\x01y\x18\x02 \x01(\x05R\x01y\"P\n" +
+	"\x05Frame\x12%\n" +
+	"\x06origin\x18\x01 \x01(\v2\r.iterm2.PointR\x06origin\x12 \n" +
+	"\x04size\x18\x02 \x01(\v2\f.iterm2.SizeR\x04size\"\xa3\x01\n" +
+	"\x0eSessionSummary\x12+\n" +
+	"\x11unique_identifier\x18\x01 \x01(\tR\x10uniqueIdentifier\x12#\n" +
+	"\x05frame\x18\x02 \x01(\v2\r.iterm2.FrameR\x05frame\x12)\n" +
+	"\tgrid_size\x18\x03 \x01(\v2\f.iterm2.SizeR\bgridSize\x12\x14\n" +
+	"\x05title\x18\x04 \x01(\tR\x05title\"\xe1\x01\n" +
+	"\rSplitTreeNode\x12\x1a\n" +
+	"\bvertical\x18\x01 \x01(\bR\bvertical\x129\n" +
+	"\x05links\x18\x02 \x03(\v2#.iterm2.SplitTreeNode.SplitTreeLinkR\x05links\x1ay\n" +
+	"\rSplitTreeLink\x122\n" +
+	"\asession\x18\x01 \x01(\v2\x16.iterm2.SessionSummaryH\x00R\asession\x12+\n" +
+	"\x04node\x18\x02 \x01(\v2\x15.iterm2.SplitTreeNodeH\x00R\x04nodeB\a\n" +
+	"\x05child\"\x96\x04\n" +
+	"\x14ListSessionsResponse\x12=\n" +
+	"\awindows\x18\x01 \x03(\v2#.iterm2.ListSessionsResponse.WindowR\awindows\x12?\n" +
+	"\x0fburied_sessions\x18\x02 \x03(\v2\x16.iterm2.SessionSummaryR\x0eburiedSessions\x1a\x98\x01\n" +
+	"\x06Window\x124\n" +
+	"\x04tabs\x18\x01 \x03(\v2 .iterm2.ListSessionsResponse.TabR\x04tabs\x12\x1b\n" +
+	"\twindow_id\x18\x02 \x01(\tR\bwindowId\x12#\n" +
+	"\x05frame\x18\x03 \x01(\v2\r.iterm2.FrameR\x05frame\x12\x16\n" +
+	"\x06number\x18\x04 \x01(\x05R\x06number\x1a\xe2\x01\n" +
+	"\x03Tab\x12)\n" +
+	"\x04root\x18\x03 \x01(\v2\x15.iterm2.SplitTreeNodeR\x04root\x12\x15\n" +
+	"\x06tab_id\x18\x02 \x01(\tR\x05tabId\x12$\n" +
+	"\x0etmux_window_id\x18\x04 \x01(\tR\ftmuxWindowId\x12,\n" +
+	"\x12tmux_connection_id\x18\x05 \x01(\tR\x10tmuxConnectionId\x12E\n" +
+	"\x12minimized_sessions\x18\x06 \x03(\v2\x16.iterm2.SessionSummaryR\x11minimizedSessions\"\xe2\x01\n" +
+	"\x10CreateTabRequest\x12!\n" +
+	"\fprofile_name\x18\x01 \x01(\tR\vprofileName\x12\x1b\n" +
+	"\twindow_id\x18\x02 \x01(\tR\bwindowId\x12\x1b\n" +
+	"\ttab_index\x18\x03 \x01(\rR\btabIndex\x12\x1c\n" +
+	"\acommand\x18\x04 \x01(\tB\x02\x18\x01R\acommand\x12S\n" +
+	"\x19custom_profile_properties\x18\x05 \x03(\v2\x17.iterm2.ProfilePropertyR\x17customProfileProperties\"\x94\x02\n" +
+	"\x11CreateTabResponse\x128\n" +
+	"\x06status\x18\x01 \x01(\x0e2 .iterm2.CreateTabResponse.StatusR\x06status\x12\x1b\n" +
+	"\twindow_id\x18\x02 \x01(\tR\bwindowId\x12\x15\n" +
+	"\x06tab_id\x18\x03 \x01(\x05R\x05tabId\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x04 \x01(\tR\tsessionId\"r\n" +
+	"\x06Status\x12\x06\n" +
+	"\x02OK\x10\x00\x12\x18\n" +
+	"\x14INVALID_PROFILE_NAME\x10\x01\x12\x15\n" +
+	"\x11INVALID_WINDOW_ID\x10\x02\x12\x15\n" +
+	"\x11INVALID_TAB_INDEX\x10\x03\x12\x18\n" +
+	"\x14MISSING_SUBSTITUTION\x10\x04\"\xc5\x02\n" +
 	"\x10SplitPaneRequest\x12\x18\n" +
 	"\asession\x18\x01 \x01(\tR\asession\x12P\n" +
 	"\x0fsplit_direction\x18\x02 \x01(\x0e2'.iterm2.SplitPaneRequest.SplitDirectionR\x0esplitDirection\x12\x1d\n" +
@@ -13707,435 +15823,31 @@ const file_api_proto_rawDesc = "" +
 	"\x11SESSION_NOT_FOUND\x10\x01\x12\x18\n" +
 	"\x14INVALID_PROFILE_NAME\x10\x02\x12\x10\n" +
 	"\fCANNOT_SPLIT\x10\x03\x12%\n" +
-	"!MALFORMED_CUSTOM_PROFILE_PROPERTY\x10\x04\"\x95\x01\n" +
-	"\x12SetPropertyRequest\x12\x1d\n" +
-	"\twindow_id\x18\x01 \x01(\tH\x00R\bwindowId\x12\x1f\n" +
+	"!MALFORMED_CUSTOM_PROFILE_PROPERTY\x10\x04*V\n" +
+	"\rSelectionMode\x12\r\n" +
+	"\tCHARACTER\x10\x00\x12\b\n" +
+	"\x04WORD\x10\x01\x12\b\n" +
+	"\x04LINE\x10\x02\x12\t\n" +
+	"\x05SMART\x10\x03\x12\a\n" +
+	"\x03BOX\x10\x04\x12\x0e\n" +
 	"\n" +
-	"session_id\x18\x05 \x01(\tH\x00R\tsessionId\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1d\n" +
-	"\n" +
-	"json_value\x18\x04 \x01(\tR\tjsonValueB\f\n" +
-	"\n" +
-	"identifier\"\xcb\x01\n" +
-	"\x13SetPropertyResponse\x12:\n" +
-	"\x06status\x18\x01 \x01(\x0e2\".iterm2.SetPropertyResponse.StatusR\x06status\"x\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11UNRECOGNIZED_NAME\x10\x01\x12\x11\n" +
-	"\rINVALID_VALUE\x10\x02\x12\x12\n" +
-	"\x0eINVALID_TARGET\x10\x03\x12\f\n" +
-	"\bDEFERRED\x10\x04\x12\x0e\n" +
-	"\n" +
-	"IMPOSSIBLE\x10\x05\x12\n" +
-	"\n" +
-	"\x06FAILED\x10\x06\"v\n" +
-	"\x12GetPropertyRequest\x12\x1d\n" +
-	"\twindow_id\x18\x01 \x01(\tH\x00R\bwindowId\x12\x1f\n" +
-	"\n" +
-	"session_id\x18\x03 \x01(\tH\x00R\tsessionId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04nameB\f\n" +
-	"\n" +
-	"identifier\"\xad\x01\n" +
-	"\x13GetPropertyResponse\x12:\n" +
-	"\x06status\x18\x01 \x01(\x0e2\".iterm2.GetPropertyResponse.StatusR\x06status\x12\x1d\n" +
-	"\n" +
-	"json_value\x18\x02 \x01(\tR\tjsonValue\";\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11UNRECOGNIZED_NAME\x10\x01\x12\x12\n" +
-	"\x0eINVALID_TARGET\x10\x02\"B\n" +
-	"\rInjectRequest\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x03(\tR\tsessionId\x12\x12\n" +
-	"\x04data\x18\x02 \x01(\fR\x04data\"p\n" +
-	"\x0eInjectResponse\x125\n" +
-	"\x06status\x18\x01 \x03(\x0e2\x1d.iterm2.InjectResponse.StatusR\x06status\"'\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11SESSION_NOT_FOUND\x10\x01\"\x8f\x03\n" +
-	"\x0fActivateRequest\x12\x1d\n" +
-	"\twindow_id\x18\x01 \x01(\tH\x00R\bwindowId\x12\x17\n" +
-	"\x06tab_id\x18\x02 \x01(\tH\x00R\x05tabId\x12\x1f\n" +
-	"\n" +
-	"session_id\x18\x03 \x01(\tH\x00R\tsessionId\x12,\n" +
-	"\x12order_window_front\x18\x04 \x01(\bR\x10orderWindowFront\x12\x1d\n" +
-	"\n" +
-	"select_tab\x18\x05 \x01(\bR\tselectTab\x12%\n" +
-	"\x0eselect_session\x18\x06 \x01(\bR\rselectSession\x12>\n" +
-	"\factivate_app\x18\a \x01(\v2\x1b.iterm2.ActivateRequest.AppR\vactivateApp\x1aa\n" +
-	"\x03App\x12*\n" +
-	"\x11raise_all_windows\x18\x01 \x01(\bR\x0fraiseAllWindows\x12.\n" +
-	"\x13ignoring_other_apps\x18\x02 \x01(\bR\x11ignoringOtherAppsB\f\n" +
-	"\n" +
-	"identifier\"\x85\x01\n" +
-	"\x10ActivateResponse\x127\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x1f.iterm2.ActivateResponse.StatusR\x06status\"8\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x12\n" +
-	"\x0eBAD_IDENTIFIER\x10\x01\x12\x12\n" +
-	"\x0eINVALID_OPTION\x10\x02\"\xf9\x01\n" +
-	"\x0fVariableRequest\x12\x1f\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tH\x00R\tsessionId\x12\x17\n" +
-	"\x06tab_id\x18\x04 \x01(\tH\x00R\x05tabId\x12\x12\n" +
-	"\x03app\x18\x05 \x01(\bH\x00R\x03app\x12\x1d\n" +
-	"\twindow_id\x18\x06 \x01(\tH\x00R\bwindowId\x12-\n" +
-	"\x03set\x18\x02 \x03(\v2\x1b.iterm2.VariableRequest.SetR\x03set\x12\x10\n" +
-	"\x03get\x18\x03 \x03(\tR\x03get\x1a/\n" +
-	"\x03Set\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05valueB\a\n" +
-	"\x05scope\"\xf5\x01\n" +
-	"\x10VariableResponse\x127\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x1f.iterm2.VariableResponse.StatusR\x06status\x12\x16\n" +
-	"\x06values\x18\x02 \x03(\tR\x06values\"\x8f\x01\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11SESSION_NOT_FOUND\x10\x01\x12\x10\n" +
-	"\fINVALID_NAME\x10\x02\x12\x11\n" +
-	"\rMISSING_SCOPE\x10\x03\x12\x11\n" +
-	"\rTAB_NOT_FOUND\x10\x04\x12\x18\n" +
-	"\x14MULTI_GET_DISALLOWED\x10\x05\x12\x14\n" +
-	"\x10WINDOW_NOT_FOUND\x10\x06\"\xb5\x01\n" +
-	"\x17SavedArrangementRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12>\n" +
-	"\x06action\x18\x02 \x01(\x0e2&.iterm2.SavedArrangementRequest.ActionR\x06action\x12\x1b\n" +
-	"\twindow_id\x18\x03 \x01(\tR\bwindowId\")\n" +
-	"\x06Action\x12\v\n" +
-	"\aRESTORE\x10\x00\x12\b\n" +
-	"\x04SAVE\x10\x01\x12\b\n" +
-	"\x04LIST\x10\x02\"\xcb\x01\n" +
-	"\x18SavedArrangementResponse\x12?\n" +
-	"\x06status\x18\x01 \x01(\x0e2'.iterm2.SavedArrangementResponse.StatusR\x06status\x12\x14\n" +
-	"\x05names\x18\x02 \x03(\tR\x05names\"X\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x19\n" +
-	"\x15ARRANGEMENT_NOT_FOUND\x10\x01\x12\x14\n" +
-	"\x10WINDOW_NOT_FOUND\x10\x02\x12\x15\n" +
-	"\x11REQUEST_MALFORMED\x10\x03\"\x0e\n" +
-	"\fFocusRequest\"W\n" +
-	"\rFocusResponse\x12F\n" +
-	"\rnotifications\x18\x01 \x03(\v2 .iterm2.FocusChangedNotificationR\rnotifications\"K\n" +
-	"\x13ListProfilesRequest\x12\x1e\n" +
-	"\n" +
-	"properties\x18\x01 \x03(\tR\n" +
-	"properties\x12\x14\n" +
-	"\x05guids\x18\x02 \x03(\tR\x05guids\"\x9c\x01\n" +
-	"\x14ListProfilesResponse\x12@\n" +
-	"\bprofiles\x18\x01 \x03(\v2$.iterm2.ListProfilesResponse.ProfileR\bprofiles\x1aB\n" +
-	"\aProfile\x127\n" +
-	"\n" +
-	"properties\x18\x01 \x03(\v2\x17.iterm2.ProfilePropertyR\n" +
-	"properties\"\x95\x01\n" +
-	" ServerOriginatedRPCResultRequest\x12\x1d\n" +
-	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\x12'\n" +
-	"\x0ejson_exception\x18\x02 \x01(\tH\x00R\rjsonException\x12\x1f\n" +
-	"\n" +
-	"json_value\x18\x03 \x01(\tH\x00R\tjsonValueB\b\n" +
-	"\x06result\"#\n" +
-	"!ServerOriginatedRPCResultResponse\"\\\n" +
-	"\x15RestartSessionRequest\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12$\n" +
-	"\x0eonly_if_exited\x18\x02 \x01(\bR\fonlyIfExited\"\x9d\x01\n" +
-	"\x16RestartSessionResponse\x12=\n" +
-	"\x06status\x18\x01 \x01(\x0e2%.iterm2.RestartSessionResponse.StatusR\x06status\"D\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11SESSION_NOT_FOUND\x10\x01\x12\x1b\n" +
-	"\x17SESSION_NOT_RESTARTABLE\x10\x02\"P\n" +
-	"\x0fMenuItemRequest\x12\x1e\n" +
-	"\n" +
-	"identifier\x18\x01 \x01(\tR\n" +
-	"identifier\x12\x1d\n" +
-	"\n" +
-	"query_only\x18\x02 \x01(\bR\tqueryOnly\"\xb3\x01\n" +
-	"\x10MenuItemResponse\x127\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x1f.iterm2.MenuItemResponse.StatusR\x06status\x12\x18\n" +
-	"\achecked\x18\x02 \x01(\bR\achecked\x12\x18\n" +
-	"\aenabled\x18\x03 \x01(\bR\aenabled\"2\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x12\n" +
-	"\x0eBAD_IDENTIFIER\x10\x01\x12\f\n" +
-	"\bDISABLED\x10\x02\"W\n" +
-	"\x13SetTabLayoutRequest\x12)\n" +
-	"\x04root\x18\x01 \x01(\v2\x15.iterm2.SplitTreeNodeR\x04root\x12\x15\n" +
-	"\x06tab_id\x18\x02 \x01(\tR\x05tabId\"\x97\x01\n" +
-	"\x14SetTabLayoutResponse\x12;\n" +
-	"\x06status\x18\x01 \x01(\x0e2#.iterm2.SetTabLayoutResponse.StatusR\x06status\"B\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x0e\n" +
-	"\n" +
-	"BAD_TAB_ID\x10\x01\x12\x0e\n" +
-	"\n" +
-	"WRONG_TREE\x10\x02\x12\x10\n" +
-	"\fINVALID_SIZE\x10\x03\"\x1c\n" +
-	"\x1aGetBroadcastDomainsRequest\"c\n" +
-	"\x1bGetBroadcastDomainsResponse\x12D\n" +
-	"\x11broadcast_domains\x18\x01 \x03(\v2\x17.iterm2.BroadcastDomainR\x10broadcastDomains\"\xf1\x04\n" +
-	"\vTmuxRequest\x12P\n" +
-	"\x10list_connections\x18\x01 \x01(\v2#.iterm2.TmuxRequest.ListConnectionsH\x00R\x0flistConnections\x12D\n" +
-	"\fsend_command\x18\x02 \x01(\v2\x1f.iterm2.TmuxRequest.SendCommandH\x00R\vsendCommand\x12T\n" +
-	"\x12set_window_visible\x18\x03 \x01(\v2$.iterm2.TmuxRequest.SetWindowVisibleH\x00R\x10setWindowVisible\x12G\n" +
-	"\rcreate_window\x18\x04 \x01(\v2 .iterm2.TmuxRequest.CreateWindowH\x00R\fcreateWindow\x1a\x11\n" +
-	"\x0fListConnections\x1aL\n" +
-	"\vSendCommand\x12#\n" +
-	"\rconnection_id\x18\x01 \x01(\tR\fconnectionId\x12\x18\n" +
-	"\acommand\x18\x02 \x01(\tR\acommand\x1an\n" +
-	"\x10SetWindowVisible\x12#\n" +
-	"\rconnection_id\x18\x01 \x01(\tR\fconnectionId\x12\x1b\n" +
-	"\twindow_id\x18\x02 \x01(\tR\bwindowId\x12\x18\n" +
-	"\avisible\x18\x03 \x01(\bR\avisible\x1aO\n" +
-	"\fCreateWindow\x12#\n" +
-	"\rconnection_id\x18\x01 \x01(\tR\fconnectionId\x12\x1a\n" +
-	"\baffinity\x18\x02 \x01(\tR\baffinityB\t\n" +
-	"\apayload\"\x8a\x06\n" +
-	"\fTmuxResponse\x12Q\n" +
-	"\x10list_connections\x18\x01 \x01(\v2$.iterm2.TmuxResponse.ListConnectionsH\x00R\x0flistConnections\x12E\n" +
-	"\fsend_command\x18\x02 \x01(\v2 .iterm2.TmuxResponse.SendCommandH\x00R\vsendCommand\x12U\n" +
-	"\x12set_window_visible\x18\x03 \x01(\v2%.iterm2.TmuxResponse.SetWindowVisibleH\x00R\x10setWindowVisible\x12H\n" +
-	"\rcreate_window\x18\x05 \x01(\v2!.iterm2.TmuxResponse.CreateWindowH\x00R\fcreateWindow\x123\n" +
-	"\x06status\x18\x04 \x01(\x0e2\x1b.iterm2.TmuxResponse.StatusR\x06status\x1a\xc3\x01\n" +
-	"\x0fListConnections\x12Q\n" +
-	"\vconnections\x18\x01 \x03(\v2/.iterm2.TmuxResponse.ListConnections.ConnectionR\vconnections\x1a]\n" +
-	"\n" +
-	"Connection\x12#\n" +
-	"\rconnection_id\x18\x01 \x01(\tR\fconnectionId\x12*\n" +
-	"\x11owning_session_id\x18\x02 \x01(\tR\x0fowningSessionId\x1a%\n" +
-	"\vSendCommand\x12\x16\n" +
-	"\x06output\x18\x01 \x01(\tR\x06output\x1a\x12\n" +
-	"\x10SetWindowVisible\x1a%\n" +
-	"\fCreateWindow\x12\x15\n" +
-	"\x06tab_id\x18\x01 \x01(\tR\x05tabId\"W\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x13\n" +
-	"\x0fINVALID_REQUEST\x10\x01\x12\x19\n" +
-	"\x15INVALID_CONNECTION_ID\x10\x02\x12\x15\n" +
-	"\x11INVALID_WINDOW_ID\x10\x03B\t\n" +
-	"\apayload\"\xa1\x01\n" +
-	"\x12ReorderTabsRequest\x12G\n" +
-	"\vassignments\x18\x03 \x03(\v2%.iterm2.ReorderTabsRequest.AssignmentR\vassignments\x1aB\n" +
-	"\n" +
-	"Assignment\x12\x1b\n" +
-	"\twindow_id\x18\x01 \x01(\tR\bwindowId\x12\x17\n" +
-	"\atab_ids\x18\x02 \x03(\tR\x06tabIds\"\xa6\x01\n" +
-	"\x13ReorderTabsResponse\x12:\n" +
-	"\x06status\x18\x04 \x01(\x0e2\".iterm2.ReorderTabsResponse.StatusR\x06status\"S\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x16\n" +
-	"\x12INVALID_ASSIGNMENT\x10\x01\x12\x15\n" +
-	"\x11INVALID_WINDOW_ID\x10\x02\x12\x12\n" +
-	"\x0eINVALID_TAB_ID\x10\x03\"\xd0\x05\n" +
-	"\x12PreferencesRequest\x12>\n" +
-	"\brequests\x18\x01 \x03(\v2\".iterm2.PreferencesRequest.RequestR\brequests\x1a\xf9\x04\n" +
-	"\aRequest\x12h\n" +
-	"\x16set_preference_request\x18\x01 \x01(\v20.iterm2.PreferencesRequest.Request.SetPreferenceH\x00R\x14setPreferenceRequest\x12h\n" +
-	"\x16get_preference_request\x18\x02 \x01(\v20.iterm2.PreferencesRequest.Request.GetPreferenceH\x00R\x14getPreferenceRequest\x12u\n" +
-	"\x1bset_default_profile_request\x18\x03 \x01(\v24.iterm2.PreferencesRequest.Request.SetDefaultProfileH\x00R\x18setDefaultProfileRequest\x12u\n" +
-	"\x1bget_default_profile_request\x18\x04 \x01(\v24.iterm2.PreferencesRequest.Request.GetDefaultProfileH\x00R\x18getDefaultProfileRequest\x1a@\n" +
-	"\rSetPreference\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x1d\n" +
-	"\n" +
-	"json_value\x18\x02 \x01(\tR\tjsonValue\x1a!\n" +
-	"\rGetPreference\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x1a'\n" +
-	"\x11SetDefaultProfile\x12\x12\n" +
-	"\x04guid\x18\x01 \x01(\tR\x04guid\x1a\x13\n" +
-	"\x11GetDefaultProfileB\t\n" +
-	"\arequest\"\xda\b\n" +
-	"\x13PreferencesResponse\x12<\n" +
-	"\aresults\x18\x01 \x03(\v2\".iterm2.PreferencesResponse.ResultR\aresults\x1a\x84\b\n" +
-	"\x06Result\x12j\n" +
-	"\x14unrecognized_request\x18\x01 \x01(\v25.iterm2.PreferencesResponse.Result.UnrecognizedResultH\x00R\x13unrecognizedRequest\x12l\n" +
-	"\x15set_preference_result\x18\x02 \x01(\v26.iterm2.PreferencesResponse.Result.SetPreferenceResultH\x00R\x13setPreferenceResult\x12l\n" +
-	"\x15get_preference_result\x18\x03 \x01(\v26.iterm2.PreferencesResponse.Result.GetPreferenceResultH\x00R\x13getPreferenceResult\x12y\n" +
-	"\x1aset_default_profile_result\x18\x04 \x01(\v2:.iterm2.PreferencesResponse.Result.SetDefaultProfileResultH\x00R\x17setDefaultProfileResult\x12y\n" +
-	"\x1aget_default_profile_result\x18\x05 \x01(\v2:.iterm2.PreferencesResponse.Result.GetDefaultProfileResultH\x00R\x17getDefaultProfileResult\x1a\x9f\x01\n" +
-	"\x13SetPreferenceResult\x12U\n" +
-	"\x06status\x18\x01 \x01(\x0e2=.iterm2.PreferencesResponse.Result.SetPreferenceResult.StatusR\x06status\"1\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\f\n" +
-	"\bBAD_JSON\x10\x01\x12\x11\n" +
-	"\rINVALID_VALUE\x10\x02\x1a4\n" +
-	"\x13GetPreferenceResult\x12\x1d\n" +
-	"\n" +
-	"json_value\x18\x01 \x01(\tR\tjsonValue\x1a\x94\x01\n" +
-	"\x17SetDefaultProfileResult\x12Y\n" +
-	"\x06status\x18\x01 \x01(\x0e2A.iterm2.PreferencesResponse.Result.SetDefaultProfileResult.StatusR\x06status\"\x1e\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\f\n" +
-	"\bBAD_GUID\x10\x01\x1a\x14\n" +
-	"\x12UnrecognizedResult\x1a-\n" +
-	"\x17GetDefaultProfileResult\x12\x12\n" +
-	"\x04guid\x18\x01 \x01(\tR\x04guidB\b\n" +
-	"\x06result\"\xe3\x01\n" +
-	"\x12ColorPresetRequest\x12K\n" +
-	"\flist_presets\x18\x01 \x01(\v2&.iterm2.ColorPresetRequest.ListPresetsH\x00R\vlistPresets\x12E\n" +
-	"\n" +
-	"get_preset\x18\x02 \x01(\v2$.iterm2.ColorPresetRequest.GetPresetH\x00R\tgetPreset\x1a\r\n" +
-	"\vListPresets\x1a\x1f\n" +
-	"\tGetPreset\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04nameB\t\n" +
-	"\arequest\"\xd4\x04\n" +
-	"\x13ColorPresetResponse\x12L\n" +
-	"\flist_presets\x18\x01 \x01(\v2'.iterm2.ColorPresetResponse.ListPresetsH\x00R\vlistPresets\x12F\n" +
-	"\n" +
-	"get_preset\x18\x02 \x01(\v2%.iterm2.ColorPresetResponse.GetPresetH\x00R\tgetPreset\x12:\n" +
-	"\x06status\x18\x03 \x01(\x0e2\".iterm2.ColorPresetResponse.StatusR\x06status\x1a!\n" +
-	"\vListPresets\x12\x12\n" +
-	"\x04name\x18\x01 \x03(\tR\x04name\x1a\xfc\x01\n" +
-	"\tGetPreset\x12Y\n" +
-	"\x0ecolor_settings\x18\x01 \x03(\v22.iterm2.ColorPresetResponse.GetPreset.ColorSettingR\rcolorSettings\x1a\x93\x01\n" +
-	"\fColorSetting\x12\x10\n" +
-	"\x03red\x18\x01 \x01(\x02R\x03red\x12\x14\n" +
-	"\x05green\x18\x02 \x01(\x02R\x05green\x12\x12\n" +
-	"\x04blue\x18\x03 \x01(\x02R\x04blue\x12\x14\n" +
-	"\x05alpha\x18\x04 \x01(\x02R\x05alpha\x12\x1f\n" +
-	"\vcolor_space\x18\x05 \x01(\tR\n" +
-	"colorSpace\x12\x10\n" +
-	"\x03key\x18\x06 \x01(\tR\x03key\"=\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x14\n" +
-	"\x10PRESET_NOT_FOUND\x10\x01\x12\x15\n" +
-	"\x11REQUEST_MALFORMED\x10\x02B\n" +
-	"\n" +
-	"\bresponse\"\xb8\x01\n" +
-	"\fSubSelection\x12L\n" +
-	"\x14windowed_coord_range\x18\x01 \x01(\v2\x1a.iterm2.WindowedCoordRangeR\x12windowedCoordRange\x12<\n" +
-	"\x0eselection_mode\x18\x02 \x01(\x0e2\x15.iterm2.SelectionModeR\rselectionMode\x12\x1c\n" +
-	"\tconnected\x18\x03 \x01(\bR\tconnected\"H\n" +
-	"\tSelection\x12;\n" +
-	"\x0esub_selections\x18\x01 \x03(\v2\x14.iterm2.SubSelectionR\rsubSelections\"\x82\x03\n" +
-	"\x10SelectionRequest\x12b\n" +
-	"\x15get_selection_request\x18\x01 \x01(\v2,.iterm2.SelectionRequest.GetSelectionRequestH\x00R\x13getSelectionRequest\x12b\n" +
-	"\x15set_selection_request\x18\x02 \x01(\v2,.iterm2.SelectionRequest.SetSelectionRequestH\x00R\x13setSelectionRequest\x1a4\n" +
-	"\x13GetSelectionRequest\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x1ae\n" +
-	"\x13SetSelectionRequest\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12/\n" +
-	"\tselection\x18\x02 \x01(\v2\x11.iterm2.SelectionR\tselectionB\t\n" +
-	"\arequest\"\xdb\x03\n" +
-	"\x11SelectionResponse\x128\n" +
-	"\x06status\x18\x01 \x01(\x0e2 .iterm2.SelectionResponse.StatusR\x06status\x12f\n" +
-	"\x16get_selection_response\x18\x02 \x01(\v2..iterm2.SelectionResponse.GetSelectionResponseH\x00R\x14getSelectionResponse\x12f\n" +
-	"\x16set_selection_response\x18\x03 \x01(\v2..iterm2.SelectionResponse.SetSelectionResponseH\x00R\x14setSelectionResponse\x1aG\n" +
-	"\x14GetSelectionResponse\x12/\n" +
-	"\tselection\x18\x02 \x01(\v2\x11.iterm2.SelectionR\tselection\x1a\x16\n" +
-	"\x14SetSelectionResponse\"O\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x13\n" +
-	"\x0fINVALID_SESSION\x10\x01\x12\x11\n" +
-	"\rINVALID_RANGE\x10\x02\x12\x15\n" +
-	"\x11REQUEST_MALFORMED\x10\x03B\n" +
-	"\n" +
-	"\bresponse\"\xfe\x01\n" +
-	"\x19StatusBarComponentRequest\x12R\n" +
-	"\fopen_popover\x18\x01 \x01(\v2-.iterm2.StatusBarComponentRequest.OpenPopoverH\x00R\vopenPopover\x12\x1e\n" +
-	"\n" +
-	"identifier\x18\x02 \x01(\tR\n" +
-	"identifier\x1ab\n" +
-	"\vOpenPopover\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x12\n" +
-	"\x04html\x18\x02 \x01(\tR\x04html\x12 \n" +
-	"\x04size\x18\x03 \x01(\v2\f.iterm2.SizeR\x04sizeB\t\n" +
-	"\arequest\"\xb7\x01\n" +
-	"\x1aStatusBarComponentResponse\x12A\n" +
-	"\x06status\x18\x01 \x01(\x0e2).iterm2.StatusBarComponentResponse.StatusR\x06status\"V\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11SESSION_NOT_FOUND\x10\x01\x12\x15\n" +
-	"\x11REQUEST_MALFORMED\x10\x02\x12\x16\n" +
-	"\x12INVALID_IDENTIFIER\x10\x03\"b\n" +
-	"\x1aSetBroadcastDomainsRequest\x12D\n" +
-	"\x11broadcast_domains\x18\x01 \x03(\v2\x17.iterm2.BroadcastDomainR\x10broadcastDomains\"\xcf\x01\n" +
-	"\x1bSetBroadcastDomainsResponse\x12B\n" +
-	"\x06status\x18\x01 \x01(\x0e2*.iterm2.SetBroadcastDomainsResponse.StatusR\x06status\"l\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11SESSION_NOT_FOUND\x10\x01\x12\"\n" +
-	"\x1eBROADCAST_DOMAINS_NOT_DISJOINT\x10\x02\x12\x1f\n" +
-	"\x1bSESSIONS_NOT_IN_SAME_WINDOW\x10\x03\"\xec\x02\n" +
-	"\fCloseRequest\x124\n" +
-	"\x04tabs\x18\x01 \x01(\v2\x1e.iterm2.CloseRequest.CloseTabsH\x00R\x04tabs\x12@\n" +
-	"\bsessions\x18\x02 \x01(\v2\".iterm2.CloseRequest.CloseSessionsH\x00R\bsessions\x12=\n" +
-	"\awindows\x18\x03 \x01(\v2!.iterm2.CloseRequest.CloseWindowsH\x00R\awindows\x12\x14\n" +
-	"\x05force\x18\x04 \x01(\bR\x05force\x1a$\n" +
-	"\tCloseTabs\x12\x17\n" +
-	"\atab_ids\x18\x01 \x03(\tR\x06tabIds\x1a0\n" +
-	"\rCloseSessions\x12\x1f\n" +
-	"\vsession_ids\x18\x01 \x03(\tR\n" +
-	"sessionIds\x1a-\n" +
-	"\fCloseWindows\x12\x1d\n" +
-	"\n" +
-	"window_ids\x18\x01 \x03(\tR\twindowIdsB\b\n" +
-	"\x06target\"}\n" +
-	"\rCloseResponse\x128\n" +
-	"\bstatuses\x18\x01 \x03(\x0e2\x1c.iterm2.CloseResponse.StatusR\bstatuses\"2\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\r\n" +
-	"\tNOT_FOUND\x10\x01\x12\x11\n" +
-	"\rUSER_DECLINED\x10\x02\"\xad\x04\n" +
-	"\x15InvokeFunctionRequest\x125\n" +
-	"\x03tab\x18\x01 \x01(\v2!.iterm2.InvokeFunctionRequest.TabH\x00R\x03tab\x12A\n" +
-	"\asession\x18\x02 \x01(\v2%.iterm2.InvokeFunctionRequest.SessionH\x00R\asession\x12>\n" +
-	"\x06window\x18\x03 \x01(\v2$.iterm2.InvokeFunctionRequest.WindowH\x00R\x06window\x125\n" +
-	"\x03app\x18\x04 \x01(\v2!.iterm2.InvokeFunctionRequest.AppH\x00R\x03app\x12>\n" +
-	"\x06method\x18\a \x01(\v2$.iterm2.InvokeFunctionRequest.MethodH\x00R\x06method\x12\x1e\n" +
-	"\n" +
-	"invocation\x18\x05 \x01(\tR\n" +
-	"invocation\x12\x1c\n" +
-	"\atimeout\x18\x06 \x01(\x01:\x02-1R\atimeout\x1a\x1c\n" +
-	"\x03Tab\x12\x15\n" +
-	"\x06tab_id\x18\x01 \x01(\tR\x05tabId\x1a(\n" +
-	"\aSession\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x1a%\n" +
-	"\x06Window\x12\x1b\n" +
-	"\twindow_id\x18\x01 \x01(\tR\bwindowId\x1a\x05\n" +
-	"\x03App\x1a$\n" +
-	"\x06Method\x12\x1a\n" +
-	"\breceiver\x18\x01 \x01(\tR\breceiverB\t\n" +
-	"\acontext\"\x8a\x03\n" +
-	"\x16InvokeFunctionResponse\x12<\n" +
-	"\x05error\x18\x01 \x01(\v2$.iterm2.InvokeFunctionResponse.ErrorH\x00R\x05error\x12B\n" +
-	"\asuccess\x18\x02 \x01(\v2&.iterm2.InvokeFunctionResponse.SuccessH\x00R\asuccess\x1ai\n" +
-	"\x05Error\x12=\n" +
-	"\x06status\x18\x01 \x01(\x0e2%.iterm2.InvokeFunctionResponse.StatusR\x06status\x12!\n" +
-	"\ferror_reason\x18\x02 \x01(\tR\verrorReason\x1a*\n" +
-	"\aSuccess\x12\x1f\n" +
-	"\vjson_result\x18\x01 \x01(\tR\n" +
-	"jsonResult\"H\n" +
-	"\x06Status\x12\v\n" +
-	"\aTIMEOUT\x10\x01\x12\n" +
-	"\n" +
-	"\x06FAILED\x10\x02\x12\x15\n" +
-	"\x11REQUEST_MALFORMED\x10\x03\x12\x0e\n" +
-	"\n" +
-	"INVALID_ID\x10\x04B\r\n" +
-	"\vdisposition\"|\n" +
-	"\x12ListPromptsRequest\x12\x18\n" +
-	"\asession\x18\x01 \x01(\tR\asession\x12&\n" +
-	"\x0ffirst_unique_id\x18\x02 \x01(\tR\rfirstUniqueId\x12$\n" +
-	"\x0elast_unique_id\x18\x03 \x01(\tR\flastUniqueId\"\xa8\x01\n" +
-	"\x13ListPromptsResponse\x12>\n" +
-	"\x06status\x18\x01 \x01(\x0e2\".iterm2.ListPromptsResponse.Status:\x02OKR\x06status\x12(\n" +
-	"\x10unique_prompt_id\x18\x02 \x03(\tR\x0euniquePromptId\"'\n" +
-	"\x06Status\x12\x06\n" +
-	"\x02OK\x10\x00\x12\x15\n" +
-	"\x11SESSION_NOT_FOUND\x10\x01*G\n" +
-	"\x0eAlternateColor\x12\v\n" +
-	"\aDEFAULT\x10\x00\x12\x14\n" +
-	"\x10REVERSED_DEFAULT\x10\x03\x12\x12\n" +
-	"\x0eSYSTEM_MESSAGE\x10\x04*7\n" +
-	"\x14ImagePlaceholderType\x12\b\n" +
-	"\x04NONE\x10\x00\x12\n" +
-	"\n" +
-	"\x06ITERM2\x10\x01\x12\t\n" +
-	"\x05KITTY\x10\x02*V\n" +
+	"WHOLE_LINE\x10\x05*\xb4\x03\n" +
+	"\x10NotificationType\x12\x17\n" +
+	"\x13NOTIFY_ON_KEYSTROKE\x10\x01\x12\x1b\n" +
+	"\x17NOTIFY_ON_SCREEN_UPDATE\x10\x02\x12\x14\n" +
+	"\x10NOTIFY_ON_PROMPT\x10\x03\x12!\n" +
+	"\x19NOTIFY_ON_LOCATION_CHANGE\x10\x04\x1a\x02\b\x01\x12$\n" +
+	" NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE\x10\x05\x12\x1d\n" +
+	"\x19NOTIFY_ON_VARIABLE_CHANGE\x10\f\x12\x14\n" +
+	"\x10KEYSTROKE_FILTER\x10\x0e\x12\x19\n" +
+	"\x15NOTIFY_ON_NEW_SESSION\x10\x06\x12\x1f\n" +
+	"\x1bNOTIFY_ON_TERMINATE_SESSION\x10\a\x12\x1b\n" +
+	"\x17NOTIFY_ON_LAYOUT_CHANGE\x10\b\x12\x1a\n" +
+	"\x16NOTIFY_ON_FOCUS_CHANGE\x10\t\x12#\n" +
+	"\x1fNOTIFY_ON_SERVER_ORIGINATED_RPC\x10\n" +
+	"\x12\x1e\n" +
+	"\x1aNOTIFY_ON_BROADCAST_CHANGE\x10\v\x12\x1c\n" +
+	"\x18NOTIFY_ON_PROFILE_CHANGE\x10\r*V\n" +
 	"\tModifiers\x12\v\n" +
 	"\aCONTROL\x10\x01\x12\n" +
 	"\n" +
@@ -14144,15 +15856,27 @@ const file_api_proto_rawDesc = "" +
 	"\x05SHIFT\x10\x04\x12\f\n" +
 	"\bFUNCTION\x10\x05\x12\n" +
 	"\n" +
-	"\x06NUMPAD\x10\x06*V\n" +
-	"\rSelectionMode\x12\r\n" +
-	"\tCHARACTER\x10\x00\x12\b\n" +
-	"\x04WORD\x10\x01\x12\b\n" +
-	"\x04LINE\x10\x02\x12\t\n" +
-	"\x05SMART\x10\x03\x12\a\n" +
-	"\x03BOX\x10\x04\x12\x0e\n" +
+	"\x06NUMPAD\x10\x06*:\n" +
+	"\rVariableScope\x12\v\n" +
+	"\aSESSION\x10\x01\x12\a\n" +
+	"\x03TAB\x10\x02\x12\n" +
 	"\n" +
-	"WHOLE_LINE\x10\x05B Z\x18github.com/tmc/it2/proto\xa2\x02\x03ITM"
+	"\x06WINDOW\x10\x03\x12\a\n" +
+	"\x03APP\x10\x04*C\n" +
+	"\x11PromptMonitorMode\x12\n" +
+	"\n" +
+	"\x06PROMPT\x10\x01\x12\x11\n" +
+	"\rCOMMAND_START\x10\x02\x12\x0f\n" +
+	"\vCOMMAND_END\x10\x03*G\n" +
+	"\x0eAlternateColor\x12\v\n" +
+	"\aDEFAULT\x10\x00\x12\x14\n" +
+	"\x10REVERSED_DEFAULT\x10\x03\x12\x12\n" +
+	"\x0eSYSTEM_MESSAGE\x10\x04*7\n" +
+	"\x14ImagePlaceholderType\x12\b\n" +
+	"\x04NONE\x10\x00\x12\n" +
+	"\n" +
+	"\x06ITERM2\x10\x01\x12\t\n" +
+	"\x05KITTY\x10\x02B Z\x18github.com/tmc/it2/proto\xa2\x02\x03ITM"
 
 var (
 	file_api_proto_rawDescOnce sync.Once
@@ -14166,437 +15890,483 @@ func file_api_proto_rawDescGZIP() []byte {
 	return file_api_proto_rawDescData
 }
 
-var file_api_proto_enumTypes = make([]protoimpl.EnumInfo, 40)
-var file_api_proto_msgTypes = make([]protoimpl.MessageInfo, 158)
+var file_api_proto_enumTypes = make([]protoimpl.EnumInfo, 47)
+var file_api_proto_msgTypes = make([]protoimpl.MessageInfo, 172)
 var file_api_proto_goTypes = []any{
-	(AlternateColor)(0),                                            // 0: iterm2.AlternateColor
-	(ImagePlaceholderType)(0),                                      // 1: iterm2.ImagePlaceholderType
-	(Modifiers)(0),                                                 // 2: iterm2.Modifiers
-	(SelectionMode)(0),                                             // 3: iterm2.SelectionMode
-	(GetBufferResponse_Status)(0),                                  // 4: iterm2.GetBufferResponse.Status
-	(LineContents_Continuation)(0),                                 // 5: iterm2.LineContents.Continuation
-	(SendTextResponse_Status)(0),                                   // 6: iterm2.SendTextResponse.Status
-	(CreateTabResponse_Status)(0),                                  // 7: iterm2.CreateTabResponse.Status
-	(KeystrokeNotification_Action)(0),                              // 8: iterm2.KeystrokeNotification.Action
-	(GetPromptResponse_Status)(0),                                  // 9: iterm2.GetPromptResponse.Status
-	(GetPromptResponse_State)(0),                                   // 10: iterm2.GetPromptResponse.State
-	(FocusChangedNotification_Window_WindowStatus)(0),              // 11: iterm2.FocusChangedNotification.Window.WindowStatus
-	(TransactionResponse_Status)(0),                                // 12: iterm2.TransactionResponse.Status
-	(NotificationResponse_Status)(0),                               // 13: iterm2.NotificationResponse.Status
-	(RegisterToolResponse_Status)(0),                               // 14: iterm2.RegisterToolResponse.Status
-	(SetProfilePropertyResponse_Status)(0),                         // 15: iterm2.SetProfilePropertyResponse.Status
-	(GetProfilePropertyResponse_Status)(0),                         // 16: iterm2.GetProfilePropertyResponse.Status
-	(SplitPaneRequest_SplitDirection)(0),                           // 17: iterm2.SplitPaneRequest.SplitDirection
-	(SplitPaneResponse_Status)(0),                                  // 18: iterm2.SplitPaneResponse.Status
-	(SetPropertyResponse_Status)(0),                                // 19: iterm2.SetPropertyResponse.Status
-	(GetPropertyResponse_Status)(0),                                // 20: iterm2.GetPropertyResponse.Status
-	(InjectResponse_Status)(0),                                     // 21: iterm2.InjectResponse.Status
-	(ActivateResponse_Status)(0),                                   // 22: iterm2.ActivateResponse.Status
-	(VariableResponse_Status)(0),                                   // 23: iterm2.VariableResponse.Status
-	(SavedArrangementRequest_Action)(0),                            // 24: iterm2.SavedArrangementRequest.Action
-	(SavedArrangementResponse_Status)(0),                           // 25: iterm2.SavedArrangementResponse.Status
-	(RestartSessionResponse_Status)(0),                             // 26: iterm2.RestartSessionResponse.Status
-	(MenuItemResponse_Status)(0),                                   // 27: iterm2.MenuItemResponse.Status
-	(SetTabLayoutResponse_Status)(0),                               // 28: iterm2.SetTabLayoutResponse.Status
-	(TmuxResponse_Status)(0),                                       // 29: iterm2.TmuxResponse.Status
-	(ReorderTabsResponse_Status)(0),                                // 30: iterm2.ReorderTabsResponse.Status
-	(PreferencesResponse_Result_SetPreferenceResult_Status)(0),     // 31: iterm2.PreferencesResponse.Result.SetPreferenceResult.Status
-	(PreferencesResponse_Result_SetDefaultProfileResult_Status)(0), // 32: iterm2.PreferencesResponse.Result.SetDefaultProfileResult.Status
-	(ColorPresetResponse_Status)(0),                                // 33: iterm2.ColorPresetResponse.Status
-	(SelectionResponse_Status)(0),                                  // 34: iterm2.SelectionResponse.Status
-	(StatusBarComponentResponse_Status)(0),                         // 35: iterm2.StatusBarComponentResponse.Status
-	(SetBroadcastDomainsResponse_Status)(0),                        // 36: iterm2.SetBroadcastDomainsResponse.Status
-	(CloseResponse_Status)(0),                                      // 37: iterm2.CloseResponse.Status
-	(InvokeFunctionResponse_Status)(0),                             // 38: iterm2.InvokeFunctionResponse.Status
-	(ListPromptsResponse_Status)(0),                                // 39: iterm2.ListPromptsResponse.Status
-	(*ClientOriginatedMessage)(nil),                                // 40: iterm2.ClientOriginatedMessage
-	(*ServerOriginatedMessage)(nil),                                // 41: iterm2.ServerOriginatedMessage
-	(*GetBufferRequest)(nil),                                       // 42: iterm2.GetBufferRequest
-	(*GetBufferResponse)(nil),                                      // 43: iterm2.GetBufferResponse
-	(*LineRange)(nil),                                              // 44: iterm2.LineRange
-	(*Coord)(nil),                                                  // 45: iterm2.Coord
-	(*Range)(nil),                                                  // 46: iterm2.Range
-	(*CoordRange)(nil),                                             // 47: iterm2.CoordRange
-	(*WindowedCoordRange)(nil),                                     // 48: iterm2.WindowedCoordRange
-	(*LineContents)(nil),                                           // 49: iterm2.LineContents
-	(*CodePointsPerCell)(nil),                                      // 50: iterm2.CodePointsPerCell
-	(*RGBColor)(nil),                                               // 51: iterm2.RGBColor
-	(*URL)(nil),                                                    // 52: iterm2.URL
-	(*CellStyle)(nil),                                              // 53: iterm2.CellStyle
-	(*ListSessionsRequest)(nil),                                    // 54: iterm2.ListSessionsRequest
-	(*Size)(nil),                                                   // 55: iterm2.Size
-	(*Point)(nil),                                                  // 56: iterm2.Point
-	(*Frame)(nil),                                                  // 57: iterm2.Frame
-	(*SessionSummary)(nil),                                         // 58: iterm2.SessionSummary
-	(*SplitTreeNode)(nil),                                          // 59: iterm2.SplitTreeNode
-	(*ListSessionsResponse)(nil),                                   // 60: iterm2.ListSessionsResponse
-	(*SendTextRequest)(nil),                                        // 61: iterm2.SendTextRequest
-	(*SendTextResponse)(nil),                                       // 62: iterm2.SendTextResponse
-	(*CreateTabRequest)(nil),                                       // 63: iterm2.CreateTabRequest
-	(*ProfileProperty)(nil),                                        // 64: iterm2.ProfileProperty
-	(*CreateTabResponse)(nil),                                      // 65: iterm2.CreateTabResponse
-	(*Notification)(nil),                                           // 66: iterm2.Notification
-	(*KeystrokeNotification)(nil),                                  // 67: iterm2.KeystrokeNotification
-	(*ScreenUpdateNotification)(nil),                               // 68: iterm2.ScreenUpdateNotification
-	(*GetPromptResponse)(nil),                                      // 69: iterm2.GetPromptResponse
-	(*PromptNotificationPrompt)(nil),                               // 70: iterm2.PromptNotificationPrompt
-	(*PromptNotificationCommandStart)(nil),                         // 71: iterm2.PromptNotificationCommandStart
-	(*PromptNotificationCommandEnd)(nil),                           // 72: iterm2.PromptNotificationCommandEnd
-	(*PromptNotification)(nil),                                     // 73: iterm2.PromptNotification
-	(*LocationChangeNotification)(nil),                             // 74: iterm2.LocationChangeNotification
-	(*CustomEscapeSequenceNotification)(nil),                       // 75: iterm2.CustomEscapeSequenceNotification
-	(*NewSessionNotification)(nil),                                 // 76: iterm2.NewSessionNotification
-	(*FocusChangedNotification)(nil),                               // 77: iterm2.FocusChangedNotification
-	(*TerminateSessionNotification)(nil),                           // 78: iterm2.TerminateSessionNotification
-	(*LayoutChangedNotification)(nil),                              // 79: iterm2.LayoutChangedNotification
-	(*ServerOriginatedRPC)(nil),                                    // 80: iterm2.ServerOriginatedRPC
-	(*ServerOriginatedRPCNotification)(nil),                        // 81: iterm2.ServerOriginatedRPCNotification
-	(*BroadcastDomain)(nil),                                        // 82: iterm2.BroadcastDomain
-	(*BroadcastDomainsChangedNotification)(nil),                    // 83: iterm2.BroadcastDomainsChangedNotification
-	(*VariableChangedNotification)(nil),                            // 84: iterm2.VariableChangedNotification
-	(*ProfileChangedNotification)(nil),                             // 85: iterm2.ProfileChangedNotification
-	(*GetPromptRequest)(nil),                                       // 86: iterm2.GetPromptRequest
-	(*TransactionRequest)(nil),                                     // 87: iterm2.TransactionRequest
-	(*TransactionResponse)(nil),                                    // 88: iterm2.TransactionResponse
-	(*NotificationRequest)(nil),                                    // 89: iterm2.NotificationRequest
-	(*NotificationResponse)(nil),                                   // 90: iterm2.NotificationResponse
-	(*RegisterToolRequest)(nil),                                    // 91: iterm2.RegisterToolRequest
-	(*RegisterToolResponse)(nil),                                   // 92: iterm2.RegisterToolResponse
-	(*SetProfilePropertyRequest)(nil),                              // 93: iterm2.SetProfilePropertyRequest
-	(*SetProfilePropertyResponse)(nil),                             // 94: iterm2.SetProfilePropertyResponse
-	(*GetProfilePropertyRequest)(nil),                              // 95: iterm2.GetProfilePropertyRequest
-	(*GetProfilePropertyResponse)(nil),                             // 96: iterm2.GetProfilePropertyResponse
-	(*SplitPaneRequest)(nil),                                       // 97: iterm2.SplitPaneRequest
-	(*SplitPaneResponse)(nil),                                      // 98: iterm2.SplitPaneResponse
-	(*SetPropertyRequest)(nil),                                     // 99: iterm2.SetPropertyRequest
-	(*SetPropertyResponse)(nil),                                    // 100: iterm2.SetPropertyResponse
-	(*GetPropertyRequest)(nil),                                     // 101: iterm2.GetPropertyRequest
-	(*GetPropertyResponse)(nil),                                    // 102: iterm2.GetPropertyResponse
-	(*InjectRequest)(nil),                                          // 103: iterm2.InjectRequest
-	(*InjectResponse)(nil),                                         // 104: iterm2.InjectResponse
-	(*ActivateRequest)(nil),                                        // 105: iterm2.ActivateRequest
-	(*ActivateResponse)(nil),                                       // 106: iterm2.ActivateResponse
-	(*VariableRequest)(nil),                                        // 107: iterm2.VariableRequest
-	(*VariableResponse)(nil),                                       // 108: iterm2.VariableResponse
-	(*SavedArrangementRequest)(nil),                                // 109: iterm2.SavedArrangementRequest
-	(*SavedArrangementResponse)(nil),                               // 110: iterm2.SavedArrangementResponse
-	(*FocusRequest)(nil),                                           // 111: iterm2.FocusRequest
-	(*FocusResponse)(nil),                                          // 112: iterm2.FocusResponse
-	(*ListProfilesRequest)(nil),                                    // 113: iterm2.ListProfilesRequest
-	(*ListProfilesResponse)(nil),                                   // 114: iterm2.ListProfilesResponse
-	(*ServerOriginatedRPCResultRequest)(nil),                       // 115: iterm2.ServerOriginatedRPCResultRequest
-	(*ServerOriginatedRPCResultResponse)(nil),                      // 116: iterm2.ServerOriginatedRPCResultResponse
-	(*RestartSessionRequest)(nil),                                  // 117: iterm2.RestartSessionRequest
-	(*RestartSessionResponse)(nil),                                 // 118: iterm2.RestartSessionResponse
-	(*MenuItemRequest)(nil),                                        // 119: iterm2.MenuItemRequest
-	(*MenuItemResponse)(nil),                                       // 120: iterm2.MenuItemResponse
-	(*SetTabLayoutRequest)(nil),                                    // 121: iterm2.SetTabLayoutRequest
-	(*SetTabLayoutResponse)(nil),                                   // 122: iterm2.SetTabLayoutResponse
-	(*GetBroadcastDomainsRequest)(nil),                             // 123: iterm2.GetBroadcastDomainsRequest
-	(*GetBroadcastDomainsResponse)(nil),                            // 124: iterm2.GetBroadcastDomainsResponse
-	(*TmuxRequest)(nil),                                            // 125: iterm2.TmuxRequest
-	(*TmuxResponse)(nil),                                           // 126: iterm2.TmuxResponse
-	(*ReorderTabsRequest)(nil),                                     // 127: iterm2.ReorderTabsRequest
-	(*ReorderTabsResponse)(nil),                                    // 128: iterm2.ReorderTabsResponse
-	(*PreferencesRequest)(nil),                                     // 129: iterm2.PreferencesRequest
-	(*PreferencesResponse)(nil),                                    // 130: iterm2.PreferencesResponse
-	(*ColorPresetRequest)(nil),                                     // 131: iterm2.ColorPresetRequest
-	(*ColorPresetResponse)(nil),                                    // 132: iterm2.ColorPresetResponse
-	(*SubSelection)(nil),                                           // 133: iterm2.SubSelection
-	(*Selection)(nil),                                              // 134: iterm2.Selection
-	(*SelectionRequest)(nil),                                       // 135: iterm2.SelectionRequest
-	(*SelectionResponse)(nil),                                      // 136: iterm2.SelectionResponse
-	(*StatusBarComponentRequest)(nil),                              // 137: iterm2.StatusBarComponentRequest
-	(*StatusBarComponentResponse)(nil),                             // 138: iterm2.StatusBarComponentResponse
-	(*SetBroadcastDomainsRequest)(nil),                             // 139: iterm2.SetBroadcastDomainsRequest
-	(*SetBroadcastDomainsResponse)(nil),                            // 140: iterm2.SetBroadcastDomainsResponse
-	(*CloseRequest)(nil),                                           // 141: iterm2.CloseRequest
-	(*CloseResponse)(nil),                                          // 142: iterm2.CloseResponse
-	(*InvokeFunctionRequest)(nil),                                  // 143: iterm2.InvokeFunctionRequest
-	(*InvokeFunctionResponse)(nil),                                 // 144: iterm2.InvokeFunctionResponse
-	(*ListPromptsRequest)(nil),                                     // 145: iterm2.ListPromptsRequest
-	(*ListPromptsResponse)(nil),                                    // 146: iterm2.ListPromptsResponse
-	(*SplitTreeNode_SplitTreeLink)(nil),                            // 147: iterm2.SplitTreeNode.SplitTreeLink
-	(*ListSessionsResponse_Window)(nil),                            // 148: iterm2.ListSessionsResponse.Window
-	(*ListSessionsResponse_Tab)(nil),                               // 149: iterm2.ListSessionsResponse.Tab
-	(*FocusChangedNotification_Window)(nil),                        // 150: iterm2.FocusChangedNotification.Window
-	(*ServerOriginatedRPC_RPCArgument)(nil),                        // 151: iterm2.ServerOriginatedRPC.RPCArgument
-	(*SetProfilePropertyRequest_GuidList)(nil),                     // 152: iterm2.SetProfilePropertyRequest.GuidList
-	(*SetProfilePropertyRequest_Assignment)(nil),                   // 153: iterm2.SetProfilePropertyRequest.Assignment
-	(*ActivateRequest_App)(nil),                                    // 154: iterm2.ActivateRequest.App
-	(*VariableRequest_Set)(nil),                                    // 155: iterm2.VariableRequest.Set
-	(*ListProfilesResponse_Profile)(nil),                           // 156: iterm2.ListProfilesResponse.Profile
-	(*TmuxRequest_ListConnections)(nil),                            // 157: iterm2.TmuxRequest.ListConnections
-	(*TmuxRequest_SendCommand)(nil),                                // 158: iterm2.TmuxRequest.SendCommand
-	(*TmuxRequest_SetWindowVisible)(nil),                           // 159: iterm2.TmuxRequest.SetWindowVisible
-	(*TmuxRequest_CreateWindow)(nil),                               // 160: iterm2.TmuxRequest.CreateWindow
-	(*TmuxResponse_ListConnections)(nil),                           // 161: iterm2.TmuxResponse.ListConnections
-	(*TmuxResponse_SendCommand)(nil),                               // 162: iterm2.TmuxResponse.SendCommand
-	(*TmuxResponse_SetWindowVisible)(nil),                          // 163: iterm2.TmuxResponse.SetWindowVisible
-	(*TmuxResponse_CreateWindow)(nil),                              // 164: iterm2.TmuxResponse.CreateWindow
-	(*TmuxResponse_ListConnections_Connection)(nil),                // 165: iterm2.TmuxResponse.ListConnections.Connection
-	(*ReorderTabsRequest_Assignment)(nil),                          // 166: iterm2.ReorderTabsRequest.Assignment
-	(*PreferencesRequest_Request)(nil),                             // 167: iterm2.PreferencesRequest.Request
-	(*PreferencesRequest_Request_SetPreference)(nil),               // 168: iterm2.PreferencesRequest.Request.SetPreference
-	(*PreferencesRequest_Request_GetPreference)(nil),               // 169: iterm2.PreferencesRequest.Request.GetPreference
-	(*PreferencesRequest_Request_SetDefaultProfile)(nil),           // 170: iterm2.PreferencesRequest.Request.SetDefaultProfile
-	(*PreferencesRequest_Request_GetDefaultProfile)(nil),           // 171: iterm2.PreferencesRequest.Request.GetDefaultProfile
-	(*PreferencesResponse_Result)(nil),                             // 172: iterm2.PreferencesResponse.Result
-	(*PreferencesResponse_Result_SetPreferenceResult)(nil),         // 173: iterm2.PreferencesResponse.Result.SetPreferenceResult
-	(*PreferencesResponse_Result_GetPreferenceResult)(nil),         // 174: iterm2.PreferencesResponse.Result.GetPreferenceResult
-	(*PreferencesResponse_Result_SetDefaultProfileResult)(nil),     // 175: iterm2.PreferencesResponse.Result.SetDefaultProfileResult
-	(*PreferencesResponse_Result_UnrecognizedResult)(nil),          // 176: iterm2.PreferencesResponse.Result.UnrecognizedResult
-	(*PreferencesResponse_Result_GetDefaultProfileResult)(nil),     // 177: iterm2.PreferencesResponse.Result.GetDefaultProfileResult
-	(*ColorPresetRequest_ListPresets)(nil),                         // 178: iterm2.ColorPresetRequest.ListPresets
-	(*ColorPresetRequest_GetPreset)(nil),                           // 179: iterm2.ColorPresetRequest.GetPreset
-	(*ColorPresetResponse_ListPresets)(nil),                        // 180: iterm2.ColorPresetResponse.ListPresets
-	(*ColorPresetResponse_GetPreset)(nil),                          // 181: iterm2.ColorPresetResponse.GetPreset
-	(*ColorPresetResponse_GetPreset_ColorSetting)(nil),             // 182: iterm2.ColorPresetResponse.GetPreset.ColorSetting
-	(*SelectionRequest_GetSelectionRequest)(nil),                   // 183: iterm2.SelectionRequest.GetSelectionRequest
-	(*SelectionRequest_SetSelectionRequest)(nil),                   // 184: iterm2.SelectionRequest.SetSelectionRequest
-	(*SelectionResponse_GetSelectionResponse)(nil),                 // 185: iterm2.SelectionResponse.GetSelectionResponse
-	(*SelectionResponse_SetSelectionResponse)(nil),                 // 186: iterm2.SelectionResponse.SetSelectionResponse
-	(*StatusBarComponentRequest_OpenPopover)(nil),                  // 187: iterm2.StatusBarComponentRequest.OpenPopover
-	(*CloseRequest_CloseTabs)(nil),                                 // 188: iterm2.CloseRequest.CloseTabs
-	(*CloseRequest_CloseSessions)(nil),                             // 189: iterm2.CloseRequest.CloseSessions
-	(*CloseRequest_CloseWindows)(nil),                              // 190: iterm2.CloseRequest.CloseWindows
-	(*InvokeFunctionRequest_Tab)(nil),                              // 191: iterm2.InvokeFunctionRequest.Tab
-	(*InvokeFunctionRequest_Session)(nil),                          // 192: iterm2.InvokeFunctionRequest.Session
-	(*InvokeFunctionRequest_Window)(nil),                           // 193: iterm2.InvokeFunctionRequest.Window
-	(*InvokeFunctionRequest_App)(nil),                              // 194: iterm2.InvokeFunctionRequest.App
-	(*InvokeFunctionRequest_Method)(nil),                           // 195: iterm2.InvokeFunctionRequest.Method
-	(*InvokeFunctionResponse_Error)(nil),                           // 196: iterm2.InvokeFunctionResponse.Error
-	(*InvokeFunctionResponse_Success)(nil),                         // 197: iterm2.InvokeFunctionResponse.Success
+	(SelectionMode)(0),                                                 // 0: iterm2.SelectionMode
+	(NotificationType)(0),                                              // 1: iterm2.NotificationType
+	(Modifiers)(0),                                                     // 2: iterm2.Modifiers
+	(VariableScope)(0),                                                 // 3: iterm2.VariableScope
+	(PromptMonitorMode)(0),                                             // 4: iterm2.PromptMonitorMode
+	(AlternateColor)(0),                                                // 5: iterm2.AlternateColor
+	(ImagePlaceholderType)(0),                                          // 6: iterm2.ImagePlaceholderType
+	(InvokeFunctionResponse_Status)(0),                                 // 7: iterm2.InvokeFunctionResponse.Status
+	(CloseResponse_Status)(0),                                          // 8: iterm2.CloseResponse.Status
+	(SetBroadcastDomainsResponse_Status)(0),                            // 9: iterm2.SetBroadcastDomainsResponse.Status
+	(StatusBarComponentResponse_Status)(0),                             // 10: iterm2.StatusBarComponentResponse.Status
+	(SelectionResponse_Status)(0),                                      // 11: iterm2.SelectionResponse.Status
+	(ColorPresetResponse_Status)(0),                                    // 12: iterm2.ColorPresetResponse.Status
+	(PreferencesResponse_Result_SetPreferenceResult_Status)(0),         // 13: iterm2.PreferencesResponse.Result.SetPreferenceResult.Status
+	(PreferencesResponse_Result_SetDefaultProfileResult_Status)(0),     // 14: iterm2.PreferencesResponse.Result.SetDefaultProfileResult.Status
+	(ReorderTabsResponse_Status)(0),                                    // 15: iterm2.ReorderTabsResponse.Status
+	(TmuxResponse_Status)(0),                                           // 16: iterm2.TmuxResponse.Status
+	(SetTabLayoutResponse_Status)(0),                                   // 17: iterm2.SetTabLayoutResponse.Status
+	(MenuItemResponse_Status)(0),                                       // 18: iterm2.MenuItemResponse.Status
+	(RestartSessionResponse_Status)(0),                                 // 19: iterm2.RestartSessionResponse.Status
+	(SavedArrangementRequest_Action)(0),                                // 20: iterm2.SavedArrangementRequest.Action
+	(SavedArrangementResponse_Status)(0),                               // 21: iterm2.SavedArrangementResponse.Status
+	(VariableResponse_Status)(0),                                       // 22: iterm2.VariableResponse.Status
+	(ActivateResponse_Status)(0),                                       // 23: iterm2.ActivateResponse.Status
+	(InjectResponse_Status)(0),                                         // 24: iterm2.InjectResponse.Status
+	(GetPropertyResponse_Status)(0),                                    // 25: iterm2.GetPropertyResponse.Status
+	(SetPropertyResponse_Status)(0),                                    // 26: iterm2.SetPropertyResponse.Status
+	(RegisterToolRequest_ToolType)(0),                                  // 27: iterm2.RegisterToolRequest.ToolType
+	(RPCRegistrationRequest_Role)(0),                                   // 28: iterm2.RPCRegistrationRequest.Role
+	(RPCRegistrationRequest_StatusBarComponentAttributes_Format)(0),    // 29: iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Format
+	(RPCRegistrationRequest_StatusBarComponentAttributes_Knob_Type)(0), // 30: iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Knob.Type
+	(RegisterToolResponse_Status)(0),                                   // 31: iterm2.RegisterToolResponse.Status
+	(NotificationResponse_Status)(0),                                   // 32: iterm2.NotificationResponse.Status
+	(KeystrokeNotification_Action)(0),                                  // 33: iterm2.KeystrokeNotification.Action
+	(FocusChangedNotification_Window_WindowStatus)(0),                  // 34: iterm2.FocusChangedNotification.Window.WindowStatus
+	(GetBufferResponse_Status)(0),                                      // 35: iterm2.GetBufferResponse.Status
+	(GetPromptResponse_Status)(0),                                      // 36: iterm2.GetPromptResponse.Status
+	(GetPromptResponse_State)(0),                                       // 37: iterm2.GetPromptResponse.State
+	(ListPromptsResponse_Status)(0),                                    // 38: iterm2.ListPromptsResponse.Status
+	(GetProfilePropertyResponse_Status)(0),                             // 39: iterm2.GetProfilePropertyResponse.Status
+	(SetProfilePropertyResponse_Status)(0),                             // 40: iterm2.SetProfilePropertyResponse.Status
+	(TransactionResponse_Status)(0),                                    // 41: iterm2.TransactionResponse.Status
+	(LineContents_Continuation)(0),                                     // 42: iterm2.LineContents.Continuation
+	(SendTextResponse_Status)(0),                                       // 43: iterm2.SendTextResponse.Status
+	(CreateTabResponse_Status)(0),                                      // 44: iterm2.CreateTabResponse.Status
+	(SplitPaneRequest_SplitDirection)(0),                               // 45: iterm2.SplitPaneRequest.SplitDirection
+	(SplitPaneResponse_Status)(0),                                      // 46: iterm2.SplitPaneResponse.Status
+	(*ClientOriginatedMessage)(nil),                                    // 47: iterm2.ClientOriginatedMessage
+	(*ServerOriginatedMessage)(nil),                                    // 48: iterm2.ServerOriginatedMessage
+	(*InvokeFunctionRequest)(nil),                                      // 49: iterm2.InvokeFunctionRequest
+	(*InvokeFunctionResponse)(nil),                                     // 50: iterm2.InvokeFunctionResponse
+	(*CloseRequest)(nil),                                               // 51: iterm2.CloseRequest
+	(*CloseResponse)(nil),                                              // 52: iterm2.CloseResponse
+	(*SetBroadcastDomainsRequest)(nil),                                 // 53: iterm2.SetBroadcastDomainsRequest
+	(*SetBroadcastDomainsResponse)(nil),                                // 54: iterm2.SetBroadcastDomainsResponse
+	(*StatusBarComponentRequest)(nil),                                  // 55: iterm2.StatusBarComponentRequest
+	(*StatusBarComponentResponse)(nil),                                 // 56: iterm2.StatusBarComponentResponse
+	(*WindowedCoordRange)(nil),                                         // 57: iterm2.WindowedCoordRange
+	(*SubSelection)(nil),                                               // 58: iterm2.SubSelection
+	(*Selection)(nil),                                                  // 59: iterm2.Selection
+	(*SelectionRequest)(nil),                                           // 60: iterm2.SelectionRequest
+	(*SelectionResponse)(nil),                                          // 61: iterm2.SelectionResponse
+	(*ColorPresetRequest)(nil),                                         // 62: iterm2.ColorPresetRequest
+	(*ColorPresetResponse)(nil),                                        // 63: iterm2.ColorPresetResponse
+	(*PreferencesRequest)(nil),                                         // 64: iterm2.PreferencesRequest
+	(*PreferencesResponse)(nil),                                        // 65: iterm2.PreferencesResponse
+	(*ReorderTabsRequest)(nil),                                         // 66: iterm2.ReorderTabsRequest
+	(*ReorderTabsResponse)(nil),                                        // 67: iterm2.ReorderTabsResponse
+	(*TmuxRequest)(nil),                                                // 68: iterm2.TmuxRequest
+	(*TmuxResponse)(nil),                                               // 69: iterm2.TmuxResponse
+	(*GetBroadcastDomainsRequest)(nil),                                 // 70: iterm2.GetBroadcastDomainsRequest
+	(*BroadcastDomain)(nil),                                            // 71: iterm2.BroadcastDomain
+	(*GetBroadcastDomainsResponse)(nil),                                // 72: iterm2.GetBroadcastDomainsResponse
+	(*SetTabLayoutRequest)(nil),                                        // 73: iterm2.SetTabLayoutRequest
+	(*SetTabLayoutResponse)(nil),                                       // 74: iterm2.SetTabLayoutResponse
+	(*MenuItemRequest)(nil),                                            // 75: iterm2.MenuItemRequest
+	(*MenuItemResponse)(nil),                                           // 76: iterm2.MenuItemResponse
+	(*RestartSessionRequest)(nil),                                      // 77: iterm2.RestartSessionRequest
+	(*RestartSessionResponse)(nil),                                     // 78: iterm2.RestartSessionResponse
+	(*ServerOriginatedRPCResultRequest)(nil),                           // 79: iterm2.ServerOriginatedRPCResultRequest
+	(*ServerOriginatedRPCResultResponse)(nil),                          // 80: iterm2.ServerOriginatedRPCResultResponse
+	(*ListProfilesRequest)(nil),                                        // 81: iterm2.ListProfilesRequest
+	(*ListProfilesResponse)(nil),                                       // 82: iterm2.ListProfilesResponse
+	(*FocusRequest)(nil),                                               // 83: iterm2.FocusRequest
+	(*FocusResponse)(nil),                                              // 84: iterm2.FocusResponse
+	(*SavedArrangementRequest)(nil),                                    // 85: iterm2.SavedArrangementRequest
+	(*SavedArrangementResponse)(nil),                                   // 86: iterm2.SavedArrangementResponse
+	(*VariableRequest)(nil),                                            // 87: iterm2.VariableRequest
+	(*VariableResponse)(nil),                                           // 88: iterm2.VariableResponse
+	(*ActivateRequest)(nil),                                            // 89: iterm2.ActivateRequest
+	(*ActivateResponse)(nil),                                           // 90: iterm2.ActivateResponse
+	(*InjectRequest)(nil),                                              // 91: iterm2.InjectRequest
+	(*InjectResponse)(nil),                                             // 92: iterm2.InjectResponse
+	(*GetPropertyRequest)(nil),                                         // 93: iterm2.GetPropertyRequest
+	(*GetPropertyResponse)(nil),                                        // 94: iterm2.GetPropertyResponse
+	(*SetPropertyRequest)(nil),                                         // 95: iterm2.SetPropertyRequest
+	(*SetPropertyResponse)(nil),                                        // 96: iterm2.SetPropertyResponse
+	(*RegisterToolRequest)(nil),                                        // 97: iterm2.RegisterToolRequest
+	(*RPCRegistrationRequest)(nil),                                     // 98: iterm2.RPCRegistrationRequest
+	(*RegisterToolResponse)(nil),                                       // 99: iterm2.RegisterToolResponse
+	(*KeystrokePattern)(nil),                                           // 100: iterm2.KeystrokePattern
+	(*KeystrokeMonitorRequest)(nil),                                    // 101: iterm2.KeystrokeMonitorRequest
+	(*KeystrokeFilterRequest)(nil),                                     // 102: iterm2.KeystrokeFilterRequest
+	(*VariableMonitorRequest)(nil),                                     // 103: iterm2.VariableMonitorRequest
+	(*ProfileChangeRequest)(nil),                                       // 104: iterm2.ProfileChangeRequest
+	(*PromptMonitorRequest)(nil),                                       // 105: iterm2.PromptMonitorRequest
+	(*NotificationRequest)(nil),                                        // 106: iterm2.NotificationRequest
+	(*NotificationResponse)(nil),                                       // 107: iterm2.NotificationResponse
+	(*Notification)(nil),                                               // 108: iterm2.Notification
+	(*ProfileChangedNotification)(nil),                                 // 109: iterm2.ProfileChangedNotification
+	(*VariableChangedNotification)(nil),                                // 110: iterm2.VariableChangedNotification
+	(*BroadcastDomainsChangedNotification)(nil),                        // 111: iterm2.BroadcastDomainsChangedNotification
+	(*ServerOriginatedRPC)(nil),                                        // 112: iterm2.ServerOriginatedRPC
+	(*ServerOriginatedRPCNotification)(nil),                            // 113: iterm2.ServerOriginatedRPCNotification
+	(*KeystrokeNotification)(nil),                                      // 114: iterm2.KeystrokeNotification
+	(*ScreenUpdateNotification)(nil),                                   // 115: iterm2.ScreenUpdateNotification
+	(*PromptNotificationPrompt)(nil),                                   // 116: iterm2.PromptNotificationPrompt
+	(*PromptNotificationCommandStart)(nil),                             // 117: iterm2.PromptNotificationCommandStart
+	(*PromptNotificationCommandEnd)(nil),                               // 118: iterm2.PromptNotificationCommandEnd
+	(*PromptNotification)(nil),                                         // 119: iterm2.PromptNotification
+	(*LocationChangeNotification)(nil),                                 // 120: iterm2.LocationChangeNotification
+	(*CustomEscapeSequenceNotification)(nil),                           // 121: iterm2.CustomEscapeSequenceNotification
+	(*NewSessionNotification)(nil),                                     // 122: iterm2.NewSessionNotification
+	(*FocusChangedNotification)(nil),                                   // 123: iterm2.FocusChangedNotification
+	(*TerminateSessionNotification)(nil),                               // 124: iterm2.TerminateSessionNotification
+	(*LayoutChangedNotification)(nil),                                  // 125: iterm2.LayoutChangedNotification
+	(*GetBufferRequest)(nil),                                           // 126: iterm2.GetBufferRequest
+	(*GetBufferResponse)(nil),                                          // 127: iterm2.GetBufferResponse
+	(*GetPromptRequest)(nil),                                           // 128: iterm2.GetPromptRequest
+	(*GetPromptResponse)(nil),                                          // 129: iterm2.GetPromptResponse
+	(*ListPromptsRequest)(nil),                                         // 130: iterm2.ListPromptsRequest
+	(*ListPromptsResponse)(nil),                                        // 131: iterm2.ListPromptsResponse
+	(*GetProfilePropertyRequest)(nil),                                  // 132: iterm2.GetProfilePropertyRequest
+	(*ProfileProperty)(nil),                                            // 133: iterm2.ProfileProperty
+	(*GetProfilePropertyResponse)(nil),                                 // 134: iterm2.GetProfilePropertyResponse
+	(*SetProfilePropertyRequest)(nil),                                  // 135: iterm2.SetProfilePropertyRequest
+	(*SetProfilePropertyResponse)(nil),                                 // 136: iterm2.SetProfilePropertyResponse
+	(*TransactionRequest)(nil),                                         // 137: iterm2.TransactionRequest
+	(*TransactionResponse)(nil),                                        // 138: iterm2.TransactionResponse
+	(*LineRange)(nil),                                                  // 139: iterm2.LineRange
+	(*Range)(nil),                                                      // 140: iterm2.Range
+	(*CoordRange)(nil),                                                 // 141: iterm2.CoordRange
+	(*Coord)(nil),                                                      // 142: iterm2.Coord
+	(*RGBColor)(nil),                                                   // 143: iterm2.RGBColor
+	(*URL)(nil),                                                        // 144: iterm2.URL
+	(*CellStyle)(nil),                                                  // 145: iterm2.CellStyle
+	(*LineContents)(nil),                                               // 146: iterm2.LineContents
+	(*CodePointsPerCell)(nil),                                          // 147: iterm2.CodePointsPerCell
+	(*ListSessionsRequest)(nil),                                        // 148: iterm2.ListSessionsRequest
+	(*SendTextRequest)(nil),                                            // 149: iterm2.SendTextRequest
+	(*SendTextResponse)(nil),                                           // 150: iterm2.SendTextResponse
+	(*Size)(nil),                                                       // 151: iterm2.Size
+	(*Point)(nil),                                                      // 152: iterm2.Point
+	(*Frame)(nil),                                                      // 153: iterm2.Frame
+	(*SessionSummary)(nil),                                             // 154: iterm2.SessionSummary
+	(*SplitTreeNode)(nil),                                              // 155: iterm2.SplitTreeNode
+	(*ListSessionsResponse)(nil),                                       // 156: iterm2.ListSessionsResponse
+	(*CreateTabRequest)(nil),                                           // 157: iterm2.CreateTabRequest
+	(*CreateTabResponse)(nil),                                          // 158: iterm2.CreateTabResponse
+	(*SplitPaneRequest)(nil),                                           // 159: iterm2.SplitPaneRequest
+	(*SplitPaneResponse)(nil),                                          // 160: iterm2.SplitPaneResponse
+	(*InvokeFunctionRequest_Tab)(nil),                                  // 161: iterm2.InvokeFunctionRequest.Tab
+	(*InvokeFunctionRequest_Session)(nil),                              // 162: iterm2.InvokeFunctionRequest.Session
+	(*InvokeFunctionRequest_Window)(nil),                               // 163: iterm2.InvokeFunctionRequest.Window
+	(*InvokeFunctionRequest_App)(nil),                                  // 164: iterm2.InvokeFunctionRequest.App
+	(*InvokeFunctionRequest_Method)(nil),                               // 165: iterm2.InvokeFunctionRequest.Method
+	(*InvokeFunctionResponse_Error)(nil),                               // 166: iterm2.InvokeFunctionResponse.Error
+	(*InvokeFunctionResponse_Success)(nil),                             // 167: iterm2.InvokeFunctionResponse.Success
+	(*CloseRequest_CloseTabs)(nil),                                     // 168: iterm2.CloseRequest.CloseTabs
+	(*CloseRequest_CloseSessions)(nil),                                 // 169: iterm2.CloseRequest.CloseSessions
+	(*CloseRequest_CloseWindows)(nil),                                  // 170: iterm2.CloseRequest.CloseWindows
+	(*StatusBarComponentRequest_OpenPopover)(nil),                      // 171: iterm2.StatusBarComponentRequest.OpenPopover
+	(*SelectionRequest_GetSelectionRequest)(nil),                       // 172: iterm2.SelectionRequest.GetSelectionRequest
+	(*SelectionRequest_SetSelectionRequest)(nil),                       // 173: iterm2.SelectionRequest.SetSelectionRequest
+	(*SelectionResponse_GetSelectionResponse)(nil),                     // 174: iterm2.SelectionResponse.GetSelectionResponse
+	(*SelectionResponse_SetSelectionResponse)(nil),                     // 175: iterm2.SelectionResponse.SetSelectionResponse
+	(*ColorPresetRequest_ListPresets)(nil),                             // 176: iterm2.ColorPresetRequest.ListPresets
+	(*ColorPresetRequest_GetPreset)(nil),                               // 177: iterm2.ColorPresetRequest.GetPreset
+	(*ColorPresetResponse_ListPresets)(nil),                            // 178: iterm2.ColorPresetResponse.ListPresets
+	(*ColorPresetResponse_GetPreset)(nil),                              // 179: iterm2.ColorPresetResponse.GetPreset
+	(*ColorPresetResponse_GetPreset_ColorSetting)(nil),                 // 180: iterm2.ColorPresetResponse.GetPreset.ColorSetting
+	(*PreferencesRequest_Request)(nil),                                 // 181: iterm2.PreferencesRequest.Request
+	(*PreferencesRequest_Request_SetPreference)(nil),                   // 182: iterm2.PreferencesRequest.Request.SetPreference
+	(*PreferencesRequest_Request_GetPreference)(nil),                   // 183: iterm2.PreferencesRequest.Request.GetPreference
+	(*PreferencesRequest_Request_SetDefaultProfile)(nil),               // 184: iterm2.PreferencesRequest.Request.SetDefaultProfile
+	(*PreferencesRequest_Request_GetDefaultProfile)(nil),               // 185: iterm2.PreferencesRequest.Request.GetDefaultProfile
+	(*PreferencesResponse_Result)(nil),                                 // 186: iterm2.PreferencesResponse.Result
+	(*PreferencesResponse_Result_SetPreferenceResult)(nil),             // 187: iterm2.PreferencesResponse.Result.SetPreferenceResult
+	(*PreferencesResponse_Result_GetPreferenceResult)(nil),             // 188: iterm2.PreferencesResponse.Result.GetPreferenceResult
+	(*PreferencesResponse_Result_SetDefaultProfileResult)(nil),         // 189: iterm2.PreferencesResponse.Result.SetDefaultProfileResult
+	(*PreferencesResponse_Result_UnrecognizedResult)(nil),              // 190: iterm2.PreferencesResponse.Result.UnrecognizedResult
+	(*PreferencesResponse_Result_GetDefaultProfileResult)(nil),         // 191: iterm2.PreferencesResponse.Result.GetDefaultProfileResult
+	(*ReorderTabsRequest_Assignment)(nil),                              // 192: iterm2.ReorderTabsRequest.Assignment
+	(*TmuxRequest_ListConnections)(nil),                                // 193: iterm2.TmuxRequest.ListConnections
+	(*TmuxRequest_SendCommand)(nil),                                    // 194: iterm2.TmuxRequest.SendCommand
+	(*TmuxRequest_SetWindowVisible)(nil),                               // 195: iterm2.TmuxRequest.SetWindowVisible
+	(*TmuxRequest_CreateWindow)(nil),                                   // 196: iterm2.TmuxRequest.CreateWindow
+	(*TmuxResponse_ListConnections)(nil),                               // 197: iterm2.TmuxResponse.ListConnections
+	(*TmuxResponse_SendCommand)(nil),                                   // 198: iterm2.TmuxResponse.SendCommand
+	(*TmuxResponse_SetWindowVisible)(nil),                              // 199: iterm2.TmuxResponse.SetWindowVisible
+	(*TmuxResponse_CreateWindow)(nil),                                  // 200: iterm2.TmuxResponse.CreateWindow
+	(*TmuxResponse_ListConnections_Connection)(nil),                    // 201: iterm2.TmuxResponse.ListConnections.Connection
+	(*ListProfilesResponse_Profile)(nil),                               // 202: iterm2.ListProfilesResponse.Profile
+	(*VariableRequest_Set)(nil),                                        // 203: iterm2.VariableRequest.Set
+	(*ActivateRequest_App)(nil),                                        // 204: iterm2.ActivateRequest.App
+	(*RPCRegistrationRequest_RPCArgumentSignature)(nil),                // 205: iterm2.RPCRegistrationRequest.RPCArgumentSignature
+	(*RPCRegistrationRequest_RPCArgument)(nil),                         // 206: iterm2.RPCRegistrationRequest.RPCArgument
+	(*RPCRegistrationRequest_SessionTitleAttributes)(nil),              // 207: iterm2.RPCRegistrationRequest.SessionTitleAttributes
+	(*RPCRegistrationRequest_StatusBarComponentAttributes)(nil),        // 208: iterm2.RPCRegistrationRequest.StatusBarComponentAttributes
+	(*RPCRegistrationRequest_ContextMenuAttributes)(nil),               // 209: iterm2.RPCRegistrationRequest.ContextMenuAttributes
+	(*RPCRegistrationRequest_StatusBarComponentAttributes_Knob)(nil),   // 210: iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Knob
+	(*RPCRegistrationRequest_StatusBarComponentAttributes_Icon)(nil),   // 211: iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Icon
+	(*ServerOriginatedRPC_RPCArgument)(nil),                            // 212: iterm2.ServerOriginatedRPC.RPCArgument
+	(*FocusChangedNotification_Window)(nil),                            // 213: iterm2.FocusChangedNotification.Window
+	(*SetProfilePropertyRequest_GuidList)(nil),                         // 214: iterm2.SetProfilePropertyRequest.GuidList
+	(*SetProfilePropertyRequest_Assignment)(nil),                       // 215: iterm2.SetProfilePropertyRequest.Assignment
+	(*SplitTreeNode_SplitTreeLink)(nil),                                // 216: iterm2.SplitTreeNode.SplitTreeLink
+	(*ListSessionsResponse_Window)(nil),                                // 217: iterm2.ListSessionsResponse.Window
+	(*ListSessionsResponse_Tab)(nil),                                   // 218: iterm2.ListSessionsResponse.Tab
 }
 var file_api_proto_depIdxs = []int32{
-	42,  // 0: iterm2.ClientOriginatedMessage.get_buffer_request:type_name -> iterm2.GetBufferRequest
-	86,  // 1: iterm2.ClientOriginatedMessage.get_prompt_request:type_name -> iterm2.GetPromptRequest
-	87,  // 2: iterm2.ClientOriginatedMessage.transaction_request:type_name -> iterm2.TransactionRequest
-	89,  // 3: iterm2.ClientOriginatedMessage.notification_request:type_name -> iterm2.NotificationRequest
-	91,  // 4: iterm2.ClientOriginatedMessage.register_tool_request:type_name -> iterm2.RegisterToolRequest
-	93,  // 5: iterm2.ClientOriginatedMessage.set_profile_property_request:type_name -> iterm2.SetProfilePropertyRequest
-	54,  // 6: iterm2.ClientOriginatedMessage.list_sessions_request:type_name -> iterm2.ListSessionsRequest
-	61,  // 7: iterm2.ClientOriginatedMessage.send_text_request:type_name -> iterm2.SendTextRequest
-	63,  // 8: iterm2.ClientOriginatedMessage.create_tab_request:type_name -> iterm2.CreateTabRequest
-	97,  // 9: iterm2.ClientOriginatedMessage.split_pane_request:type_name -> iterm2.SplitPaneRequest
-	95,  // 10: iterm2.ClientOriginatedMessage.get_profile_property_request:type_name -> iterm2.GetProfilePropertyRequest
-	99,  // 11: iterm2.ClientOriginatedMessage.set_property_request:type_name -> iterm2.SetPropertyRequest
-	101, // 12: iterm2.ClientOriginatedMessage.get_property_request:type_name -> iterm2.GetPropertyRequest
-	103, // 13: iterm2.ClientOriginatedMessage.inject_request:type_name -> iterm2.InjectRequest
-	105, // 14: iterm2.ClientOriginatedMessage.activate_request:type_name -> iterm2.ActivateRequest
-	107, // 15: iterm2.ClientOriginatedMessage.variable_request:type_name -> iterm2.VariableRequest
-	109, // 16: iterm2.ClientOriginatedMessage.saved_arrangement_request:type_name -> iterm2.SavedArrangementRequest
-	111, // 17: iterm2.ClientOriginatedMessage.focus_request:type_name -> iterm2.FocusRequest
-	113, // 18: iterm2.ClientOriginatedMessage.list_profiles_request:type_name -> iterm2.ListProfilesRequest
-	115, // 19: iterm2.ClientOriginatedMessage.server_originated_rpc_result_request:type_name -> iterm2.ServerOriginatedRPCResultRequest
-	117, // 20: iterm2.ClientOriginatedMessage.restart_session_request:type_name -> iterm2.RestartSessionRequest
-	119, // 21: iterm2.ClientOriginatedMessage.menu_item_request:type_name -> iterm2.MenuItemRequest
-	121, // 22: iterm2.ClientOriginatedMessage.set_tab_layout_request:type_name -> iterm2.SetTabLayoutRequest
-	123, // 23: iterm2.ClientOriginatedMessage.get_broadcast_domains_request:type_name -> iterm2.GetBroadcastDomainsRequest
-	125, // 24: iterm2.ClientOriginatedMessage.tmux_request:type_name -> iterm2.TmuxRequest
-	127, // 25: iterm2.ClientOriginatedMessage.reorder_tabs_request:type_name -> iterm2.ReorderTabsRequest
-	129, // 26: iterm2.ClientOriginatedMessage.preferences_request:type_name -> iterm2.PreferencesRequest
-	131, // 27: iterm2.ClientOriginatedMessage.color_preset_request:type_name -> iterm2.ColorPresetRequest
-	135, // 28: iterm2.ClientOriginatedMessage.selection_request:type_name -> iterm2.SelectionRequest
-	137, // 29: iterm2.ClientOriginatedMessage.status_bar_component_request:type_name -> iterm2.StatusBarComponentRequest
-	139, // 30: iterm2.ClientOriginatedMessage.set_broadcast_domains_request:type_name -> iterm2.SetBroadcastDomainsRequest
-	141, // 31: iterm2.ClientOriginatedMessage.close_request:type_name -> iterm2.CloseRequest
-	143, // 32: iterm2.ClientOriginatedMessage.invoke_function_request:type_name -> iterm2.InvokeFunctionRequest
-	145, // 33: iterm2.ClientOriginatedMessage.list_prompts_request:type_name -> iterm2.ListPromptsRequest
-	43,  // 34: iterm2.ServerOriginatedMessage.get_buffer_response:type_name -> iterm2.GetBufferResponse
-	69,  // 35: iterm2.ServerOriginatedMessage.get_prompt_response:type_name -> iterm2.GetPromptResponse
-	88,  // 36: iterm2.ServerOriginatedMessage.transaction_response:type_name -> iterm2.TransactionResponse
-	90,  // 37: iterm2.ServerOriginatedMessage.notification_response:type_name -> iterm2.NotificationResponse
-	92,  // 38: iterm2.ServerOriginatedMessage.register_tool_response:type_name -> iterm2.RegisterToolResponse
-	94,  // 39: iterm2.ServerOriginatedMessage.set_profile_property_response:type_name -> iterm2.SetProfilePropertyResponse
-	60,  // 40: iterm2.ServerOriginatedMessage.list_sessions_response:type_name -> iterm2.ListSessionsResponse
-	62,  // 41: iterm2.ServerOriginatedMessage.send_text_response:type_name -> iterm2.SendTextResponse
-	65,  // 42: iterm2.ServerOriginatedMessage.create_tab_response:type_name -> iterm2.CreateTabResponse
-	98,  // 43: iterm2.ServerOriginatedMessage.split_pane_response:type_name -> iterm2.SplitPaneResponse
-	96,  // 44: iterm2.ServerOriginatedMessage.get_profile_property_response:type_name -> iterm2.GetProfilePropertyResponse
-	100, // 45: iterm2.ServerOriginatedMessage.set_property_response:type_name -> iterm2.SetPropertyResponse
-	102, // 46: iterm2.ServerOriginatedMessage.get_property_response:type_name -> iterm2.GetPropertyResponse
-	104, // 47: iterm2.ServerOriginatedMessage.inject_response:type_name -> iterm2.InjectResponse
-	106, // 48: iterm2.ServerOriginatedMessage.activate_response:type_name -> iterm2.ActivateResponse
-	108, // 49: iterm2.ServerOriginatedMessage.variable_response:type_name -> iterm2.VariableResponse
-	110, // 50: iterm2.ServerOriginatedMessage.saved_arrangement_response:type_name -> iterm2.SavedArrangementResponse
-	112, // 51: iterm2.ServerOriginatedMessage.focus_response:type_name -> iterm2.FocusResponse
-	114, // 52: iterm2.ServerOriginatedMessage.list_profiles_response:type_name -> iterm2.ListProfilesResponse
-	116, // 53: iterm2.ServerOriginatedMessage.server_originated_rpc_result_response:type_name -> iterm2.ServerOriginatedRPCResultResponse
-	118, // 54: iterm2.ServerOriginatedMessage.restart_session_response:type_name -> iterm2.RestartSessionResponse
-	120, // 55: iterm2.ServerOriginatedMessage.menu_item_response:type_name -> iterm2.MenuItemResponse
-	122, // 56: iterm2.ServerOriginatedMessage.set_tab_layout_response:type_name -> iterm2.SetTabLayoutResponse
-	124, // 57: iterm2.ServerOriginatedMessage.get_broadcast_domains_response:type_name -> iterm2.GetBroadcastDomainsResponse
-	126, // 58: iterm2.ServerOriginatedMessage.tmux_response:type_name -> iterm2.TmuxResponse
-	128, // 59: iterm2.ServerOriginatedMessage.reorder_tabs_response:type_name -> iterm2.ReorderTabsResponse
-	130, // 60: iterm2.ServerOriginatedMessage.preferences_response:type_name -> iterm2.PreferencesResponse
-	132, // 61: iterm2.ServerOriginatedMessage.color_preset_response:type_name -> iterm2.ColorPresetResponse
-	136, // 62: iterm2.ServerOriginatedMessage.selection_response:type_name -> iterm2.SelectionResponse
-	138, // 63: iterm2.ServerOriginatedMessage.status_bar_component_response:type_name -> iterm2.StatusBarComponentResponse
-	140, // 64: iterm2.ServerOriginatedMessage.set_broadcast_domains_response:type_name -> iterm2.SetBroadcastDomainsResponse
-	142, // 65: iterm2.ServerOriginatedMessage.close_response:type_name -> iterm2.CloseResponse
-	144, // 66: iterm2.ServerOriginatedMessage.invoke_function_response:type_name -> iterm2.InvokeFunctionResponse
-	146, // 67: iterm2.ServerOriginatedMessage.list_prompts_response:type_name -> iterm2.ListPromptsResponse
-	66,  // 68: iterm2.ServerOriginatedMessage.notification:type_name -> iterm2.Notification
-	44,  // 69: iterm2.GetBufferRequest.line_range:type_name -> iterm2.LineRange
-	4,   // 70: iterm2.GetBufferResponse.status:type_name -> iterm2.GetBufferResponse.Status
-	46,  // 71: iterm2.GetBufferResponse.range:type_name -> iterm2.Range
-	49,  // 72: iterm2.GetBufferResponse.contents:type_name -> iterm2.LineContents
-	45,  // 73: iterm2.GetBufferResponse.cursor:type_name -> iterm2.Coord
-	48,  // 74: iterm2.GetBufferResponse.windowed_coord_range:type_name -> iterm2.WindowedCoordRange
-	48,  // 75: iterm2.LineRange.windowed_coord_range:type_name -> iterm2.WindowedCoordRange
-	45,  // 76: iterm2.CoordRange.start:type_name -> iterm2.Coord
-	45,  // 77: iterm2.CoordRange.end:type_name -> iterm2.Coord
-	47,  // 78: iterm2.WindowedCoordRange.coord_range:type_name -> iterm2.CoordRange
-	46,  // 79: iterm2.WindowedCoordRange.columns:type_name -> iterm2.Range
-	50,  // 80: iterm2.LineContents.code_points_per_cell:type_name -> iterm2.CodePointsPerCell
-	5,   // 81: iterm2.LineContents.continuation:type_name -> iterm2.LineContents.Continuation
-	53,  // 82: iterm2.LineContents.style:type_name -> iterm2.CellStyle
-	0,   // 83: iterm2.CellStyle.fgAlternate:type_name -> iterm2.AlternateColor
-	51,  // 84: iterm2.CellStyle.fgRgb:type_name -> iterm2.RGBColor
-	0,   // 85: iterm2.CellStyle.bgAlternate:type_name -> iterm2.AlternateColor
-	51,  // 86: iterm2.CellStyle.bgRgb:type_name -> iterm2.RGBColor
-	1,   // 87: iterm2.CellStyle.image:type_name -> iterm2.ImagePlaceholderType
-	51,  // 88: iterm2.CellStyle.underlineColor:type_name -> iterm2.RGBColor
-	52,  // 89: iterm2.CellStyle.url:type_name -> iterm2.URL
-	56,  // 90: iterm2.Frame.origin:type_name -> iterm2.Point
-	55,  // 91: iterm2.Frame.size:type_name -> iterm2.Size
-	57,  // 92: iterm2.SessionSummary.frame:type_name -> iterm2.Frame
-	55,  // 93: iterm2.SessionSummary.grid_size:type_name -> iterm2.Size
-	147, // 94: iterm2.SplitTreeNode.links:type_name -> iterm2.SplitTreeNode.SplitTreeLink
-	148, // 95: iterm2.ListSessionsResponse.windows:type_name -> iterm2.ListSessionsResponse.Window
-	58,  // 96: iterm2.ListSessionsResponse.buried_sessions:type_name -> iterm2.SessionSummary
-	6,   // 97: iterm2.SendTextResponse.status:type_name -> iterm2.SendTextResponse.Status
-	64,  // 98: iterm2.CreateTabRequest.custom_profile_properties:type_name -> iterm2.ProfileProperty
-	7,   // 99: iterm2.CreateTabResponse.status:type_name -> iterm2.CreateTabResponse.Status
-	67,  // 100: iterm2.Notification.keystroke_notification:type_name -> iterm2.KeystrokeNotification
-	68,  // 101: iterm2.Notification.screen_update_notification:type_name -> iterm2.ScreenUpdateNotification
-	73,  // 102: iterm2.Notification.prompt_notification:type_name -> iterm2.PromptNotification
-	74,  // 103: iterm2.Notification.location_change_notification:type_name -> iterm2.LocationChangeNotification
-	75,  // 104: iterm2.Notification.custom_escape_sequence_notification:type_name -> iterm2.CustomEscapeSequenceNotification
-	76,  // 105: iterm2.Notification.new_session_notification:type_name -> iterm2.NewSessionNotification
-	78,  // 106: iterm2.Notification.terminate_session_notification:type_name -> iterm2.TerminateSessionNotification
-	79,  // 107: iterm2.Notification.layout_changed_notification:type_name -> iterm2.LayoutChangedNotification
-	77,  // 108: iterm2.Notification.focus_changed_notification:type_name -> iterm2.FocusChangedNotification
-	81,  // 109: iterm2.Notification.server_originated_rpc_notification:type_name -> iterm2.ServerOriginatedRPCNotification
-	83,  // 110: iterm2.Notification.broadcast_domains_changed:type_name -> iterm2.BroadcastDomainsChangedNotification
-	84,  // 111: iterm2.Notification.variable_changed_notification:type_name -> iterm2.VariableChangedNotification
-	85,  // 112: iterm2.Notification.profile_changed_notification:type_name -> iterm2.ProfileChangedNotification
-	2,   // 113: iterm2.KeystrokeNotification.modifiers:type_name -> iterm2.Modifiers
-	8,   // 114: iterm2.KeystrokeNotification.action:type_name -> iterm2.KeystrokeNotification.Action
-	9,   // 115: iterm2.GetPromptResponse.status:type_name -> iterm2.GetPromptResponse.Status
-	47,  // 116: iterm2.GetPromptResponse.prompt_range:type_name -> iterm2.CoordRange
-	47,  // 117: iterm2.GetPromptResponse.command_range:type_name -> iterm2.CoordRange
-	47,  // 118: iterm2.GetPromptResponse.output_range:type_name -> iterm2.CoordRange
-	10,  // 119: iterm2.GetPromptResponse.prompt_state:type_name -> iterm2.GetPromptResponse.State
-	69,  // 120: iterm2.PromptNotificationPrompt.prompt:type_name -> iterm2.GetPromptResponse
-	70,  // 121: iterm2.PromptNotification.prompt:type_name -> iterm2.PromptNotificationPrompt
-	71,  // 122: iterm2.PromptNotification.command_start:type_name -> iterm2.PromptNotificationCommandStart
-	72,  // 123: iterm2.PromptNotification.command_end:type_name -> iterm2.PromptNotificationCommandEnd
-	150, // 124: iterm2.FocusChangedNotification.window:type_name -> iterm2.FocusChangedNotification.Window
-	60,  // 125: iterm2.LayoutChangedNotification.list_sessions_response:type_name -> iterm2.ListSessionsResponse
-	151, // 126: iterm2.ServerOriginatedRPC.arguments:type_name -> iterm2.ServerOriginatedRPC.RPCArgument
-	80,  // 127: iterm2.ServerOriginatedRPCNotification.rpc:type_name -> iterm2.ServerOriginatedRPC
-	82,  // 128: iterm2.BroadcastDomainsChangedNotification.broadcast_domains:type_name -> iterm2.BroadcastDomain
-	12,  // 129: iterm2.TransactionResponse.status:type_name -> iterm2.TransactionResponse.Status
-	13,  // 130: iterm2.NotificationResponse.status:type_name -> iterm2.NotificationResponse.Status
-	14,  // 131: iterm2.RegisterToolResponse.status:type_name -> iterm2.RegisterToolResponse.Status
-	152, // 132: iterm2.SetProfilePropertyRequest.guid_list:type_name -> iterm2.SetProfilePropertyRequest.GuidList
-	153, // 133: iterm2.SetProfilePropertyRequest.assignments:type_name -> iterm2.SetProfilePropertyRequest.Assignment
-	15,  // 134: iterm2.SetProfilePropertyResponse.status:type_name -> iterm2.SetProfilePropertyResponse.Status
-	16,  // 135: iterm2.GetProfilePropertyResponse.status:type_name -> iterm2.GetProfilePropertyResponse.Status
-	64,  // 136: iterm2.GetProfilePropertyResponse.properties:type_name -> iterm2.ProfileProperty
-	17,  // 137: iterm2.SplitPaneRequest.split_direction:type_name -> iterm2.SplitPaneRequest.SplitDirection
-	64,  // 138: iterm2.SplitPaneRequest.custom_profile_properties:type_name -> iterm2.ProfileProperty
-	18,  // 139: iterm2.SplitPaneResponse.status:type_name -> iterm2.SplitPaneResponse.Status
-	19,  // 140: iterm2.SetPropertyResponse.status:type_name -> iterm2.SetPropertyResponse.Status
-	20,  // 141: iterm2.GetPropertyResponse.status:type_name -> iterm2.GetPropertyResponse.Status
-	21,  // 142: iterm2.InjectResponse.status:type_name -> iterm2.InjectResponse.Status
-	154, // 143: iterm2.ActivateRequest.activate_app:type_name -> iterm2.ActivateRequest.App
-	22,  // 144: iterm2.ActivateResponse.status:type_name -> iterm2.ActivateResponse.Status
-	155, // 145: iterm2.VariableRequest.set:type_name -> iterm2.VariableRequest.Set
-	23,  // 146: iterm2.VariableResponse.status:type_name -> iterm2.VariableResponse.Status
-	24,  // 147: iterm2.SavedArrangementRequest.action:type_name -> iterm2.SavedArrangementRequest.Action
-	25,  // 148: iterm2.SavedArrangementResponse.status:type_name -> iterm2.SavedArrangementResponse.Status
-	77,  // 149: iterm2.FocusResponse.notifications:type_name -> iterm2.FocusChangedNotification
-	156, // 150: iterm2.ListProfilesResponse.profiles:type_name -> iterm2.ListProfilesResponse.Profile
-	26,  // 151: iterm2.RestartSessionResponse.status:type_name -> iterm2.RestartSessionResponse.Status
-	27,  // 152: iterm2.MenuItemResponse.status:type_name -> iterm2.MenuItemResponse.Status
-	59,  // 153: iterm2.SetTabLayoutRequest.root:type_name -> iterm2.SplitTreeNode
-	28,  // 154: iterm2.SetTabLayoutResponse.status:type_name -> iterm2.SetTabLayoutResponse.Status
-	82,  // 155: iterm2.GetBroadcastDomainsResponse.broadcast_domains:type_name -> iterm2.BroadcastDomain
-	157, // 156: iterm2.TmuxRequest.list_connections:type_name -> iterm2.TmuxRequest.ListConnections
-	158, // 157: iterm2.TmuxRequest.send_command:type_name -> iterm2.TmuxRequest.SendCommand
-	159, // 158: iterm2.TmuxRequest.set_window_visible:type_name -> iterm2.TmuxRequest.SetWindowVisible
-	160, // 159: iterm2.TmuxRequest.create_window:type_name -> iterm2.TmuxRequest.CreateWindow
-	161, // 160: iterm2.TmuxResponse.list_connections:type_name -> iterm2.TmuxResponse.ListConnections
-	162, // 161: iterm2.TmuxResponse.send_command:type_name -> iterm2.TmuxResponse.SendCommand
-	163, // 162: iterm2.TmuxResponse.set_window_visible:type_name -> iterm2.TmuxResponse.SetWindowVisible
-	164, // 163: iterm2.TmuxResponse.create_window:type_name -> iterm2.TmuxResponse.CreateWindow
-	29,  // 164: iterm2.TmuxResponse.status:type_name -> iterm2.TmuxResponse.Status
-	166, // 165: iterm2.ReorderTabsRequest.assignments:type_name -> iterm2.ReorderTabsRequest.Assignment
-	30,  // 166: iterm2.ReorderTabsResponse.status:type_name -> iterm2.ReorderTabsResponse.Status
-	167, // 167: iterm2.PreferencesRequest.requests:type_name -> iterm2.PreferencesRequest.Request
-	172, // 168: iterm2.PreferencesResponse.results:type_name -> iterm2.PreferencesResponse.Result
-	178, // 169: iterm2.ColorPresetRequest.list_presets:type_name -> iterm2.ColorPresetRequest.ListPresets
-	179, // 170: iterm2.ColorPresetRequest.get_preset:type_name -> iterm2.ColorPresetRequest.GetPreset
-	180, // 171: iterm2.ColorPresetResponse.list_presets:type_name -> iterm2.ColorPresetResponse.ListPresets
-	181, // 172: iterm2.ColorPresetResponse.get_preset:type_name -> iterm2.ColorPresetResponse.GetPreset
-	33,  // 173: iterm2.ColorPresetResponse.status:type_name -> iterm2.ColorPresetResponse.Status
-	48,  // 174: iterm2.SubSelection.windowed_coord_range:type_name -> iterm2.WindowedCoordRange
-	3,   // 175: iterm2.SubSelection.selection_mode:type_name -> iterm2.SelectionMode
-	133, // 176: iterm2.Selection.sub_selections:type_name -> iterm2.SubSelection
-	183, // 177: iterm2.SelectionRequest.get_selection_request:type_name -> iterm2.SelectionRequest.GetSelectionRequest
-	184, // 178: iterm2.SelectionRequest.set_selection_request:type_name -> iterm2.SelectionRequest.SetSelectionRequest
-	34,  // 179: iterm2.SelectionResponse.status:type_name -> iterm2.SelectionResponse.Status
-	185, // 180: iterm2.SelectionResponse.get_selection_response:type_name -> iterm2.SelectionResponse.GetSelectionResponse
-	186, // 181: iterm2.SelectionResponse.set_selection_response:type_name -> iterm2.SelectionResponse.SetSelectionResponse
-	187, // 182: iterm2.StatusBarComponentRequest.open_popover:type_name -> iterm2.StatusBarComponentRequest.OpenPopover
-	35,  // 183: iterm2.StatusBarComponentResponse.status:type_name -> iterm2.StatusBarComponentResponse.Status
-	82,  // 184: iterm2.SetBroadcastDomainsRequest.broadcast_domains:type_name -> iterm2.BroadcastDomain
-	36,  // 185: iterm2.SetBroadcastDomainsResponse.status:type_name -> iterm2.SetBroadcastDomainsResponse.Status
-	188, // 186: iterm2.CloseRequest.tabs:type_name -> iterm2.CloseRequest.CloseTabs
-	189, // 187: iterm2.CloseRequest.sessions:type_name -> iterm2.CloseRequest.CloseSessions
-	190, // 188: iterm2.CloseRequest.windows:type_name -> iterm2.CloseRequest.CloseWindows
-	37,  // 189: iterm2.CloseResponse.statuses:type_name -> iterm2.CloseResponse.Status
-	191, // 190: iterm2.InvokeFunctionRequest.tab:type_name -> iterm2.InvokeFunctionRequest.Tab
-	192, // 191: iterm2.InvokeFunctionRequest.session:type_name -> iterm2.InvokeFunctionRequest.Session
-	193, // 192: iterm2.InvokeFunctionRequest.window:type_name -> iterm2.InvokeFunctionRequest.Window
-	194, // 193: iterm2.InvokeFunctionRequest.app:type_name -> iterm2.InvokeFunctionRequest.App
-	195, // 194: iterm2.InvokeFunctionRequest.method:type_name -> iterm2.InvokeFunctionRequest.Method
-	196, // 195: iterm2.InvokeFunctionResponse.error:type_name -> iterm2.InvokeFunctionResponse.Error
-	197, // 196: iterm2.InvokeFunctionResponse.success:type_name -> iterm2.InvokeFunctionResponse.Success
-	39,  // 197: iterm2.ListPromptsResponse.status:type_name -> iterm2.ListPromptsResponse.Status
-	58,  // 198: iterm2.SplitTreeNode.SplitTreeLink.session:type_name -> iterm2.SessionSummary
-	59,  // 199: iterm2.SplitTreeNode.SplitTreeLink.node:type_name -> iterm2.SplitTreeNode
-	149, // 200: iterm2.ListSessionsResponse.Window.tabs:type_name -> iterm2.ListSessionsResponse.Tab
-	57,  // 201: iterm2.ListSessionsResponse.Window.frame:type_name -> iterm2.Frame
-	59,  // 202: iterm2.ListSessionsResponse.Tab.root:type_name -> iterm2.SplitTreeNode
-	58,  // 203: iterm2.ListSessionsResponse.Tab.minimized_sessions:type_name -> iterm2.SessionSummary
-	11,  // 204: iterm2.FocusChangedNotification.Window.window_status:type_name -> iterm2.FocusChangedNotification.Window.WindowStatus
-	64,  // 205: iterm2.ListProfilesResponse.Profile.properties:type_name -> iterm2.ProfileProperty
-	165, // 206: iterm2.TmuxResponse.ListConnections.connections:type_name -> iterm2.TmuxResponse.ListConnections.Connection
-	168, // 207: iterm2.PreferencesRequest.Request.set_preference_request:type_name -> iterm2.PreferencesRequest.Request.SetPreference
-	169, // 208: iterm2.PreferencesRequest.Request.get_preference_request:type_name -> iterm2.PreferencesRequest.Request.GetPreference
-	170, // 209: iterm2.PreferencesRequest.Request.set_default_profile_request:type_name -> iterm2.PreferencesRequest.Request.SetDefaultProfile
-	171, // 210: iterm2.PreferencesRequest.Request.get_default_profile_request:type_name -> iterm2.PreferencesRequest.Request.GetDefaultProfile
-	176, // 211: iterm2.PreferencesResponse.Result.unrecognized_request:type_name -> iterm2.PreferencesResponse.Result.UnrecognizedResult
-	173, // 212: iterm2.PreferencesResponse.Result.set_preference_result:type_name -> iterm2.PreferencesResponse.Result.SetPreferenceResult
-	174, // 213: iterm2.PreferencesResponse.Result.get_preference_result:type_name -> iterm2.PreferencesResponse.Result.GetPreferenceResult
-	175, // 214: iterm2.PreferencesResponse.Result.set_default_profile_result:type_name -> iterm2.PreferencesResponse.Result.SetDefaultProfileResult
-	177, // 215: iterm2.PreferencesResponse.Result.get_default_profile_result:type_name -> iterm2.PreferencesResponse.Result.GetDefaultProfileResult
-	31,  // 216: iterm2.PreferencesResponse.Result.SetPreferenceResult.status:type_name -> iterm2.PreferencesResponse.Result.SetPreferenceResult.Status
-	32,  // 217: iterm2.PreferencesResponse.Result.SetDefaultProfileResult.status:type_name -> iterm2.PreferencesResponse.Result.SetDefaultProfileResult.Status
-	182, // 218: iterm2.ColorPresetResponse.GetPreset.color_settings:type_name -> iterm2.ColorPresetResponse.GetPreset.ColorSetting
-	134, // 219: iterm2.SelectionRequest.SetSelectionRequest.selection:type_name -> iterm2.Selection
-	134, // 220: iterm2.SelectionResponse.GetSelectionResponse.selection:type_name -> iterm2.Selection
-	55,  // 221: iterm2.StatusBarComponentRequest.OpenPopover.size:type_name -> iterm2.Size
-	38,  // 222: iterm2.InvokeFunctionResponse.Error.status:type_name -> iterm2.InvokeFunctionResponse.Status
-	223, // [223:223] is the sub-list for method output_type
-	223, // [223:223] is the sub-list for method input_type
-	223, // [223:223] is the sub-list for extension type_name
-	223, // [223:223] is the sub-list for extension extendee
-	0,   // [0:223] is the sub-list for field type_name
+	126, // 0: iterm2.ClientOriginatedMessage.get_buffer_request:type_name -> iterm2.GetBufferRequest
+	128, // 1: iterm2.ClientOriginatedMessage.get_prompt_request:type_name -> iterm2.GetPromptRequest
+	137, // 2: iterm2.ClientOriginatedMessage.transaction_request:type_name -> iterm2.TransactionRequest
+	106, // 3: iterm2.ClientOriginatedMessage.notification_request:type_name -> iterm2.NotificationRequest
+	97,  // 4: iterm2.ClientOriginatedMessage.register_tool_request:type_name -> iterm2.RegisterToolRequest
+	135, // 5: iterm2.ClientOriginatedMessage.set_profile_property_request:type_name -> iterm2.SetProfilePropertyRequest
+	148, // 6: iterm2.ClientOriginatedMessage.list_sessions_request:type_name -> iterm2.ListSessionsRequest
+	149, // 7: iterm2.ClientOriginatedMessage.send_text_request:type_name -> iterm2.SendTextRequest
+	157, // 8: iterm2.ClientOriginatedMessage.create_tab_request:type_name -> iterm2.CreateTabRequest
+	159, // 9: iterm2.ClientOriginatedMessage.split_pane_request:type_name -> iterm2.SplitPaneRequest
+	132, // 10: iterm2.ClientOriginatedMessage.get_profile_property_request:type_name -> iterm2.GetProfilePropertyRequest
+	95,  // 11: iterm2.ClientOriginatedMessage.set_property_request:type_name -> iterm2.SetPropertyRequest
+	93,  // 12: iterm2.ClientOriginatedMessage.get_property_request:type_name -> iterm2.GetPropertyRequest
+	91,  // 13: iterm2.ClientOriginatedMessage.inject_request:type_name -> iterm2.InjectRequest
+	89,  // 14: iterm2.ClientOriginatedMessage.activate_request:type_name -> iterm2.ActivateRequest
+	87,  // 15: iterm2.ClientOriginatedMessage.variable_request:type_name -> iterm2.VariableRequest
+	85,  // 16: iterm2.ClientOriginatedMessage.saved_arrangement_request:type_name -> iterm2.SavedArrangementRequest
+	83,  // 17: iterm2.ClientOriginatedMessage.focus_request:type_name -> iterm2.FocusRequest
+	81,  // 18: iterm2.ClientOriginatedMessage.list_profiles_request:type_name -> iterm2.ListProfilesRequest
+	79,  // 19: iterm2.ClientOriginatedMessage.server_originated_rpc_result_request:type_name -> iterm2.ServerOriginatedRPCResultRequest
+	77,  // 20: iterm2.ClientOriginatedMessage.restart_session_request:type_name -> iterm2.RestartSessionRequest
+	75,  // 21: iterm2.ClientOriginatedMessage.menu_item_request:type_name -> iterm2.MenuItemRequest
+	73,  // 22: iterm2.ClientOriginatedMessage.set_tab_layout_request:type_name -> iterm2.SetTabLayoutRequest
+	70,  // 23: iterm2.ClientOriginatedMessage.get_broadcast_domains_request:type_name -> iterm2.GetBroadcastDomainsRequest
+	68,  // 24: iterm2.ClientOriginatedMessage.tmux_request:type_name -> iterm2.TmuxRequest
+	66,  // 25: iterm2.ClientOriginatedMessage.reorder_tabs_request:type_name -> iterm2.ReorderTabsRequest
+	64,  // 26: iterm2.ClientOriginatedMessage.preferences_request:type_name -> iterm2.PreferencesRequest
+	62,  // 27: iterm2.ClientOriginatedMessage.color_preset_request:type_name -> iterm2.ColorPresetRequest
+	60,  // 28: iterm2.ClientOriginatedMessage.selection_request:type_name -> iterm2.SelectionRequest
+	55,  // 29: iterm2.ClientOriginatedMessage.status_bar_component_request:type_name -> iterm2.StatusBarComponentRequest
+	53,  // 30: iterm2.ClientOriginatedMessage.set_broadcast_domains_request:type_name -> iterm2.SetBroadcastDomainsRequest
+	51,  // 31: iterm2.ClientOriginatedMessage.close_request:type_name -> iterm2.CloseRequest
+	49,  // 32: iterm2.ClientOriginatedMessage.invoke_function_request:type_name -> iterm2.InvokeFunctionRequest
+	130, // 33: iterm2.ClientOriginatedMessage.list_prompts_request:type_name -> iterm2.ListPromptsRequest
+	127, // 34: iterm2.ServerOriginatedMessage.get_buffer_response:type_name -> iterm2.GetBufferResponse
+	129, // 35: iterm2.ServerOriginatedMessage.get_prompt_response:type_name -> iterm2.GetPromptResponse
+	138, // 36: iterm2.ServerOriginatedMessage.transaction_response:type_name -> iterm2.TransactionResponse
+	107, // 37: iterm2.ServerOriginatedMessage.notification_response:type_name -> iterm2.NotificationResponse
+	99,  // 38: iterm2.ServerOriginatedMessage.register_tool_response:type_name -> iterm2.RegisterToolResponse
+	136, // 39: iterm2.ServerOriginatedMessage.set_profile_property_response:type_name -> iterm2.SetProfilePropertyResponse
+	156, // 40: iterm2.ServerOriginatedMessage.list_sessions_response:type_name -> iterm2.ListSessionsResponse
+	150, // 41: iterm2.ServerOriginatedMessage.send_text_response:type_name -> iterm2.SendTextResponse
+	158, // 42: iterm2.ServerOriginatedMessage.create_tab_response:type_name -> iterm2.CreateTabResponse
+	160, // 43: iterm2.ServerOriginatedMessage.split_pane_response:type_name -> iterm2.SplitPaneResponse
+	134, // 44: iterm2.ServerOriginatedMessage.get_profile_property_response:type_name -> iterm2.GetProfilePropertyResponse
+	96,  // 45: iterm2.ServerOriginatedMessage.set_property_response:type_name -> iterm2.SetPropertyResponse
+	94,  // 46: iterm2.ServerOriginatedMessage.get_property_response:type_name -> iterm2.GetPropertyResponse
+	92,  // 47: iterm2.ServerOriginatedMessage.inject_response:type_name -> iterm2.InjectResponse
+	90,  // 48: iterm2.ServerOriginatedMessage.activate_response:type_name -> iterm2.ActivateResponse
+	88,  // 49: iterm2.ServerOriginatedMessage.variable_response:type_name -> iterm2.VariableResponse
+	86,  // 50: iterm2.ServerOriginatedMessage.saved_arrangement_response:type_name -> iterm2.SavedArrangementResponse
+	84,  // 51: iterm2.ServerOriginatedMessage.focus_response:type_name -> iterm2.FocusResponse
+	82,  // 52: iterm2.ServerOriginatedMessage.list_profiles_response:type_name -> iterm2.ListProfilesResponse
+	80,  // 53: iterm2.ServerOriginatedMessage.server_originated_rpc_result_response:type_name -> iterm2.ServerOriginatedRPCResultResponse
+	78,  // 54: iterm2.ServerOriginatedMessage.restart_session_response:type_name -> iterm2.RestartSessionResponse
+	76,  // 55: iterm2.ServerOriginatedMessage.menu_item_response:type_name -> iterm2.MenuItemResponse
+	74,  // 56: iterm2.ServerOriginatedMessage.set_tab_layout_response:type_name -> iterm2.SetTabLayoutResponse
+	72,  // 57: iterm2.ServerOriginatedMessage.get_broadcast_domains_response:type_name -> iterm2.GetBroadcastDomainsResponse
+	69,  // 58: iterm2.ServerOriginatedMessage.tmux_response:type_name -> iterm2.TmuxResponse
+	67,  // 59: iterm2.ServerOriginatedMessage.reorder_tabs_response:type_name -> iterm2.ReorderTabsResponse
+	65,  // 60: iterm2.ServerOriginatedMessage.preferences_response:type_name -> iterm2.PreferencesResponse
+	63,  // 61: iterm2.ServerOriginatedMessage.color_preset_response:type_name -> iterm2.ColorPresetResponse
+	61,  // 62: iterm2.ServerOriginatedMessage.selection_response:type_name -> iterm2.SelectionResponse
+	56,  // 63: iterm2.ServerOriginatedMessage.status_bar_component_response:type_name -> iterm2.StatusBarComponentResponse
+	54,  // 64: iterm2.ServerOriginatedMessage.set_broadcast_domains_response:type_name -> iterm2.SetBroadcastDomainsResponse
+	52,  // 65: iterm2.ServerOriginatedMessage.close_response:type_name -> iterm2.CloseResponse
+	50,  // 66: iterm2.ServerOriginatedMessage.invoke_function_response:type_name -> iterm2.InvokeFunctionResponse
+	131, // 67: iterm2.ServerOriginatedMessage.list_prompts_response:type_name -> iterm2.ListPromptsResponse
+	108, // 68: iterm2.ServerOriginatedMessage.notification:type_name -> iterm2.Notification
+	161, // 69: iterm2.InvokeFunctionRequest.tab:type_name -> iterm2.InvokeFunctionRequest.Tab
+	162, // 70: iterm2.InvokeFunctionRequest.session:type_name -> iterm2.InvokeFunctionRequest.Session
+	163, // 71: iterm2.InvokeFunctionRequest.window:type_name -> iterm2.InvokeFunctionRequest.Window
+	164, // 72: iterm2.InvokeFunctionRequest.app:type_name -> iterm2.InvokeFunctionRequest.App
+	165, // 73: iterm2.InvokeFunctionRequest.method:type_name -> iterm2.InvokeFunctionRequest.Method
+	166, // 74: iterm2.InvokeFunctionResponse.error:type_name -> iterm2.InvokeFunctionResponse.Error
+	167, // 75: iterm2.InvokeFunctionResponse.success:type_name -> iterm2.InvokeFunctionResponse.Success
+	168, // 76: iterm2.CloseRequest.tabs:type_name -> iterm2.CloseRequest.CloseTabs
+	169, // 77: iterm2.CloseRequest.sessions:type_name -> iterm2.CloseRequest.CloseSessions
+	170, // 78: iterm2.CloseRequest.windows:type_name -> iterm2.CloseRequest.CloseWindows
+	8,   // 79: iterm2.CloseResponse.statuses:type_name -> iterm2.CloseResponse.Status
+	71,  // 80: iterm2.SetBroadcastDomainsRequest.broadcast_domains:type_name -> iterm2.BroadcastDomain
+	9,   // 81: iterm2.SetBroadcastDomainsResponse.status:type_name -> iterm2.SetBroadcastDomainsResponse.Status
+	171, // 82: iterm2.StatusBarComponentRequest.open_popover:type_name -> iterm2.StatusBarComponentRequest.OpenPopover
+	10,  // 83: iterm2.StatusBarComponentResponse.status:type_name -> iterm2.StatusBarComponentResponse.Status
+	141, // 84: iterm2.WindowedCoordRange.coord_range:type_name -> iterm2.CoordRange
+	140, // 85: iterm2.WindowedCoordRange.columns:type_name -> iterm2.Range
+	57,  // 86: iterm2.SubSelection.windowed_coord_range:type_name -> iterm2.WindowedCoordRange
+	0,   // 87: iterm2.SubSelection.selection_mode:type_name -> iterm2.SelectionMode
+	58,  // 88: iterm2.Selection.sub_selections:type_name -> iterm2.SubSelection
+	172, // 89: iterm2.SelectionRequest.get_selection_request:type_name -> iterm2.SelectionRequest.GetSelectionRequest
+	173, // 90: iterm2.SelectionRequest.set_selection_request:type_name -> iterm2.SelectionRequest.SetSelectionRequest
+	11,  // 91: iterm2.SelectionResponse.status:type_name -> iterm2.SelectionResponse.Status
+	174, // 92: iterm2.SelectionResponse.get_selection_response:type_name -> iterm2.SelectionResponse.GetSelectionResponse
+	175, // 93: iterm2.SelectionResponse.set_selection_response:type_name -> iterm2.SelectionResponse.SetSelectionResponse
+	176, // 94: iterm2.ColorPresetRequest.list_presets:type_name -> iterm2.ColorPresetRequest.ListPresets
+	177, // 95: iterm2.ColorPresetRequest.get_preset:type_name -> iterm2.ColorPresetRequest.GetPreset
+	178, // 96: iterm2.ColorPresetResponse.list_presets:type_name -> iterm2.ColorPresetResponse.ListPresets
+	179, // 97: iterm2.ColorPresetResponse.get_preset:type_name -> iterm2.ColorPresetResponse.GetPreset
+	12,  // 98: iterm2.ColorPresetResponse.status:type_name -> iterm2.ColorPresetResponse.Status
+	181, // 99: iterm2.PreferencesRequest.requests:type_name -> iterm2.PreferencesRequest.Request
+	186, // 100: iterm2.PreferencesResponse.results:type_name -> iterm2.PreferencesResponse.Result
+	192, // 101: iterm2.ReorderTabsRequest.assignments:type_name -> iterm2.ReorderTabsRequest.Assignment
+	15,  // 102: iterm2.ReorderTabsResponse.status:type_name -> iterm2.ReorderTabsResponse.Status
+	193, // 103: iterm2.TmuxRequest.list_connections:type_name -> iterm2.TmuxRequest.ListConnections
+	194, // 104: iterm2.TmuxRequest.send_command:type_name -> iterm2.TmuxRequest.SendCommand
+	195, // 105: iterm2.TmuxRequest.set_window_visible:type_name -> iterm2.TmuxRequest.SetWindowVisible
+	196, // 106: iterm2.TmuxRequest.create_window:type_name -> iterm2.TmuxRequest.CreateWindow
+	197, // 107: iterm2.TmuxResponse.list_connections:type_name -> iterm2.TmuxResponse.ListConnections
+	198, // 108: iterm2.TmuxResponse.send_command:type_name -> iterm2.TmuxResponse.SendCommand
+	199, // 109: iterm2.TmuxResponse.set_window_visible:type_name -> iterm2.TmuxResponse.SetWindowVisible
+	200, // 110: iterm2.TmuxResponse.create_window:type_name -> iterm2.TmuxResponse.CreateWindow
+	16,  // 111: iterm2.TmuxResponse.status:type_name -> iterm2.TmuxResponse.Status
+	71,  // 112: iterm2.GetBroadcastDomainsResponse.broadcast_domains:type_name -> iterm2.BroadcastDomain
+	155, // 113: iterm2.SetTabLayoutRequest.root:type_name -> iterm2.SplitTreeNode
+	17,  // 114: iterm2.SetTabLayoutResponse.status:type_name -> iterm2.SetTabLayoutResponse.Status
+	18,  // 115: iterm2.MenuItemResponse.status:type_name -> iterm2.MenuItemResponse.Status
+	19,  // 116: iterm2.RestartSessionResponse.status:type_name -> iterm2.RestartSessionResponse.Status
+	202, // 117: iterm2.ListProfilesResponse.profiles:type_name -> iterm2.ListProfilesResponse.Profile
+	123, // 118: iterm2.FocusResponse.notifications:type_name -> iterm2.FocusChangedNotification
+	20,  // 119: iterm2.SavedArrangementRequest.action:type_name -> iterm2.SavedArrangementRequest.Action
+	21,  // 120: iterm2.SavedArrangementResponse.status:type_name -> iterm2.SavedArrangementResponse.Status
+	203, // 121: iterm2.VariableRequest.set:type_name -> iterm2.VariableRequest.Set
+	22,  // 122: iterm2.VariableResponse.status:type_name -> iterm2.VariableResponse.Status
+	204, // 123: iterm2.ActivateRequest.activate_app:type_name -> iterm2.ActivateRequest.App
+	23,  // 124: iterm2.ActivateResponse.status:type_name -> iterm2.ActivateResponse.Status
+	24,  // 125: iterm2.InjectResponse.status:type_name -> iterm2.InjectResponse.Status
+	25,  // 126: iterm2.GetPropertyResponse.status:type_name -> iterm2.GetPropertyResponse.Status
+	26,  // 127: iterm2.SetPropertyResponse.status:type_name -> iterm2.SetPropertyResponse.Status
+	27,  // 128: iterm2.RegisterToolRequest.tool_type:type_name -> iterm2.RegisterToolRequest.ToolType
+	205, // 129: iterm2.RPCRegistrationRequest.arguments:type_name -> iterm2.RPCRegistrationRequest.RPCArgumentSignature
+	206, // 130: iterm2.RPCRegistrationRequest.defaults:type_name -> iterm2.RPCRegistrationRequest.RPCArgument
+	28,  // 131: iterm2.RPCRegistrationRequest.role:type_name -> iterm2.RPCRegistrationRequest.Role
+	207, // 132: iterm2.RPCRegistrationRequest.session_title_attributes:type_name -> iterm2.RPCRegistrationRequest.SessionTitleAttributes
+	208, // 133: iterm2.RPCRegistrationRequest.status_bar_component_attributes:type_name -> iterm2.RPCRegistrationRequest.StatusBarComponentAttributes
+	209, // 134: iterm2.RPCRegistrationRequest.context_menu_attributes:type_name -> iterm2.RPCRegistrationRequest.ContextMenuAttributes
+	31,  // 135: iterm2.RegisterToolResponse.status:type_name -> iterm2.RegisterToolResponse.Status
+	2,   // 136: iterm2.KeystrokePattern.required_modifiers:type_name -> iterm2.Modifiers
+	2,   // 137: iterm2.KeystrokePattern.forbidden_modifiers:type_name -> iterm2.Modifiers
+	100, // 138: iterm2.KeystrokeMonitorRequest.patterns_to_ignore:type_name -> iterm2.KeystrokePattern
+	100, // 139: iterm2.KeystrokeFilterRequest.patterns_to_ignore:type_name -> iterm2.KeystrokePattern
+	3,   // 140: iterm2.VariableMonitorRequest.scope:type_name -> iterm2.VariableScope
+	4,   // 141: iterm2.PromptMonitorRequest.modes:type_name -> iterm2.PromptMonitorMode
+	1,   // 142: iterm2.NotificationRequest.notification_type:type_name -> iterm2.NotificationType
+	98,  // 143: iterm2.NotificationRequest.rpc_registration_request:type_name -> iterm2.RPCRegistrationRequest
+	101, // 144: iterm2.NotificationRequest.keystroke_monitor_request:type_name -> iterm2.KeystrokeMonitorRequest
+	103, // 145: iterm2.NotificationRequest.variable_monitor_request:type_name -> iterm2.VariableMonitorRequest
+	104, // 146: iterm2.NotificationRequest.profile_change_request:type_name -> iterm2.ProfileChangeRequest
+	102, // 147: iterm2.NotificationRequest.keystroke_filter_request:type_name -> iterm2.KeystrokeFilterRequest
+	105, // 148: iterm2.NotificationRequest.prompt_monitor_request:type_name -> iterm2.PromptMonitorRequest
+	32,  // 149: iterm2.NotificationResponse.status:type_name -> iterm2.NotificationResponse.Status
+	114, // 150: iterm2.Notification.keystroke_notification:type_name -> iterm2.KeystrokeNotification
+	115, // 151: iterm2.Notification.screen_update_notification:type_name -> iterm2.ScreenUpdateNotification
+	119, // 152: iterm2.Notification.prompt_notification:type_name -> iterm2.PromptNotification
+	120, // 153: iterm2.Notification.location_change_notification:type_name -> iterm2.LocationChangeNotification
+	121, // 154: iterm2.Notification.custom_escape_sequence_notification:type_name -> iterm2.CustomEscapeSequenceNotification
+	122, // 155: iterm2.Notification.new_session_notification:type_name -> iterm2.NewSessionNotification
+	124, // 156: iterm2.Notification.terminate_session_notification:type_name -> iterm2.TerminateSessionNotification
+	125, // 157: iterm2.Notification.layout_changed_notification:type_name -> iterm2.LayoutChangedNotification
+	123, // 158: iterm2.Notification.focus_changed_notification:type_name -> iterm2.FocusChangedNotification
+	113, // 159: iterm2.Notification.server_originated_rpc_notification:type_name -> iterm2.ServerOriginatedRPCNotification
+	111, // 160: iterm2.Notification.broadcast_domains_changed:type_name -> iterm2.BroadcastDomainsChangedNotification
+	110, // 161: iterm2.Notification.variable_changed_notification:type_name -> iterm2.VariableChangedNotification
+	109, // 162: iterm2.Notification.profile_changed_notification:type_name -> iterm2.ProfileChangedNotification
+	3,   // 163: iterm2.VariableChangedNotification.scope:type_name -> iterm2.VariableScope
+	71,  // 164: iterm2.BroadcastDomainsChangedNotification.broadcast_domains:type_name -> iterm2.BroadcastDomain
+	212, // 165: iterm2.ServerOriginatedRPC.arguments:type_name -> iterm2.ServerOriginatedRPC.RPCArgument
+	112, // 166: iterm2.ServerOriginatedRPCNotification.rpc:type_name -> iterm2.ServerOriginatedRPC
+	2,   // 167: iterm2.KeystrokeNotification.modifiers:type_name -> iterm2.Modifiers
+	33,  // 168: iterm2.KeystrokeNotification.action:type_name -> iterm2.KeystrokeNotification.Action
+	129, // 169: iterm2.PromptNotificationPrompt.prompt:type_name -> iterm2.GetPromptResponse
+	116, // 170: iterm2.PromptNotification.prompt:type_name -> iterm2.PromptNotificationPrompt
+	117, // 171: iterm2.PromptNotification.command_start:type_name -> iterm2.PromptNotificationCommandStart
+	118, // 172: iterm2.PromptNotification.command_end:type_name -> iterm2.PromptNotificationCommandEnd
+	213, // 173: iterm2.FocusChangedNotification.window:type_name -> iterm2.FocusChangedNotification.Window
+	156, // 174: iterm2.LayoutChangedNotification.list_sessions_response:type_name -> iterm2.ListSessionsResponse
+	139, // 175: iterm2.GetBufferRequest.line_range:type_name -> iterm2.LineRange
+	35,  // 176: iterm2.GetBufferResponse.status:type_name -> iterm2.GetBufferResponse.Status
+	140, // 177: iterm2.GetBufferResponse.range:type_name -> iterm2.Range
+	146, // 178: iterm2.GetBufferResponse.contents:type_name -> iterm2.LineContents
+	142, // 179: iterm2.GetBufferResponse.cursor:type_name -> iterm2.Coord
+	57,  // 180: iterm2.GetBufferResponse.windowed_coord_range:type_name -> iterm2.WindowedCoordRange
+	36,  // 181: iterm2.GetPromptResponse.status:type_name -> iterm2.GetPromptResponse.Status
+	141, // 182: iterm2.GetPromptResponse.prompt_range:type_name -> iterm2.CoordRange
+	141, // 183: iterm2.GetPromptResponse.command_range:type_name -> iterm2.CoordRange
+	141, // 184: iterm2.GetPromptResponse.output_range:type_name -> iterm2.CoordRange
+	37,  // 185: iterm2.GetPromptResponse.prompt_state:type_name -> iterm2.GetPromptResponse.State
+	38,  // 186: iterm2.ListPromptsResponse.status:type_name -> iterm2.ListPromptsResponse.Status
+	39,  // 187: iterm2.GetProfilePropertyResponse.status:type_name -> iterm2.GetProfilePropertyResponse.Status
+	133, // 188: iterm2.GetProfilePropertyResponse.properties:type_name -> iterm2.ProfileProperty
+	214, // 189: iterm2.SetProfilePropertyRequest.guid_list:type_name -> iterm2.SetProfilePropertyRequest.GuidList
+	215, // 190: iterm2.SetProfilePropertyRequest.assignments:type_name -> iterm2.SetProfilePropertyRequest.Assignment
+	40,  // 191: iterm2.SetProfilePropertyResponse.status:type_name -> iterm2.SetProfilePropertyResponse.Status
+	41,  // 192: iterm2.TransactionResponse.status:type_name -> iterm2.TransactionResponse.Status
+	57,  // 193: iterm2.LineRange.windowed_coord_range:type_name -> iterm2.WindowedCoordRange
+	142, // 194: iterm2.CoordRange.start:type_name -> iterm2.Coord
+	142, // 195: iterm2.CoordRange.end:type_name -> iterm2.Coord
+	5,   // 196: iterm2.CellStyle.fgAlternate:type_name -> iterm2.AlternateColor
+	143, // 197: iterm2.CellStyle.fgRgb:type_name -> iterm2.RGBColor
+	5,   // 198: iterm2.CellStyle.bgAlternate:type_name -> iterm2.AlternateColor
+	143, // 199: iterm2.CellStyle.bgRgb:type_name -> iterm2.RGBColor
+	6,   // 200: iterm2.CellStyle.image:type_name -> iterm2.ImagePlaceholderType
+	143, // 201: iterm2.CellStyle.underlineColor:type_name -> iterm2.RGBColor
+	144, // 202: iterm2.CellStyle.url:type_name -> iterm2.URL
+	147, // 203: iterm2.LineContents.code_points_per_cell:type_name -> iterm2.CodePointsPerCell
+	42,  // 204: iterm2.LineContents.continuation:type_name -> iterm2.LineContents.Continuation
+	145, // 205: iterm2.LineContents.style:type_name -> iterm2.CellStyle
+	43,  // 206: iterm2.SendTextResponse.status:type_name -> iterm2.SendTextResponse.Status
+	152, // 207: iterm2.Frame.origin:type_name -> iterm2.Point
+	151, // 208: iterm2.Frame.size:type_name -> iterm2.Size
+	153, // 209: iterm2.SessionSummary.frame:type_name -> iterm2.Frame
+	151, // 210: iterm2.SessionSummary.grid_size:type_name -> iterm2.Size
+	216, // 211: iterm2.SplitTreeNode.links:type_name -> iterm2.SplitTreeNode.SplitTreeLink
+	217, // 212: iterm2.ListSessionsResponse.windows:type_name -> iterm2.ListSessionsResponse.Window
+	154, // 213: iterm2.ListSessionsResponse.buried_sessions:type_name -> iterm2.SessionSummary
+	133, // 214: iterm2.CreateTabRequest.custom_profile_properties:type_name -> iterm2.ProfileProperty
+	44,  // 215: iterm2.CreateTabResponse.status:type_name -> iterm2.CreateTabResponse.Status
+	45,  // 216: iterm2.SplitPaneRequest.split_direction:type_name -> iterm2.SplitPaneRequest.SplitDirection
+	133, // 217: iterm2.SplitPaneRequest.custom_profile_properties:type_name -> iterm2.ProfileProperty
+	46,  // 218: iterm2.SplitPaneResponse.status:type_name -> iterm2.SplitPaneResponse.Status
+	7,   // 219: iterm2.InvokeFunctionResponse.Error.status:type_name -> iterm2.InvokeFunctionResponse.Status
+	151, // 220: iterm2.StatusBarComponentRequest.OpenPopover.size:type_name -> iterm2.Size
+	59,  // 221: iterm2.SelectionRequest.SetSelectionRequest.selection:type_name -> iterm2.Selection
+	59,  // 222: iterm2.SelectionResponse.GetSelectionResponse.selection:type_name -> iterm2.Selection
+	180, // 223: iterm2.ColorPresetResponse.GetPreset.color_settings:type_name -> iterm2.ColorPresetResponse.GetPreset.ColorSetting
+	182, // 224: iterm2.PreferencesRequest.Request.set_preference_request:type_name -> iterm2.PreferencesRequest.Request.SetPreference
+	183, // 225: iterm2.PreferencesRequest.Request.get_preference_request:type_name -> iterm2.PreferencesRequest.Request.GetPreference
+	184, // 226: iterm2.PreferencesRequest.Request.set_default_profile_request:type_name -> iterm2.PreferencesRequest.Request.SetDefaultProfile
+	185, // 227: iterm2.PreferencesRequest.Request.get_default_profile_request:type_name -> iterm2.PreferencesRequest.Request.GetDefaultProfile
+	190, // 228: iterm2.PreferencesResponse.Result.unrecognized_request:type_name -> iterm2.PreferencesResponse.Result.UnrecognizedResult
+	187, // 229: iterm2.PreferencesResponse.Result.set_preference_result:type_name -> iterm2.PreferencesResponse.Result.SetPreferenceResult
+	188, // 230: iterm2.PreferencesResponse.Result.get_preference_result:type_name -> iterm2.PreferencesResponse.Result.GetPreferenceResult
+	189, // 231: iterm2.PreferencesResponse.Result.set_default_profile_result:type_name -> iterm2.PreferencesResponse.Result.SetDefaultProfileResult
+	191, // 232: iterm2.PreferencesResponse.Result.get_default_profile_result:type_name -> iterm2.PreferencesResponse.Result.GetDefaultProfileResult
+	13,  // 233: iterm2.PreferencesResponse.Result.SetPreferenceResult.status:type_name -> iterm2.PreferencesResponse.Result.SetPreferenceResult.Status
+	14,  // 234: iterm2.PreferencesResponse.Result.SetDefaultProfileResult.status:type_name -> iterm2.PreferencesResponse.Result.SetDefaultProfileResult.Status
+	201, // 235: iterm2.TmuxResponse.ListConnections.connections:type_name -> iterm2.TmuxResponse.ListConnections.Connection
+	133, // 236: iterm2.ListProfilesResponse.Profile.properties:type_name -> iterm2.ProfileProperty
+	210, // 237: iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.knobs:type_name -> iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Knob
+	211, // 238: iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.icons:type_name -> iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Icon
+	29,  // 239: iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.format:type_name -> iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Format
+	30,  // 240: iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Knob.type:type_name -> iterm2.RPCRegistrationRequest.StatusBarComponentAttributes.Knob.Type
+	34,  // 241: iterm2.FocusChangedNotification.Window.window_status:type_name -> iterm2.FocusChangedNotification.Window.WindowStatus
+	154, // 242: iterm2.SplitTreeNode.SplitTreeLink.session:type_name -> iterm2.SessionSummary
+	155, // 243: iterm2.SplitTreeNode.SplitTreeLink.node:type_name -> iterm2.SplitTreeNode
+	218, // 244: iterm2.ListSessionsResponse.Window.tabs:type_name -> iterm2.ListSessionsResponse.Tab
+	153, // 245: iterm2.ListSessionsResponse.Window.frame:type_name -> iterm2.Frame
+	155, // 246: iterm2.ListSessionsResponse.Tab.root:type_name -> iterm2.SplitTreeNode
+	154, // 247: iterm2.ListSessionsResponse.Tab.minimized_sessions:type_name -> iterm2.SessionSummary
+	248, // [248:248] is the sub-list for method output_type
+	248, // [248:248] is the sub-list for method input_type
+	248, // [248:248] is the sub-list for extension type_name
+	248, // [248:248] is the sub-list for extension extendee
+	0,   // [0:248] is the sub-list for field type_name
 }
 
 func init() { file_api_proto_init() }
@@ -14678,7 +16448,105 @@ func file_api_proto_init() {
 		(*ServerOriginatedMessage_ListPromptsResponse)(nil),
 		(*ServerOriginatedMessage_Notification)(nil),
 	}
+	file_api_proto_msgTypes[2].OneofWrappers = []any{
+		(*InvokeFunctionRequest_Tab_)(nil),
+		(*InvokeFunctionRequest_Session_)(nil),
+		(*InvokeFunctionRequest_Window_)(nil),
+		(*InvokeFunctionRequest_App_)(nil),
+		(*InvokeFunctionRequest_Method_)(nil),
+	}
+	file_api_proto_msgTypes[3].OneofWrappers = []any{
+		(*InvokeFunctionResponse_Error_)(nil),
+		(*InvokeFunctionResponse_Success_)(nil),
+	}
+	file_api_proto_msgTypes[4].OneofWrappers = []any{
+		(*CloseRequest_Tabs)(nil),
+		(*CloseRequest_Sessions)(nil),
+		(*CloseRequest_Windows)(nil),
+	}
+	file_api_proto_msgTypes[8].OneofWrappers = []any{
+		(*StatusBarComponentRequest_OpenPopover_)(nil),
+	}
 	file_api_proto_msgTypes[13].OneofWrappers = []any{
+		(*SelectionRequest_GetSelectionRequest_)(nil),
+		(*SelectionRequest_SetSelectionRequest_)(nil),
+	}
+	file_api_proto_msgTypes[14].OneofWrappers = []any{
+		(*SelectionResponse_GetSelectionResponse_)(nil),
+		(*SelectionResponse_SetSelectionResponse_)(nil),
+	}
+	file_api_proto_msgTypes[15].OneofWrappers = []any{
+		(*ColorPresetRequest_ListPresets_)(nil),
+		(*ColorPresetRequest_GetPreset_)(nil),
+	}
+	file_api_proto_msgTypes[16].OneofWrappers = []any{
+		(*ColorPresetResponse_ListPresets_)(nil),
+		(*ColorPresetResponse_GetPreset_)(nil),
+	}
+	file_api_proto_msgTypes[21].OneofWrappers = []any{
+		(*TmuxRequest_ListConnections_)(nil),
+		(*TmuxRequest_SendCommand_)(nil),
+		(*TmuxRequest_SetWindowVisible_)(nil),
+		(*TmuxRequest_CreateWindow_)(nil),
+	}
+	file_api_proto_msgTypes[22].OneofWrappers = []any{
+		(*TmuxResponse_ListConnections_)(nil),
+		(*TmuxResponse_SendCommand_)(nil),
+		(*TmuxResponse_SetWindowVisible_)(nil),
+		(*TmuxResponse_CreateWindow_)(nil),
+	}
+	file_api_proto_msgTypes[32].OneofWrappers = []any{
+		(*ServerOriginatedRPCResultRequest_JsonException)(nil),
+		(*ServerOriginatedRPCResultRequest_JsonValue)(nil),
+	}
+	file_api_proto_msgTypes[40].OneofWrappers = []any{
+		(*VariableRequest_SessionId)(nil),
+		(*VariableRequest_TabId)(nil),
+		(*VariableRequest_App)(nil),
+		(*VariableRequest_WindowId)(nil),
+	}
+	file_api_proto_msgTypes[42].OneofWrappers = []any{
+		(*ActivateRequest_WindowId)(nil),
+		(*ActivateRequest_TabId)(nil),
+		(*ActivateRequest_SessionId)(nil),
+	}
+	file_api_proto_msgTypes[46].OneofWrappers = []any{
+		(*GetPropertyRequest_WindowId)(nil),
+		(*GetPropertyRequest_SessionId)(nil),
+	}
+	file_api_proto_msgTypes[48].OneofWrappers = []any{
+		(*SetPropertyRequest_WindowId)(nil),
+		(*SetPropertyRequest_SessionId)(nil),
+	}
+	file_api_proto_msgTypes[51].OneofWrappers = []any{
+		(*RPCRegistrationRequest_SessionTitleAttributes_)(nil),
+		(*RPCRegistrationRequest_StatusBarComponentAttributes_)(nil),
+		(*RPCRegistrationRequest_ContextMenuAttributes_)(nil),
+	}
+	file_api_proto_msgTypes[59].OneofWrappers = []any{
+		(*NotificationRequest_RpcRegistrationRequest)(nil),
+		(*NotificationRequest_KeystrokeMonitorRequest)(nil),
+		(*NotificationRequest_VariableMonitorRequest)(nil),
+		(*NotificationRequest_ProfileChangeRequest)(nil),
+		(*NotificationRequest_KeystrokeFilterRequest)(nil),
+		(*NotificationRequest_PromptMonitorRequest)(nil),
+	}
+	file_api_proto_msgTypes[72].OneofWrappers = []any{
+		(*PromptNotification_Prompt)(nil),
+		(*PromptNotification_CommandStart)(nil),
+		(*PromptNotification_CommandEnd)(nil),
+	}
+	file_api_proto_msgTypes[76].OneofWrappers = []any{
+		(*FocusChangedNotification_ApplicationActive)(nil),
+		(*FocusChangedNotification_Window_)(nil),
+		(*FocusChangedNotification_SelectedTab)(nil),
+		(*FocusChangedNotification_Session)(nil),
+	}
+	file_api_proto_msgTypes[88].OneofWrappers = []any{
+		(*SetProfilePropertyRequest_Session)(nil),
+		(*SetProfilePropertyRequest_GuidList_)(nil),
+	}
+	file_api_proto_msgTypes[98].OneofWrappers = []any{
 		(*CellStyle_FgStandard)(nil),
 		(*CellStyle_FgAlternate)(nil),
 		(*CellStyle_FgRgb)(nil),
@@ -14688,115 +16556,30 @@ func file_api_proto_init() {
 		(*CellStyle_BgRgb)(nil),
 		(*CellStyle_BgAlternatePlacementY)(nil),
 	}
-	file_api_proto_msgTypes[33].OneofWrappers = []any{
-		(*PromptNotification_Prompt)(nil),
-		(*PromptNotification_CommandStart)(nil),
-		(*PromptNotification_CommandEnd)(nil),
-	}
-	file_api_proto_msgTypes[37].OneofWrappers = []any{
-		(*FocusChangedNotification_ApplicationActive)(nil),
-		(*FocusChangedNotification_Window_)(nil),
-		(*FocusChangedNotification_SelectedTab)(nil),
-		(*FocusChangedNotification_Session)(nil),
-	}
-	file_api_proto_msgTypes[53].OneofWrappers = []any{
-		(*SetProfilePropertyRequest_Session)(nil),
-		(*SetProfilePropertyRequest_GuidList_)(nil),
-	}
-	file_api_proto_msgTypes[59].OneofWrappers = []any{
-		(*SetPropertyRequest_WindowId)(nil),
-		(*SetPropertyRequest_SessionId)(nil),
-	}
-	file_api_proto_msgTypes[61].OneofWrappers = []any{
-		(*GetPropertyRequest_WindowId)(nil),
-		(*GetPropertyRequest_SessionId)(nil),
-	}
-	file_api_proto_msgTypes[65].OneofWrappers = []any{
-		(*ActivateRequest_WindowId)(nil),
-		(*ActivateRequest_TabId)(nil),
-		(*ActivateRequest_SessionId)(nil),
-	}
-	file_api_proto_msgTypes[67].OneofWrappers = []any{
-		(*VariableRequest_SessionId)(nil),
-		(*VariableRequest_TabId)(nil),
-		(*VariableRequest_App)(nil),
-		(*VariableRequest_WindowId)(nil),
-	}
-	file_api_proto_msgTypes[75].OneofWrappers = []any{
-		(*ServerOriginatedRPCResultRequest_JsonException)(nil),
-		(*ServerOriginatedRPCResultRequest_JsonValue)(nil),
-	}
-	file_api_proto_msgTypes[85].OneofWrappers = []any{
-		(*TmuxRequest_ListConnections_)(nil),
-		(*TmuxRequest_SendCommand_)(nil),
-		(*TmuxRequest_SetWindowVisible_)(nil),
-		(*TmuxRequest_CreateWindow_)(nil),
-	}
-	file_api_proto_msgTypes[86].OneofWrappers = []any{
-		(*TmuxResponse_ListConnections_)(nil),
-		(*TmuxResponse_SendCommand_)(nil),
-		(*TmuxResponse_SetWindowVisible_)(nil),
-		(*TmuxResponse_CreateWindow_)(nil),
-	}
-	file_api_proto_msgTypes[91].OneofWrappers = []any{
-		(*ColorPresetRequest_ListPresets_)(nil),
-		(*ColorPresetRequest_GetPreset_)(nil),
-	}
-	file_api_proto_msgTypes[92].OneofWrappers = []any{
-		(*ColorPresetResponse_ListPresets_)(nil),
-		(*ColorPresetResponse_GetPreset_)(nil),
-	}
-	file_api_proto_msgTypes[95].OneofWrappers = []any{
-		(*SelectionRequest_GetSelectionRequest_)(nil),
-		(*SelectionRequest_SetSelectionRequest_)(nil),
-	}
-	file_api_proto_msgTypes[96].OneofWrappers = []any{
-		(*SelectionResponse_GetSelectionResponse_)(nil),
-		(*SelectionResponse_SetSelectionResponse_)(nil),
-	}
-	file_api_proto_msgTypes[97].OneofWrappers = []any{
-		(*StatusBarComponentRequest_OpenPopover_)(nil),
-	}
-	file_api_proto_msgTypes[101].OneofWrappers = []any{
-		(*CloseRequest_Tabs)(nil),
-		(*CloseRequest_Sessions)(nil),
-		(*CloseRequest_Windows)(nil),
-	}
-	file_api_proto_msgTypes[103].OneofWrappers = []any{
-		(*InvokeFunctionRequest_Tab_)(nil),
-		(*InvokeFunctionRequest_Session_)(nil),
-		(*InvokeFunctionRequest_Window_)(nil),
-		(*InvokeFunctionRequest_App_)(nil),
-		(*InvokeFunctionRequest_Method_)(nil),
-	}
-	file_api_proto_msgTypes[104].OneofWrappers = []any{
-		(*InvokeFunctionResponse_Error_)(nil),
-		(*InvokeFunctionResponse_Success_)(nil),
-	}
-	file_api_proto_msgTypes[107].OneofWrappers = []any{
-		(*SplitTreeNode_SplitTreeLink_Session)(nil),
-		(*SplitTreeNode_SplitTreeLink_Node)(nil),
-	}
-	file_api_proto_msgTypes[127].OneofWrappers = []any{
+	file_api_proto_msgTypes[134].OneofWrappers = []any{
 		(*PreferencesRequest_Request_SetPreferenceRequest)(nil),
 		(*PreferencesRequest_Request_GetPreferenceRequest)(nil),
 		(*PreferencesRequest_Request_SetDefaultProfileRequest)(nil),
 		(*PreferencesRequest_Request_GetDefaultProfileRequest)(nil),
 	}
-	file_api_proto_msgTypes[132].OneofWrappers = []any{
+	file_api_proto_msgTypes[139].OneofWrappers = []any{
 		(*PreferencesResponse_Result_UnrecognizedRequest)(nil),
 		(*PreferencesResponse_Result_SetPreferenceResult_)(nil),
 		(*PreferencesResponse_Result_GetPreferenceResult_)(nil),
 		(*PreferencesResponse_Result_SetDefaultProfileResult_)(nil),
 		(*PreferencesResponse_Result_GetDefaultProfileResult_)(nil),
 	}
+	file_api_proto_msgTypes[169].OneofWrappers = []any{
+		(*SplitTreeNode_SplitTreeLink_Session)(nil),
+		(*SplitTreeNode_SplitTreeLink_Node)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_proto_rawDesc), len(file_api_proto_rawDesc)),
-			NumEnums:      40,
-			NumMessages:   158,
+			NumEnums:      47,
+			NumMessages:   172,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

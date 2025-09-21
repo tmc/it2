@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -38,6 +39,24 @@ func New(wsURL string) *Client {
 		pending:  make(map[int64]chan *pb.ServerOriginatedMessage),
 		debug:    os.Getenv("ITERM2_DEBUG") != "",
 	}
+}
+
+// buildHeaders creates common WebSocket headers for iTerm2 API connections
+func (c *Client) buildHeaders() http.Header {
+	headers := make(http.Header)
+	headers.Add("Origin", "ws://localhost/")
+	headers.Add("x-iterm2-library-version", "go 1.0")
+	headers.Add("x-iterm2-disable-auth-ui", "true")
+
+	// Add authentication if available
+	if cookie := os.Getenv("ITERM2_COOKIE"); cookie != "" {
+		headers.Add("x-iterm2-cookie", cookie)
+	}
+	if key := os.Getenv("ITERM2_KEY"); key != "" {
+		headers.Add("x-iterm2-key", key)
+	}
+
+	return headers
 }
 
 // requestAuth dynamically requests authentication from iTerm2
@@ -108,18 +127,7 @@ func (c *Client) Connect(ctx context.Context) error {
 		return fmt.Errorf("invalid URL: %w", err)
 	}
 
-	headers := make(http.Header)
-	headers.Add("Origin", "ws://localhost/")
-	headers.Add("x-iterm2-library-version", "go 1.0")
-	headers.Add("x-iterm2-disable-auth-ui", "true")
-
-	// Add authentication if available
-	if cookie := os.Getenv("ITERM2_COOKIE"); cookie != "" {
-		headers.Add("x-iterm2-cookie", cookie)
-	}
-	if key := os.Getenv("ITERM2_KEY"); key != "" {
-		headers.Add("x-iterm2-key", key)
-	}
+	headers := c.buildHeaders()
 
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 10 * time.Second,
@@ -145,18 +153,7 @@ func (c *Client) Connect(ctx context.Context) error {
 }
 
 func (c *Client) connectUnixSocket(ctx context.Context, socketPath string) error {
-	headers := make(http.Header)
-	headers.Add("Origin", "ws://localhost/")
-	headers.Add("x-iterm2-library-version", "go 1.0")
-	headers.Add("x-iterm2-disable-auth-ui", "true")
-
-	// Add authentication if available
-	if cookie := os.Getenv("ITERM2_COOKIE"); cookie != "" {
-		headers.Add("x-iterm2-cookie", cookie)
-	}
-	if key := os.Getenv("ITERM2_KEY"); key != "" {
-		headers.Add("x-iterm2-key", key)
-	}
+	headers := c.buildHeaders()
 
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 10 * time.Second,
@@ -268,293 +265,166 @@ func (c *Client) SendRequest(ctx context.Context, msg *pb.ClientOriginatedMessag
 	}
 }
 
-func (c *Client) SendText(ctx context.Context, sessionID, text string) error {
+// InvokeFunction invokes a function in iTerm2, possibly as a method call on an object
+func (c *Client) InvokeFunction(ctx context.Context, invocation string, sessionID, tabID, windowID *string, timeout float64) (interface{}, error) {
 	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_SendTextRequest{
-			SendTextRequest: &pb.SendTextRequest{
-				Session: &sessionID,
-				Text:    &text,
+		Submessage: &pb.ClientOriginatedMessage_InvokeFunctionRequest{
+			InvokeFunctionRequest: &pb.InvokeFunctionRequest{
+				Invocation: &invocation,
+				Timeout:    &timeout,
 			},
 		},
 	}
 
-	_, err := c.SendRequest(ctx, msg)
-	return err
+	// Set the appropriate context
+	if sessionID != nil {
+		msg.GetInvokeFunctionRequest().Context = &pb.InvokeFunctionRequest_Session_{
+			Session: &pb.InvokeFunctionRequest_Session{
+				SessionId: sessionID,
+			},
+		}
+	} else if tabID != nil {
+		msg.GetInvokeFunctionRequest().Context = &pb.InvokeFunctionRequest_Tab_{
+			Tab: &pb.InvokeFunctionRequest_Tab{
+				TabId: tabID,
+			},
+		}
+	} else if windowID != nil {
+		msg.GetInvokeFunctionRequest().Context = &pb.InvokeFunctionRequest_Window_{
+			Window: &pb.InvokeFunctionRequest_Window{
+				WindowId: windowID,
+			},
+		}
+	} else {
+		// App context
+		msg.GetInvokeFunctionRequest().Context = &pb.InvokeFunctionRequest_App_{
+			App: &pb.InvokeFunctionRequest_App{},
+		}
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to invoke function: %w", err)
+	}
+
+	if resp := response.GetInvokeFunctionResponse(); resp != nil {
+		switch disposition := resp.GetDisposition().(type) {
+		case *pb.InvokeFunctionResponse_Error_:
+			statusName := "UNKNOWN"
+			if statusPtr := disposition.Error.Status; statusPtr != nil {
+				statusName = pb.InvokeFunctionResponse_Status_name[int32(*statusPtr)]
+			}
+			return nil, fmt.Errorf("function invocation error: %s: %s",
+				statusName,
+				disposition.Error.GetErrorReason())
+		case *pb.InvokeFunctionResponse_Success_:
+			// Parse JSON result
+			var result interface{}
+			if err := json.Unmarshal([]byte(disposition.Success.GetJsonResult()), &result); err != nil {
+				return nil, fmt.Errorf("failed to parse JSON result: %w", err)
+			}
+			return result, nil
+		default:
+			return nil, fmt.Errorf("unexpected response disposition")
+		}
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
 }
 
-func (c *Client) CreateTab(ctx context.Context, profileName, windowID string) (*pb.CreateTabResponse, error) {
+// InvokeMethod invokes a method on an iTerm2 object (convenience wrapper around InvokeFunction)
+func (c *Client) InvokeMethod(ctx context.Context, invocation, receiver string, timeout float64) error {
 	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_CreateTabRequest{
-			CreateTabRequest: &pb.CreateTabRequest{
-				ProfileName: &profileName,
-				WindowId:    &windowID,
+		Submessage: &pb.ClientOriginatedMessage_InvokeFunctionRequest{
+			InvokeFunctionRequest: &pb.InvokeFunctionRequest{
+				Invocation: &invocation,
+				Timeout:    &timeout,
+			},
+		},
+	}
+
+	// Set method context with receiver
+	msg.GetInvokeFunctionRequest().Context = &pb.InvokeFunctionRequest_Method_{
+		Method: &pb.InvokeFunctionRequest_Method{
+			Receiver: &receiver,
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return fmt.Errorf("failed to invoke method: %w", err)
+	}
+
+	if resp := response.GetInvokeFunctionResponse(); resp != nil {
+		switch disposition := resp.GetDisposition().(type) {
+		case *pb.InvokeFunctionResponse_Error_:
+			statusName := "UNKNOWN"
+			if statusPtr := disposition.Error.Status; statusPtr != nil {
+				statusName = pb.InvokeFunctionResponse_Status_name[int32(*statusPtr)]
+			}
+			return fmt.Errorf("method invocation error: %s: %s",
+				statusName,
+				disposition.Error.GetErrorReason())
+		case *pb.InvokeFunctionResponse_Success_:
+			// Method succeeded
+			return nil
+		default:
+			return fmt.Errorf("unexpected response disposition")
+		}
+	}
+
+	return fmt.Errorf("unexpected response type")
+}
+
+// SubscribeToNotification subscribes to a specific notification type
+func (c *Client) SubscribeToNotification(ctx context.Context, notificationType pb.NotificationType) error {
+	subscribe := true
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_NotificationRequest{
+			NotificationRequest: &pb.NotificationRequest{
+				Subscribe:        &subscribe,
+				NotificationType: &notificationType,
 			},
 		},
 	}
 
 	response, err := c.SendRequest(ctx, msg)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("failed to subscribe to notifications: %w", err)
 	}
 
-	if response.GetCreateTabResponse() != nil {
-		return response.GetCreateTabResponse(), nil
+	if resp := response.GetNotificationResponse(); resp != nil {
+		if resp.GetStatus() != pb.NotificationResponse_OK {
+			return fmt.Errorf("notification subscription failed: %v", resp.GetStatus())
+		}
 	}
 
-	return nil, fmt.Errorf("unexpected response type")
+	return nil
 }
 
-func (c *Client) GetBuffer(ctx context.Context, sessionID string, lines int32) (*pb.GetBufferResponse, error) {
-	screenOnly := false
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_GetBufferRequest{
-			GetBufferRequest: &pb.GetBufferRequest{
-				Session: &sessionID,
-				LineRange: &pb.LineRange{
-					ScreenContentsOnly: &screenOnly,
-				},
-			},
-		},
+// ReadNotification reads the next notification from the message stream
+func (c *Client) ReadNotification(ctx context.Context) (*pb.ServerOriginatedMessage, error) {
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case msg, ok := <-c.messages:
+		if !ok {
+			return nil, fmt.Errorf("message channel closed")
+		}
+		return msg, nil
 	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.GetGetBufferResponse() != nil {
-		return response.GetGetBufferResponse(), nil
-	}
-
-	return nil, fmt.Errorf("unexpected response type")
 }
 
-func (c *Client) SplitPane(ctx context.Context, sessionID string, vertical bool, before bool, profileName string) (*pb.SplitPaneResponse, error) {
-	splitDirection := pb.SplitPaneRequest_HORIZONTAL
-	if vertical {
-		splitDirection = pb.SplitPaneRequest_VERTICAL
-	}
-
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_SplitPaneRequest{
-			SplitPaneRequest: &pb.SplitPaneRequest{
-				Session:        &sessionID,
-				SplitDirection: &splitDirection,
-				Before:         &before,
-				ProfileName:    &profileName,
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.GetSplitPaneResponse() != nil {
-		return response.GetSplitPaneResponse(), nil
-	}
-
-	return nil, fmt.Errorf("unexpected response type")
+// FocusInfo represents current focus state
+type FocusInfo struct {
+	ApplicationFocused bool   `json:"application_focused"`
+	WindowId          string `json:"window_id,omitempty"`
+	TabId             string `json:"tab_id,omitempty"`
+	SessionId         string `json:"session_id,omitempty"`
 }
 
-func (c *Client) CloseSessions(ctx context.Context, sessionIDs []string, force bool) (*pb.CloseResponse, error) {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_CloseRequest{
-			CloseRequest: &pb.CloseRequest{
-				Target: &pb.CloseRequest_Sessions{
-					Sessions: &pb.CloseRequest_CloseSessions{
-						SessionIds: sessionIDs,
-					},
-				},
-				Force: &force,
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.GetCloseResponse() != nil {
-		return response.GetCloseResponse(), nil
-	}
-
-	return nil, fmt.Errorf("unexpected response type")
-}
-
-func (c *Client) CloseTabs(ctx context.Context, tabIDs []string, force bool) (*pb.CloseResponse, error) {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_CloseRequest{
-			CloseRequest: &pb.CloseRequest{
-				Target: &pb.CloseRequest_Tabs{
-					Tabs: &pb.CloseRequest_CloseTabs{
-						TabIds: tabIDs,
-					},
-				},
-				Force: &force,
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.GetCloseResponse() != nil {
-		return response.GetCloseResponse(), nil
-	}
-
-	return nil, fmt.Errorf("unexpected response type")
-}
-
-func (c *Client) CloseWindows(ctx context.Context, windowIDs []string, force bool) (*pb.CloseResponse, error) {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_CloseRequest{
-			CloseRequest: &pb.CloseRequest{
-				Target: &pb.CloseRequest_Windows{
-					Windows: &pb.CloseRequest_CloseWindows{
-						WindowIds: windowIDs,
-					},
-				},
-				Force: &force,
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.GetCloseResponse() != nil {
-		return response.GetCloseResponse(), nil
-	}
-
-	return nil, fmt.Errorf("unexpected response type")
-}
-
-func (c *Client) ActivateSession(ctx context.Context, sessionID string, selectSession bool) (*pb.ActivateResponse, error) {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_ActivateRequest{
-			ActivateRequest: &pb.ActivateRequest{
-				Identifier: &pb.ActivateRequest_SessionId{
-					SessionId: sessionID,
-				},
-				SelectSession: &selectSession,
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.GetActivateResponse() != nil {
-		return response.GetActivateResponse(), nil
-	}
-
-	return nil, fmt.Errorf("unexpected response type")
-}
-
-func (c *Client) ActivateTab(ctx context.Context, tabID string, selectTab bool) (*pb.ActivateResponse, error) {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_ActivateRequest{
-			ActivateRequest: &pb.ActivateRequest{
-				Identifier: &pb.ActivateRequest_TabId{
-					TabId: tabID,
-				},
-				SelectTab: &selectTab,
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.GetActivateResponse() != nil {
-		return response.GetActivateResponse(), nil
-	}
-
-	return nil, fmt.Errorf("unexpected response type")
-}
-
-func (c *Client) ActivateWindow(ctx context.Context, windowID string, orderFront bool) (*pb.ActivateResponse, error) {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_ActivateRequest{
-			ActivateRequest: &pb.ActivateRequest{
-				Identifier: &pb.ActivateRequest_WindowId{
-					WindowId: windowID,
-				},
-				OrderWindowFront: &orderFront,
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.GetActivateResponse() != nil {
-		return response.GetActivateResponse(), nil
-	}
-
-	return nil, fmt.Errorf("unexpected response type")
-}
-
-func (c *Client) RestartSession(ctx context.Context, sessionID string, onlyIfExited bool) (*pb.RestartSessionResponse, error) {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_RestartSessionRequest{
-			RestartSessionRequest: &pb.RestartSessionRequest{
-				SessionId:    &sessionID,
-				OnlyIfExited: &onlyIfExited,
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.GetRestartSessionResponse() != nil {
-		return response.GetRestartSessionResponse(), nil
-	}
-
-	return nil, fmt.Errorf("unexpected response type")
-}
-
-
-// GetPrompt gets information about prompts in a session (requires Shell Integration)
-func (c *Client) GetPrompt(ctx context.Context, sessionID string) (*pb.GetPromptResponse, error) {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_GetPromptRequest{
-			GetPromptRequest: &pb.GetPromptRequest{
-				Session: &sessionID,
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.GetGetPromptResponse() != nil {
-		return response.GetGetPromptResponse(), nil
-	}
-
-	return nil, fmt.Errorf("unexpected response type")
-}
-
-// Focus brings iTerm2 to the foreground
-func (c *Client) Focus(ctx context.Context, raiseAll bool) (*pb.FocusResponse, error) {
+// GetFocus gets current focus information
+func (c *Client) GetFocus(ctx context.Context) (*FocusInfo, error) {
 	msg := &pb.ClientOriginatedMessage{
 		Submessage: &pb.ClientOriginatedMessage_FocusRequest{
 			FocusRequest: &pb.FocusRequest{},
@@ -566,79 +436,30 @@ func (c *Client) Focus(ctx context.Context, raiseAll bool) (*pb.FocusResponse, e
 		return nil, err
 	}
 
-	if response.GetFocusResponse() != nil {
-		return response.GetFocusResponse(), nil
+	if focusResp := response.GetFocusResponse(); focusResp != nil {
+		info := &FocusInfo{}
+
+		// Parse focus notifications to get current state
+		if notifications := focusResp.GetNotifications(); len(notifications) > 0 {
+			// Get the latest notification of each type
+			for _, notif := range notifications {
+				switch e := notif.GetEvent().(type) {
+				case *pb.FocusChangedNotification_ApplicationActive:
+					info.ApplicationFocused = e.ApplicationActive
+				case *pb.FocusChangedNotification_Window_:
+					if e.Window != nil && e.Window.WindowId != nil {
+						info.WindowId = *e.Window.WindowId
+					}
+				case *pb.FocusChangedNotification_SelectedTab:
+					info.TabId = e.SelectedTab
+				case *pb.FocusChangedNotification_Session:
+					info.SessionId = e.Session
+				}
+			}
+		}
+
+		return info, nil
 	}
 
 	return nil, fmt.Errorf("unexpected response type")
-}
-
-// GetVariable gets the value of a variable
-func (c *Client) GetVariable(ctx context.Context, sessionID, name string) (string, error) {
-	req := &pb.VariableRequest{
-		Get: []string{name},
-	}
-
-	// Set scope based on sessionID
-	if sessionID != "" {
-		req.Scope = &pb.VariableRequest_SessionId{
-			SessionId: sessionID,
-		}
-	} else {
-		req.Scope = &pb.VariableRequest_App{
-			App: true,
-		}
-	}
-
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_VariableRequest{
-			VariableRequest: req,
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return "", err
-	}
-
-	if varResponse := response.GetVariableResponse(); varResponse != nil {
-		if varResponse.GetValues() != nil && len(varResponse.GetValues()) > 0 {
-			return varResponse.GetValues()[0], nil
-		}
-		return "", fmt.Errorf("variable not found")
-	}
-
-	return "", fmt.Errorf("unexpected response type")
-}
-
-// SetVariable sets the value of a variable
-func (c *Client) SetVariable(ctx context.Context, sessionID, name, value string) error {
-	req := &pb.VariableRequest{
-		Set: []*pb.VariableRequest_Set{
-			{
-				Name:  &name,
-				Value: &value,
-			},
-		},
-	}
-
-	// Set scope based on sessionID
-	if sessionID != "" {
-		req.Scope = &pb.VariableRequest_SessionId{
-			SessionId: sessionID,
-		}
-	} else {
-		req.Scope = &pb.VariableRequest_App{
-			App: true,
-		}
-	}
-
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_VariableRequest{
-			VariableRequest: req,
-		},
-	}
-
-	_, err := c.SendRequest(ctx, msg)
-	return err
 }

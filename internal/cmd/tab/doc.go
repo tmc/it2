@@ -13,8 +13,9 @@
 // and behavior.
 //
 // Examples:
-//   it2 tab create --profile "Development" --window w0
-//   it2 tab activate w0t1
-//   it2 tab move w0t1 --position 0
-//   it2 tab close w0t1
+//
+//	it2 tab create --profile "Development" --window w0
+//	it2 tab activate w0t1
+//	it2 tab move w0t1 --position 0
+//	it2 tab close w0t1
 package tab

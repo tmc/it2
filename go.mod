@@ -1,12 +1,12 @@
 module github.com/tmc/it2
 
-go 1.21
+go 1.22.4
+
+toolchain go1.24.6
 
 require (
-	github.com/fatih/color v1.16.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/spf13/cobra v1.8.1
-	github.com/tmc/spinner v0.1.0
 	google.golang.org/protobuf v1.35.2
 	gopkg.in/yaml.v3 v3.0.1
 )

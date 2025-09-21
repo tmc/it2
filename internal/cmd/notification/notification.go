@@ -1,6 +1,8 @@
 package notification
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -8,104 +10,53 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "notification",
-		Short: "Manage iTerm2 notifications",
-		Long:  "Commands for sending and watching iTerm2 notifications",
+		Short: "Subscribe to iTerm2 notifications",
+		Long:  "Commands for subscribing to and watching iTerm2 notification events",
 	}
 
-	cmd.AddCommand(newSendCommand())
-	cmd.AddCommand(newWatchCommand())
+	cmd.AddCommand(newSubscribeCommand())
+	cmd.AddCommand(newListTypesCommand())
+	cmd.AddCommand(newMonitorCommand())
+	cmd.AddCommand(newUnsubscribeCommand())
+	cmd.AddCommand(newTestCommand())
+	cmd.AddCommand(newStatusCommand())
 
 	return cmd
 }
 
-func newSendCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "send",
-		Short: "Send a notification",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement notification sending
-			return nil
-		},
+// getNotificationTypes returns a map of all available notification types with descriptions
+func getNotificationTypes() map[string]notificationTypeInfo {
+	return map[string]notificationTypeInfo{
+		"keystroke":  {"Keystroke events in sessions", true, "NOTIFY_ON_KEYSTROKE"},
+		"screen":     {"Screen updates in sessions", true, "NOTIFY_ON_SCREEN_UPDATE"},
+		"prompt":     {"Shell prompt changes in sessions", true, "NOTIFY_ON_PROMPT"},
+		"location":   {"Working directory changes (deprecated)", true, "NOTIFY_ON_LOCATION_CHANGE"},
+		"custom":     {"Custom escape sequence events in sessions", true, "NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE"},
+		"variable":   {"Variable changes", false, "NOTIFY_ON_VARIABLE_CHANGE"},
+		"filter":     {"Keystroke filter (no notifications sent)", true, "KEYSTROKE_FILTER"},
+		"session":    {"New session creation", false, "NOTIFY_ON_NEW_SESSION"},
+		"terminate":  {"Session termination", false, "NOTIFY_ON_TERMINATE_SESSION"},
+		"layout":     {"Layout changes", false, "NOTIFY_ON_LAYOUT_CHANGE"},
+		"focus":      {"Focus changes", false, "NOTIFY_ON_FOCUS_CHANGE"},
+		"rpc":        {"Server-originated RPC calls", false, "NOTIFY_ON_SERVER_ORIGINATED_RPC"},
+		"broadcast":  {"Broadcast domain changes", false, "NOTIFY_ON_BROADCAST_CHANGE"},
+		"profile":    {"Profile changes", false, "NOTIFY_ON_PROFILE_CHANGE"},
 	}
-
-	cmd.Flags().String("title", "", "Notification title")
-	cmd.Flags().String("message", "", "Notification message")
-	cmd.Flags().String("subtitle", "", "Notification subtitle")
-	cmd.MarkFlagRequired("message")
-
-	return cmd
 }
 
-func newWatchCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "watch",
-		Short: "Watch for notifications",
-		Long:  "Watch for various iTerm2 notification types in real-time",
-	}
-
-	// Add subcommands for specific notification types
-	cmd.AddCommand(&cobra.Command{
-		Use:   "all",
-		Short: "Watch all notification types",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement watching all notifications
-			return nil
-		},
-	})
-
-	cmd.AddCommand(&cobra.Command{
-		Use:   "keystrokes",
-		Short: "Watch keystroke notifications",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement keystroke watching
-			return nil
-		},
-	})
-
-	cmd.AddCommand(&cobra.Command{
-		Use:   "screen",
-		Short: "Watch screen update notifications",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement screen update watching
-			return nil
-		},
-	})
-
-	cmd.AddCommand(&cobra.Command{
-		Use:   "focus",
-		Short: "Watch focus change notifications",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement focus change watching
-			return nil
-		},
-	})
-
-	cmd.AddCommand(&cobra.Command{
-		Use:   "sessions",
-		Short: "Watch new session notifications",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement new session watching
-			return nil
-		},
-	})
-
-	cmd.AddCommand(&cobra.Command{
-		Use:   "location",
-		Short: "Watch location change notifications",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement location change watching
-			return nil
-		},
-	})
-
-	cmd.AddCommand(&cobra.Command{
-		Use:   "variables",
-		Short: "Watch variable change notifications",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			// TODO: Implement variable change watching
-			return nil
-		},
-	})
-
-	return cmd
+type notificationTypeInfo struct {
+	description   string
+	sessionScoped bool
+	enumName      string
 }
+
+// validateNotificationType checks if a notification type is valid
+func validateNotificationType(notifType string) error {
+	types := getNotificationTypes()
+	if _, exists := types[notifType]; !exists {
+		return fmt.Errorf("unknown notification type: %s", notifType)
+	}
+	return nil
+}
+
+

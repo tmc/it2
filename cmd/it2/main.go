@@ -6,13 +6,20 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmd/app"
+	"github.com/tmc/it2/internal/cmd/arrangement"
 	"github.com/tmc/it2/internal/cmd/auth"
+	"github.com/tmc/it2/internal/cmd/broadcast"
+	"github.com/tmc/it2/internal/cmd/color"
 	"github.com/tmc/it2/internal/cmd/job"
 	"github.com/tmc/it2/internal/cmd/notification"
 	"github.com/tmc/it2/internal/cmd/profile"
+	"github.com/tmc/it2/internal/cmd/prompt"
+	"github.com/tmc/it2/internal/cmd/selection"
 	"github.com/tmc/it2/internal/cmd/session"
+	"github.com/tmc/it2/internal/cmd/statusbar"
 	"github.com/tmc/it2/internal/cmd/tab"
 	"github.com/tmc/it2/internal/cmd/text"
+	"github.com/tmc/it2/internal/cmd/tmux"
 	"github.com/tmc/it2/internal/cmd/variable"
 	"github.com/tmc/it2/internal/cmd/window"
 )
@@ -37,15 +44,22 @@ func init() {
 
 	// Add organized command groups
 	rootCmd.AddCommand(app.NewCommand())
-	rootCmd.AddCommand(session.NewCommand())
-	rootCmd.AddCommand(tab.NewCommand())
-	rootCmd.AddCommand(window.NewCommand())
-	rootCmd.AddCommand(text.NewCommand())
-	rootCmd.AddCommand(profile.NewCommand())
-	rootCmd.AddCommand(variable.NewCommand())
+	rootCmd.AddCommand(arrangement.NewCommand())
+	rootCmd.AddCommand(auth.NewCommand())
+	rootCmd.AddCommand(broadcast.NewCommand())
+	rootCmd.AddCommand(color.NewCommand())
 	rootCmd.AddCommand(job.NewCommand())
 	rootCmd.AddCommand(notification.NewCommand())
-	rootCmd.AddCommand(auth.NewCommand())
+	rootCmd.AddCommand(profile.NewCommand())
+	rootCmd.AddCommand(prompt.NewCommand())
+	rootCmd.AddCommand(selection.NewCommand())
+	rootCmd.AddCommand(session.NewCommand())
+	rootCmd.AddCommand(statusbar.NewCommand())
+	rootCmd.AddCommand(tab.NewCommand())
+	rootCmd.AddCommand(text.NewCommand())
+	rootCmd.AddCommand(tmux.NewCommand())
+	rootCmd.AddCommand(variable.NewCommand())
+	rootCmd.AddCommand(window.NewCommand())
 }
 
 func main() {
