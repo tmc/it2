@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
 )
@@ -33,7 +34,12 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "annotation",
 		Short: "Manage session annotations",
-		Long:  "Commands for adding, removing, and listing annotations in sessions",
+		Long: `Commands for adding, removing, and listing annotations in sessions.
+
+Annotations are metadata attached to terminal sessions that can be used to:
+- Mark important locations in command output
+- Add notes and reminders about session state
+- Create navigable markers for debugging sessions`,
 	}
 
 	cmd.AddCommand(newAddCommand())
@@ -45,32 +51,32 @@ func NewCommand() *cobra.Command {
 }
 
 func newAddCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	template := cmdutil.CommandTemplate{
 		Use:   "add <session-id> <text>",
 		Short: "Add an annotation to a session",
-		Args:  cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Long: `Add an annotation to a session with optional line and column position.
+
+Examples:
+  it2 annotation add session123 "Error occurred here"
+  it2 annotation add session123 "Stack trace" --line 42
+  it2 annotation add session123 "Breakpoint" --line 10 --column 5 --type error`,
+		Args:            cobra.ExactArgs(2),
+		RequiresClient:  true,
+		RequiresSession: true,
+		SupportsFormat:  true,
+		ValidArgsFunc:   completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			// Session ID is already normalized by template when RequiresSession: true
 			sessionID := args[0]
 			text := args[1]
-			line, _ := cmd.Flags().GetInt("line")
-			column, _ := cmd.Flags().GetInt("column")
-			annotationType, _ := cmd.Flags().GetString("type")
-
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
-
-			ctx, cancel := cmdutil.CreateContext(timeout)
-			defer cancel()
-
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
-			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
-			}
-			defer c.Close()
+			line, _ := sc.GetCommand().Flags().GetInt("line")
+			column, _ := sc.GetCommand().Flags().GetInt("column")
+			annotationType, _ := sc.GetCommand().Flags().GetString("type")
 
 			// Get existing annotations
-			store, err := getAnnotationStore(c, ctx, sessionID)
+			store, err := getAnnotationStore(sc.GetClient(), sc.GetContext(), sessionID)
 			if err != nil {
-				return fmt.Errorf("failed to get existing annotations: %w", err)
+				return sc.ReportError("get existing annotations", err)
 			}
 
 			// Create new annotation
@@ -87,16 +93,27 @@ func newAddCommand() *cobra.Command {
 			store.Annotations = append(store.Annotations, annotation)
 
 			// Save back to session
-			err = setAnnotationStore(c, ctx, sessionID, store)
+			err = setAnnotationStore(sc.GetClient(), sc.GetContext(), sessionID, store)
 			if err != nil {
-				return fmt.Errorf("failed to save annotation: %w", err)
+				return sc.ReportError("save annotation", err)
 			}
 
-			fmt.Printf("Added annotation: %s (ID: %s)\n", text, annotation.ID)
+			// Report success with JSON output support
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"session_id": sessionID,
+					"annotation": annotation,
+					"action":     "added",
+				}
+				return sc.FormatOutput(result)
+			}
+
+			sc.ReportSuccess("Added annotation: %s (ID: %s)", text, annotation.ID)
 			return nil
 		},
 	}
 
+	cmd := cmdutil.NewCommandFromTemplate(template)
 	cmd.Flags().Int("line", 0, "Line number for the annotation")
 	cmd.Flags().Int("column", 0, "Column number for the annotation")
 	cmd.Flags().String("type", "note", "Annotation type (note, warning, error, etc.)")
@@ -105,35 +122,36 @@ func newAddCommand() *cobra.Command {
 }
 
 func newRemoveCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	template := cmdutil.CommandTemplate{
 		Use:   "remove <session-id> <annotation-id>",
 		Short: "Remove an annotation from a session",
-		Args:  cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Long: `Remove a specific annotation from a session by its ID.
+
+Examples:
+  it2 annotation remove session123 anno_1234567890
+  it2 annotation list session123 --format json | jq -r '.[-1].id' | xargs it2 annotation remove session123`,
+		Args:            cobra.ExactArgs(2),
+		RequiresClient:  true,
+		RequiresSession: true,
+		SupportsFormat:  true,
+		ValidArgsFunc:   completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			// Session ID is already normalized by template when RequiresSession: true
 			sessionID := args[0]
 			annotationID := args[1]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
-
-			ctx, cancel := cmdutil.CreateContext(timeout)
-			defer cancel()
-
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
-			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
-			}
-			defer c.Close()
-
 			// Get existing annotations
-			store, err := getAnnotationStore(c, ctx, sessionID)
+			store, err := getAnnotationStore(sc.GetClient(), sc.GetContext(), sessionID)
 			if err != nil {
-				return fmt.Errorf("failed to get existing annotations: %w", err)
+				return sc.ReportError("get existing annotations", err)
 			}
 
 			// Find and remove annotation
 			var found bool
+			var removedAnnotation *Annotation
 			for i, annotation := range store.Annotations {
 				if annotation.ID == annotationID {
+					removedAnnotation = annotation
 					store.Annotations = append(store.Annotations[:i], store.Annotations[i+1:]...)
 					found = true
 					break
@@ -141,46 +159,62 @@ func newRemoveCommand() *cobra.Command {
 			}
 
 			if !found {
-				return fmt.Errorf("annotation with ID '%s' not found", annotationID)
+				return cmdutil.NewNotFoundError("annotation", annotationID)
 			}
 
 			// Save back to session
-			err = setAnnotationStore(c, ctx, sessionID, store)
+			err = setAnnotationStore(sc.GetClient(), sc.GetContext(), sessionID, store)
 			if err != nil {
-				return fmt.Errorf("failed to save annotations: %w", err)
+				return sc.ReportError("save annotations", err)
 			}
 
-			fmt.Printf("Removed annotation: %s\n", annotationID)
+			// Report success with JSON output support
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"session_id": sessionID,
+					"annotation": removedAnnotation,
+					"action":     "removed",
+				}
+				return sc.FormatOutput(result)
+			}
+
+			sc.ReportSuccess("Removed annotation: %s", annotationID)
 			return nil
 		},
 	}
 
-	return cmd
+	return cmdutil.NewCommandFromTemplate(template)
 }
 
 func newListCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "list <session-id>",
+	template := cmdutil.CommandTemplate{
+		Use:   "list [session-id]",
 		Short: "List all annotations in a session",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			sessionID := args[0]
+		Long: `List all annotations in a session. If no session-id is provided,
+uses $ITERM_SESSION_ID environment variable.
 
-			wsURL, timeout, format := cmdutil.GetFlags(cmd)
-
-			ctx, cancel := cmdutil.CreateContext(timeout)
-			defer cancel()
-
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
-			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
+Examples:
+  it2 annotation list                  # List for current session
+  it2 annotation list session123       # List for specific session
+  it2 annotation list --format json    # Output as JSON for processing`,
+		Args:            cobra.RangeArgs(0, 1),
+		RequiresClient:  true,
+		SupportsFormat:  true,
+		ValidArgsFunc:   completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			var sessionID string
+			if len(args) > 0 {
+				sessionID = args[0]
 			}
-			defer c.Close()
+			sessionID = cmdutil.ResolveSessionID(sessionID)
+			if sessionID == "" {
+				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+			}
 
 			// Get annotations
-			store, err := getAnnotationStore(c, ctx, sessionID)
+			store, err := getAnnotationStore(sc.GetClient(), sc.GetContext(), sessionID)
 			if err != nil {
-				return fmt.Errorf("failed to get annotations: %w", err)
+				return sc.ReportError("get annotations", err)
 			}
 
 			// Convert to formatting annotations
@@ -196,47 +230,64 @@ func newListCommand() *cobra.Command {
 				}
 			}
 
-			formatter := formatting.New(format)
+			formatter := formatting.New(sc.GetFlags().Format)
 			return formatter.FormatAnnotations(formattingAnnotations)
 		},
 	}
 
-	return cmd
+	return cmdutil.NewCommandFromTemplate(template)
 }
 
 func newClearCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	template := cmdutil.CommandTemplate{
 		Use:   "clear <session-id>",
 		Short: "Clear all annotations from a session",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Long: `Clear all annotations from a session, removing all stored metadata.
+
+Examples:
+  it2 annotation clear session123
+  it2 session list --format json | jq -r '.[].id' | xargs -I{} it2 annotation clear {}`,
+		Args:            cobra.ExactArgs(1),
+		RequiresClient:  true,
+		RequiresSession: true,
+		SupportsFormat:  true,
+		ValidArgsFunc:   completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			// Session ID is already normalized by template when RequiresSession: true
 			sessionID := args[0]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
-
-			ctx, cancel := cmdutil.CreateContext(timeout)
-			defer cancel()
-
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
-			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
-			}
-			defer c.Close()
+			// Get current count before clearing
+			store, _ := getAnnotationStore(sc.GetClient(), sc.GetContext(), sessionID)
+			previousCount := len(store.Annotations)
 
 			// Clear annotations
-			store := &AnnotationStore{Annotations: []*Annotation{}}
+			store = &AnnotationStore{Annotations: []*Annotation{}}
 
-			err = setAnnotationStore(c, ctx, sessionID, store)
+			err := setAnnotationStore(sc.GetClient(), sc.GetContext(), sessionID, store)
 			if err != nil {
-				return fmt.Errorf("failed to clear annotations: %w", err)
+				return sc.ReportError("clear annotations", err)
 			}
 
-			fmt.Printf("Cleared all annotations from session %s\n", sessionID)
+			// Report success with JSON output support
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"session_id":     sessionID,
+					"cleared_count":  previousCount,
+					"action":         "cleared",
+				}
+				return sc.FormatOutput(result)
+			}
+
+			if previousCount > 0 {
+				sc.ReportSuccess("Cleared %d annotations from session %s", previousCount, sessionID)
+			} else {
+				sc.ReportSuccess("No annotations to clear in session %s", sessionID)
+			}
 			return nil
 		},
 	}
 
-	return cmd
+	return cmdutil.NewCommandFromTemplate(template)
 }
 
 // getAnnotationStore retrieves the annotation store from session properties

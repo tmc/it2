@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/completion"
 	pb "github.com/tmc/it2/proto"
 )
 
@@ -15,7 +16,12 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "badge",
 		Short: "Manage session badges",
-		Long:  "Commands for setting and clearing session badges",
+		Long: `Commands for setting and clearing session badges.
+
+Badges are small text labels that appear on terminal sessions, useful for:
+- Identifying different environments (prod, dev, test)
+- Showing current git branch or project
+- Marking sessions with status information`,
 	}
 
 	cmd.AddCommand(newSetCommand())
@@ -26,92 +32,129 @@ func NewCommand() *cobra.Command {
 }
 
 func newSetCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	template := cmdutil.CommandTemplate{
 		Use:   "set <session-id> <text>",
 		Short: "Set a badge for a session",
-		Args:  cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Long: `Set a badge for a session to display status or identification text.
+
+Examples:
+  it2 badge set session123 "PRODUCTION"
+  it2 badge set session123 "feature-branch"
+  it2 badge set session123 "🔴 LIVE"`,
+		Args:            cobra.ExactArgs(2),
+		RequiresClient:  true,
+		RequiresSession: true,
+		SupportsFormat:  true,
+		ValidArgsFunc:   completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			// Session ID is already normalized by template when RequiresSession: true
 			sessionID := args[0]
 			text := args[1]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
-
-			ctx, cancel := cmdutil.CreateContext(timeout)
-			defer cancel()
-
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			err := setBadge(sc.GetClient(), sc.GetContext(), sessionID, text)
 			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
-			}
-			defer c.Close()
-
-			err = setBadge(c, ctx, sessionID, text)
-			if err != nil {
-				return fmt.Errorf("failed to set badge: %w", err)
+				return sc.ReportError("set badge", err)
 			}
 
-			fmt.Printf("Set badge for session %s: %s\n", sessionID, text)
+			// Report success with JSON output support
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"session_id": sessionID,
+					"badge":      text,
+					"action":     "set",
+				}
+				return sc.FormatOutput(result)
+			}
+
+			sc.ReportSuccess("Set badge for session %s: %s", sessionID, text)
 			return nil
 		},
 	}
 
-	return cmd
+	return cmdutil.NewCommandFromTemplate(template)
 }
 
 func newClearCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	template := cmdutil.CommandTemplate{
 		Use:   "clear <session-id>",
 		Short: "Clear the badge for a session",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Long: `Clear the badge for a session, removing any previously set text.
+
+Examples:
+  it2 badge clear session123
+  it2 badge clear $(it2 session list --format json | jq -r '.[0].id')`,
+		Args:            cobra.ExactArgs(1),
+		RequiresClient:  true,
+		RequiresSession: true,
+		SupportsFormat:  true,
+		ValidArgsFunc:   completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			// Session ID is already normalized by template when RequiresSession: true
 			sessionID := args[0]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
-
-			ctx, cancel := cmdutil.CreateContext(timeout)
-			defer cancel()
-
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			err := setBadge(sc.GetClient(), sc.GetContext(), sessionID, "")
 			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
-			}
-			defer c.Close()
-
-			err = setBadge(c, ctx, sessionID, "")
-			if err != nil {
-				return fmt.Errorf("failed to clear badge: %w", err)
+				return sc.ReportError("clear badge", err)
 			}
 
-			fmt.Printf("Cleared badge for session %s\n", sessionID)
+			// Report success with JSON output support
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"session_id": sessionID,
+					"badge":      nil,
+					"action":     "cleared",
+				}
+				return sc.FormatOutput(result)
+			}
+
+			sc.ReportSuccess("Cleared badge for session %s", sessionID)
 			return nil
 		},
 	}
 
-	return cmd
+	return cmdutil.NewCommandFromTemplate(template)
 }
 
 func newGetCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "get <session-id>",
+	template := cmdutil.CommandTemplate{
+		Use:   "get [session-id]",
 		Short: "Get the current badge for a session",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			sessionID := args[0]
+		Long: `Get the current badge for a session. If no session-id is provided,
+uses $ITERM_SESSION_ID environment variable.
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
-
-			ctx, cancel := cmdutil.CreateContext(timeout)
-			defer cancel()
-
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
-			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
+Examples:
+  it2 badge get                    # Get badge for current session
+  it2 badge get session123         # Get specific session's badge
+  it2 badge get --format json      # Output as JSON`,
+		Args:            cobra.RangeArgs(0, 1),
+		RequiresClient:  true,
+		SupportsFormat:  true,
+		ValidArgsFunc:   completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			var sessionID string
+			if len(args) > 0 {
+				sessionID = args[0]
 			}
-			defer c.Close()
+			sessionID = cmdutil.ResolveSessionID(sessionID)
+			if sessionID == "" {
+				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+			}
 
-			badge, err := getBadge(c, ctx, sessionID)
+			badge, err := getBadge(sc.GetClient(), sc.GetContext(), sessionID)
 			if err != nil {
-				return fmt.Errorf("failed to get badge: %w", err)
+				return sc.ReportError("get badge", err)
+			}
+
+			// Format output based on format flag
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"session_id": sessionID,
+					"badge":      badge,
+				}
+				if badge == "" {
+					result["badge"] = nil
+				}
+				return sc.FormatOutput(result)
 			}
 
 			if badge == "" {
@@ -123,7 +166,7 @@ func newGetCommand() *cobra.Command {
 		},
 	}
 
-	return cmd
+	return cmdutil.NewCommandFromTemplate(template)
 }
 
 // setBadge sets the badge text for a session using the badge property
