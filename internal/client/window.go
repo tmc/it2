@@ -141,12 +141,13 @@ func (c *Client) SetWindowProperty(ctx context.Context, windowID, property, valu
 
 // WindowInfo represents window information for client functions
 type WindowInfo struct {
-	WindowID     string `json:"window_id"`
-	Title        string `json:"title,omitempty"`
-	Frame        string `json:"frame,omitempty"`
-	Fullscreen   string `json:"fullscreen,omitempty"`
-	Miniaturized string `json:"miniaturized,omitempty"`
-	TabCount     int    `json:"tab_count"`
+	WindowID     string                 `json:"window_id"`
+	Title        string                 `json:"title,omitempty"`
+	Frame        string                 `json:"frame,omitempty"`
+	Fullscreen   string                 `json:"fullscreen,omitempty"`
+	Miniaturized string                 `json:"miniaturized,omitempty"`
+	TabCount     int                    `json:"tab_count"`
+	PluginData   map[string]interface{} `json:"plugin_data,omitempty"`
 }
 
 // ListWindows gets a list of all windows with their information

@@ -14,6 +14,7 @@ type SessionInfo struct {
 	WindowTitle string
 	TabTitle    string
 	SessionName string
+	PluginData  map[string]interface{} // Additional data from plugins
 }
 
 func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
