@@ -9,15 +9,22 @@ import (
 
 func newGetScreenCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:             "get-screen <session-id>",
+		Use:             "get-screen [session-id]",
 		Short:           "Get current screen contents of a session",
-		Long:            "Get the current visible screen contents of a session without scrollback history.",
-		Args:            cobra.ExactArgs(1),
+		Long:            "Get the current visible screen contents of a session without scrollback history. If no session-id is provided, uses $ITERM_SESSION_ID environment variable.",
+		Args:            cobra.RangeArgs(0, 1),
 		RequiresClient:  true,
 		SupportsFormat:  true,
 		ValidArgsFunc:   completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
-			sessionID := cmdutil.NormalizeSessionID(args[0])
+			var sessionID string
+			if len(args) > 0 {
+				sessionID = args[0]
+			}
+			sessionID = cmdutil.ResolveSessionID(sessionID)
+			if sessionID == "" {
+				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+			}
 
 			// Get command flags
 			colorized, _ := sc.GetCommand().Flags().GetBool("color")

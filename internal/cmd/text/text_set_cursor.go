@@ -35,6 +35,7 @@ Examples:
 			return nil
 		},
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			// Always normalize session ID (strip prefix if present)
 			sessionID := cmdutil.NormalizeSessionID(args[0])
 
 			// Parse coordinates

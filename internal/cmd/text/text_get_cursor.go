@@ -9,22 +9,31 @@ import (
 
 func newGetCursorCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "get-cursor <session-id>",
+		Use:   "get-cursor [session-id]",
 		Short: "Get cursor position and state",
 		Long: `Get the current cursor position and state information for a session.
+If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 
 Returns cursor coordinates, visibility, and other cursor state information.
 
 Examples:
+  it2 text get-cursor
   it2 text get-cursor session123
-  it2 text get-cursor session123 --format json`,
-		Args:            cobra.ExactArgs(1),
+  it2 text get-cursor --format json`,
+		Args:            cobra.RangeArgs(0, 1),
 		RequiresClient:  true,
-		RequiresSession: true,
+		RequiresSession: false,
 		SupportsFormat:  true,
 		ValidArgsFunc:   completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
-			sessionID := cmdutil.NormalizeSessionID(args[0])
+			var sessionID string
+			if len(args) > 0 {
+				sessionID = args[0]
+			}
+			sessionID = cmdutil.ResolveSessionID(sessionID)
+			if sessionID == "" {
+				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+			}
 
 			// Get cursor information
 			cursor, err := sc.GetClient().GetCursor(sc.GetContext(), sessionID)
