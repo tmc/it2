@@ -13,11 +13,24 @@ import (
 )
 
 type Formatter struct {
-	format string
+	format      string
+	columns     []string
+	sortBy      string
+	sortReverse bool
 }
 
 func New(format string) *Formatter {
 	return &Formatter{format: format}
+}
+
+// NewWithOptions creates a new formatter with column and sort options
+func NewWithOptions(format string, columns []string, sortBy string, sortReverse bool) *Formatter {
+	return &Formatter{
+		format:      format,
+		columns:     columns,
+		sortBy:      sortBy,
+		sortReverse: sortReverse,
+	}
 }
 
 func (f *Formatter) GetFormat() string {
@@ -30,8 +43,13 @@ func (f *Formatter) FormatSessions(sessions []*client.SessionInfo) error {
 		return f.formatJSON(sessions)
 	case "yaml":
 		return f.formatYAML(sessions)
-	default:
+	case "table":
+		return f.formatSessionsTable(sessions)
+	case "text":
 		return f.formatText(sessions)
+	default:
+		// Default to table format for better readability
+		return f.formatSessionsTable(sessions)
 	}
 }
 
@@ -385,9 +403,71 @@ func (f *Formatter) formatText(sessions []*client.SessionInfo) error {
 		if session.SessionName != "" {
 			fmt.Printf("  Name: %s\n", session.SessionName)
 		}
+		// Display plugin data if available
+		if len(session.PluginData) > 0 {
+			for key, value := range session.PluginData {
+				fmt.Printf("  %s: %v\n", key, value)
+			}
+		}
 		fmt.Println(strings.Repeat("-", 40))
 	}
 	return nil
+}
+
+func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
+	if len(sessions) == 0 {
+		fmt.Println("No sessions found")
+		return nil
+	}
+
+	// Determine columns to include
+	headers := []string{"ID", "Name", "Window", "Tab"}
+
+	// Check if any sessions have plugin data to determine additional columns
+	pluginColumns := make(map[string]bool)
+	for _, session := range sessions {
+		for key := range session.PluginData {
+			pluginColumns[key] = true
+		}
+	}
+
+	// Add plugin columns to headers
+	for col := range pluginColumns {
+		headers = append(headers, strings.Title(col))
+	}
+
+	table := NewTableData(headers)
+
+	for _, session := range sessions {
+		// Show full session ID without truncation
+		fullID := session.SessionID
+
+		// Truncate long names
+		name := session.SessionName
+		if len(name) > 50 {
+			name = name[:47] + "..."
+		}
+
+		row := []string{
+			fullID,
+			name,
+			session.WindowID,
+			session.TabID,
+		}
+
+		// Add plugin data columns
+		for col := range pluginColumns {
+			if value, exists := session.PluginData[col]; exists {
+				row = append(row, fmt.Sprintf("%v", value))
+			} else {
+				row = append(row, "")
+			}
+		}
+
+		table.AddRow(row)
+	}
+
+	return f.FormatTable(table)
 }
 
 func (f *Formatter) formatJSON(v interface{}) error {
@@ -431,22 +511,25 @@ func (f *Formatter) FormatSelection(selection *pb.Selection) error {
 
 // WindowInfo represents window information for formatting
 type WindowInfo struct {
-	WindowID     string `json:"window_id"`
-	Title        string `json:"title,omitempty"`
-	Frame        string `json:"frame,omitempty"`
-	Fullscreen   string `json:"fullscreen,omitempty"`
-	Miniaturized string `json:"miniaturized,omitempty"`
-	TabCount     int    `json:"tab_count"`
+	WindowID     string                 `json:"window_id"`
+	Name         string                 `json:"name,omitempty"`
+	Title        string                 `json:"title,omitempty"`
+	Frame        string                 `json:"frame,omitempty"`
+	Fullscreen   string                 `json:"fullscreen,omitempty"`
+	Miniaturized string                 `json:"miniaturized,omitempty"`
+	TabCount     int                    `json:"tab_count"`
+	PluginData   map[string]interface{} `json:"plugin_data,omitempty"`
 }
 
 // TabInfo represents tab information for formatting
 type TabInfo struct {
-	TabID    string                `json:"tab_id"`
-	WindowID string                `json:"window_id"`
-	Title    string                `json:"title,omitempty"`
-	Active   bool                  `json:"active"`
-	Position int                   `json:"position"`
-	Sessions []*client.SessionInfo `json:"sessions,omitempty"`
+	TabID      string                 `json:"tab_id"`
+	WindowID   string                 `json:"window_id"`
+	Title      string                 `json:"title,omitempty"`
+	Active     bool                   `json:"active"`
+	Position   int                    `json:"position"`
+	Sessions   []*client.SessionInfo  `json:"sessions,omitempty"`
+	PluginData map[string]interface{} `json:"plugin_data,omitempty"`
 }
 
 func (f *Formatter) FormatWindows(windows []*WindowInfo) error {
@@ -467,8 +550,13 @@ func (f *Formatter) FormatClientWindows(windows []*client.WindowInfo) error {
 		return f.formatJSON(windows)
 	case "yaml":
 		return f.formatYAML(windows)
-	default:
+	case "table":
+		return f.formatClientWindowsTable(windows)
+	case "text":
 		return f.formatClientWindowsText(windows)
+	default:
+		// Default to table format
+		return f.formatClientWindowsTable(windows)
 	}
 }
 
@@ -529,6 +617,42 @@ func (f *Formatter) formatWindowsText(windows []*WindowInfo) error {
 	return nil
 }
 
+func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error {
+	if len(windows) == 0 {
+		fmt.Println("No windows found")
+		return nil
+	}
+
+	headers := []string{"ID", "Title", "Tabs", "Fullscreen", "Miniaturized"}
+	table := NewTableData(headers)
+
+	for _, window := range windows {
+		// Truncate long window IDs
+		shortID := window.WindowID
+		if len(shortID) > 12 {
+			shortID = shortID[:9] + "..."
+		}
+
+		// Truncate long titles
+		title := window.Title
+		if len(title) > 40 {
+			title = title[:37] + "..."
+		}
+
+		row := []string{
+			shortID,
+			title,
+			fmt.Sprintf("%d", window.TabCount),
+			window.Fullscreen,
+			window.Miniaturized,
+		}
+
+		table.AddRow(row)
+	}
+
+	return f.FormatTable(table)
+}
+
 func (f *Formatter) formatWindowInfoText(window *WindowInfo) error {
 	fmt.Printf("Window ID: %s\n", window.WindowID)
 	if window.Title != "" {
@@ -554,8 +678,13 @@ func (f *Formatter) FormatTabs(tabs []*TabInfo) error {
 		return f.formatJSON(tabs)
 	case "yaml":
 		return f.formatYAML(tabs)
-	default:
+	case "table":
+		return f.formatTabsTable(tabs)
+	case "text":
 		return f.formatTabsText(tabs)
+	default:
+		// Default to table format for better readability
+		return f.formatTabsTable(tabs)
 	}
 }
 
@@ -629,6 +758,73 @@ func (f *Formatter) formatTabInfoText(tab *TabInfo) error {
 		}
 	}
 	return nil
+}
+
+// formatTabsTable formats tabs as a table
+func (f *Formatter) formatTabsTable(tabs []*TabInfo) error {
+	if len(tabs) == 0 {
+		fmt.Println("No tabs found")
+		return nil
+	}
+
+	// Collect all plugin column names
+	pluginColumns := make(map[string]bool)
+	for _, tab := range tabs {
+		if tab.PluginData != nil {
+			for k := range tab.PluginData {
+				pluginColumns[k] = true
+			}
+		}
+	}
+
+	// Create table with headers (base headers + plugin columns)
+	headers := []string{"Window ID", "Tab ID", "Position", "Active", "Title", "Sessions"}
+	for pluginName := range pluginColumns {
+		headers = append(headers, pluginName)
+	}
+	table := NewTableData(headers)
+
+	// Add rows for each tab
+	for _, tab := range tabs {
+		activeIndicator := ""
+		if tab.Active {
+			activeIndicator = "✓"
+		}
+
+		title := tab.Title
+		if title == "" {
+			title = "-"
+		}
+
+		sessionsCount := fmt.Sprintf("%d", len(tab.Sessions))
+		if len(tab.Sessions) == 0 {
+			sessionsCount = "-"
+		}
+
+		row := []string{
+			tab.WindowID,
+			tab.TabID,
+			fmt.Sprintf("%d", tab.Position),
+			activeIndicator,
+			title,
+			sessionsCount,
+		}
+
+		// Add plugin data columns
+		for pluginName := range pluginColumns {
+			value := ""
+			if tab.PluginData != nil {
+				if v, exists := tab.PluginData[pluginName]; exists {
+					value = fmt.Sprintf("%v", v)
+				}
+			}
+			row = append(row, value)
+		}
+
+		table.AddRow(row)
+	}
+
+	return f.FormatTable(table)
 }
 
 // FormatGeneric formats any interface{} as JSON
