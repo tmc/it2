@@ -1,51 +1,48 @@
 package session
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/completion"
 )
 
 func newCloseCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "close <session-id>",
-		Short: "Close a session",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+	template := cmdutil.CommandTemplate{
+		Use:             "close <session-id>",
+		Short:           "Close a session",
+		Long:            "Close the specified iTerm2 session. Use --force to close without prompting",
+		Args:            cobra.ExactArgs(1),
+		RequiresClient:  true,
+		RequiresSession: true,
+		SupportsFormat:  true,
+		ValidArgsFunc:   completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := args[0]
-			force, _ := cmd.Flags().GetBool("force")
+			force, _ := sc.GetCommand().Flags().GetBool("force")
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-
-			// Use parent command flags if not set
-			if wsURL == "" {
-				wsURL = cmd.Parent().PersistentFlags().Lookup("url").Value.String()
-			}
-			if timeout == 0 {
-				timeout, _ = cmd.Parent().PersistentFlags().GetDuration("timeout")
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
-			defer cancel()
-
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
-			}
-			defer c.Close()
-
-			_, err := c.CloseSessions(ctx, []string{sessionID}, force)
+			// Close the session
+			_, err := sc.GetClient().CloseSessions(sc.GetContext(), []string{sessionID}, force)
 			if err != nil {
-				return fmt.Errorf("failed to close session: %w", err)
+				return sc.ReportError("close session", err)
 			}
 
+			// Report success with JSON output support
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"session_id": sessionID,
+					"closed":     true,
+					"force":      force,
+				}
+				return sc.FormatOutput(result)
+			}
+
+			sc.ReportSuccess("Successfully closed session: %s", sessionID)
 			return nil
 		},
 	}
 
-	cmd.Flags().Bool("force", false, "Force close the session")
+	cmd := cmdutil.NewCommandFromTemplate(template)
+	cmd.Flags().Bool("force", false, "Force close the session without prompting")
+
 	return cmd
 }

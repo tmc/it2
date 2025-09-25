@@ -1,51 +1,50 @@
 package session
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/completion"
 )
 
 func newActivateCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "activate <session-id>",
-		Short: "Activate a session",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+	template := cmdutil.CommandTemplate{
+		Use:             "activate <session-id>",
+		Short:           "Activate a session",
+		Long:            "Activate the specified iTerm2 session, optionally selecting it in its tab",
+		Args:            cobra.ExactArgs(1),
+		RequiresClient:  true,
+		RequiresSession: true,
+		SupportsFormat:  true,
+		ValidArgsFunc:   completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := args[0]
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-			selectSession, _ := cmd.Flags().GetBool("select-session")
+			// Get the select-session flag
+			selectSession, _ := sc.GetCommand().Flags().GetBool("select-session")
 
-			// Use parent command flags if not set
-			if wsURL == "" {
-				wsURL = cmd.Parent().PersistentFlags().Lookup("url").Value.String()
-			}
-			if timeout == 0 {
-				timeout, _ = cmd.Parent().PersistentFlags().GetDuration("timeout")
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
-			defer cancel()
-
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
-			}
-			defer c.Close()
-
-			_, err := c.ActivateSession(ctx, sessionID, selectSession)
+			// Execute the activation
+			_, err := sc.GetClient().ActivateSession(sc.GetContext(), sessionID, selectSession)
 			if err != nil {
-				return fmt.Errorf("failed to activate session: %w", err)
+				return sc.ReportError("activate session", err)
 			}
 
+			// Report success with JSON output support
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"session_id": sessionID,
+					"activated":  true,
+					"selected":   selectSession,
+				}
+				return sc.FormatOutput(result)
+			}
+
+			sc.ReportSuccess("Successfully activated session: %s", sessionID)
 			return nil
 		},
 	}
 
+	cmd := cmdutil.NewCommandFromTemplate(template)
 	cmd.Flags().Bool("select-session", true, "Select the session in its tab")
+
 	return cmd
 }
