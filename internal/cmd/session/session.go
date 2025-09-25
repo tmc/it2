@@ -18,6 +18,8 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newCloseCommand())
 	cmd.AddCommand(newActivateCommand())
 	cmd.AddCommand(newSendTextCommand())
+	cmd.AddCommand(newSendKeyCommand())
+	cmd.AddCommand(newCurrentCommand())
 
 	// Phase 2A implementations - Session Enhancement
 	cmd.AddCommand(newRestartCommand())
@@ -27,6 +29,10 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newSetPropertyCommand())
 	cmd.AddCommand(newMonitorCommand())
 	cmd.AddCommand(newGetInfoCommand())
+
+	// Enhanced monitoring commands
+	cmd.AddCommand(newAutoRespondCommand())
+	cmd.AddCommand(newWatchCommand())
 
 	// TODO: Extract these remaining commands to separate files:
 	// cmd.AddCommand(newLastCommandCommand())

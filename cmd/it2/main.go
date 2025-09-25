@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -22,12 +23,15 @@ import (
 	"github.com/tmc/it2/internal/cmd/tmux"
 	"github.com/tmc/it2/internal/cmd/variable"
 	"github.com/tmc/it2/internal/cmd/window"
+	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/config"
 )
 
 var (
-	wsURL   string
-	timeout time.Duration
-	format  string
+	wsURL     string
+	timeout   time.Duration
+	format    string
+	configCmd *cobra.Command
 )
 
 var rootCmd = &cobra.Command{
@@ -76,7 +80,7 @@ EXAMPLES:
   it2 prompt search "git commit"
 
 GLOBAL FLAGS:
-  --format string      Output format: text, json, yaml (default "text")
+  --format string      Output format: table, text, json, yaml (default "table")
   --timeout duration   Connection timeout (default 5s)
   --url string         WebSocket URL (default "ws://localhost:1912")
 
@@ -98,10 +102,147 @@ REQUIREMENTS:
 Use "it2 [command] --help" for more information about a command.`,
 }
 
+// newCompletionCommand creates the completion command
+func newCompletionCommand() *cobra.Command {
+	completionCmd := &cobra.Command{
+		Use:   "completion [bash|zsh|fish|powershell]",
+		Short: "Generate completion scripts for various shells",
+		Long: `Generate shell completion scripts for it2.
+
+To load completions:
+
+Bash:
+  # Load completion into current session
+  source <(it2 completion bash)
+
+  # Install permanently (Linux)
+  it2 completion bash > /etc/bash_completion.d/it2
+
+  # Install permanently (macOS with Homebrew)
+  it2 completion bash > $(brew --prefix)/etc/bash_completion.d/it2
+
+Zsh:
+  # Load completion into current session
+  source <(it2 completion zsh)
+
+  # Install permanently
+  it2 completion zsh > "${fpath[1]}/_it2"
+
+Fish:
+  it2 completion fish | source
+
+  # Install permanently
+  it2 completion fish > ~/.config/fish/completions/it2.fish
+
+PowerShell:
+  it2 completion powershell | Out-String | Invoke-Expression
+
+  # Install permanently, run:
+  it2 completion powershell > it2.ps1
+  # and source this file from your PowerShell profile.`,
+		DisableFlagsInUseLine: true,
+		ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
+		Args:                  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
+		Run: func(cmd *cobra.Command, args []string) {
+			switch args[0] {
+			case "bash":
+				cmd.Root().GenBashCompletion(cmd.OutOrStdout())
+			case "zsh":
+				cmd.Root().GenZshCompletion(cmd.OutOrStdout())
+			case "fish":
+				cmd.Root().GenFishCompletion(cmd.OutOrStdout(), true)
+			case "powershell":
+				cmd.Root().GenPowerShellCompletionWithDesc(cmd.OutOrStdout())
+			}
+		},
+	}
+	return completionCmd
+}
+
+// newConfigCommand creates the config management command
+func newConfigCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "config",
+		Short: "Manage it2 configuration",
+		Long:  "Commands for viewing, editing, and managing it2 configuration files",
+	}
+
+	// Add config subcommands
+	cmd.AddCommand(&cobra.Command{
+		Use:   "show",
+		Short: "Show current configuration",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+
+			// Display configuration in YAML format
+			fmt.Printf("Current configuration:\n")
+			fmt.Printf("URL: %s\n", cfg.URL)
+			fmt.Printf("Timeout: %s\n", cfg.Timeout)
+			fmt.Printf("Format: %s\n", cfg.Format)
+			fmt.Printf("Color: %t\n", cfg.Color)
+			fmt.Printf("Verbose: %t\n", cfg.Verbose)
+			fmt.Printf("Debug: %t\n", cfg.Debug)
+			fmt.Printf("Show Progress: %t\n", cfg.ShowProgress)
+			fmt.Printf("Log Level: %s\n", cfg.LogLevel)
+			fmt.Printf("Retry Attempts: %d\n", cfg.RetryAttempts)
+			fmt.Printf("Retry Delay: %s\n", cfg.RetryDelay)
+
+			return nil
+		},
+	})
+
+	cmd.AddCommand(&cobra.Command{
+		Use:   "path",
+		Short: "Show configuration file path",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Printf("Configuration file path: %s\n", config.GetConfigPath())
+			return nil
+		},
+	})
+
+	cmd.AddCommand(&cobra.Command{
+		Use:   "init",
+		Short: "Create default configuration file",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg := config.DefaultConfig()
+			err := cfg.Save()
+			if err != nil {
+				return err
+			}
+			fmt.Printf("Created default configuration at: %s\n", config.GetConfigPath())
+			return nil
+		},
+	})
+
+	return cmd
+}
+
 func init() {
-	rootCmd.PersistentFlags().StringVar(&wsURL, "url", "ws://localhost:1912", "WebSocket URL for iTerm2 API")
-	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", 5*time.Second, "Connection timeout")
-	rootCmd.PersistentFlags().StringVar(&format, "format", "text", "Output format (text, json, yaml)")
+	// Load configuration from file/env and use as defaults
+	cfg, err := config.Load()
+	defaultURL := "ws://localhost:1912"
+	defaultTimeout := 5 * time.Second
+	defaultFormat := "table"
+
+	if err == nil {
+		defaultURL = cfg.URL
+		defaultTimeout = cfg.Timeout
+		defaultFormat = cfg.Format
+	}
+
+	rootCmd.PersistentFlags().StringVar(&wsURL, "url", defaultURL, "WebSocket URL for iTerm2 API")
+	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", defaultTimeout, "Connection timeout")
+	rootCmd.PersistentFlags().StringVar(&format, "format", defaultFormat, "Output format (table, text, json, yaml)")
+
+	// Add flag completion
+	rootCmd.RegisterFlagCompletionFunc("format", completion.FormatCompletion)
+
+	// Add shell completion commands
+	rootCmd.AddCommand(newCompletionCommand())
+	rootCmd.AddCommand(newConfigCommand())
 
 	// Add organized command groups
 	rootCmd.AddCommand(app.NewCommand())

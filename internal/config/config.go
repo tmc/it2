@@ -166,3 +166,8 @@ func GetConfigDir() string {
 	}
 	return filepath.Join(homeDir, ".it2")
 }
+
+// GetConfigPath returns the configuration file path
+func GetConfigPath() string {
+	return getConfigPath()
+}

@@ -50,10 +50,36 @@ func GetFlags(cmd *cobra.Command) (wsURL string, timeout time.Duration, format s
 		timeout = 5 * time.Second
 	}
 	if format == "" {
-		format = "text"
+		format = "table"
 	}
 
 	return wsURL, timeout, format
+}
+
+// GetExtendedFlags extracts common flags plus column/sort options from a command
+func GetExtendedFlags(cmd *cobra.Command) (wsURL string, timeout time.Duration, format string, columns []string, sortBy string, sortReverse bool) {
+	wsURL, timeout, format = GetFlags(cmd)
+
+	// Get column selection flags
+	if columnsFlag := cmd.Flags().Lookup("columns"); columnsFlag != nil {
+		if columnsStr, err := cmd.Flags().GetString("columns"); err == nil && columnsStr != "" {
+			columns = strings.Split(columnsStr, ",")
+			// Trim whitespace from each column name
+			for i := range columns {
+				columns[i] = strings.TrimSpace(columns[i])
+			}
+		}
+	}
+
+	// Get sort flags
+	if sortFlag := cmd.Flags().Lookup("sort"); sortFlag != nil {
+		sortBy, _ = cmd.Flags().GetString("sort")
+	}
+	if reverseFlag := cmd.Flags().Lookup("reverse"); reverseFlag != nil {
+		sortReverse, _ = cmd.Flags().GetBool("reverse")
+	}
+
+	return wsURL, timeout, format, columns, sortBy, sortReverse
 }
 
 // ConnectClient creates and connects a client with standard timeout handling
