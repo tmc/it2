@@ -12,11 +12,11 @@ func newSendKeyCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "send-key [session-id] <key>",
 		Short: "Send a special key to a session",
-		Long: `Send a special key to a session.
+		Long: `Send a key or character to a session.
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 
-Supported keys:
+Supported special keys:
   enter, return    - Send Enter/Return key
   tab             - Send Tab key
   escape, esc     - Send Escape key
@@ -42,12 +42,20 @@ Supported keys:
   ctrl-o          - Send Ctrl+O
   ctrl-w          - Send Ctrl+W
 
+You can also send any regular character (a-z, 0-9, punctuation, etc.).
+
 Examples:
   # Send Enter to current session
   it2 session send-key enter
 
   # Send Tab to specific session
   it2 session send-key w0t1p11:SESSION-ID tab
+
+  # Send the letter 'q'
+  it2 session send-key q
+
+  # Send a number
+  it2 session send-key 5
 
   # Send Escape
   it2 session send-key escape
@@ -73,10 +81,11 @@ Examples:
 				return fmt.Errorf("no session ID provided and $ITERM_SESSION_ID not set")
 			}
 
-			// Map key names to actual key codes
+			// Map key names to actual key codes or use the character directly
 			keyCode := mapKeyToCode(strings.ToLower(key))
 			if keyCode == "" {
-				return fmt.Errorf("unsupported key: %s", key)
+				// If not a special key, use the key as-is (for regular characters)
+				keyCode = key
 			}
 
 			wsURL, timeout, _ := cmdutil.GetFlags(cmd)

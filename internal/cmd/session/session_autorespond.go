@@ -210,7 +210,8 @@ func executeResponse(c *client.Client, sessionID string, responder *AutoResponde
 		}
 		keyCode := mapKeyToCode(strings.ToLower(responder.Response))
 		if keyCode == "" {
-			return fmt.Errorf("unsupported key: %s", responder.Response)
+			// If not a special key, use the key as-is (for regular characters)
+			keyCode = responder.Response
 		}
 		return c.SendText(context.Background(), sessionID, keyCode)
 
