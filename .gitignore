@@ -3,4 +3,23 @@
 /it2
 it2-test
 *.exe
+
+# Development artifacts
 .working-notes/
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+
+# Go build artifacts
+*.test
+coverage.out
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# OS generated files
+Thumbs.db
