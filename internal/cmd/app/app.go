@@ -14,9 +14,10 @@ import (
 // NewCommand creates the app command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "app",
-		Short: "Control the iTerm2 application",
-		Long:  "Commands for interacting with iTerm2 as a whole, including activation and window management",
+		Use:     "app",
+		GroupID: "core",
+		Short:   "Control the iTerm2 application",
+		Long:    "Commands for interacting with iTerm2 as a whole, including activation and window management",
 	}
 
 	cmd.AddCommand(newFocusCommand())

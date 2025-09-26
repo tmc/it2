@@ -9,12 +9,17 @@ import (
 	"github.com/tmc/it2/internal/cmd/app"
 	"github.com/tmc/it2/internal/cmd/arrangement"
 	"github.com/tmc/it2/internal/cmd/auth"
+	"github.com/tmc/it2/internal/cmd/badge"
 	"github.com/tmc/it2/internal/cmd/broadcast"
+	"github.com/tmc/it2/internal/cmd/clipboard"
 	"github.com/tmc/it2/internal/cmd/color"
+
+	// "github.com/tmc/it2/internal/cmd/input"  // TODO: Fix compilation
 	"github.com/tmc/it2/internal/cmd/job"
 	"github.com/tmc/it2/internal/cmd/notification"
 	"github.com/tmc/it2/internal/cmd/profile"
 	"github.com/tmc/it2/internal/cmd/prompt"
+	"github.com/tmc/it2/internal/cmd/screen"
 	"github.com/tmc/it2/internal/cmd/selection"
 	"github.com/tmc/it2/internal/cmd/session"
 	"github.com/tmc/it2/internal/cmd/statusbar"
@@ -224,7 +229,7 @@ func init() {
 	// Load configuration from file/env and use as defaults
 	cfg, err := config.Load()
 	defaultURL := "ws://localhost:1912"
-	defaultTimeout := 5 * time.Second
+	defaultTimeout := 60 * time.Second
 	defaultFormat := "table"
 
 	if err == nil {
@@ -240,6 +245,13 @@ func init() {
 	// Add flag completion
 	rootCmd.RegisterFlagCompletionFunc("format", completion.FormatCompletion)
 
+	// Add command groups like GitHub CLI
+	rootCmd.AddGroup(&cobra.Group{ID: "core", Title: "Core Operations"})
+	rootCmd.AddGroup(&cobra.Group{ID: "content", Title: "Content & Text"})
+	rootCmd.AddGroup(&cobra.Group{ID: "config", Title: "Configuration"})
+	rootCmd.AddGroup(&cobra.Group{ID: "monitoring", Title: "Monitoring"})
+	rootCmd.AddGroup(&cobra.Group{ID: "advanced", Title: "Advanced"})
+
 	// Add shell completion commands
 	rootCmd.AddCommand(newCompletionCommand())
 	rootCmd.AddCommand(newConfigCommand())
@@ -248,12 +260,16 @@ func init() {
 	rootCmd.AddCommand(app.NewCommand())
 	rootCmd.AddCommand(arrangement.NewCommand())
 	rootCmd.AddCommand(auth.NewCommand())
+	rootCmd.AddCommand(badge.NewCommand())
 	rootCmd.AddCommand(broadcast.NewCommand())
+	rootCmd.AddCommand(clipboard.NewCommand())
 	rootCmd.AddCommand(color.NewCommand())
+	// rootCmd.AddCommand(input.NewCommand())        // TODO: Fix send-key compilation issue
 	rootCmd.AddCommand(job.NewCommand())
 	rootCmd.AddCommand(notification.NewCommand())
 	rootCmd.AddCommand(profile.NewCommand())
 	rootCmd.AddCommand(prompt.NewCommand())
+	rootCmd.AddCommand(screen.NewCommand())
 	rootCmd.AddCommand(selection.NewCommand())
 	rootCmd.AddCommand(session.NewCommand())
 	rootCmd.AddCommand(statusbar.NewCommand())

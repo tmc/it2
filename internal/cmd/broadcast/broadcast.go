@@ -13,9 +13,10 @@ import (
 // NewCommand creates the broadcast command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "broadcast",
-		Short: "Manage broadcast domains",
-		Long:  "Commands for managing broadcast domains across sessions",
+		Use:     "broadcast",
+		GroupID: "advanced",
+		Short:   "Manage broadcast domains",
+		Long:    "Commands for managing broadcast domains across sessions",
 	}
 
 	cmd.AddCommand(newListCommand())

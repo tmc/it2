@@ -8,9 +8,10 @@ import (
 // NewCommand creates the color command with preset management subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "color",
-		Short: "Manage iTerm2 colors and appearance",
-		Long:  "Commands for managing iTerm2 color presets and appearance settings",
+		Use:     "color",
+		GroupID: "config",
+		Short:   "Manage iTerm2 colors and appearance",
+		Long:    "Commands for managing iTerm2 color presets and appearance settings",
 	}
 
 	// Add preset subcommand

@@ -12,9 +12,10 @@ import (
 // NewCommand creates the tmux command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "tmux",
-		Short: "Manage tmux integration",
-		Long:  "Commands for interacting with tmux integration connections",
+		Use:     "tmux",
+		GroupID: "advanced",
+		Short:   "Manage tmux integration",
+		Long:    "Commands for interacting with tmux integration connections",
 	}
 
 	cmd.AddCommand(newListConnectionsCommand())

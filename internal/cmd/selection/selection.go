@@ -14,9 +14,10 @@ import (
 // NewCommand creates the selection command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "selection",
-		Short: "Text selection operations in iTerm2",
-		Long:  "Commands for getting, setting, and managing text selection",
+		Use:     "selection",
+		GroupID: "content",
+		Short:   "Text selection operations in iTerm2",
+		Long:    "Commands for getting, setting, and managing text selection",
 	}
 
 	cmd.AddCommand(newGetCommand())

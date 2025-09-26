@@ -9,7 +9,7 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "clipboard",
 		GroupID: "content",
-		Short: "Manage clipboard operations",
+		Short:   "Manage clipboard operations",
 		Long: `Commands for copying to and pasting from clipboard.
 
 This includes:
@@ -22,8 +22,8 @@ These commands handle clipboard interactions between sessions and the system cli
 	}
 
 	// Register subcommands
-	cmd.AddCommand(newCopyCommand())   // from session_copy.go
-	cmd.AddCommand(newPasteCommand())  // from session_paste.go
+	cmd.AddCommand(newCopyCommand())  // from session_copy.go
+	cmd.AddCommand(newPasteCommand()) // from session_paste.go
 
 	return cmd
 }

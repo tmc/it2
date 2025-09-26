@@ -11,9 +11,10 @@ import (
 // NewCommand creates the status-bar command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "statusbar",
-		Short: "Manage iTerm2 status bar components",
-		Long:  "Commands for managing iTerm2 status bar components",
+		Use:     "statusbar",
+		GroupID: "config",
+		Short:   "Manage iTerm2 status bar components",
+		Long:    "Commands for managing iTerm2 status bar components",
 	}
 
 	cmd.AddCommand(newOpenPopoverCommand())

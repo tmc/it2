@@ -9,9 +9,10 @@ import (
 // NewCommand creates the notification command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "notification",
-		Short: "Subscribe to iTerm2 notifications",
-		Long:  "Commands for subscribing to and watching iTerm2 notification events",
+		Use:     "notification",
+		GroupID: "monitoring",
+		Short:   "Subscribe to iTerm2 notifications",
+		Long:    "Commands for subscribing to and watching iTerm2 notification events",
 	}
 
 	cmd.AddCommand(newSubscribeCommand())

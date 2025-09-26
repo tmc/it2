@@ -3,19 +3,20 @@ package badge
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
-	pb "github.com/tmc/it2/proto"
 )
 
 // NewCommand creates the badge command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "badge",
-		Short: "Manage session badges",
+		Use:     "badge",
+		GroupID: "content",
+		Short:   "Manage session badges",
 		Long: `Commands for setting and clearing session badges.
 
 Badges are small text labels that appear on terminal sessions, useful for:
@@ -27,6 +28,7 @@ Badges are small text labels that appear on terminal sessions, useful for:
 	cmd.AddCommand(newSetCommand())
 	cmd.AddCommand(newClearCommand())
 	cmd.AddCommand(newGetCommand())
+	cmd.AddCommand(newListCommand())
 
 	return cmd
 }
@@ -126,10 +128,10 @@ Examples:
   it2 badge get                    # Get badge for current session
   it2 badge get session123         # Get specific session's badge
   it2 badge get --format json      # Output as JSON`,
-		Args:            cobra.RangeArgs(0, 1),
-		RequiresClient:  true,
-		SupportsFormat:  true,
-		ValidArgsFunc:   completion.SessionIDCompletion,
+		Args:           cobra.RangeArgs(0, 1),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			var sessionID string
 			if len(args) > 0 {
@@ -169,77 +171,73 @@ Examples:
 	return cmdutil.NewCommandFromTemplate(template)
 }
 
-// setBadge sets the badge text for a session using the badge property
+// setBadge sets the badge text for a specific session without affecting other sessions
+// This sets the badge on the session's copy of the profile, not the underlying profile
 func setBadge(c *client.Client, ctx context.Context, sessionID, text string) error {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_SetPropertyRequest{
-			SetPropertyRequest: &pb.SetPropertyRequest{
-				Identifier: &pb.SetPropertyRequest_SessionId{
-					SessionId: sessionID,
-				},
-				Name:      cmdutil.StringPtr("badge"),
-				JsonValue: cmdutil.StringPtr(fmt.Sprintf(`"%s"`, text)),
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
+	// Use session-specific profile property to set badge only for this session
+	// This is equivalent to the UI's per-session badge functionality
+	err := c.SetSessionProfileProperty(ctx, sessionID, "Badge Text", fmt.Sprintf(`"%s"`, text))
 	if err != nil {
-		return err
-	}
-
-	resp := response.GetSetPropertyResponse()
-	if resp == nil {
-		return fmt.Errorf("no set property response received")
-	}
-
-	if resp.GetStatus() != pb.SetPropertyResponse_OK {
-		return fmt.Errorf("failed to set badge property: %v", resp.GetStatus())
+		return fmt.Errorf("failed to set session badge: %w", err)
 	}
 
 	return nil
 }
 
-// getBadge gets the badge text for a session using the badge property
+// getBadge gets the badge text for a specific session's profile copy
 func getBadge(c *client.Client, ctx context.Context, sessionID string) (string, error) {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_GetPropertyRequest{
-			GetPropertyRequest: &pb.GetPropertyRequest{
-				Identifier: &pb.GetPropertyRequest_SessionId{
-					SessionId: sessionID,
-				},
-				Name: cmdutil.StringPtr("badge"),
-			},
+	// Get the Badge Text property from the session's profile copy
+	value, err := c.GetSessionProfileProperty(ctx, sessionID, "Badge Text")
+	if err != nil {
+		return "", fmt.Errorf("failed to get session badge: %w", err)
+	}
+
+	// Convert the value to string if it's not already
+	if str, ok := value.(string); ok {
+		return str, nil
+	}
+
+	return "", nil
+}
+
+func newListCommand() *cobra.Command {
+	template := cmdutil.CommandTemplate{
+		Use:   "list",
+		Short: "List all sessions with their badges",
+		Long: `Lists all active sessions and shows their badge text if any.
+
+This command shows which sessions have per-session badges set and what the badge text is.`,
+		RequiresClient: true,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			// Get all sessions
+			sessions, err := sc.GetClient().ListSessions(sc.GetContext())
+			if err != nil {
+				return sc.ReportError("list sessions", err)
+			}
+
+			// Check badge for each session
+			fmt.Printf("%-36s %-50s %s\n", "Session ID", "Session Name", "Badge Text")
+			fmt.Printf("%-36s %-50s %s\n", strings.Repeat("-", 36), strings.Repeat("-", 50), strings.Repeat("-", 20))
+
+			for _, session := range sessions {
+				badge, err := getBadge(sc.GetClient(), sc.GetContext(), session.SessionID)
+				if err != nil {
+					// If we can't get the badge, just show empty
+					badge = ""
+				}
+
+				// Truncate long session names
+				name := session.SessionName
+				if len(name) > 50 {
+					name = name[:47] + "..."
+				}
+
+				fmt.Printf("%-36s %-50s %s\n", session.SessionID, name, badge)
+			}
+
+			return nil
 		},
 	}
 
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return "", err
-	}
-
-	resp := response.GetGetPropertyResponse()
-	if resp == nil {
-		return "", fmt.Errorf("no get property response received")
-	}
-
-	if resp.GetStatus() != pb.GetPropertyResponse_OK {
-		if resp.GetStatus() == pb.GetPropertyResponse_UNRECOGNIZED_NAME {
-			// Property doesn't exist yet, return empty string
-			return "", nil
-		}
-		return "", fmt.Errorf("failed to get badge property: %v", resp.GetStatus())
-	}
-
-	if resp.JsonValue == nil {
-		return "", nil
-	}
-
-	// The value is stored as a JSON string, so we need to remove the quotes
-	value := *resp.JsonValue
-	if len(value) >= 2 && value[0] == '"' && value[len(value)-1] == '"' {
-		value = value[1 : len(value)-1]
-	}
-
-	return value, nil
+	return cmdutil.NewCommandFromTemplate(template)
 }

@@ -13,9 +13,10 @@ import (
 // NewCommand creates the arrangement command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "arrangement",
-		Short: "Manage iTerm2 window arrangements",
-		Long:  "Commands for saving, restoring, and managing iTerm2 window arrangements",
+		Use:     "arrangement",
+		GroupID: "advanced",
+		Short:   "Manage iTerm2 window arrangements",
+		Long:    "Commands for saving, restoring, and managing iTerm2 window arrangements",
 	}
 
 	cmd.AddCommand(newSaveCommand())

@@ -8,15 +8,17 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
 )
 
 // NewCommand creates the profile command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "profile",
-		Short: "Manage iTerm2 profiles",
-		Long:  "Commands for listing, viewing, and modifying iTerm2 profiles",
+		Use:     "profile",
+		GroupID: "config",
+		Short:   "Manage iTerm2 profiles",
+		Long:    "Commands for listing, viewing, and modifying iTerm2 profiles",
 	}
 
 	cmd.AddCommand(newListCommand())
@@ -30,6 +32,11 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newExportCommand())
 	cmd.AddCommand(newImportCommand())
 	cmd.AddCommand(newCreateCommand())
+
+	// Per-session profile commands
+	cmd.AddCommand(newSessionSetPropertyCommand())
+	cmd.AddCommand(newSessionGetPropertyCommand())
+	cmd.AddCommand(newSessionResetCommand())
 
 	return cmd
 }
@@ -637,4 +644,234 @@ provides step-by-step instructions for manual creation.`,
 
 	cmd.Flags().String("clone", "", "Source profile to clone from")
 	return cmd
+}
+
+// newSessionSetPropertyCommand creates a command for setting profile properties on individual sessions
+func newSessionSetPropertyCommand() *cobra.Command {
+	template := cmdutil.CommandTemplate{
+		Use:   "session-set-property [session-id] <property-key> <value>",
+		Short: "Set a profile property for a specific session only",
+		Long: `Set a profile property for a specific session without modifying the underlying profile.
+This allows per-session customization similar to the badge functionality.
+
+Common properties that work well per-session:
+  Badge Text          - Badge to display on this session
+  Background Color    - Session-specific background color
+  Foreground Color    - Session-specific text color
+  Transparency        - Session-specific transparency (0.0-1.0)
+  Blur                - Session-specific blur (true/false)
+  Use Bold Font       - Session-specific bold font usage
+
+Examples:
+  it2 profile session-set-property "Badge Text" "PRODUCTION"
+  it2 profile session-set-property sess_123 "Background Color" '{"Red Component":0.1,"Green Component":0.0,"Blue Component":0.0}'
+  it2 profile session-set-property sess_123 "Transparency" "0.2"`,
+		Args:           cobra.RangeArgs(2, 3),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			var sessionID, propertyKey, propertyValue string
+
+			if len(args) == 2 {
+				// No session ID provided, use current session
+				sessionID = cmdutil.ResolveSessionID("")
+				if sessionID == "" {
+					return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+				}
+				propertyKey = args[0]
+				propertyValue = args[1]
+			} else {
+				// Session ID provided
+				sessionID = cmdutil.ResolveSessionID(args[0])
+				if sessionID == "" {
+					return cmdutil.NewRequiredArgumentError("session ID")
+				}
+				propertyKey = args[1]
+				propertyValue = args[2]
+			}
+
+			// Parse value - try JSON first, fall back to string
+			var value interface{}
+			if err := json.Unmarshal([]byte(propertyValue), &value); err != nil {
+				// If JSON parsing fails, use as string with quotes for iTerm2 API
+				value = fmt.Sprintf(`"%s"`, propertyValue)
+			} else {
+				// Convert parsed JSON back to string for API
+				jsonValue, _ := json.Marshal(value)
+				value = string(jsonValue)
+			}
+
+			err := sc.GetClient().SetSessionProfileProperty(sc.GetContext(), sessionID, propertyKey, value.(string))
+			if err != nil {
+				return sc.ReportError("set session profile property", err)
+			}
+
+			// Report success with JSON output support
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"session_id": sessionID,
+					"property":   propertyKey,
+					"value":      propertyValue,
+					"action":     "set",
+				}
+				return sc.FormatOutput(result)
+			}
+
+			sc.ReportSuccess("Set %s = %s for session %s", propertyKey, propertyValue, sessionID)
+			return nil
+		},
+	}
+
+	return cmdutil.NewCommandFromTemplate(template)
+}
+
+// newSessionGetPropertyCommand creates a command for getting profile properties from individual sessions
+func newSessionGetPropertyCommand() *cobra.Command {
+	template := cmdutil.CommandTemplate{
+		Use:   "session-get-property [session-id] <property-key>",
+		Short: "Get a profile property value from a specific session",
+		Long: `Get a profile property value from a specific session's profile copy.
+This retrieves values that may have been customized per-session.
+
+Examples:
+  it2 profile session-get-property "Badge Text"
+  it2 profile session-get-property sess_123 "Background Color"
+  it2 profile session-get-property sess_123 "Transparency"`,
+		Args:           cobra.RangeArgs(1, 2),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			var sessionID, propertyKey string
+
+			if len(args) == 1 {
+				// No session ID provided, use current session
+				sessionID = cmdutil.ResolveSessionID("")
+				if sessionID == "" {
+					return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+				}
+				propertyKey = args[0]
+			} else {
+				// Session ID provided
+				sessionID = cmdutil.ResolveSessionID(args[0])
+				if sessionID == "" {
+					return cmdutil.NewRequiredArgumentError("session ID")
+				}
+				propertyKey = args[1]
+			}
+
+			value, err := sc.GetClient().GetSessionProfileProperty(sc.GetContext(), sessionID, propertyKey)
+			if err != nil {
+				return sc.ReportError("get session profile property", err)
+			}
+
+			// Format output based on format flag
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"session_id": sessionID,
+					"property":   propertyKey,
+					"value":      value,
+				}
+				return sc.FormatOutput(result)
+			}
+
+			if value == "" {
+				fmt.Printf("Property %s not set for session %s (using profile default)\n", propertyKey, sessionID)
+			} else {
+				fmt.Printf("Session %s property '%s': %s\n", sessionID, propertyKey, value)
+			}
+			return nil
+		},
+	}
+
+	return cmdutil.NewCommandFromTemplate(template)
+}
+
+// newSessionResetCommand creates a command for resetting session-specific profile customizations
+func newSessionResetCommand() *cobra.Command {
+	template := cmdutil.CommandTemplate{
+		Use:   "session-reset [session-id] [property-key]",
+		Short: "Reset session-specific profile customizations",
+		Long: `Reset session-specific profile customizations back to the profile defaults.
+If no property is specified, provides guidance on resetting all customizations.
+
+Examples:
+  it2 profile session-reset                          # Reset all customizations for current session
+  it2 profile session-reset sess_123                 # Reset all customizations for specific session
+  it2 profile session-reset "Badge Text"             # Reset badge for current session
+  it2 profile session-reset sess_123 "Badge Text"    # Reset badge for specific session`,
+		Args:           cobra.RangeArgs(0, 2),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			var sessionID, propertyKey string
+
+			if len(args) == 0 {
+				// No session ID provided, use current session
+				sessionID = cmdutil.ResolveSessionID("")
+				if sessionID == "" {
+					return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+				}
+			} else if len(args) == 1 {
+				// Could be session ID or property key
+				resolved := cmdutil.ResolveSessionID(args[0])
+				if resolved != "" && resolved != args[0] {
+					// It's a session ID
+					sessionID = resolved
+				} else {
+					// It's a property key, use current session
+					sessionID = cmdutil.ResolveSessionID("")
+					if sessionID == "" {
+						return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+					}
+					propertyKey = args[0]
+				}
+			} else {
+				// Both session ID and property key provided
+				sessionID = cmdutil.ResolveSessionID(args[0])
+				if sessionID == "" {
+					return cmdutil.NewRequiredArgumentError("session ID")
+				}
+				propertyKey = args[1]
+			}
+
+			if propertyKey != "" {
+				// Reset specific property by setting it to empty string
+				err := sc.GetClient().SetSessionProfileProperty(sc.GetContext(), sessionID, propertyKey, `""`)
+				if err != nil {
+					return sc.ReportError("reset session profile property", err)
+				}
+
+				// Report success with JSON output support
+				if sc.GetFlags().Format == "json" {
+					result := map[string]interface{}{
+						"session_id": sessionID,
+						"property":   propertyKey,
+						"action":     "reset",
+					}
+					return sc.FormatOutput(result)
+				}
+
+				sc.ReportSuccess("Reset %s for session %s to profile default", propertyKey, sessionID)
+			} else {
+				// Provide guidance for resetting all properties
+				fmt.Printf("To reset all session-specific customizations for session %s:\n", sessionID)
+				fmt.Printf("Common properties that might have session customizations:\n")
+				fmt.Printf("  it2 profile session-reset %s \"Badge Text\"\n", sessionID)
+				fmt.Printf("  it2 profile session-reset %s \"Background Color\"\n", sessionID)
+				fmt.Printf("  it2 profile session-reset %s \"Foreground Color\"\n", sessionID)
+				fmt.Printf("  it2 profile session-reset %s \"Transparency\"\n", sessionID)
+				fmt.Printf("  it2 profile session-reset %s \"Blur\"\n", sessionID)
+				fmt.Printf("  it2 profile session-reset %s \"Use Bold Font\"\n", sessionID)
+				fmt.Printf("\nNote: iTerm2's API doesn't provide a way to list session-specific overrides.\n")
+				fmt.Printf("You'll need to reset properties individually if you know which ones were customized.\n")
+			}
+
+			return nil
+		},
+	}
+
+	return cmdutil.NewCommandFromTemplate(template)
 }

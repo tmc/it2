@@ -11,9 +11,10 @@ import (
 // NewCommand creates the auth command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "auth",
-		Short: "Manage iTerm2 API authentication",
-		Long:  "Commands for requesting and checking iTerm2 API authentication",
+		Use:     "auth",
+		GroupID: "config",
+		Short:   "Manage iTerm2 API authentication",
+		Long:    "Commands for requesting and checking iTerm2 API authentication",
 	}
 
 	cmd.AddCommand(newRequestCommand())

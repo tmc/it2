@@ -18,9 +18,10 @@ import (
 // NewCommand creates the prompt command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "prompt",
-		Short: "Manage prompts and command history in iTerm2 sessions",
-		Long:  "Commands for listing, monitoring, and searching prompts and command history in iTerm2 sessions",
+		Use:     "prompt",
+		GroupID: "monitoring",
+		Short:   "Manage prompts and command history in iTerm2 sessions",
+		Long:    "Commands for listing, monitoring, and searching prompts and command history in iTerm2 sessions",
 	}
 
 	cmd.AddCommand(newListCommand())

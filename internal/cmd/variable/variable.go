@@ -10,9 +10,10 @@ import (
 // NewCommand creates the variable command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "variable",
-		Short: "Manage iTerm2 variables",
-		Long:  "Commands for getting, setting, listing, monitoring, and managing iTerm2 variables",
+		Use:     "variable",
+		GroupID: "config",
+		Short:   "Manage iTerm2 variables",
+		Long:    "Commands for getting, setting, listing, monitoring, and managing iTerm2 variables",
 	}
 
 	cmd.AddCommand(newGetCommand())

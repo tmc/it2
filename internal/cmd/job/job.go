@@ -12,9 +12,10 @@ import (
 // NewCommand creates the job command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "job",
-		Short: "Monitor jobs in iTerm2 sessions",
-		Long:  "Commands for listing and monitoring jobs running in iTerm2 sessions",
+		Use:     "job",
+		GroupID: "monitoring",
+		Short:   "Monitor jobs in iTerm2 sessions",
+		Long:    "Commands for listing and monitoring jobs running in iTerm2 sessions",
 	}
 
 	cmd.AddCommand(newListCommand())

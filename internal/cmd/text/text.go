@@ -7,9 +7,10 @@ import (
 // NewCommand creates the text command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "text",
-		Short: "Text and buffer operations in iTerm2",
-		Long:  "Commands for buffer operations, text manipulation, and terminal content management",
+		Use:     "text",
+		Short:   "Text and buffer operations in iTerm2",
+		Long:    "Commands for buffer operations, text manipulation, and terminal content management",
+		GroupID: "content",
 	}
 
 	// Core buffer operations (Phase 1D roadmap)
