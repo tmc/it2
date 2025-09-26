@@ -35,6 +35,7 @@ func TestNewCommand(t *testing.T) {
 		"set-title",
 		"set-layout",
 		"get-info",
+		"splits",
 	}
 
 	subcommands := cmd.Commands()
@@ -96,7 +97,13 @@ func TestListCommand_Structure(t *testing.T) {
 		t.Errorf("Expected Short to be 'List tabs in windows', got '%s'", cmd.Short)
 	}
 
-	if cmd.Long != "List tabs in a specific window or all windows if no window-id provided" {
+	expectedLong := `List tabs in a specific window or all windows.
+
+Examples:
+  it2 tab list           # List tabs in all windows
+  it2 tab list 1         # List tabs in window 1 (positional)
+  it2 tab list --window-id 1  # List tabs in window 1 (flag)`
+	if cmd.Long != expectedLong {
 		t.Errorf("Expected correct Long description, got '%s'", cmd.Long)
 	}
 
@@ -374,57 +381,57 @@ func TestTabCommandCreationFunctions(t *testing.T) {
 // Test argument validation functions
 func TestCobraArgValidations(t *testing.T) {
 	testCases := []struct {
-		name     string
-		argsFunc cobra.PositionalArgs
-		args     []string
+		name        string
+		argsFunc    cobra.PositionalArgs
+		args        []string
 		expectError bool
 	}{
 		{
-			name:     "ExactArgs(1) with correct args",
-			argsFunc: cobra.ExactArgs(1),
-			args:     []string{"arg1"},
+			name:        "ExactArgs(1) with correct args",
+			argsFunc:    cobra.ExactArgs(1),
+			args:        []string{"arg1"},
 			expectError: false,
 		},
 		{
-			name:     "ExactArgs(1) with no args",
-			argsFunc: cobra.ExactArgs(1),
-			args:     []string{},
+			name:        "ExactArgs(1) with no args",
+			argsFunc:    cobra.ExactArgs(1),
+			args:        []string{},
 			expectError: true,
 		},
 		{
-			name:     "ExactArgs(2) with correct args",
-			argsFunc: cobra.ExactArgs(2),
-			args:     []string{"arg1", "arg2"},
+			name:        "ExactArgs(2) with correct args",
+			argsFunc:    cobra.ExactArgs(2),
+			args:        []string{"arg1", "arg2"},
 			expectError: false,
 		},
 		{
-			name:     "MinimumNArgs(1) with correct args",
-			argsFunc: cobra.MinimumNArgs(1),
-			args:     []string{"arg1", "arg2"},
+			name:        "MinimumNArgs(1) with correct args",
+			argsFunc:    cobra.MinimumNArgs(1),
+			args:        []string{"arg1", "arg2"},
 			expectError: false,
 		},
 		{
-			name:     "MinimumNArgs(1) with no args",
-			argsFunc: cobra.MinimumNArgs(1),
-			args:     []string{},
+			name:        "MinimumNArgs(1) with no args",
+			argsFunc:    cobra.MinimumNArgs(1),
+			args:        []string{},
 			expectError: true,
 		},
 		{
-			name:     "RangeArgs(1,2) with one arg",
-			argsFunc: cobra.RangeArgs(1, 2),
-			args:     []string{"arg1"},
+			name:        "RangeArgs(1,2) with one arg",
+			argsFunc:    cobra.RangeArgs(1, 2),
+			args:        []string{"arg1"},
 			expectError: false,
 		},
 		{
-			name:     "RangeArgs(1,2) with two args",
-			argsFunc: cobra.RangeArgs(1, 2),
-			args:     []string{"arg1", "arg2"},
+			name:        "RangeArgs(1,2) with two args",
+			argsFunc:    cobra.RangeArgs(1, 2),
+			args:        []string{"arg1", "arg2"},
 			expectError: false,
 		},
 		{
-			name:     "RangeArgs(1,2) with no args",
-			argsFunc: cobra.RangeArgs(1, 2),
-			args:     []string{},
+			name:        "RangeArgs(1,2) with no args",
+			argsFunc:    cobra.RangeArgs(1, 2),
+			args:        []string{},
 			expectError: true,
 		},
 	}

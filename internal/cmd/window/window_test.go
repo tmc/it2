@@ -13,16 +13,30 @@ func TestNewCommand(t *testing.T) {
 		t.Fatal("Expected non-nil command")
 	}
 
-	if cmd.Use != "window" {
-		t.Errorf("Expected Use to be 'window', got '%s'", cmd.Use)
+	if cmd.Use != "window [window-id] [command]" {
+		t.Errorf("Expected Use to be 'window [window-id] [command]', got '%s'", cmd.Use)
 	}
 
-	if cmd.Short != "Manage iTerm2 windows" {
-		t.Errorf("Expected Short to be 'Manage iTerm2 windows', got '%s'", cmd.Short)
+	if cmd.Short != "Manage iTerm2 windows or navigate to window context" {
+		t.Errorf("Expected Short to be 'Manage iTerm2 windows or navigate to window context', got '%s'", cmd.Short)
 	}
 
-	if cmd.Long != "Commands for creating, listing, and managing iTerm2 windows" {
-		t.Errorf("Expected Long to be 'Commands for creating, listing, and managing iTerm2 windows', got '%s'", cmd.Long)
+	expectedLong := `Manage iTerm2 windows with support for both flat and hierarchical command styles.
+
+Flat Command Examples:
+  it2 window list                   # List all windows
+  it2 window create                 # Create new window
+  it2 window close 1                # Close window 1
+
+Hierarchical Command Examples:
+  it2 window 1 tab list            # List tabs in window 1
+  it2 window 1 session list        # List sessions in window 1
+  it2 window 1 tab 2 session list  # List sessions in tab 2 of window 1
+
+The hierarchical style provides context-aware navigation while maintaining
+full compatibility with existing flat commands.`
+	if cmd.Long != expectedLong {
+		t.Errorf("Expected Long to be '%s', got '%s'", expectedLong, cmd.Long)
 	}
 
 	// Check that subcommands are added
@@ -56,10 +70,9 @@ func TestNewCommand(t *testing.T) {
 func TestNewCommand_RunE(t *testing.T) {
 	cmd := NewCommand()
 
-	// The main window command should not have a RunE function
-	// since it's a parent command that requires subcommands
-	if cmd.RunE != nil {
-		t.Error("Expected main window command to not have RunE function")
+	// The main window command should have a RunE function for hierarchical support
+	if cmd.RunE == nil {
+		t.Error("Expected main window command to have RunE function for hierarchical support")
 	}
 }
 

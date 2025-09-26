@@ -20,8 +20,8 @@ func TestGetFlags_Defaults(t *testing.T) {
 	if wsURL != "ws://localhost:1912" {
 		t.Errorf("Expected default wsURL to be 'ws://localhost:1912', got '%s'", wsURL)
 	}
-	if timeout != 5*time.Second {
-		t.Errorf("Expected default timeout to be 5s, got %v", timeout)
+	if timeout != 60*time.Second {
+		t.Errorf("Expected default timeout to be 60s, got %v", timeout)
 	}
 	if format != "table" {
 		t.Errorf("Expected default format to be 'table', got '%s'", format)
@@ -72,8 +72,8 @@ func TestGetExtendedFlags_WithColumns(t *testing.T) {
 	if wsURL != "ws://localhost:1912" {
 		t.Errorf("Expected default wsURL to be 'ws://localhost:1912', got '%s'", wsURL)
 	}
-	if timeout != 5*time.Second {
-		t.Errorf("Expected default timeout to be 5s, got %v", timeout)
+	if timeout != 60*time.Second {
+		t.Errorf("Expected default timeout to be 60s, got %v", timeout)
 	}
 	if format != "table" {
 		t.Errorf("Expected default format to be 'table', got '%s'", format)
