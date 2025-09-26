@@ -32,6 +32,12 @@ Supported special keys:
   pageup          - Send Page Up
   pagedown        - Send Page Down
   ctrl-a thru ctrl-z  - Send Ctrl+A through Ctrl+Z (ctrl+a, ctrl-a formats both work)
+  cmd+a thru cmd+z    - Send Cmd+A through Cmd+Z (maps to corresponding Ctrl sequences)
+
+Complex modifier combinations:
+  cmd+ctrl+shift+a    - Multiple modifiers (supports cmd, ctrl, shift, opt/alt)
+  shift+ctrl+c        - Any combination of modifiers
+  opt+cmd+v          - Option/Alt key combinations
 
 You can also send any regular character (a-z, 0-9, punctuation, etc.).
 
@@ -60,7 +66,18 @@ Examples:
   it2 session send-key ctrl+o
 
   # Send Ctrl+T (transpose characters in bash/zsh)
-  it2 session send-key ctrl-t`,
+  it2 session send-key ctrl-t
+
+  # Send Cmd+V (paste - mapped to Ctrl+V)
+  it2 session send-key cmd+v
+
+  # Send Cmd+C (copy - mapped to Ctrl+C)
+  it2 session send-key cmd-c
+
+  # Send complex modifier combinations
+  it2 session send-key cmd+shift+z     # Cmd+Shift+Z (redo)
+  it2 session send-key ctrl+opt+a      # Ctrl+Option+A
+  it2 session send-key cmd+ctrl+shift+v # All modifiers`,
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID, key string

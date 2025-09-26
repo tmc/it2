@@ -257,6 +257,12 @@ func getSessionContent(c *client.Client, sessionID string) (string, error) {
 
 // mapKeyToCode maps key names to their corresponding escape sequences
 func mapKeyToCode(key string) string {
+	// Check if this is a complex modifier combination (e.g., cmd+ctrl+shift+a)
+	if parsed := parseComplexKey(key); parsed != "" {
+		return parsed
+	}
+
+	// Fall back to simple key mappings
 	keyMap := map[string]string{
 		"enter":     "\r",
 		"return":    "\r",
@@ -327,7 +333,173 @@ func mapKeyToCode(key string) string {
 		"ctrl+y":    "\x19",
 		"ctrl-z":    "\x1a",
 		"ctrl+z":    "\x1a",
+
+		// macOS Cmd key combinations (commonly used shortcuts)
+		// Note: These send escape sequences that applications may interpret as Cmd keys
+		"cmd+a":     "\x01", // Cmd+A maps to Ctrl+A (select all in many apps)
+		"cmd-a":     "\x01",
+		"cmd+c":     "\x03", // Cmd+C maps to Ctrl+C (copy in many terminal apps)
+		"cmd-c":     "\x03",
+		"cmd+v":     "\x16", // Cmd+V maps to Ctrl+V (paste in some contexts)
+		"cmd-v":     "\x16",
+		"cmd+x":     "\x18", // Cmd+X maps to Ctrl+X (cut)
+		"cmd-x":     "\x18",
+		"cmd+z":     "\x1a", // Cmd+Z maps to Ctrl+Z (undo/suspend)
+		"cmd-z":     "\x1a",
+		"cmd+n":     "\x0e", // Cmd+N maps to Ctrl+N
+		"cmd-n":     "\x0e",
+		"cmd+o":     "\x0f", // Cmd+O maps to Ctrl+O
+		"cmd-o":     "\x0f",
+		"cmd+s":     "\x13", // Cmd+S maps to Ctrl+S (save/freeze)
+		"cmd-s":     "\x13",
+		"cmd+w":     "\x17", // Cmd+W maps to Ctrl+W (close)
+		"cmd-w":     "\x17",
+		"cmd+t":     "\x14", // Cmd+T maps to Ctrl+T
+		"cmd-t":     "\x14",
+		"cmd+f":     "\x06", // Cmd+F maps to Ctrl+F (find/forward)
+		"cmd-f":     "\x06",
+		"cmd+g":     "\x07", // Cmd+G maps to Ctrl+G
+		"cmd-g":     "\x07",
+		"cmd+r":     "\x12", // Cmd+R maps to Ctrl+R (refresh/reverse search)
+		"cmd-r":     "\x12",
+		"cmd+q":     "\x11", // Cmd+Q maps to Ctrl+Q (quit/XON)
+		"cmd-q":     "\x11",
 	}
 
 	return keyMap[key]
+}
+
+// parseComplexKey handles complex modifier combinations like cmd+ctrl+shift+opt+a
+func parseComplexKey(keyStr string) string {
+	// Split on + or - to get parts
+	parts := strings.FieldsFunc(keyStr, func(r rune) bool {
+		return r == '+' || r == '-'
+	})
+
+	if len(parts) < 2 {
+		return "" // Not a complex key
+	}
+
+	// Extract modifiers and the final key
+	modifiers := make(map[string]bool)
+	var finalKey string
+
+	for i, part := range parts {
+		part = strings.ToLower(strings.TrimSpace(part))
+		if i == len(parts)-1 {
+			// Last part is the key
+			finalKey = part
+		} else {
+			// Earlier parts are modifiers
+			switch part {
+			case "cmd", "command":
+				modifiers["cmd"] = true
+			case "ctrl", "control":
+				modifiers["ctrl"] = true
+			case "shift":
+				modifiers["shift"] = true
+			case "opt", "option", "alt":
+				modifiers["opt"] = true
+			case "fn", "function":
+				modifiers["fn"] = true
+			}
+		}
+	}
+
+	// If no modifiers or no final key, return empty
+	if len(modifiers) == 0 || finalKey == "" {
+		return ""
+	}
+
+	// Generate escape sequence based on modifiers and key
+	return generateModifierSequence(modifiers, finalKey)
+}
+
+// generateModifierSequence creates the appropriate escape sequence for modifier combinations
+func generateModifierSequence(modifiers map[string]bool, key string) string {
+	// For terminal compatibility, we use CSI sequences with modifier parameters
+	// Format: \x1b[1;{modifier}~{key} or variations
+
+	modifierCode := 1 // Base modifier code
+
+	// Add modifier bits (following xterm conventions)
+	if modifiers["shift"] {
+		modifierCode += 1
+	}
+	if modifiers["opt"] { // Alt/Option
+		modifierCode += 2
+	}
+	if modifiers["ctrl"] {
+		modifierCode += 4
+	}
+	if modifiers["cmd"] { // Meta/Cmd (maps to Alt in terminal contexts)
+		modifierCode += 8
+	}
+
+	// Handle single character keys
+	if len(key) == 1 {
+		char := key[0]
+		if char >= 'a' && char <= 'z' {
+			// For letter keys, create modified sequence
+			if modifiers["ctrl"] && !modifiers["cmd"] && !modifiers["shift"] && !modifiers["opt"] {
+				// Simple ctrl+letter = control character
+				return string(rune(char - 'a' + 1))
+			}
+			// Complex modifier sequence
+			return fmt.Sprintf("\x1b[27;%d;%d~", modifierCode, int(char))
+		}
+		if char >= '0' && char <= '9' {
+			return fmt.Sprintf("\x1b[27;%d;%d~", modifierCode, int(char))
+		}
+	}
+
+	// Handle special keys with modifiers
+	specialKeys := map[string]string{
+		"enter":     "13",
+		"return":    "13",
+		"tab":       "9",
+		"space":     "32",
+		"escape":    "27",
+		"backspace": "127",
+		"delete":    "127",
+	}
+
+	if keyCode, exists := specialKeys[key]; exists {
+		if modifierCode > 1 {
+			return fmt.Sprintf("\x1b[%s;%d~", keyCode, modifierCode)
+		}
+		// Fallback for simple cases
+		switch key {
+		case "enter", "return":
+			return "\r"
+		case "tab":
+			return "\t"
+		case "space":
+			return " "
+		case "escape":
+			return "\x1b"
+		case "backspace", "delete":
+			return "\x7f"
+		}
+	}
+
+	// Arrow keys and function keys with modifiers
+	arrowKeys := map[string]string{
+		"up":    "A",
+		"down":  "B",
+		"right": "C",
+		"left":  "D",
+		"home":  "H",
+		"end":   "F",
+	}
+
+	if arrow, exists := arrowKeys[key]; exists {
+		if modifierCode > 1 {
+			return fmt.Sprintf("\x1b[1;%d%s", modifierCode, arrow)
+		}
+		return fmt.Sprintf("\x1b[%s", arrow)
+	}
+
+	// If we can't handle it, return empty string
+	return ""
 }
