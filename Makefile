@@ -1,4 +1,4 @@
-.PHONY: build clean test proto install deps tidy
+.PHONY: build clean test proto install deps tidy gen-docs
 
 # Build variables
 BINARY_NAME=it2
@@ -53,3 +53,7 @@ dist: clean
 	GOOS=darwin GOARCH=arm64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)_darwin_arm64
 	GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)_linux_amd64
 	GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o dist/$(BINARY_NAME)_windows_amd64.exe
+
+# Generate documentation
+gen-docs:
+	go run cmd/gen-docs/main.go --website --hierarchy --doc-path ./docs
