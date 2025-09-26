@@ -1,0 +1,1617 @@
+{
+  "cli": {
+    "name": "it2",
+    "short": "iTerm2 API Command-Line Interface",
+    "path": "it2",
+    "subcommands": [
+      {
+        "name": "app",
+        "short": "Control the iTerm2 application",
+        "path": "it2 app",
+        "subcommands": [
+          {
+            "name": "focus",
+            "short": "Bring iTerm2 to the foreground",
+            "path": "it2 app focus"
+          },
+          {
+            "name": "get-info",
+            "short": "Get comprehensive application information",
+            "path": "it2 app get-info"
+          },
+          {
+            "name": "get-property",
+            "short": "Get the value of an application-level property",
+            "path": "it2 app get-property"
+          },
+          {
+            "name": "get-variable",
+            "short": "Get the value of an application-level variable",
+            "path": "it2 app get-variable"
+          },
+          {
+            "name": "list-properties",
+            "short": "List all available application properties",
+            "path": "it2 app list-properties"
+          },
+          {
+            "name": "list-windows",
+            "short": "List all terminal windows with their IDs, tabs, and sessions",
+            "path": "it2 app list-windows"
+          },
+          {
+            "name": "preferences",
+            "short": "Quick access to common preference operations",
+            "path": "it2 app preferences"
+          },
+          {
+            "name": "set-property",
+            "short": "Set the value of an application-level property",
+            "path": "it2 app set-property"
+          },
+          {
+            "name": "set-variable",
+            "short": "Set a user-defined application-level variable",
+            "path": "it2 app set-variable"
+          },
+          {
+            "name": "version",
+            "short": "Get iTerm2 version information",
+            "path": "it2 app version"
+          }
+        ]
+      },
+      {
+        "name": "arrangement",
+        "short": "Manage iTerm2 window arrangements",
+        "path": "it2 arrangement",
+        "subcommands": [
+          {
+            "name": "delete",
+            "short": "Delete a saved arrangement",
+            "path": "it2 arrangement delete"
+          },
+          {
+            "name": "export",
+            "short": "Export arrangement to file",
+            "path": "it2 arrangement export"
+          },
+          {
+            "name": "list",
+            "short": "List all saved arrangements",
+            "path": "it2 arrangement list"
+          },
+          {
+            "name": "restore",
+            "short": "Restore saved layout",
+            "path": "it2 arrangement restore"
+          },
+          {
+            "name": "save",
+            "short": "Save current window layout",
+            "path": "it2 arrangement save"
+          }
+        ]
+      },
+      {
+        "name": "auth",
+        "short": "Manage iTerm2 API authentication",
+        "path": "it2 auth",
+        "subcommands": [
+          {
+            "name": "check",
+            "short": "Check if authentication is configured",
+            "path": "it2 auth check"
+          },
+          {
+            "name": "request",
+            "short": "Request authentication from iTerm2",
+            "path": "it2 auth request"
+          }
+        ]
+      },
+      {
+        "name": "badge",
+        "short": "Manage session badges",
+        "path": "it2 badge",
+        "subcommands": [
+          {
+            "name": "clear",
+            "short": "Clear the badge for a session",
+            "path": "it2 badge clear"
+          },
+          {
+            "name": "get",
+            "short": "Get the current badge for a session",
+            "path": "it2 badge get"
+          },
+          {
+            "name": "list",
+            "short": "List all sessions with their badges",
+            "path": "it2 badge list"
+          },
+          {
+            "name": "set",
+            "short": "Set a badge for a session",
+            "path": "it2 badge set"
+          }
+        ]
+      },
+      {
+        "name": "broadcast",
+        "short": "Manage broadcast domains",
+        "path": "it2 broadcast",
+        "subcommands": [
+          {
+            "name": "clear",
+            "short": "Clear broadcast domains",
+            "path": "it2 broadcast clear"
+          },
+          {
+            "name": "list",
+            "short": "List broadcast domains",
+            "path": "it2 broadcast list"
+          },
+          {
+            "name": "send",
+            "short": "Send text to broadcast domain",
+            "path": "it2 broadcast send"
+          },
+          {
+            "name": "set",
+            "short": "Set broadcast domain",
+            "path": "it2 broadcast set"
+          }
+        ]
+      },
+      {
+        "name": "clipboard",
+        "short": "Manage clipboard operations",
+        "path": "it2 clipboard",
+        "subcommands": [
+          {
+            "name": "copy",
+            "short": "Copy current selection to clipboard",
+            "path": "it2 clipboard copy"
+          },
+          {
+            "name": "paste",
+            "short": "Paste clipboard content to session",
+            "path": "it2 clipboard paste"
+          }
+        ]
+      },
+      {
+        "name": "color",
+        "short": "Manage iTerm2 colors and appearance",
+        "path": "it2 color",
+        "subcommands": [
+          {
+            "name": "preset",
+            "short": "Manage color presets",
+            "path": "it2 color preset",
+            "subcommands": [
+              {
+                "name": "apply",
+                "short": "Apply a color preset to a profile",
+                "path": "it2 color preset apply"
+              },
+              {
+                "name": "create",
+                "short": "Create a color preset from current profile settings",
+                "path": "it2 color preset create"
+              },
+              {
+                "name": "delete",
+                "short": "Delete a color preset",
+                "path": "it2 color preset delete"
+              },
+              {
+                "name": "export",
+                "short": "Export a color preset to an .itermcolors file",
+                "path": "it2 color preset export"
+              },
+              {
+                "name": "import",
+                "short": "Import a color preset from an .itermcolors file",
+                "path": "it2 color preset import"
+              },
+              {
+                "name": "list",
+                "short": "List available color presets",
+                "path": "it2 color preset list"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "job",
+        "short": "Monitor jobs in iTerm2 sessions",
+        "path": "it2 job",
+        "subcommands": [
+          {
+            "name": "list",
+            "short": "List running jobs in a session",
+            "path": "it2 job list"
+          },
+          {
+            "name": "monitor",
+            "short": "Monitor job status changes in real-time",
+            "path": "it2 job monitor"
+          }
+        ]
+      },
+      {
+        "name": "notification",
+        "short": "Subscribe to iTerm2 notifications",
+        "path": "it2 notification",
+        "subcommands": [
+          {
+            "name": "list-types",
+            "short": "List available notification types",
+            "path": "it2 notification list-types"
+          },
+          {
+            "name": "monitor",
+            "short": "Monitor notifications in real-time",
+            "path": "it2 notification monitor"
+          },
+          {
+            "name": "status",
+            "short": "Show notification subscription status",
+            "path": "it2 notification status"
+          },
+          {
+            "name": "subscribe",
+            "short": "Subscribe to iTerm2 notifications",
+            "path": "it2 notification subscribe"
+          },
+          {
+            "name": "test",
+            "short": "Test notification functionality",
+            "path": "it2 notification test"
+          },
+          {
+            "name": "unsubscribe",
+            "short": "Unsubscribe from iTerm2 notifications",
+            "path": "it2 notification unsubscribe"
+          }
+        ]
+      },
+      {
+        "name": "profile",
+        "short": "Manage iTerm2 profiles",
+        "path": "it2 profile",
+        "subcommands": [
+          {
+            "name": "bulk-update",
+            "short": "Update properties across multiple profiles",
+            "path": "it2 profile bulk-update"
+          },
+          {
+            "name": "create",
+            "short": "Guide for creating a new profile",
+            "path": "it2 profile create"
+          },
+          {
+            "name": "delete",
+            "short": "Delete a profile",
+            "path": "it2 profile delete"
+          },
+          {
+            "name": "duplicate",
+            "short": "Duplicate a profile",
+            "path": "it2 profile duplicate"
+          },
+          {
+            "name": "export",
+            "short": "Export profile settings",
+            "path": "it2 profile export"
+          },
+          {
+            "name": "get",
+            "short": "Get profile details",
+            "path": "it2 profile get"
+          },
+          {
+            "name": "get-property",
+            "short": "Get a specific profile property",
+            "path": "it2 profile get-property"
+          },
+          {
+            "name": "import",
+            "short": "Import profile settings",
+            "path": "it2 profile import"
+          },
+          {
+            "name": "list",
+            "short": "List all available profiles",
+            "path": "it2 profile list"
+          },
+          {
+            "name": "session-get-property",
+            "short": "Get a profile property value from a specific session",
+            "path": "it2 profile session-get-property"
+          },
+          {
+            "name": "session-reset",
+            "short": "Reset session-specific profile customizations",
+            "path": "it2 profile session-reset"
+          },
+          {
+            "name": "session-set-property",
+            "short": "Set a profile property for a specific session only",
+            "path": "it2 profile session-set-property"
+          },
+          {
+            "name": "set",
+            "short": "Set multiple profile properties from JSON",
+            "path": "it2 profile set"
+          },
+          {
+            "name": "set-property",
+            "short": "Set a single profile property",
+            "path": "it2 profile set-property"
+          }
+        ]
+      },
+      {
+        "name": "prompt",
+        "short": "Manage prompts and command history in iTerm2 sessions",
+        "path": "it2 prompt",
+        "subcommands": [
+          {
+            "name": "get",
+            "short": "Get specific prompt details by ID",
+            "path": "it2 prompt get"
+          },
+          {
+            "name": "list",
+            "short": "List historical prompts in a session",
+            "path": "it2 prompt list"
+          },
+          {
+            "name": "monitor",
+            "short": "Monitor prompt events in real-time",
+            "path": "it2 prompt monitor"
+          },
+          {
+            "name": "search",
+            "short": "Search through command history",
+            "path": "it2 prompt search"
+          }
+        ]
+      },
+      {
+        "name": "screen",
+        "short": "Screen capture utilities",
+        "path": "it2 screen",
+        "subcommands": [
+          {
+            "name": "capture",
+            "short": "Take a screenshot using macOS screencapture with absolute coordinates",
+            "path": "it2 screen capture"
+          }
+        ]
+      },
+      {
+        "name": "selection",
+        "short": "Text selection operations in iTerm2",
+        "path": "it2 selection",
+        "subcommands": [
+          {
+            "name": "clear",
+            "short": "Clear current text selection",
+            "path": "it2 selection clear"
+          },
+          {
+            "name": "copy",
+            "short": "Copy current selection to clipboard",
+            "path": "it2 selection copy"
+          },
+          {
+            "name": "get",
+            "short": "Get current text selection",
+            "path": "it2 selection get"
+          },
+          {
+            "name": "set",
+            "short": "Set text selection range",
+            "path": "it2 selection set"
+          }
+        ]
+      },
+      {
+        "name": "session",
+        "short": "Manage iTerm2 sessions",
+        "path": "it2 session",
+        "subcommands": [
+          {
+            "name": "activate",
+            "short": "Activate a session",
+            "path": "it2 session activate"
+          },
+          {
+            "name": "autorespond",
+            "short": "Monitor and automatically respond to session prompts",
+            "path": "it2 session autorespond"
+          },
+          {
+            "name": "close",
+            "short": "Close a session",
+            "path": "it2 session close"
+          },
+          {
+            "name": "copy",
+            "short": "Copy current selection to clipboard",
+            "path": "it2 session copy"
+          },
+          {
+            "name": "create",
+            "short": "Create a new session",
+            "path": "it2 session create"
+          },
+          {
+            "name": "current",
+            "short": "Show the current session ID",
+            "path": "it2 session current"
+          },
+          {
+            "name": "get-info",
+            "short": "Get comprehensive session information",
+            "path": "it2 session get-info"
+          },
+          {
+            "name": "get-pid",
+            "short": "Get the process ID (PID) of the shell in a session",
+            "path": "it2 session get-pid"
+          },
+          {
+            "name": "get-property",
+            "short": "Get a session property value",
+            "path": "it2 session get-property"
+          },
+          {
+            "name": "get-screen",
+            "short": "Get current screen contents of a session",
+            "path": "it2 session get-screen"
+          },
+          {
+            "name": "list",
+            "short": "List all iTerm2 sessions",
+            "path": "it2 session list"
+          },
+          {
+            "name": "monitor",
+            "short": "Monitor session events in real-time",
+            "path": "it2 session monitor"
+          },
+          {
+            "name": "paste",
+            "short": "Paste clipboard content to session",
+            "path": "it2 session paste"
+          },
+          {
+            "name": "restart",
+            "short": "Restart a session",
+            "path": "it2 session restart"
+          },
+          {
+            "name": "select",
+            "short": "Select text in a session",
+            "path": "it2 session select"
+          },
+          {
+            "name": "send-key",
+            "short": "Send a special key to a session",
+            "path": "it2 session send-key"
+          },
+          {
+            "name": "send-text",
+            "short": "Send text to a session as if typed",
+            "path": "it2 session send-text"
+          },
+          {
+            "name": "set-property",
+            "short": "Set a session property value",
+            "path": "it2 session set-property"
+          },
+          {
+            "name": "split",
+            "short": "Split a session pane",
+            "path": "it2 session split"
+          },
+          {
+            "name": "splits",
+            "short": "Show split pane layout (moved to 'tab splits')",
+            "path": "it2 session splits"
+          },
+          {
+            "name": "watch",
+            "short": "Watch sessions and provide status overview",
+            "path": "it2 session watch"
+          }
+        ]
+      },
+      {
+        "name": "statusbar",
+        "short": "Manage iTerm2 status bar components",
+        "path": "it2 statusbar",
+        "subcommands": [
+          {
+            "name": "open-popover",
+            "short": "Open a popover from a status bar component",
+            "path": "it2 statusbar open-popover"
+          }
+        ]
+      },
+      {
+        "name": "tab",
+        "short": "Manage iTerm2 tabs",
+        "path": "it2 tab",
+        "subcommands": [
+          {
+            "name": "activate",
+            "short": "Activate a tab",
+            "path": "it2 tab activate"
+          },
+          {
+            "name": "close",
+            "short": "Close one or more tabs",
+            "path": "it2 tab close"
+          },
+          {
+            "name": "create",
+            "short": "Create a new tab",
+            "path": "it2 tab create"
+          },
+          {
+            "name": "get-info",
+            "short": "Get detailed information about a tab",
+            "path": "it2 tab get-info"
+          },
+          {
+            "name": "list",
+            "short": "List tabs in windows",
+            "path": "it2 tab list"
+          },
+          {
+            "name": "reorder",
+            "short": "Reorder tabs within a window",
+            "path": "it2 tab reorder"
+          },
+          {
+            "name": "set-layout",
+            "short": "Set the layout of a tab",
+            "path": "it2 tab set-layout"
+          },
+          {
+            "name": "set-title",
+            "short": "Set the title of a tab",
+            "path": "it2 tab set-title"
+          },
+          {
+            "name": "splits",
+            "short": "Show split pane layout and coordinates",
+            "path": "it2 tab splits"
+          }
+        ]
+      },
+      {
+        "name": "text",
+        "short": "Text and buffer operations in iTerm2",
+        "path": "it2 text",
+        "subcommands": [
+          {
+            "name": "clear-buffer",
+            "short": "Clear screen buffer contents",
+            "path": "it2 text clear-buffer"
+          },
+          {
+            "name": "find",
+            "short": "Find text in session buffer",
+            "path": "it2 text find"
+          },
+          {
+            "name": "get-buffer",
+            "short": "Get buffer contents of a session",
+            "path": "it2 text get-buffer"
+          },
+          {
+            "name": "get-contents",
+            "short": "Get specific line ranges from a session buffer",
+            "path": "it2 text get-contents"
+          },
+          {
+            "name": "get-cursor",
+            "short": "Get cursor position and state",
+            "path": "it2 text get-cursor"
+          },
+          {
+            "name": "get-screen",
+            "short": "Get current screen contents of a session",
+            "path": "it2 text get-screen"
+          },
+          {
+            "name": "highlight",
+            "short": "Temporarily highlight text patterns",
+            "path": "it2 text highlight"
+          },
+          {
+            "name": "inject",
+            "short": "Inject data into a session as if it came from the program",
+            "path": "it2 text inject"
+          },
+          {
+            "name": "replace",
+            "short": "Replace text in session buffer",
+            "path": "it2 text replace"
+          },
+          {
+            "name": "search",
+            "short": "Search buffer contents for patterns",
+            "path": "it2 text search"
+          },
+          {
+            "name": "select",
+            "short": "Control text selection in a session",
+            "path": "it2 text select"
+          },
+          {
+            "name": "send",
+            "short": "Send text to a session",
+            "path": "it2 text send"
+          },
+          {
+            "name": "set-cursor",
+            "short": "Set cursor position",
+            "path": "it2 text set-cursor"
+          },
+          {
+            "name": "set-size",
+            "short": "Set the terminal grid size for a session",
+            "path": "it2 text set-size"
+          }
+        ]
+      },
+      {
+        "name": "tmux",
+        "short": "Manage tmux integration",
+        "path": "it2 tmux",
+        "subcommands": [
+          {
+            "name": "attach",
+            "short": "Attach to tmux session",
+            "path": "it2 tmux attach"
+          },
+          {
+            "name": "detach",
+            "short": "Detach from tmux session",
+            "path": "it2 tmux detach"
+          },
+          {
+            "name": "list-clients",
+            "short": "List tmux clients",
+            "path": "it2 tmux list-clients"
+          },
+          {
+            "name": "list-connections",
+            "short": "List all tmux connections",
+            "path": "it2 tmux list-connections"
+          },
+          {
+            "name": "list-windows",
+            "short": "List tmux windows",
+            "path": "it2 tmux list-windows"
+          },
+          {
+            "name": "send",
+            "short": "Send command to tmux",
+            "path": "it2 tmux send"
+          }
+        ]
+      },
+      {
+        "name": "variable",
+        "short": "Manage iTerm2 variables",
+        "path": "it2 variable",
+        "subcommands": [
+          {
+            "name": "delete",
+            "short": "Delete/unset a variable",
+            "path": "it2 variable delete"
+          },
+          {
+            "name": "export",
+            "short": "Export variables to JSON",
+            "path": "it2 variable export"
+          },
+          {
+            "name": "get",
+            "short": "Get value of a variable",
+            "path": "it2 variable get"
+          },
+          {
+            "name": "import",
+            "short": "Import variables from JSON file",
+            "path": "it2 variable import"
+          },
+          {
+            "name": "list",
+            "short": "List variables",
+            "path": "it2 variable list"
+          },
+          {
+            "name": "monitor",
+            "short": "Monitor variable changes in real-time",
+            "path": "it2 variable monitor"
+          },
+          {
+            "name": "set",
+            "short": "Set value of a variable",
+            "path": "it2 variable set"
+          }
+        ]
+      },
+      {
+        "name": "window",
+        "short": "Manage iTerm2 windows or navigate to window context",
+        "path": "it2 window",
+        "subcommands": [
+          {
+            "name": "close",
+            "short": "Close a window",
+            "path": "it2 window close"
+          },
+          {
+            "name": "create",
+            "short": "Create a new window",
+            "path": "it2 window create"
+          },
+          {
+            "name": "focus",
+            "short": "Focus/activate a window",
+            "path": "it2 window focus"
+          },
+          {
+            "name": "get-property",
+            "short": "Get a window property",
+            "path": "it2 window get-property"
+          },
+          {
+            "name": "list",
+            "short": "List all iTerm2 windows",
+            "path": "it2 window list"
+          },
+          {
+            "name": "set-property",
+            "short": "Set a window property",
+            "path": "it2 window set-property"
+          }
+        ]
+      }
+    ]
+  },
+  "groups": [
+    {
+      "id": "core",
+      "title": "Core Operations",
+      "commands": [
+        {
+          "name": "app",
+          "short": "Control the iTerm2 application",
+          "path": "it2 app",
+          "subcommands": [
+            {
+              "name": "focus",
+              "short": "Bring iTerm2 to the foreground",
+              "path": "it2 app focus"
+            },
+            {
+              "name": "get-info",
+              "short": "Get comprehensive application information",
+              "path": "it2 app get-info"
+            },
+            {
+              "name": "get-property",
+              "short": "Get the value of an application-level property",
+              "path": "it2 app get-property"
+            },
+            {
+              "name": "get-variable",
+              "short": "Get the value of an application-level variable",
+              "path": "it2 app get-variable"
+            },
+            {
+              "name": "list-properties",
+              "short": "List all available application properties",
+              "path": "it2 app list-properties"
+            },
+            {
+              "name": "list-windows",
+              "short": "List all terminal windows with their IDs, tabs, and sessions",
+              "path": "it2 app list-windows"
+            },
+            {
+              "name": "preferences",
+              "short": "Quick access to common preference operations",
+              "path": "it2 app preferences"
+            },
+            {
+              "name": "set-property",
+              "short": "Set the value of an application-level property",
+              "path": "it2 app set-property"
+            },
+            {
+              "name": "set-variable",
+              "short": "Set a user-defined application-level variable",
+              "path": "it2 app set-variable"
+            },
+            {
+              "name": "version",
+              "short": "Get iTerm2 version information",
+              "path": "it2 app version"
+            }
+          ]
+        },
+        {
+          "name": "session",
+          "short": "Manage iTerm2 sessions",
+          "path": "it2 session",
+          "subcommands": [
+            {
+              "name": "activate",
+              "short": "Activate a session",
+              "path": "it2 session activate"
+            },
+            {
+              "name": "autorespond",
+              "short": "Monitor and automatically respond to session prompts",
+              "path": "it2 session autorespond"
+            },
+            {
+              "name": "close",
+              "short": "Close a session",
+              "path": "it2 session close"
+            },
+            {
+              "name": "copy",
+              "short": "Copy current selection to clipboard",
+              "path": "it2 session copy"
+            },
+            {
+              "name": "create",
+              "short": "Create a new session",
+              "path": "it2 session create"
+            },
+            {
+              "name": "current",
+              "short": "Show the current session ID",
+              "path": "it2 session current"
+            },
+            {
+              "name": "get-info",
+              "short": "Get comprehensive session information",
+              "path": "it2 session get-info"
+            },
+            {
+              "name": "get-pid",
+              "short": "Get the process ID (PID) of the shell in a session",
+              "path": "it2 session get-pid"
+            },
+            {
+              "name": "get-property",
+              "short": "Get a session property value",
+              "path": "it2 session get-property"
+            },
+            {
+              "name": "get-screen",
+              "short": "Get current screen contents of a session",
+              "path": "it2 session get-screen"
+            },
+            {
+              "name": "list",
+              "short": "List all iTerm2 sessions",
+              "path": "it2 session list"
+            },
+            {
+              "name": "monitor",
+              "short": "Monitor session events in real-time",
+              "path": "it2 session monitor"
+            },
+            {
+              "name": "paste",
+              "short": "Paste clipboard content to session",
+              "path": "it2 session paste"
+            },
+            {
+              "name": "restart",
+              "short": "Restart a session",
+              "path": "it2 session restart"
+            },
+            {
+              "name": "select",
+              "short": "Select text in a session",
+              "path": "it2 session select"
+            },
+            {
+              "name": "send-key",
+              "short": "Send a special key to a session",
+              "path": "it2 session send-key"
+            },
+            {
+              "name": "send-text",
+              "short": "Send text to a session as if typed",
+              "path": "it2 session send-text"
+            },
+            {
+              "name": "set-property",
+              "short": "Set a session property value",
+              "path": "it2 session set-property"
+            },
+            {
+              "name": "split",
+              "short": "Split a session pane",
+              "path": "it2 session split"
+            },
+            {
+              "name": "splits",
+              "short": "Show split pane layout (moved to 'tab splits')",
+              "path": "it2 session splits"
+            },
+            {
+              "name": "watch",
+              "short": "Watch sessions and provide status overview",
+              "path": "it2 session watch"
+            }
+          ]
+        },
+        {
+          "name": "tab",
+          "short": "Manage iTerm2 tabs",
+          "path": "it2 tab",
+          "subcommands": [
+            {
+              "name": "activate",
+              "short": "Activate a tab",
+              "path": "it2 tab activate"
+            },
+            {
+              "name": "close",
+              "short": "Close one or more tabs",
+              "path": "it2 tab close"
+            },
+            {
+              "name": "create",
+              "short": "Create a new tab",
+              "path": "it2 tab create"
+            },
+            {
+              "name": "get-info",
+              "short": "Get detailed information about a tab",
+              "path": "it2 tab get-info"
+            },
+            {
+              "name": "list",
+              "short": "List tabs in windows",
+              "path": "it2 tab list"
+            },
+            {
+              "name": "reorder",
+              "short": "Reorder tabs within a window",
+              "path": "it2 tab reorder"
+            },
+            {
+              "name": "set-layout",
+              "short": "Set the layout of a tab",
+              "path": "it2 tab set-layout"
+            },
+            {
+              "name": "set-title",
+              "short": "Set the title of a tab",
+              "path": "it2 tab set-title"
+            },
+            {
+              "name": "splits",
+              "short": "Show split pane layout and coordinates",
+              "path": "it2 tab splits"
+            }
+          ]
+        },
+        {
+          "name": "window",
+          "short": "Manage iTerm2 windows or navigate to window context",
+          "path": "it2 window",
+          "subcommands": [
+            {
+              "name": "close",
+              "short": "Close a window",
+              "path": "it2 window close"
+            },
+            {
+              "name": "create",
+              "short": "Create a new window",
+              "path": "it2 window create"
+            },
+            {
+              "name": "focus",
+              "short": "Focus/activate a window",
+              "path": "it2 window focus"
+            },
+            {
+              "name": "get-property",
+              "short": "Get a window property",
+              "path": "it2 window get-property"
+            },
+            {
+              "name": "list",
+              "short": "List all iTerm2 windows",
+              "path": "it2 window list"
+            },
+            {
+              "name": "set-property",
+              "short": "Set a window property",
+              "path": "it2 window set-property"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "content",
+      "title": "Content \u0026 Text",
+      "commands": [
+        {
+          "name": "badge",
+          "short": "Manage session badges",
+          "path": "it2 badge",
+          "subcommands": [
+            {
+              "name": "clear",
+              "short": "Clear the badge for a session",
+              "path": "it2 badge clear"
+            },
+            {
+              "name": "get",
+              "short": "Get the current badge for a session",
+              "path": "it2 badge get"
+            },
+            {
+              "name": "list",
+              "short": "List all sessions with their badges",
+              "path": "it2 badge list"
+            },
+            {
+              "name": "set",
+              "short": "Set a badge for a session",
+              "path": "it2 badge set"
+            }
+          ]
+        },
+        {
+          "name": "clipboard",
+          "short": "Manage clipboard operations",
+          "path": "it2 clipboard",
+          "subcommands": [
+            {
+              "name": "copy",
+              "short": "Copy current selection to clipboard",
+              "path": "it2 clipboard copy"
+            },
+            {
+              "name": "paste",
+              "short": "Paste clipboard content to session",
+              "path": "it2 clipboard paste"
+            }
+          ]
+        },
+        {
+          "name": "screen",
+          "short": "Screen capture utilities",
+          "path": "it2 screen",
+          "subcommands": [
+            {
+              "name": "capture",
+              "short": "Take a screenshot using macOS screencapture with absolute coordinates",
+              "path": "it2 screen capture"
+            }
+          ]
+        },
+        {
+          "name": "selection",
+          "short": "Text selection operations in iTerm2",
+          "path": "it2 selection",
+          "subcommands": [
+            {
+              "name": "clear",
+              "short": "Clear current text selection",
+              "path": "it2 selection clear"
+            },
+            {
+              "name": "copy",
+              "short": "Copy current selection to clipboard",
+              "path": "it2 selection copy"
+            },
+            {
+              "name": "get",
+              "short": "Get current text selection",
+              "path": "it2 selection get"
+            },
+            {
+              "name": "set",
+              "short": "Set text selection range",
+              "path": "it2 selection set"
+            }
+          ]
+        },
+        {
+          "name": "text",
+          "short": "Text and buffer operations in iTerm2",
+          "path": "it2 text",
+          "subcommands": [
+            {
+              "name": "clear-buffer",
+              "short": "Clear screen buffer contents",
+              "path": "it2 text clear-buffer"
+            },
+            {
+              "name": "find",
+              "short": "Find text in session buffer",
+              "path": "it2 text find"
+            },
+            {
+              "name": "get-buffer",
+              "short": "Get buffer contents of a session",
+              "path": "it2 text get-buffer"
+            },
+            {
+              "name": "get-contents",
+              "short": "Get specific line ranges from a session buffer",
+              "path": "it2 text get-contents"
+            },
+            {
+              "name": "get-cursor",
+              "short": "Get cursor position and state",
+              "path": "it2 text get-cursor"
+            },
+            {
+              "name": "get-screen",
+              "short": "Get current screen contents of a session",
+              "path": "it2 text get-screen"
+            },
+            {
+              "name": "highlight",
+              "short": "Temporarily highlight text patterns",
+              "path": "it2 text highlight"
+            },
+            {
+              "name": "inject",
+              "short": "Inject data into a session as if it came from the program",
+              "path": "it2 text inject"
+            },
+            {
+              "name": "replace",
+              "short": "Replace text in session buffer",
+              "path": "it2 text replace"
+            },
+            {
+              "name": "search",
+              "short": "Search buffer contents for patterns",
+              "path": "it2 text search"
+            },
+            {
+              "name": "select",
+              "short": "Control text selection in a session",
+              "path": "it2 text select"
+            },
+            {
+              "name": "send",
+              "short": "Send text to a session",
+              "path": "it2 text send"
+            },
+            {
+              "name": "set-cursor",
+              "short": "Set cursor position",
+              "path": "it2 text set-cursor"
+            },
+            {
+              "name": "set-size",
+              "short": "Set the terminal grid size for a session",
+              "path": "it2 text set-size"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "config",
+      "title": "Configuration",
+      "commands": [
+        {
+          "name": "auth",
+          "short": "Manage iTerm2 API authentication",
+          "path": "it2 auth",
+          "subcommands": [
+            {
+              "name": "check",
+              "short": "Check if authentication is configured",
+              "path": "it2 auth check"
+            },
+            {
+              "name": "request",
+              "short": "Request authentication from iTerm2",
+              "path": "it2 auth request"
+            }
+          ]
+        },
+        {
+          "name": "color",
+          "short": "Manage iTerm2 colors and appearance",
+          "path": "it2 color",
+          "subcommands": [
+            {
+              "name": "preset",
+              "short": "Manage color presets",
+              "path": "it2 color preset",
+              "subcommands": [
+                {
+                  "name": "apply",
+                  "short": "Apply a color preset to a profile",
+                  "path": "it2 color preset apply"
+                },
+                {
+                  "name": "create",
+                  "short": "Create a color preset from current profile settings",
+                  "path": "it2 color preset create"
+                },
+                {
+                  "name": "delete",
+                  "short": "Delete a color preset",
+                  "path": "it2 color preset delete"
+                },
+                {
+                  "name": "export",
+                  "short": "Export a color preset to an .itermcolors file",
+                  "path": "it2 color preset export"
+                },
+                {
+                  "name": "import",
+                  "short": "Import a color preset from an .itermcolors file",
+                  "path": "it2 color preset import"
+                },
+                {
+                  "name": "list",
+                  "short": "List available color presets",
+                  "path": "it2 color preset list"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "profile",
+          "short": "Manage iTerm2 profiles",
+          "path": "it2 profile",
+          "subcommands": [
+            {
+              "name": "bulk-update",
+              "short": "Update properties across multiple profiles",
+              "path": "it2 profile bulk-update"
+            },
+            {
+              "name": "create",
+              "short": "Guide for creating a new profile",
+              "path": "it2 profile create"
+            },
+            {
+              "name": "delete",
+              "short": "Delete a profile",
+              "path": "it2 profile delete"
+            },
+            {
+              "name": "duplicate",
+              "short": "Duplicate a profile",
+              "path": "it2 profile duplicate"
+            },
+            {
+              "name": "export",
+              "short": "Export profile settings",
+              "path": "it2 profile export"
+            },
+            {
+              "name": "get",
+              "short": "Get profile details",
+              "path": "it2 profile get"
+            },
+            {
+              "name": "get-property",
+              "short": "Get a specific profile property",
+              "path": "it2 profile get-property"
+            },
+            {
+              "name": "import",
+              "short": "Import profile settings",
+              "path": "it2 profile import"
+            },
+            {
+              "name": "list",
+              "short": "List all available profiles",
+              "path": "it2 profile list"
+            },
+            {
+              "name": "session-get-property",
+              "short": "Get a profile property value from a specific session",
+              "path": "it2 profile session-get-property"
+            },
+            {
+              "name": "session-reset",
+              "short": "Reset session-specific profile customizations",
+              "path": "it2 profile session-reset"
+            },
+            {
+              "name": "session-set-property",
+              "short": "Set a profile property for a specific session only",
+              "path": "it2 profile session-set-property"
+            },
+            {
+              "name": "set",
+              "short": "Set multiple profile properties from JSON",
+              "path": "it2 profile set"
+            },
+            {
+              "name": "set-property",
+              "short": "Set a single profile property",
+              "path": "it2 profile set-property"
+            }
+          ]
+        },
+        {
+          "name": "statusbar",
+          "short": "Manage iTerm2 status bar components",
+          "path": "it2 statusbar",
+          "subcommands": [
+            {
+              "name": "open-popover",
+              "short": "Open a popover from a status bar component",
+              "path": "it2 statusbar open-popover"
+            }
+          ]
+        },
+        {
+          "name": "variable",
+          "short": "Manage iTerm2 variables",
+          "path": "it2 variable",
+          "subcommands": [
+            {
+              "name": "delete",
+              "short": "Delete/unset a variable",
+              "path": "it2 variable delete"
+            },
+            {
+              "name": "export",
+              "short": "Export variables to JSON",
+              "path": "it2 variable export"
+            },
+            {
+              "name": "get",
+              "short": "Get value of a variable",
+              "path": "it2 variable get"
+            },
+            {
+              "name": "import",
+              "short": "Import variables from JSON file",
+              "path": "it2 variable import"
+            },
+            {
+              "name": "list",
+              "short": "List variables",
+              "path": "it2 variable list"
+            },
+            {
+              "name": "monitor",
+              "short": "Monitor variable changes in real-time",
+              "path": "it2 variable monitor"
+            },
+            {
+              "name": "set",
+              "short": "Set value of a variable",
+              "path": "it2 variable set"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "monitoring",
+      "title": "Monitoring",
+      "commands": [
+        {
+          "name": "job",
+          "short": "Monitor jobs in iTerm2 sessions",
+          "path": "it2 job",
+          "subcommands": [
+            {
+              "name": "list",
+              "short": "List running jobs in a session",
+              "path": "it2 job list"
+            },
+            {
+              "name": "monitor",
+              "short": "Monitor job status changes in real-time",
+              "path": "it2 job monitor"
+            }
+          ]
+        },
+        {
+          "name": "notification",
+          "short": "Subscribe to iTerm2 notifications",
+          "path": "it2 notification",
+          "subcommands": [
+            {
+              "name": "list-types",
+              "short": "List available notification types",
+              "path": "it2 notification list-types"
+            },
+            {
+              "name": "monitor",
+              "short": "Monitor notifications in real-time",
+              "path": "it2 notification monitor"
+            },
+            {
+              "name": "status",
+              "short": "Show notification subscription status",
+              "path": "it2 notification status"
+            },
+            {
+              "name": "subscribe",
+              "short": "Subscribe to iTerm2 notifications",
+              "path": "it2 notification subscribe"
+            },
+            {
+              "name": "test",
+              "short": "Test notification functionality",
+              "path": "it2 notification test"
+            },
+            {
+              "name": "unsubscribe",
+              "short": "Unsubscribe from iTerm2 notifications",
+              "path": "it2 notification unsubscribe"
+            }
+          ]
+        },
+        {
+          "name": "prompt",
+          "short": "Manage prompts and command history in iTerm2 sessions",
+          "path": "it2 prompt",
+          "subcommands": [
+            {
+              "name": "get",
+              "short": "Get specific prompt details by ID",
+              "path": "it2 prompt get"
+            },
+            {
+              "name": "list",
+              "short": "List historical prompts in a session",
+              "path": "it2 prompt list"
+            },
+            {
+              "name": "monitor",
+              "short": "Monitor prompt events in real-time",
+              "path": "it2 prompt monitor"
+            },
+            {
+              "name": "search",
+              "short": "Search through command history",
+              "path": "it2 prompt search"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "advanced",
+      "title": "Advanced",
+      "commands": [
+        {
+          "name": "arrangement",
+          "short": "Manage iTerm2 window arrangements",
+          "path": "it2 arrangement",
+          "subcommands": [
+            {
+              "name": "delete",
+              "short": "Delete a saved arrangement",
+              "path": "it2 arrangement delete"
+            },
+            {
+              "name": "export",
+              "short": "Export arrangement to file",
+              "path": "it2 arrangement export"
+            },
+            {
+              "name": "list",
+              "short": "List all saved arrangements",
+              "path": "it2 arrangement list"
+            },
+            {
+              "name": "restore",
+              "short": "Restore saved layout",
+              "path": "it2 arrangement restore"
+            },
+            {
+              "name": "save",
+              "short": "Save current window layout",
+              "path": "it2 arrangement save"
+            }
+          ]
+        },
+        {
+          "name": "broadcast",
+          "short": "Manage broadcast domains",
+          "path": "it2 broadcast",
+          "subcommands": [
+            {
+              "name": "clear",
+              "short": "Clear broadcast domains",
+              "path": "it2 broadcast clear"
+            },
+            {
+              "name": "list",
+              "short": "List broadcast domains",
+              "path": "it2 broadcast list"
+            },
+            {
+              "name": "send",
+              "short": "Send text to broadcast domain",
+              "path": "it2 broadcast send"
+            },
+            {
+              "name": "set",
+              "short": "Set broadcast domain",
+              "path": "it2 broadcast set"
+            }
+          ]
+        },
+        {
+          "name": "tmux",
+          "short": "Manage tmux integration",
+          "path": "it2 tmux",
+          "subcommands": [
+            {
+              "name": "attach",
+              "short": "Attach to tmux session",
+              "path": "it2 tmux attach"
+            },
+            {
+              "name": "detach",
+              "short": "Detach from tmux session",
+              "path": "it2 tmux detach"
+            },
+            {
+              "name": "list-clients",
+              "short": "List tmux clients",
+              "path": "it2 tmux list-clients"
+            },
+            {
+              "name": "list-connections",
+              "short": "List all tmux connections",
+              "path": "it2 tmux list-connections"
+            },
+            {
+              "name": "list-windows",
+              "short": "List tmux windows",
+              "path": "it2 tmux list-windows"
+            },
+            {
+              "name": "send",
+              "short": "Send command to tmux",
+              "path": "it2 tmux send"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "total_commands": 150,
+  "generated_at": "2025-09-26T10:59:58Z"
+}
