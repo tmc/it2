@@ -54,7 +54,7 @@ Examples:
   # Send Ctrl+C
   it2 session send-key ctrl-c
 
-  # Send Ctrl+T (new tab in many applications)
+  # Send Ctrl+T (transpose characters in bash/zsh)
   it2 session send-key ctrl-t`,
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
