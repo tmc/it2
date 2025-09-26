@@ -153,8 +153,8 @@ func TestInvokeFunctionInvalidURL(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error connecting with invalid URL")
 	}
-	if !strings.Contains(err.Error(), "invalid URL") {
-		t.Errorf("Expected invalid URL error, got: %v", err)
+	if !strings.Contains(err.Error(), "malformed ws or wss URL") {
+		t.Errorf("Expected malformed URL error, got: %v", err)
 	}
 }
 

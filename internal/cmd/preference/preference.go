@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
-	pb "github.com/tmc/it2/proto"
 )
 
 // NewCommand creates the preference command with all subcommands.
@@ -70,27 +69,17 @@ func newExportCommand() *cobra.Command {
 
 			preferences := make(map[string]interface{})
 
-			for _, key := range commonKeys {
-				request := &pb.PreferencesRequest{
-					Requests: []*pb.PreferencesRequest_Request{
-						{
-							Request: &pb.PreferencesRequest_Request_GetPreferenceRequest{
-								GetPreferenceRequest: &pb.PreferencesRequest_Request_GetPreference{
-									Key: &key,
-								},
-							},
-						},
-					},
-				}
+			// Get all preferences at once using the new batch API
+			prefs, err := c.GetPreferences(ctx, commonKeys)
+			if err != nil {
+				return fmt.Errorf("failed to get preferences: %w", err)
+			}
 
-				_, err := c.GetPreferences(ctx, request)
-				if err != nil {
-					continue // Skip keys that don't exist (placeholder functionality)
+			// Add the preferences to our export map
+			for key, value := range prefs {
+				if value != nil {
+					preferences[key] = value
 				}
-
-				// Note: GetPreferences is a placeholder, so we skip actual processing
-				// In a real implementation, this would process the response
-				continue
 			}
 
 			// Add metadata
@@ -183,48 +172,19 @@ func newImportCommand() *cobra.Command {
 
 			// Import preferences
 			imported := 0
-			for key, value := range preferences {
-				if dryRun {
+			if dryRun {
+				for key := range preferences {
 					fmt.Printf("Would import preference: %s\n", key)
-					continue
+					imported++
 				}
-
-				valueJSON, err := json.Marshal(value)
+			} else {
+				// Use batch API to set all preferences at once
+				err := c.SetPreferences(ctx, preferences)
 				if err != nil {
-					fmt.Printf("Warning: failed to marshal value for key %s: %v\n", key, err)
-					continue
+					return fmt.Errorf("failed to import preferences: %w", err)
 				}
-
-				request := &pb.PreferencesRequest{
-					Requests: []*pb.PreferencesRequest_Request{
-						{
-							Request: &pb.PreferencesRequest_Request_SetPreferenceRequest{
-								SetPreferenceRequest: &pb.PreferencesRequest_Request_SetPreference{
-									Key:       &key,
-									JsonValue: func() *string { s := string(valueJSON); return &s }(),
-								},
-							},
-						},
-					},
-				}
-
-				response, err := c.SetPreferences(ctx, request)
-				if err != nil {
-					fmt.Printf("Warning: failed to set preference %s: %v\n", key, err)
-					continue
-				}
-
-				if len(response.GetResults()) > 0 {
-					result := response.GetResults()[0]
-					if setPref := result.GetSetPreferenceResult(); setPref != nil {
-						if setPref.GetStatus() == pb.PreferencesResponse_Result_SetPreferenceResult_OK {
-							imported++
-							fmt.Printf("Imported preference: %s\n", key)
-						} else {
-							fmt.Printf("Warning: failed to set preference %s: %v\n", key, setPref.GetStatus())
-						}
-					}
-				}
+				imported = len(preferences)
+				fmt.Printf("Successfully imported %d preferences\n", imported)
 			}
 
 			if dryRun {
@@ -289,39 +249,18 @@ func newResetCommand() *cobra.Command {
 			}
 
 			// Reset each preference by setting it to null/default
-			reset := 0
+			resetPrefs := make(map[string]interface{})
 			for _, key := range keysToReset {
-				request := &pb.PreferencesRequest{
-					Requests: []*pb.PreferencesRequest_Request{
-						{
-							Request: &pb.PreferencesRequest_Request_SetPreferenceRequest{
-								SetPreferenceRequest: &pb.PreferencesRequest_Request_SetPreference{
-									Key:       &key,
-									JsonValue: func() *string { s := "null"; return &s }(), // Reset to default
-								},
-							},
-						},
-					},
-				}
-
-				response, err := c.SetPreferences(ctx, request)
-				if err != nil {
-					fmt.Printf("Warning: failed to reset preference %s: %v\n", key, err)
-					continue
-				}
-
-				if len(response.GetResults()) > 0 {
-					result := response.GetResults()[0]
-					if setPref := result.GetSetPreferenceResult(); setPref != nil {
-						if setPref.GetStatus() == pb.PreferencesResponse_Result_SetPreferenceResult_OK {
-							reset++
-							fmt.Printf("Reset preference: %s\n", key)
-						} else {
-							fmt.Printf("Warning: failed to reset preference %s: %v\n", key, setPref.GetStatus())
-						}
-					}
-				}
+				resetPrefs[key] = nil // Reset to default/null
 			}
+
+			err = c.SetPreferences(ctx, resetPrefs)
+			if err != nil {
+				return fmt.Errorf("failed to reset preferences: %w", err)
+			}
+
+			reset := len(keysToReset)
+			fmt.Printf("Successfully reset %d preferences\n", reset)
 
 			fmt.Printf("Successfully reset %d out of %d preferences\n", reset, len(keysToReset))
 			return nil
@@ -475,41 +414,26 @@ func newGetCommand() *cobra.Command {
 			}
 			defer c.Close()
 
-			request := &pb.PreferencesRequest{
-				Requests: []*pb.PreferencesRequest_Request{
-					{
-						Request: &pb.PreferencesRequest_Request_GetPreferenceRequest{
-							GetPreferenceRequest: &pb.PreferencesRequest_Request_GetPreference{
-								Key: &key,
-							},
-						},
-					},
-				},
-			}
-
-			response, err := c.GetPreferences(ctx, request)
+			value, err := c.GetPreference(ctx, key)
 			if err != nil {
 				return fmt.Errorf("failed to get preference: %w", err)
 			}
 
-			if len(response.GetResults()) == 0 {
-				return fmt.Errorf("no response received")
+			formatter := formatting.New(format)
+			if format == "json" {
+				output := map[string]interface{}{
+					"key":   key,
+					"value": value,
+				}
+				return formatter.FormatGeneric(output)
 			}
 
-			result := response.GetResults()[0]
-			if getPref := result.GetGetPreferenceResult(); getPref != nil {
-				formatter := formatting.New(format)
-				if format == "json" {
-					output := map[string]interface{}{
-						"key":   key,
-						"value": getPref.GetJsonValue(),
-					}
-					return formatter.FormatGeneric(output)
-				}
-				fmt.Printf("%s: %s\n", key, getPref.GetJsonValue())
-			} else {
-				return fmt.Errorf("preference not found: %s", key)
+			// Convert the value to a JSON string for display
+			jsonValue, err := json.Marshal(value)
+			if err != nil {
+				return fmt.Errorf("failed to marshal value: %w", err)
 			}
+			fmt.Printf("%s: %s\n", key, string(jsonValue))
 
 			return nil
 		},
@@ -539,38 +463,19 @@ func newSetCommand() *cobra.Command {
 			}
 			defer c.Close()
 
-			request := &pb.PreferencesRequest{
-				Requests: []*pb.PreferencesRequest_Request{
-					{
-						Request: &pb.PreferencesRequest_Request_SetPreferenceRequest{
-							SetPreferenceRequest: &pb.PreferencesRequest_Request_SetPreference{
-								Key:       &key,
-								JsonValue: value,
-							},
-						},
-					},
-				},
+			// Try to parse the value as JSON, fallback to string
+			var parsedValue interface{}
+			if err := json.Unmarshal([]byte(value), &parsedValue); err != nil {
+				// If it's not valid JSON, treat it as a string
+				parsedValue = value
 			}
 
-			response, err := c.SetPreferences(ctx, request)
+			err = c.SetPreference(ctx, key, parsedValue)
 			if err != nil {
 				return fmt.Errorf("failed to set preference: %w", err)
 			}
 
-			if len(response.GetResults()) == 0 {
-				return fmt.Errorf("no response received")
-			}
-
-			result := response.GetResults()[0]
-			if setPref := result.GetSetPreferenceResult(); setPref != nil {
-				if setPref.GetStatus() == pb.PreferencesResponse_Result_SetPreferenceResult_OK {
-					fmt.Printf("Preference %s set to: %s\n", key, value)
-				} else {
-					return fmt.Errorf("failed to set preference: %v", setPref.GetStatus())
-				}
-			} else {
-				return fmt.Errorf("unexpected response format")
-			}
+			fmt.Printf("Preference %s set to: %s\n", key, value)
 
 			return nil
 		},

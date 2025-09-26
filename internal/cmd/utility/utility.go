@@ -71,23 +71,13 @@ func newCursorGuideShowCommand() *cobra.Command {
 			// Use InvokeFunction to show cursor guides
 			invocation := "iterm2.set_cursor_guide(True)"
 
-			request := &pb.InvokeFunctionRequest{
-				Context: &pb.InvokeFunctionRequest_Session{
-					Session: &pb.InvokeFunctionRequest_Session{
-						SessionId: sessionID,
-					},
-				},
-				Invocation: invocation,
-				Timeout:    float64(timeout.Seconds()),
-			}
-
-			response, err := c.InvokeFunction(ctx, request)
+			response, err := c.InvokeFunction(ctx, invocation, &sessionID, nil, nil, float64(timeout.Seconds()))
 			if err != nil {
 				return fmt.Errorf("failed to show cursor guides: %w", err)
 			}
 
-			if response.GetError() != nil {
-				return fmt.Errorf("cursor guide command failed: %s", response.GetError().GetErrorReason())
+			if response == nil {
+				return fmt.Errorf("no response received")
 			}
 
 			fmt.Println("Cursor guides shown")
@@ -123,23 +113,13 @@ func newCursorGuideHideCommand() *cobra.Command {
 			// Use InvokeFunction to hide cursor guides
 			invocation := "iterm2.set_cursor_guide(False)"
 
-			request := &pb.InvokeFunctionRequest{
-				Context: &pb.InvokeFunctionRequest_Session{
-					Session: &pb.InvokeFunctionRequest_Session{
-						SessionId: sessionID,
-					},
-				},
-				Invocation: invocation,
-				Timeout:    float64(timeout.Seconds()),
-			}
-
-			response, err := c.InvokeFunction(ctx, request)
+			response, err := c.InvokeFunction(ctx, invocation, &sessionID, nil, nil, float64(timeout.Seconds()))
 			if err != nil {
 				return fmt.Errorf("failed to hide cursor guides: %w", err)
 			}
 
-			if response.GetError() != nil {
-				return fmt.Errorf("cursor guide command failed: %s", response.GetError().GetErrorReason())
+			if response == nil {
+				return fmt.Errorf("no response received")
 			}
 
 			fmt.Println("Cursor guides hidden")
@@ -175,23 +155,13 @@ func newCursorGuideToggleCommand() *cobra.Command {
 			// Use InvokeFunction to toggle cursor guides
 			invocation := "iterm2.toggle_cursor_guide()"
 
-			request := &pb.InvokeFunctionRequest{
-				Context: &pb.InvokeFunctionRequest_Session{
-					Session: &pb.InvokeFunctionRequest_Session{
-						SessionId: sessionID,
-					},
-				},
-				Invocation: invocation,
-				Timeout:    float64(timeout.Seconds()),
-			}
-
-			response, err := c.InvokeFunction(ctx, request)
+			response, err := c.InvokeFunction(ctx, invocation, &sessionID, nil, nil, float64(timeout.Seconds()))
 			if err != nil {
 				return fmt.Errorf("failed to toggle cursor guides: %w", err)
 			}
 
-			if response.GetError() != nil {
-				return fmt.Errorf("cursor guide command failed: %s", response.GetError().GetErrorReason())
+			if response == nil {
+				return fmt.Errorf("no response received")
 			}
 
 			fmt.Println("Cursor guides toggled")
@@ -364,7 +334,7 @@ func newTimestampToggleCommand() *cobra.Command {
 			}
 
 			currentValue := "false"
-			if resp := response.GetPropertyResponse(); resp != nil {
+			if resp := response.GetGetPropertyResponse(); resp != nil {
 				if resp.GetStatus() == pb.GetPropertyResponse_OK && resp.JsonValue != nil {
 					currentValue = *resp.JsonValue
 				}
@@ -783,25 +753,13 @@ func newPasswordManagerGetCommand() *cobra.Command {
 				end tell
 			`, account, service)
 
-			request := &pb.InvokeFunctionRequest{
-				Context: &pb.InvokeFunctionRequest_App{
-					App: &pb.InvokeFunctionRequest_App{},
-				},
-				Invocation: invocation,
-				Timeout:    float64(timeout.Seconds()),
-			}
-
-			response, err := c.InvokeFunction(ctx, request)
+			response, err := c.InvokeFunction(ctx, invocation, nil, nil, nil, float64(timeout.Seconds()))
 			if err != nil {
 				return fmt.Errorf("failed to get password: %w", err)
 			}
 
-			if response.GetError() != nil {
-				return fmt.Errorf("password retrieval failed: %s", response.GetError().GetErrorReason())
-			}
-
-			if success := response.GetSuccess(); success != nil {
-				fmt.Println(success.GetJsonResult())
+			if response != nil {
+				fmt.Printf("%v\n", response)
 			}
 
 			return nil
@@ -846,21 +804,13 @@ func newPasswordManagerSetCommand() *cobra.Command {
 				end tell
 			`, account, password, service)
 
-			request := &pb.InvokeFunctionRequest{
-				Context: &pb.InvokeFunctionRequest_App{
-					App: &pb.InvokeFunctionRequest_App{},
-				},
-				Invocation: invocation,
-				Timeout:    float64(timeout.Seconds()),
-			}
-
-			response, err := c.InvokeFunction(ctx, request)
+			response, err := c.InvokeFunction(ctx, invocation, nil, nil, nil, float64(timeout.Seconds()))
 			if err != nil {
 				return fmt.Errorf("failed to set password: %w", err)
 			}
 
-			if response.GetError() != nil {
-				return fmt.Errorf("password storage failed: %s", response.GetError().GetErrorReason())
+			if response == nil {
+				return fmt.Errorf("no response received")
 			}
 
 			fmt.Printf("Password stored for account: %s\n", account)
@@ -1200,21 +1150,13 @@ func newTouchBarSetCommand() *cobra.Command {
 				return "TouchBar button set"
 			`, label, command)
 
-			request := &pb.InvokeFunctionRequest{
-				Context: &pb.InvokeFunctionRequest_App{
-					App: &pb.InvokeFunctionRequest_App{},
-				},
-				Invocation: invocation,
-				Timeout:    float64(timeout.Seconds()),
-			}
-
-			response, err := c.InvokeFunction(ctx, request)
+			response, err := c.InvokeFunction(ctx, invocation, nil, nil, nil, float64(timeout.Seconds()))
 			if err != nil {
 				return fmt.Errorf("failed to set TouchBar button: %w", err)
 			}
 
-			if response.GetError() != nil {
-				return fmt.Errorf("TouchBar command failed: %s", response.GetError().GetErrorReason())
+			if response == nil {
+				return fmt.Errorf("no response received")
 			}
 
 			fmt.Printf("TouchBar button set: %s -> %s\n", label, command)
@@ -1249,21 +1191,13 @@ func newTouchBarClearCommand() *cobra.Command {
 				return "TouchBar cleared"
 			`
 
-			request := &pb.InvokeFunctionRequest{
-				Context: &pb.InvokeFunctionRequest_App{
-					App: &pb.InvokeFunctionRequest_App{},
-				},
-				Invocation: invocation,
-				Timeout:    float64(timeout.Seconds()),
-			}
-
-			response, err := c.InvokeFunction(ctx, request)
+			response, err := c.InvokeFunction(ctx, invocation, nil, nil, nil, float64(timeout.Seconds()))
 			if err != nil {
 				return fmt.Errorf("failed to clear TouchBar: %w", err)
 			}
 
-			if response.GetError() != nil {
-				return fmt.Errorf("TouchBar command failed: %s", response.GetError().GetErrorReason())
+			if response == nil {
+				return fmt.Errorf("no response received")
 			}
 
 			fmt.Println("TouchBar customizations cleared")

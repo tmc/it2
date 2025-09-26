@@ -5,8 +5,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	pb "github.com/tmc/it2/proto"
 )
 
 func TestAlertMethods(t *testing.T) {
@@ -216,20 +214,6 @@ func TestPreferencesRequestCreation(t *testing.T) {
 	})
 }
 
-// Mock response for testing InvokeFunction calls
-func createMockInvokeFunctionResponse(result string) *pb.ServerOriginatedMessage {
-	return &pb.ServerOriginatedMessage{
-		Submessage: &pb.ServerOriginatedMessage_InvokeFunctionResponse{
-			InvokeFunctionResponse: &pb.InvokeFunctionResponse{
-				Disposition: &pb.InvokeFunctionResponse_Success_{
-					Success: &pb.InvokeFunctionResponse_Success{
-						JsonResult: &result,
-					},
-				},
-			},
-		},
-	}
-}
 
 func TestAlertInvocationStrings(t *testing.T) {
 	// Test that alert methods create the expected invocation strings

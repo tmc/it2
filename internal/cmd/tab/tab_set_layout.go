@@ -11,7 +11,7 @@ import (
 func newSetLayoutCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
 		Use:   "set-layout <tab-id> <layout>",
-		Short: "Set the layout of a tab (limited implementation)",
+		Short: "Set the layout of a tab",
 		Long: `Set the split layout of a tab using predefined layouts.
 
 WARNING: This command has limited implementation due to the complexity of the
