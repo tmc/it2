@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
+	"time"
 
 	pb "github.com/tmc/it2/proto"
 )
@@ -558,18 +560,11 @@ func (c *Client) SetSelectionRange(ctx context.Context, sessionID string, startX
 
 // CopySelection copies the current selection to clipboard
 func (c *Client) CopySelection(ctx context.Context, sessionID string) error {
-	// This would typically be done through a menu item or key binding
-	// For now, we'll try to invoke the copy function
-
+	// Invoke the Copy menu item
 	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_InvokeFunctionRequest{
-			InvokeFunctionRequest: &pb.InvokeFunctionRequest{
-				Context: &pb.InvokeFunctionRequest_Session_{
-					Session: &pb.InvokeFunctionRequest_Session{
-						SessionId: &sessionID,
-					},
-				},
-				Invocation: stringPtr("copy:"),
+		Submessage: &pb.ClientOriginatedMessage_MenuItemRequest{
+			MenuItemRequest: &pb.MenuItemRequest{
+				Identifier: stringPtr("Copy"),
 			},
 		},
 	}
@@ -579,13 +574,131 @@ func (c *Client) CopySelection(ctx context.Context, sessionID string) error {
 		return fmt.Errorf("failed to copy selection: %w", err)
 	}
 
-	if resp := response.GetInvokeFunctionResponse(); resp != nil {
-		if resp.GetError() != nil {
-			return fmt.Errorf("copy selection failed: %v", resp.GetError().GetErrorReason())
+	if resp := response.GetMenuItemResponse(); resp != nil {
+		if resp.GetStatus() != pb.MenuItemResponse_OK {
+			return fmt.Errorf("copy selection failed: %v", resp.GetStatus())
 		}
 	}
 
 	return nil
+}
+
+// PasteFromClipboard pastes clipboard content to the session
+// Non-disruptive: directly sends clipboard content without changing session focus
+func (c *Client) PasteFromClipboard(ctx context.Context, sessionID string) error {
+	return c.PasteFromClipboardWithOptions(ctx, sessionID, false)
+}
+
+// PasteFromClipboardWithOptions pastes clipboard content with optional focus restoration
+func (c *Client) PasteFromClipboardWithOptions(ctx context.Context, sessionID string, restoreFocus bool) error {
+	// Get clipboard content directly and send as text (more reliable than paste commands)
+	clipboardContent, err := getClipboardContent()
+	if err != nil {
+		return fmt.Errorf("failed to get clipboard content: %w", err)
+	}
+
+	if clipboardContent == "" {
+		return fmt.Errorf("clipboard is empty")
+	}
+
+	var currentSession string
+	if restoreFocus {
+		// Try to get current active session to restore later (with timeout safety)
+		focusCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+		currentSession, err = c.getCurrentActiveSession(focusCtx)
+		cancel()
+		if err != nil {
+			// If we can't get current session, just proceed without restoration
+			currentSession = ""
+		}
+
+		// Activate target session for visual feedback
+		_, err = c.ActivateSession(ctx, sessionID, true)
+		if err != nil {
+			// If activation fails, still continue with paste but without focus management
+			restoreFocus = false
+		} else {
+			// Brief pause to ensure activation is visible before pasting
+			time.Sleep(50 * time.Millisecond)
+		}
+	}
+
+	// Send the clipboard content directly to the specific session
+	// For large content, break it into chunks to avoid timeout issues
+	err = c.sendTextInChunks(ctx, sessionID, clipboardContent)
+	if err != nil {
+		return fmt.Errorf("failed to send clipboard content: %w", err)
+	}
+
+	if restoreFocus && currentSession != "" && currentSession != sessionID {
+		// Small delay to ensure paste completes before switching back
+		time.Sleep(50 * time.Millisecond)
+
+		// Restore previous session
+		_, err = c.ActivateSession(ctx, currentSession, true)
+		if err != nil {
+			// Don't fail the whole operation if we can't restore, just warn
+			// The paste already succeeded
+			return fmt.Errorf("paste succeeded but failed to restore previous session: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// getCurrentActiveSession gets the currently focused session ID
+func (c *Client) getCurrentActiveSession(ctx context.Context) (string, error) {
+	focus, err := c.GetFocus(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to get focus information: %w", err)
+	}
+
+	if focus.SessionId == "" {
+		return "", fmt.Errorf("no active session found")
+	}
+
+	return focus.SessionId, nil
+}
+
+// sendTextInChunks sends large text content in smaller chunks to avoid timeout issues
+func (c *Client) sendTextInChunks(ctx context.Context, sessionID, content string) error {
+	const chunkSize = 4000 // Keep chunks small to avoid iTerm2 protocol limits
+
+	if len(content) <= chunkSize {
+		// Small content, send directly
+		return c.SendText(ctx, sessionID, content)
+	}
+
+	// Large content, send in chunks
+	for i := 0; i < len(content); i += chunkSize {
+		end := i + chunkSize
+		if end > len(content) {
+			end = len(content)
+		}
+
+		chunk := content[i:end]
+		err := c.SendText(ctx, sessionID, chunk)
+		if err != nil {
+			return fmt.Errorf("failed to send chunk %d-%d: %w", i, end, err)
+		}
+
+		// Small delay between chunks to prevent overwhelming iTerm2
+		if end < len(content) {
+			time.Sleep(10 * time.Millisecond)
+		}
+	}
+
+	return nil
+}
+
+// getClipboardContent retrieves the current clipboard content
+func getClipboardContent() (string, error) {
+	cmd := exec.Command("pbpaste")
+	output, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
 }
 
 // Helper functions

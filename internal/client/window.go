@@ -142,6 +142,7 @@ func (c *Client) SetWindowProperty(ctx context.Context, windowID, property, valu
 // WindowInfo represents window information for client functions
 type WindowInfo struct {
 	WindowID     string                 `json:"window_id"`
+	WindowNumber int32                  `json:"window_number"` // iTerm2 window index
 	Title        string                 `json:"title,omitempty"`
 	Frame        string                 `json:"frame,omitempty"`
 	Fullscreen   string                 `json:"fullscreen,omitempty"`
@@ -176,8 +177,9 @@ func (c *Client) ListWindows(ctx context.Context) ([]*WindowInfo, error) {
 		}
 
 		info := &WindowInfo{
-			WindowID: windowID,
-			TabCount: len(window.GetTabs()),
+			WindowID:     windowID,
+			WindowNumber: window.GetNumber(),
+			TabCount:     len(window.GetTabs()),
 		}
 
 		// Get window properties to fill in additional details

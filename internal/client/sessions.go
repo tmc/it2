@@ -8,13 +8,16 @@ import (
 )
 
 type SessionInfo struct {
-	SessionID   string
-	WindowID    string
-	TabID       string
-	WindowTitle string
-	TabTitle    string
-	SessionName string
-	PluginData  map[string]interface{} // Additional data from plugins
+	SessionID    string
+	WindowID     string
+	WindowNumber int32  // iTerm2 window index
+	TabID        string
+	WindowTitle  string
+	TabTitle     string
+	SessionName  string
+	PluginData   map[string]interface{} // Additional data from plugins
+	Frame        *pb.Frame              // Frame coordinates if available
+	GridSize     *pb.Size               // Grid size if available
 }
 
 func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
@@ -37,9 +40,10 @@ func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
 	var sessions []*SessionInfo
 	for _, window := range listResp.GetWindows() {
 		windowID := window.GetWindowId()
+		windowNumber := window.GetNumber()
 		for _, tab := range window.GetTabs() {
 			tabID := tab.GetTabId()
-			sessions = append(sessions, extractSessionsFromNode(tab.GetRoot(), windowID, tabID)...)
+			sessions = append(sessions, extractSessionsFromNode(tab.GetRoot(), windowID, windowNumber, tabID)...)
 		}
 	}
 
@@ -54,7 +58,7 @@ func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
 	return sessions, nil
 }
 
-func extractSessionsFromNode(node *pb.SplitTreeNode, windowID, tabID string) []*SessionInfo {
+func extractSessionsFromNode(node *pb.SplitTreeNode, windowID string, windowNumber int32, tabID string) []*SessionInfo {
 	if node == nil {
 		return nil
 	}
@@ -68,16 +72,19 @@ func extractSessionsFromNode(node *pb.SplitTreeNode, windowID, tabID string) []*
 			session := child.Session
 			if session != nil {
 				info := &SessionInfo{
-					SessionID:   session.GetUniqueIdentifier(),
-					WindowID:    windowID,
-					TabID:       tabID,
-					SessionName: session.GetTitle(),
+					SessionID:    session.GetUniqueIdentifier(),
+					WindowID:     windowID,
+					WindowNumber: windowNumber,
+					TabID:        tabID,
+					SessionName:  session.GetTitle(),
+					Frame:        session.GetFrame(),
+					GridSize:     session.GetGridSize(),
 				}
 				sessions = append(sessions, info)
 			}
 		case *pb.SplitTreeNode_SplitTreeLink_Node:
 			// Recursively process child nodes
-			sessions = append(sessions, extractSessionsFromNode(child.Node, windowID, tabID)...)
+			sessions = append(sessions, extractSessionsFromNode(child.Node, windowID, windowNumber, tabID)...)
 		}
 	}
 

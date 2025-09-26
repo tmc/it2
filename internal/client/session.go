@@ -3,24 +3,73 @@ package client
 import (
 	"context"
 	"fmt"
+	"os"
 
 	pb "github.com/tmc/it2/proto"
 )
 
-// SendText sends text to a session as if typed by the user
+// SendText sends text to a session as if typed by the user, automatically splitting large text into 4KB chunks
 func (c *Client) SendText(ctx context.Context, sessionID, text string) error {
 	normalizedID := NormalizeSessionID(sessionID)
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_SendTextRequest{
-			SendTextRequest: &pb.SendTextRequest{
-				Session: &normalizedID,
-				Text:    &text,
+
+	// If text is small enough, send it directly
+	const chunkSize = 4096
+	if len(text) <= chunkSize {
+		msg := &pb.ClientOriginatedMessage{
+			Submessage: &pb.ClientOriginatedMessage_SendTextRequest{
+				SendTextRequest: &pb.SendTextRequest{
+					Session: &normalizedID,
+					Text:    &text,
+				},
 			},
-		},
+		}
+		_, err := c.SendRequest(ctx, msg)
+		return err
 	}
 
-	_, err := c.SendRequest(ctx, msg)
-	return err
+	// Debug: log that we're chunking
+	fmt.Fprintf(os.Stderr, "DEBUG: Chunking %d bytes into %d chunks\n", len(text), (len(text)+chunkSize-1)/chunkSize)
+
+	// Split large text into chunks
+	chunkNum := 0
+	for i := 0; i < len(text); i += chunkSize {
+		end := i + chunkSize
+		if end > len(text) {
+			end = len(text)
+		}
+		chunkNum++
+
+		chunk := text[i:end]
+		fmt.Fprintf(os.Stderr, "DEBUG: Sending chunk %d/%d (%d bytes)\n", chunkNum, (len(text)+chunkSize-1)/chunkSize, len(chunk))
+
+		msg := &pb.ClientOriginatedMessage{
+			Submessage: &pb.ClientOriginatedMessage_SendTextRequest{
+				SendTextRequest: &pb.SendTextRequest{
+					Session: &normalizedID,
+					Text:    &chunk,
+				},
+			},
+		}
+
+		_, err := c.SendRequest(ctx, msg)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "DEBUG: Chunk %d failed: %v\n", chunkNum, err)
+			return err
+		}
+		fmt.Fprintf(os.Stderr, "DEBUG: Chunk %d sent successfully\n", chunkNum)
+
+		// Check for cancellation between chunks
+		if end < len(text) {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+			}
+		}
+	}
+	fmt.Fprintf(os.Stderr, "DEBUG: All chunks sent successfully\n")
+
+	return nil
 }
 
 // SplitPane splits a session pane vertically or horizontally
@@ -454,4 +503,133 @@ func (c *Client) SubscribeToScreenUpdates(ctx context.Context, sessionID string)
 	}
 
 	return nil
+}
+
+// SetSessionProfileProperty sets a profile property on a specific sessions copy of the profile
+// without modifying the underlying profile. This enables per-session customization.
+func (c *Client) SetSessionProfileProperty(ctx context.Context, sessionID, key, value string) error {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_SetProfilePropertyRequest{
+			SetProfilePropertyRequest: &pb.SetProfilePropertyRequest{
+				Target: &pb.SetProfilePropertyRequest_Session{
+					Session: sessionID,
+				},
+				Assignments: []*pb.SetProfilePropertyRequest_Assignment{
+					{
+						Key:       &key,
+						JsonValue: &value,
+					},
+				},
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return fmt.Errorf("failed to set session profile property: %w", err)
+	}
+
+	resp := response.GetSetProfilePropertyResponse()
+	if resp == nil {
+		return fmt.Errorf("no set profile property response received")
+	}
+
+	if resp.GetStatus() != pb.SetProfilePropertyResponse_OK {
+		return fmt.Errorf("failed to set session profile property: %v", resp.GetStatus())
+	}
+
+	return nil
+}
+
+// GetSessionProfileProperty gets a profile property from a specific sessions copy of the profile
+func (c *Client) GetSessionProfileProperty(ctx context.Context, sessionID, key string) (interface{}, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_GetProfilePropertyRequest{
+			GetProfilePropertyRequest: &pb.GetProfilePropertyRequest{
+				Session: &sessionID,
+				Keys:    []string{key},
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get session profile property: %w", err)
+	}
+
+	resp := response.GetGetProfilePropertyResponse()
+	if resp == nil {
+		return nil, fmt.Errorf("no get profile property response received")
+	}
+
+	if resp.GetStatus() != pb.GetProfilePropertyResponse_OK {
+		return nil, fmt.Errorf("failed to get session profile property: %v", resp.GetStatus())
+	}
+
+	if len(resp.Properties) == 0 {
+		return "", nil
+	}
+
+	prop := resp.Properties[0]
+	if prop.JsonValue == nil {
+		return "", nil
+	}
+
+	// Remove quotes from JSON string if present
+	value := *prop.JsonValue
+	if len(value) >= 2 && value[0] == '"' && value[len(value)-1] == '"' {
+		return value[1 : len(value)-1], nil
+	}
+
+	return value, nil
+}
+// ListSessionProfileProperties gets multiple profile properties from a session's profile copy
+func (c *Client) ListSessionProfileProperties(ctx context.Context, sessionID string, keys []string) (map[string]interface{}, error) {
+	// If no keys specified, try common profile properties
+	if len(keys) == 0 {
+		keys = []string{
+			"Badge Text", "Name", "Background Color", "Foreground Color",
+			"Transparency", "Blur", "Blend", "Use Transparency Initially",
+		}
+	}
+
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_GetProfilePropertyRequest{
+			GetProfilePropertyRequest: &pb.GetProfilePropertyRequest{
+				Session: &sessionID,
+				Keys:    keys,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get session profile properties: %w", err)
+	}
+
+	resp := response.GetGetProfilePropertyResponse()
+	if resp == nil {
+		return nil, fmt.Errorf("no get profile property response received")
+	}
+
+	if resp.GetStatus() != pb.GetProfilePropertyResponse_OK {
+		return nil, fmt.Errorf("failed to get session profile properties: %v", resp.GetStatus())
+	}
+
+	result := make(map[string]interface{})
+	for _, prop := range resp.Properties {
+		if prop.Key != nil && prop.JsonValue != nil {
+			key := *prop.Key
+			value := *prop.JsonValue
+
+			// Remove quotes from JSON string if present
+			if len(value) >= 2 && value[0] == '"' && value[len(value)-1] == '"' {
+				value = value[1 : len(value)-1]
+			}
+
+			result[key] = value
+		}
+	}
+
+	return result, nil
 }
