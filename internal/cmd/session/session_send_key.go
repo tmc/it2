@@ -31,7 +31,7 @@ Supported special keys:
   end             - Send End key
   pageup          - Send Page Up
   pagedown        - Send Page Down
-  ctrl-a thru ctrl-z  - Send Ctrl+A through Ctrl+Z
+  ctrl-a thru ctrl-z  - Send Ctrl+A through Ctrl+Z (ctrl+a, ctrl-a formats both work)
 
 You can also send any regular character (a-z, 0-9, punctuation, etc.).
 
@@ -51,8 +51,13 @@ Examples:
   # Send Escape
   it2 session send-key escape
 
-  # Send Ctrl+C
+  # Send Ctrl+C (both formats work)
   it2 session send-key ctrl-c
+  it2 session send-key ctrl+c
+
+  # Send Ctrl+O (both formats work)
+  it2 session send-key ctrl-o
+  it2 session send-key ctrl+o
 
   # Send Ctrl+T (transpose characters in bash/zsh)
   it2 session send-key ctrl-t`,
