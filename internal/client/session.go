@@ -30,14 +30,20 @@ func (c *Client) SplitPane(ctx context.Context, sessionID string, vertical bool,
 		splitDirection = pb.SplitPaneRequest_VERTICAL
 	}
 
+	splitRequest := &pb.SplitPaneRequest{
+		Session:        &sessionID,
+		SplitDirection: &splitDirection,
+		Before:         &before,
+	}
+
+	// Only set ProfileName if it's not empty
+	if profileName != "" {
+		splitRequest.ProfileName = &profileName
+	}
+
 	msg := &pb.ClientOriginatedMessage{
 		Submessage: &pb.ClientOriginatedMessage_SplitPaneRequest{
-			SplitPaneRequest: &pb.SplitPaneRequest{
-				Session:        &sessionID,
-				SplitDirection: &splitDirection,
-				Before:         &before,
-				ProfileName:    &profileName,
-			},
+			SplitPaneRequest: splitRequest,
 		},
 	}
 

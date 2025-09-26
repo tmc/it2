@@ -135,7 +135,7 @@ Examples:
 	cmd.Flags().Bool("vertical", false, "Split vertically")
 	cmd.Flags().Bool("horizontal", false, "Split horizontally (default)")
 	cmd.Flags().Bool("before", false, "Create new pane before the current one")
-	cmd.Flags().String("profile", "", "Profile name for the new session")
+	cmd.Flags().String("profile", "", "Profile name for the new session (optional, uses default if not specified)")
 	cmd.Flags().Bool("json", false, "Output result as JSON")
 	cmd.Flags().Bool("quiet", false, "Only output the new session ID (for scripting)")
 	return cmd
