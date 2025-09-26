@@ -1,0 +1,525 @@
+{{define "layout"}}{{template "base" .}}{{end}}
+
+{{define "body-content"}}
+    <div id="status" class="connection-status">Connected</div>
+    <div class="docs-layout">
+        <button class="mobile-nav-toggle" id="mobile-nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <nav class="sidebar" id="sidebar">
+            {{template "sidebar-content" .}}
+        </nav>
+        <main class="main-content">
+            {{.Content}}
+        </main>
+    </div>
+{{end}}
+
+{{define "sidebar-content"}}
+    {{$hierarchy := loadJSON "command-hierarchy.json"}}
+    {{$navigation := loadJSON "docs-navigation.json"}}
+    <div class="sidebar-header">
+        <h1>{{$hierarchy.cli.short}}</h1>
+    </div>
+    <div class="sidebar-nav">
+        {{range $navigation.sections}}
+        <div class="nav-section">
+            <h3>{{.title}}</h3>
+            <ul class="nav-list">
+                {{range .items}}
+                <li><a href="{{.path}}{{if ne .path "/" }}{{$.HTMLExt}}{{end}}">{{.title}}</a></li>
+                {{end}}
+            </ul>
+        </div>
+        {{end}}
+        <div class="nav-section">
+            <h3>Core Command</h3>
+            <ul class="nav-list">
+                <li><a href="/{{$hierarchy.cli.name}}{{$.HTMLExt}}">{{$hierarchy.cli.name}}</a></li>
+            </ul>
+        </div>
+        {{range $parent := $hierarchy.cli.subcommands}}
+        <div class="nav-section">
+            <h3>{{$parent.name}}</h3>
+            <ul class="nav-list">
+                <li><a href="/it2_{{$parent.name}}{{$.HTMLExt}}">{{$parent.short}}</a>
+                {{if $parent.subcommands}}
+                    <ul class="nav-list">
+                        {{range $parent.subcommands}}
+                        <li><a href="/it2_{{$parent.name}}_{{.name}}{{$.HTMLExt}}">{{.name}}</a></li>
+                        {{end}}
+                    </ul>
+                {{end}}
+                </li>
+            </ul>
+        </div>
+        {{end}}
+    </div>
+{{end}}
+
+{{define "styles"}}
+    <style>
+        /* Minimal GitHub-style CSS with IT2 docs extensions */
+        :root {
+            /* Core colors - Light mode */
+            --fg: #24292e;
+            --fg-muted: #6a737d;
+            --fg-subtle: #6e7781;
+            --bg: #ffffff;
+            --bg-subtle: #f6f8fa;
+            --border: #e1e4e8;
+            --border-muted: #d8dee4;
+            --accent: #0366d6;
+            --accent-subtle: rgba(3, 102, 214, 0.1);
+
+            /* Semantic colors */
+            --success: #28a745;
+            --danger: #d73a49;
+
+            /* Component styles */
+            --btn-border: rgba(31, 35, 40, 0.15);
+            --btn-hover-bg: #f3f4f6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* Core colors - Dark mode */
+                --fg: #e6edf3;
+                --fg-muted: #7d8590;
+                --fg-subtle: #8b949e;
+                --bg: #0d1117;
+                --bg-subtle: #161b22;
+                --border: #30363d;
+                --border-muted: #21262d;
+                --accent: #58a6ff;
+                --accent-subtle: rgba(88, 166, 255, 0.15);
+
+                /* Semantic colors */
+                --success: #3fb950;
+                --danger: #f85149;
+
+                /* Component styles */
+                --btn-border: rgba(240, 246, 252, 0.1);
+                --btn-hover-bg: rgba(177, 186, 196, 0.12);
+            }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: var(--success);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .connection-status.disconnected {
+            background: var(--danger);
+        }
+
+        /* Layout styles - GitHub docs inspired */
+        .docs-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            min-width: 280px;
+            background: var(--bg);
+            border-right: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 0;
+        }
+
+        .sidebar-header {
+            padding: 0 16px 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0 16px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 32px 48px;
+            overflow-x: auto;
+        }
+
+        /* Headings */
+        .main-content h1 {
+            font-size: 2em;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+            padding-bottom: .3em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .main-content h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 24px 0 16px 0;
+            padding-bottom: .3em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .main-content h3 {
+            font-size: 1.25em;
+            font-weight: 600;
+            margin: 24px 0 16px 0;
+        }
+
+        .main-content h4, .main-content h5, .main-content h6 {
+            font-weight: 600;
+            margin: 24px 0 16px 0;
+        }
+
+        .main-content p { margin: 0 0 16px; }
+
+        .main-content ul, .main-content ol {
+            margin: 0 0 16px;
+            padding-left: 2em;
+        }
+
+        .main-content blockquote {
+            margin: 0 0 16px;
+            padding: 0 1em;
+            color: var(--fg-muted);
+            border-left: .25em solid var(--border);
+        }
+
+        .main-content code {
+            padding: .2em .4em;
+            margin: 0;
+            font-size: 85%;
+            background: rgba(175, 184, 193, 0.2);
+            border-radius: 6px;
+            font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+        }
+
+        .main-content a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .main-content a:hover { text-decoration: underline; }
+
+        .main-content pre {
+            padding: 16px;
+            overflow: auto;
+            font-size: 85%;
+            line-height: 1.45;
+            background: var(--bg-subtle);
+            border-radius: 6px;
+            margin: 0 0 16px;
+        }
+
+        .main-content pre code {
+            display: inline;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            border: 0;
+            font-size: 100%;
+        }
+
+        /* Navigation */
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section h3 {
+            color: var(--fg-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0 0 8px 0;
+            font-weight: 600;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-list li {
+            margin-bottom: 2px;
+        }
+
+        .nav-list a {
+            display: block;
+            color: var(--fg-muted);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.15s ease;
+        }
+
+        .nav-list a:hover {
+            color: var(--accent);
+            background: var(--accent-subtle);
+        }
+
+        .nav-list a.active {
+            color: white;
+            background: var(--accent);
+            font-weight: 500;
+        }
+
+        .nav-list .nav-list {
+            margin-left: 8px;
+            margin-top: 4px;
+            border-left: 1px solid var(--border);
+            padding-left: 4px;
+        }
+
+        .nav-list .nav-list a {
+            font-size: 12px;
+            padding: 4px 8px;
+            color: var(--fg-subtle);
+        }
+
+        .nav-list .nav-list a:hover {
+            color: var(--accent);
+            background: var(--accent-subtle);
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 260px;
+                min-width: 260px;
+            }
+
+            .main-content {
+                padding: 24px 32px;
+            }
+        }
+
+        /* Mobile toggle */
+        .mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 1001;
+            background: var(--bg-subtle);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 8px;
+            cursor: pointer;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .mobile-nav-toggle:hover {
+            background: var(--btn-hover-bg);
+        }
+
+        .mobile-nav-toggle span {
+            width: 18px;
+            height: 2px;
+            background: var(--fg);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-nav-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .mobile-nav-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-nav-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-nav-toggle {
+                display: flex;
+            }
+
+            .docs-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                background: var(--bg);
+                border-right: 1px solid var(--border);
+                padding: 60px 0 24px;
+                transition: left 0.3s ease;
+                z-index: 1000;
+                overflow-y: auto;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar-header {
+                padding: 0 16px 16px;
+                margin-bottom: 24px;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .sidebar-header h1 {
+                font-size: 16px;
+            }
+
+            .sidebar-nav {
+                padding: 0 16px;
+            }
+
+            .nav-section {
+                margin-bottom: 24px;
+            }
+
+            .nav-section h3 {
+                font-size: 11px;
+            }
+
+            .nav-list a {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+
+            .nav-list .nav-list a {
+                font-size: 12px;
+                padding: 4px 8px;
+            }
+
+            .main-content {
+                padding: 60px 16px 16px;
+            }
+
+            .main-content h1 {
+                font-size: 24px;
+                margin-bottom: 12px;
+            }
+
+            .main-content h2 {
+                font-size: 20px;
+                margin: 24px 0 12px 0;
+            }
+
+            .connection-status {
+                top: 8px;
+                right: 8px;
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+        }
+
+        {{.CustomCSS}}
+        {{.ChromaCSS}}
+    </style>
+{{end}}
+
+{{define "scripts"}}
+    <script>
+        (function() {
+            const status = document.getElementById('status');
+            const sidebar = document.getElementById('sidebar');
+            const mobileToggle = document.getElementById('mobile-nav-toggle');
+
+            // Mobile nav toggle
+            mobileToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                mobileToggle.classList.toggle('active');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768 &&
+                    !sidebar.contains(e.target) &&
+                    !mobileToggle.contains(e.target) &&
+                    sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    mobileToggle.classList.remove('active');
+                }
+            });
+
+            // Create EventSource for SSE
+            const eventSource = new EventSource('/events');
+
+            eventSource.onopen = function() {
+                {{if .Verbose}}console.log('SSE connected');{{end}}
+                status.textContent = 'Connected';
+                status.classList.remove('disconnected');
+            };
+
+            eventSource.onmessage = function(event) {
+                {{if .Verbose}}console.log('SSE message:', event.data);{{end}}
+                if (event.data === 'reload') {
+                    {{if .Verbose}}console.log('Reloading page...');{{end}}
+                    document.body.style.opacity = '0.8';
+                    setTimeout(() => {
+                        location.reload();
+                    }, 100);
+                } else if (event.data === 'shutdown') {
+                    {{if .Verbose}}console.log('Server shutting down');{{end}}
+                    status.textContent = 'Server shutdown';
+                    status.classList.add('disconnected');
+                    eventSource.close();
+                }
+            };
+
+            eventSource.onerror = function(e) {
+                {{if .Verbose}}console.log('SSE error:', e);{{end}}
+                status.textContent = 'Disconnected';
+                status.classList.add('disconnected');
+
+                if (eventSource.readyState === EventSource.CLOSED) {
+                    {{if .Verbose}}console.log('Connection closed, attempting reconnect...');{{end}}
+                    setTimeout(function() {
+                        fetch('/events', { method: 'HEAD' })
+                            .then(() => {
+                                {{if .Verbose}}console.log('Server is back, reloading...');{{end}}
+                                window.location.reload();
+                            })
+                            .catch(() => {
+                                {{if .Verbose}}console.log('Server still down, waiting...');{{end}}
+                            });
+                    }, 2000);
+                }
+            };
+        })();
+    </script>
+
+    {{template "mathjax-scripts" .}}
+    {{template "mermaid-scripts" .}}
+{{end}}

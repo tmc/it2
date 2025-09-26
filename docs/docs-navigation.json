@@ -1,0 +1,42 @@
+{
+  "sections": [
+    {
+      "title": "Getting Started",
+      "items": [
+        {
+          "title": "Home",
+          "path": "/"
+        },
+        {
+          "title": "Quick Start",
+          "path": "/QUICKSTART"
+        },
+        {
+          "title": "Configuration",
+          "path": "/CONFIGURATION"
+        },
+        {
+          "title": "Examples",
+          "path": "/EXAMPLES"
+        }
+      ]
+    },
+    {
+      "title": "Documentation",
+      "items": [
+        {
+          "title": "Automation Cookbook",
+          "path": "/AUTOMATION_COOKBOOK"
+        },
+        {
+          "title": "Plugin Development",
+          "path": "/PLUGIN_DEVELOPMENT"
+        },
+        {
+          "title": "Troubleshooting",
+          "path": "/TROUBLESHOOTING"
+        }
+      ]
+    }
+  ]
+}

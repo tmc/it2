@@ -1,0 +1,83 @@
+{{define "sidebar-toc-scripts"}}
+    <script>
+        // Generate sidebar TOC if sidebar is enabled
+        if (document.getElementById('sidebar-toc')) {
+            function generateSidebarTOC() {
+                const headings = document.querySelectorAll('.main-content h1, .main-content h2, .main-content h3');
+                const tocContainer = document.getElementById('sidebar-toc');
+
+                if (headings.length === 0) {
+                    tocContainer.style.display = 'none';
+                    return;
+                }
+
+                const tocList = document.createElement('ul');
+
+                headings.forEach((heading, index) => {
+                    const level = parseInt(heading.tagName.charAt(1));
+                    const id = heading.id || `heading-${index}`;
+
+                    if (!heading.id) {
+                        heading.id = id;
+                    }
+
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = `#${id}`;
+                    a.textContent = heading.textContent;
+                    a.className = `level-${level}`;
+
+                    // Add smooth scrolling
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.getElementById(id).scrollIntoView({
+                            behavior: 'smooth'
+                        });
+
+                        // Update active state
+                        document.querySelectorAll('.sidebar-toc a').forEach(link =>
+                            link.classList.remove('active')
+                        );
+                        a.classList.add('active');
+                    });
+
+                    li.appendChild(a);
+                    tocList.appendChild(li);
+                });
+
+                tocContainer.appendChild(tocList);
+
+                // Highlight current section on scroll
+                function updateActiveSection() {
+                    const headings = document.querySelectorAll('.main-content h1, .main-content h2, .main-content h3');
+                    const tocLinks = document.querySelectorAll('.sidebar-toc a');
+
+                    let current = '';
+                    headings.forEach(heading => {
+                        const rect = heading.getBoundingClientRect();
+                        if (rect.top <= 100) {
+                            current = heading.id;
+                        }
+                    });
+
+                    tocLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${current}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+
+                window.addEventListener('scroll', updateActiveSection);
+                updateActiveSection(); // Initial call
+            }
+
+            // Generate TOC when page loads
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', generateSidebarTOC);
+            } else {
+                generateSidebarTOC();
+            }
+        }
+    </script>
+{{end}}
