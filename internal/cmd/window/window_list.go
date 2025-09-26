@@ -5,14 +5,47 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
-	"github.com/tmc/it2/internal/formatting"
-	"github.com/tmc/it2/internal/plugins"
 )
 
 func newListCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List all iTerm2 windows",
+		Long: `List all iTerm2 windows with detailed information and filtering options.`,
+		Example: cmdutil.Doc(`
+			# List all windows (table format)
+			$ it2 window list
+
+			# JSON format for scripting
+			$ it2 window list --format json
+
+			# Show specific columns
+			$ it2 window list --columns id,name,bounds
+
+			# Sort by window ID (descending)
+			$ it2 window list --sort id --reverse
+
+			# Find window by name pattern
+			$ it2 window list --format json | jq '.[] | select(.name | contains("Production"))'
+
+			# Get first window ID for scripting
+			$ FIRST_WINDOW=$(it2 window list --format json | jq -r '.[0].id')
+
+			# Count total windows
+			$ it2 window list --format json | jq length
+
+			# Export window layout for backup
+			$ it2 window list --format json > windows-backup.json
+
+			# Close all windows except the first
+			$ for window_id in $(it2 window list --format json | jq -r '.[1:][].id'); do
+			$   it2 window close "$window_id"
+			$ done
+
+			# Focus on specific window by name
+			$ WINDOW_ID=$(it2 window list --format json | jq -r '.[] | select(.name=="Development") | .id')
+			$ it2 window focus "$WINDOW_ID"
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			wsURL, timeout, format, columns, sortBy, sortReverse := cmdutil.GetExtendedFlags(cmd)
 			ctx, cancel := cmdutil.CreateContext(timeout)
@@ -24,34 +57,14 @@ func newListCommand() *cobra.Command {
 			}
 			defer c.Close()
 
-			windows, err := c.ListWindows(ctx)
-			if err != nil {
-				return fmt.Errorf("failed to list windows: %w", err)
-			}
-
-			// Apply plugins to windows
-			registry := plugins.NewRegistry()
-			if err := registry.DiscoverAndRegister(); err == nil {
-				windowEnrichers := registry.GetWindowEnrichers()
-				for _, window := range windows {
-					// Initialize plugin data map if needed
-					if window.PluginData == nil {
-						window.PluginData = make(map[string]interface{})
-					}
-					// Apply each window enricher
-					for _, enricher := range windowEnrichers {
-						data, err := enricher.EnrichWindow(ctx, window)
-						if err == nil && len(data) > 0 {
-							for k, v := range data {
-								window.PluginData[k] = v
-							}
-						}
-					}
-				}
-			}
-
-			formatter := formatting.NewWithOptions(format, columns, sortBy, sortReverse)
-			return formatter.FormatClientWindows(windows)
+			// Use shared operations
+			sharedOps := cmdutil.NewSharedListOperations(c, ctx)
+			return sharedOps.ListWindows(cmdutil.SharedListOptions{
+				Format:      format,
+				Columns:     columns,
+				SortBy:      sortBy,
+				SortReverse: sortReverse,
+			})
 		},
 	}
 

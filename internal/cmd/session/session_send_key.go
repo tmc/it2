@@ -16,68 +16,37 @@ func newSendKeyCommand() *cobra.Command {
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 
-Supported special keys:
-  enter, return    - Send Enter/Return key
-  tab             - Send Tab key
-  escape, esc     - Send Escape key
-  backspace       - Send Backspace key
-  delete          - Send Delete key
-  space           - Send Space key
-  up              - Send Up arrow
-  down            - Send Down arrow
-  left            - Send Left arrow
-  right           - Send Right arrow
-  home            - Send Home key
-  end             - Send End key
-  pageup          - Send Page Up
-  pagedown        - Send Page Down
-  ctrl-a thru ctrl-z  - Send Ctrl+A through Ctrl+Z (ctrl+a, ctrl-a formats both work)
-  cmd+a thru cmd+z    - Send Cmd+A through Cmd+Z (maps to corresponding Ctrl sequences)
+Supported special keys: enter, tab, escape, backspace, delete, space, paste,
+up/down/left/right arrows, home, end, pageup/pagedown, ctrl-a thru ctrl-z,
+cmd+a thru cmd+z. Supports complex modifier combinations like cmd+ctrl+shift+a.`,
+		Example: cmdutil.Doc(`
+			# Send Enter to current session
+			$ it2 session send-key enter
 
-Complex modifier combinations:
-  cmd+ctrl+shift+a    - Multiple modifiers (supports cmd, ctrl, shift, opt/alt)
-  shift+ctrl+c        - Any combination of modifiers
-  opt+cmd+v          - Option/Alt key combinations
+			# Send Tab to specific session
+			$ it2 session send-key w0t1p11:SESSION-ID tab
 
-You can also send any regular character (a-z, 0-9, punctuation, etc.).
+			# Send the letter 'q'
+			$ it2 session send-key q
 
-Examples:
-  # Send Enter to current session
-  it2 session send-key enter
+			# Send Escape
+			$ it2 session send-key escape
 
-  # Send Tab to specific session
-  it2 session send-key w0t1p11:SESSION-ID tab
+			# Send Ctrl+C (both formats work)
+			$ it2 session send-key ctrl-c
+			$ it2 session send-key ctrl+c
 
-  # Send the letter 'q'
-  it2 session send-key q
+			# Send Ctrl+T (transpose characters)
+			$ it2 session send-key ctrl-t
 
-  # Send a number
-  it2 session send-key 5
+			# Send Cmd+V (paste)
+			$ it2 session send-key cmd+v
 
-  # Send Escape
-  it2 session send-key escape
-
-  # Send Ctrl+C (both formats work)
-  it2 session send-key ctrl-c
-  it2 session send-key ctrl+c
-
-  # Send Ctrl+O (both formats work)
-  it2 session send-key ctrl-o
-  it2 session send-key ctrl+o
-
-  # Send Ctrl+T (transpose characters in bash/zsh)
-  it2 session send-key ctrl-t
-
-  # Send Cmd+V (paste - mapped to Ctrl+V)
-  it2 session send-key cmd+v
-
-  # Send Cmd+C (copy - mapped to Ctrl+C)
-  it2 session send-key cmd-c
-
-  # Send complex modifier combinations
-  it2 session send-key cmd+shift+z     # Cmd+Shift+Z (redo)
-  it2 session send-key ctrl+opt+a      # Ctrl+Option+A
-  it2 session send-key cmd+ctrl+shift+v # All modifiers`,
+			# Send complex modifier combinations
+			$ it2 session send-key cmd+shift+z     # Cmd+Shift+Z (redo)
+			$ it2 session send-key ctrl+opt+a      # Ctrl+Option+A
+			$ it2 session send-key cmd+ctrl+shift+v # All modifiers
+		`),
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID, key string

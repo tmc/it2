@@ -5,14 +5,33 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
-	"github.com/tmc/it2/internal/formatting"
-	"github.com/tmc/it2/internal/plugins"
+	"github.com/tmc/it2/internal/completion"
 )
 
 func newListCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List all iTerm2 sessions",
+		Long:  `List iTerm2 sessions with optional filtering and output customization.`,
+		Example: cmdutil.Doc(`
+			# List all sessions in table format
+			$ it2 session list
+
+			# List sessions in JSON format for scripting
+			$ it2 session list --format json
+
+			# List sessions in a specific window
+			$ it2 session list --window-id 1
+
+			# List sessions with custom columns
+			$ it2 session list --columns id,name,title
+
+			# Sort sessions by name
+			$ it2 session list --sort-by name
+
+			# Export session list for backup
+			$ it2 session list --format json > sessions-backup.json
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			wsURL, timeout, format, columns, sortBy, sortReverse := cmdutil.GetExtendedFlags(cmd)
 			ctx, cancel := cmdutil.CreateContext(timeout)
@@ -24,39 +43,20 @@ func newListCommand() *cobra.Command {
 			}
 			defer c.Close()
 
-			sessions, err := c.ListSessions(ctx)
-			if err != nil {
-				return fmt.Errorf("failed to list sessions: %w", err)
-			}
+			// Get filter flags
+			windowID, _ := cmd.Flags().GetString("window-id")
+			tabID, _ := cmd.Flags().GetString("tab-id")
 
-			// Discover and apply plugins
-			registry := plugins.NewRegistry()
-			if err := registry.DiscoverAndRegister(); err == nil {
-				enrichers := registry.GetEnrichers()
-				// Debug: print number of plugins found
-				//if format == "text" && len(enrichers) > 0 {
-				//	fmt.Printf("Found %d plugin(s)\n", len(enrichers))
-				//	fmt.Println(strings.Repeat("-", 40))
-				//}
-				for _, session := range sessions {
-					// Initialize plugin data map if needed
-					if session.PluginData == nil {
-						session.PluginData = make(map[string]interface{})
-					}
-					// Apply each enricher
-					for _, enricher := range enrichers {
-						data, err := enricher.EnrichSession(ctx, session)
-						if err == nil && len(data) > 0 {
-							for k, v := range data {
-								session.PluginData[k] = v
-							}
-						}
-					}
-				}
-			}
-
-			formatter := formatting.NewWithOptions(format, columns, sortBy, sortReverse)
-			return formatter.FormatSessions(sessions)
+			// Use shared operations
+			sharedOps := cmdutil.NewSharedListOperations(c, ctx)
+			return sharedOps.ListSessions(cmdutil.SharedListOptions{
+				WindowID:    windowID,
+				TabID:       tabID,
+				Format:      format,
+				Columns:     columns,
+				SortBy:      sortBy,
+				SortReverse: sortReverse,
+			})
 		},
 	}
 
@@ -64,6 +64,14 @@ func newListCommand() *cobra.Command {
 	cmd.Flags().String("columns", "", "Comma-separated list of columns to display (e.g., 'session id,window id,name')")
 	cmd.Flags().String("sort", "", "Column to sort by (e.g., 'Session ID', 'Window ID', 'Name')")
 	cmd.Flags().Bool("reverse", false, "Reverse sort order (descending)")
+
+	// Add filtering flags
+	cmd.Flags().String("window-id", "", "Filter sessions by window ID")
+	cmd.Flags().String("tab-id", "", "Filter sessions by tab ID")
+
+	// Add completion functions
+	cmd.RegisterFlagCompletionFunc("window-id", completion.WindowIDCompletion)
+	cmd.RegisterFlagCompletionFunc("tab-id", completion.TabIDCompletion)
 
 	return cmd
 }

@@ -9,9 +9,34 @@ import (
 
 func newGetBufferCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "get-buffer [session-id]",
-		Short:          "Get buffer contents of a session",
-		Long:           "Get buffer contents of a session. If no session-id is provided, uses $ITERM_SESSION_ID environment variable.",
+		Use:   "get-buffer [session-id]",
+		Short: "Get buffer contents of a session",
+		Long: `Get buffer contents of a session including scrollback history.`,
+		Example: cmdutil.Doc(`
+			# Get current session buffer
+			$ it2 text get-buffer
+
+			# Get specific session buffer
+			$ it2 text get-buffer SESSION123
+
+			# Get last 100 lines only
+			$ it2 text get-buffer --lines 100
+
+			# Include color/formatting information
+			$ it2 text get-buffer --color
+
+			# Save session output to file
+			$ it2 text get-buffer > session-output.txt
+
+			# Get JSON format with metadata
+			$ it2 text get-buffer --format json
+
+			# Search through buffer contents
+			$ it2 text get-buffer | grep "ERROR"
+
+			# Archive session output daily
+			$ it2 text get-buffer SESSION123 > "logs/$(date +%Y%m%d)-session.log"
+		`),
 		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,
 		SupportsFormat: true,

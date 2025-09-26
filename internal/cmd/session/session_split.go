@@ -18,20 +18,23 @@ func newSplitCommand() *cobra.Command {
 		Long: `Split a session pane horizontally or vertically, creating a new session.
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
-Default is horizontal split.
+Default is horizontal split.`,
+		Example: cmdutil.Doc(`
+			# Split current session horizontally (default)
+			$ it2 session split
 
-Examples:
-  # Split current session horizontally (default)
-  it2 session split
+			# Split current session vertically
+			$ it2 session split --vertical
 
-  # Split current session vertically
-  it2 session split --vertical
+			# Split specific session horizontally
+			$ it2 session split SESSION-ID
 
-  # Split specific session horizontally
-  it2 session split SESSION-ID
+			# Split with badge text
+			$ it2 session split --badge "Build"
 
-  # Split and just output the new session ID (for scripting)
-  it2 session split --quiet`,
+			# Split and just output the new session ID (for scripting)
+			$ it2 session split --quiet
+		`),
 		Args: cobra.RangeArgs(0, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID string
@@ -49,6 +52,7 @@ Examples:
 			horizontal, _ := cmd.Flags().GetBool("horizontal")
 			before, _ := cmd.Flags().GetBool("before")
 			profileName, _ := cmd.Flags().GetString("profile")
+			badge, _ := cmd.Flags().GetString("badge")
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 			quiet, _ := cmd.Flags().GetBool("quiet")
 
@@ -87,6 +91,17 @@ Examples:
 			case pb.SplitPaneResponse_OK:
 				newSessionIDs := response.GetSessionId()
 				if len(newSessionIDs) > 0 {
+					// Set badge if requested
+					if badge != "" {
+						for _, sessionID := range newSessionIDs {
+							if err := c.SetSessionProperty(ctx, sessionID, "badge_text", badge); err != nil {
+								if !quiet {
+									fmt.Printf("Warning: Failed to set badge on session %s: %v\n", sessionID, err)
+								}
+							}
+						}
+					}
+
 					if quiet {
 						// Just output the new session ID for easy scripting
 						fmt.Println(newSessionIDs[0])
@@ -96,11 +111,17 @@ Examples:
 							"new_session_id":  newSessionIDs[0],
 							"all_session_ids": newSessionIDs,
 						}
+						if badge != "" {
+							result["badge_set"] = badge
+						}
 						return formatting.PrintJSON(result)
 					} else {
 						fmt.Printf("Session split successfully. New session ID: %s\n", newSessionIDs[0])
 						if len(newSessionIDs) > 1 {
 							fmt.Printf("All session IDs in split: %v\n", newSessionIDs)
+						}
+						if badge != "" {
+							fmt.Printf("Badge set to: %s\n", badge)
 						}
 					}
 				} else {
@@ -136,6 +157,7 @@ Examples:
 	cmd.Flags().Bool("horizontal", false, "Split horizontally (default)")
 	cmd.Flags().Bool("before", false, "Create new pane before the current one")
 	cmd.Flags().String("profile", "", "Profile name for the new session (optional, uses default if not specified)")
+	cmd.Flags().String("badge", "", "Set badge text on new session(s)")
 	cmd.Flags().Bool("json", false, "Output result as JSON")
 	cmd.Flags().Bool("quiet", false, "Only output the new session ID (for scripting)")
 	return cmd
