@@ -221,6 +221,11 @@ func (c *Client) readMessages() {
 }
 
 func (c *Client) SendRequest(ctx context.Context, msg *pb.ClientOriginatedMessage) (*pb.ServerOriginatedMessage, error) {
+	// Check if connection exists
+	if c.conn == nil {
+		return nil, fmt.Errorf("not connected to iTerm2 - call Connect() first")
+	}
+
 	c.mu.Lock()
 	c.requestCounter++
 	requestID := c.requestCounter
@@ -449,22 +454,90 @@ func (c *Client) GetFocus(ctx context.Context) (*FocusInfo, error) {
 	return nil, fmt.Errorf("unexpected response type")
 }
 
-// Placeholder client methods for commands that aren't fully implemented
-// These prevent compilation errors and provide helpful error messages
+// Alert functionality using iTerm2's InvokeFunction API
 
-// ShowAlert displays an alert dialog (placeholder)
+// ShowAlert displays an alert dialog
 func (c *Client) ShowAlert(ctx context.Context, message, title string) (interface{}, error) {
-	return nil, fmt.Errorf("alert functionality not implemented - this is a placeholder")
+	invocation := fmt.Sprintf("iterm2.alert(\"%s\", \"%s\")",
+		escapeJSONString(title), escapeJSONString(message))
+
+	return c.InvokeFunction(ctx, invocation, nil, nil, nil, 5.0)
 }
 
-// ConfirmAlert displays a confirmation alert (placeholder)
+// ConfirmAlert displays a confirmation alert
 func (c *Client) ConfirmAlert(ctx context.Context, message, title string) (interface{}, error) {
-	return nil, fmt.Errorf("alert functionality not implemented - this is a placeholder")
+	invocation := fmt.Sprintf("iterm2.confirm(\"%s\", \"%s\")",
+		escapeJSONString(title), escapeJSONString(message))
+
+	return c.InvokeFunction(ctx, invocation, nil, nil, nil, 5.0)
 }
 
-// InputAlert displays an input alert (placeholder)
+// InputAlert displays an input alert
 func (c *Client) InputAlert(ctx context.Context, prompt, title, defaultText string, secure bool) (interface{}, error) {
-	return nil, fmt.Errorf("alert functionality not implemented - this is a placeholder")
+	secureStr := "false"
+	if secure {
+		secureStr = "true"
+	}
+
+	invocation := fmt.Sprintf("iterm2.get_string(\"%s\", \"%s\", \"%s\", %s)",
+		escapeJSONString(title), escapeJSONString(prompt), escapeJSONString(defaultText), secureStr)
+
+	return c.InvokeFunction(ctx, invocation, nil, nil, nil, 10.0)
+}
+
+// escapeJSONString escapes a string for safe inclusion in JSON
+func escapeJSONString(s string) string {
+	escaped := strings.ReplaceAll(s, "\\", "\\\\")
+	escaped = strings.ReplaceAll(escaped, "\"", "\\\"")
+	escaped = strings.ReplaceAll(escaped, "\n", "\\n")
+	escaped = strings.ReplaceAll(escaped, "\r", "\\r")
+	escaped = strings.ReplaceAll(escaped, "\t", "\\t")
+	return escaped
+}
+
+// File panel functionality using iTerm2's InvokeFunction API
+
+// OpenFilePanel opens a file selection panel
+func (c *Client) OpenFilePanel(ctx context.Context, title, directory string, types []string, multiple bool) (interface{}, error) {
+	multipleStr := "false"
+	if multiple {
+		multipleStr = "true"
+	}
+
+	var typesArray string
+	if len(types) > 0 {
+		var escapedTypes []string
+		for _, t := range types {
+			escapedTypes = append(escapedTypes, fmt.Sprintf("\"%s\"", escapeJSONString(t)))
+		}
+		typesArray = fmt.Sprintf("[%s]", strings.Join(escapedTypes, ","))
+	} else {
+		typesArray = "[]"
+	}
+
+	invocation := fmt.Sprintf("iterm2.open_panel(\"%s\", \"%s\", %s, %s)",
+		escapeJSONString(title), escapeJSONString(directory), typesArray, multipleStr)
+
+	return c.InvokeFunction(ctx, invocation, nil, nil, nil, 30.0)
+}
+
+// SaveFilePanel opens a file save panel
+func (c *Client) SaveFilePanel(ctx context.Context, title, directory, filename string, types []string) (interface{}, error) {
+	var typesArray string
+	if len(types) > 0 {
+		var escapedTypes []string
+		for _, t := range types {
+			escapedTypes = append(escapedTypes, fmt.Sprintf("\"%s\"", escapeJSONString(t)))
+		}
+		typesArray = fmt.Sprintf("[%s]", strings.Join(escapedTypes, ","))
+	} else {
+		typesArray = "[]"
+	}
+
+	invocation := fmt.Sprintf("iterm2.save_panel(\"%s\", \"%s\", \"%s\", %s)",
+		escapeJSONString(title), escapeJSONString(directory), escapeJSONString(filename), typesArray)
+
+	return c.InvokeFunction(ctx, invocation, nil, nil, nil, 30.0)
 }
 
 // RegisterCustomControl registers a custom control (placeholder)
@@ -487,15 +560,6 @@ func (c *Client) ListCustomControls(ctx context.Context) (interface{}, error) {
 	return nil, fmt.Errorf("custom control functionality not implemented - this is a placeholder")
 }
 
-// OpenFilePanel opens a file selection panel (placeholder)
-func (c *Client) OpenFilePanel(ctx context.Context, title, directory string, types []string, multiple bool) (interface{}, error) {
-	return nil, fmt.Errorf("file panel functionality not implemented - this is a placeholder")
-}
-
-// SaveFilePanel opens a file save panel (placeholder)
-func (c *Client) SaveFilePanel(ctx context.Context, title, directory, filename string, types []string) (interface{}, error) {
-	return nil, fmt.Errorf("file panel functionality not implemented - this is a placeholder")
-}
 
 // RegisterRPC registers an RPC handler (placeholder)
 func (c *Client) RegisterRPC(ctx context.Context, rpcName, sessionID string) (interface{}, error) {
@@ -512,12 +576,190 @@ func (c *Client) MonitorLifecycle(ctx context.Context, sessionID string, follow 
 	return nil, fmt.Errorf("lifecycle monitoring functionality not implemented - this is a placeholder")
 }
 
-// GetPreferences gets application preferences (placeholder)
-func (c *Client) GetPreferences(ctx context.Context, request interface{}) (interface{}, error) {
-	return nil, fmt.Errorf("preferences functionality not implemented - this is a placeholder")
+// Preferences functionality using iTerm2's PreferencesRequest API
+
+// GetPreference gets a single application preference
+func (c *Client) GetPreference(ctx context.Context, key string) (interface{}, error) {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_PreferencesRequest{
+			PreferencesRequest: &pb.PreferencesRequest{
+				Requests: []*pb.PreferencesRequest_Request{
+					{
+						Request: &pb.PreferencesRequest_Request_GetPreferenceRequest{
+							GetPreferenceRequest: &pb.PreferencesRequest_Request_GetPreference{
+								Key: &key,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get preference: %w", err)
+	}
+
+	if resp := response.GetPreferencesResponse(); resp != nil {
+		if len(resp.Results) > 0 {
+			result := resp.Results[0]
+			if getResult := result.GetGetPreferenceResult(); getResult != nil {
+				// Parse JSON value
+				var value interface{}
+				if getResult.JsonValue != nil {
+					if err := json.Unmarshal([]byte(*getResult.JsonValue), &value); err != nil {
+						return nil, fmt.Errorf("failed to parse preference value: %w", err)
+					}
+				}
+				return value, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
 }
 
-// SetPreferences sets application preferences (placeholder)
-func (c *Client) SetPreferences(ctx context.Context, prefs interface{}) (interface{}, error) {
-	return nil, fmt.Errorf("preferences functionality not implemented - this is a placeholder")
+// SetPreference sets a single application preference
+func (c *Client) SetPreference(ctx context.Context, key string, value interface{}) error {
+	// Convert value to JSON
+	jsonValue, err := json.Marshal(value)
+	if err != nil {
+		return fmt.Errorf("failed to marshal preference value: %w", err)
+	}
+	jsonStr := string(jsonValue)
+
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_PreferencesRequest{
+			PreferencesRequest: &pb.PreferencesRequest{
+				Requests: []*pb.PreferencesRequest_Request{
+					{
+						Request: &pb.PreferencesRequest_Request_SetPreferenceRequest{
+							SetPreferenceRequest: &pb.PreferencesRequest_Request_SetPreference{
+								Key:       &key,
+								JsonValue: &jsonStr,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return fmt.Errorf("failed to set preference: %w", err)
+	}
+
+	if resp := response.GetPreferencesResponse(); resp != nil {
+		if len(resp.Results) > 0 {
+			result := resp.Results[0]
+			if setResult := result.GetSetPreferenceResult(); setResult != nil {
+				if setResult.Status != nil && *setResult.Status != pb.PreferencesResponse_Result_SetPreferenceResult_OK {
+					return fmt.Errorf("failed to set preference: %v", *setResult.Status)
+				}
+				return nil
+			}
+		}
+	}
+
+	return fmt.Errorf("unexpected response type")
+}
+
+// GetPreferences gets multiple application preferences
+func (c *Client) GetPreferences(ctx context.Context, keys []string) (map[string]interface{}, error) {
+	var requests []*pb.PreferencesRequest_Request
+	for _, key := range keys {
+		keyVal := key // Capture loop variable
+		requests = append(requests, &pb.PreferencesRequest_Request{
+			Request: &pb.PreferencesRequest_Request_GetPreferenceRequest{
+				GetPreferenceRequest: &pb.PreferencesRequest_Request_GetPreference{
+					Key: &keyVal,
+				},
+			},
+		})
+	}
+
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_PreferencesRequest{
+			PreferencesRequest: &pb.PreferencesRequest{
+				Requests: requests,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get preferences: %w", err)
+	}
+
+	result := make(map[string]interface{})
+	if resp := response.GetPreferencesResponse(); resp != nil {
+		for i, res := range resp.Results {
+			if i < len(keys) {
+				key := keys[i]
+				if getResult := res.GetGetPreferenceResult(); getResult != nil {
+					if getResult.JsonValue != nil {
+						var value interface{}
+						if err := json.Unmarshal([]byte(*getResult.JsonValue), &value); err != nil {
+							return nil, fmt.Errorf("failed to parse preference value for key %s: %w", key, err)
+						}
+						result[key] = value
+					} else {
+						result[key] = nil
+					}
+				}
+			}
+		}
+	}
+
+	return result, nil
+}
+
+// SetPreferences sets multiple application preferences
+func (c *Client) SetPreferences(ctx context.Context, prefs map[string]interface{}) error {
+	var requests []*pb.PreferencesRequest_Request
+	for key, value := range prefs {
+		// Convert value to JSON
+		jsonValue, err := json.Marshal(value)
+		if err != nil {
+			return fmt.Errorf("failed to marshal preference value for key %s: %w", key, err)
+		}
+		jsonStr := string(jsonValue)
+		keyVal := key // Capture loop variable
+
+		requests = append(requests, &pb.PreferencesRequest_Request{
+			Request: &pb.PreferencesRequest_Request_SetPreferenceRequest{
+				SetPreferenceRequest: &pb.PreferencesRequest_Request_SetPreference{
+					Key:       &keyVal,
+					JsonValue: &jsonStr,
+				},
+			},
+		})
+	}
+
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_PreferencesRequest{
+			PreferencesRequest: &pb.PreferencesRequest{
+				Requests: requests,
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return fmt.Errorf("failed to set preferences: %w", err)
+	}
+
+	if resp := response.GetPreferencesResponse(); resp != nil {
+		for _, result := range resp.Results {
+			if setResult := result.GetSetPreferenceResult(); setResult != nil {
+				if setResult.Status != nil && *setResult.Status != pb.PreferencesResponse_Result_SetPreferenceResult_OK {
+					return fmt.Errorf("failed to set one or more preferences: %v", *setResult.Status)
+				}
+			}
+		}
+	}
+
+	return nil
 }
