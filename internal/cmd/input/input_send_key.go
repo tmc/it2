@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/utils"
 )
 
 func newSendKeyCommand() *cobra.Command {
@@ -102,7 +103,7 @@ Examples:
 			}
 
 			// Map key names to actual key codes or use the character directly
-			keyCode := mapKeyToCode(strings.ToLower(key))
+			keyCode := utils.MapKeyToCode(strings.ToLower(key))
 			if keyCode == "" {
 				// If not a special key, use the key as-is (for regular characters)
 				keyCode = key

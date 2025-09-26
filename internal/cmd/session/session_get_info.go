@@ -10,6 +10,7 @@ import (
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/plugins"
 )
 
 func newGetInfoCommand() *cobra.Command {
@@ -210,6 +211,33 @@ func gatherSessionInfo(ctx context.Context, c *client.Client, sessionID string, 
 		info["shell_pid"] = pid
 	}
 
+	// Apply plugin enrichment
+	registry := plugins.NewRegistry()
+	if err := registry.DiscoverAndRegister(); err == nil {
+		enrichers := registry.GetEnrichers()
+		pluginData := make(map[string]interface{})
+
+		// Initialize plugin data in the target session if needed
+		if targetSession.PluginData == nil {
+			targetSession.PluginData = make(map[string]interface{})
+		}
+
+		// Apply each enricher
+		for _, enricher := range enrichers {
+			data, err := enricher.EnrichSession(ctx, targetSession)
+			if err == nil && len(data) > 0 {
+				for k, v := range data {
+					pluginData[k] = v
+				}
+			}
+		}
+
+		// Add plugin data if any plugins provided data
+		if len(pluginData) > 0 {
+			info["plugin_data"] = pluginData
+		}
+	}
+
 	return info, nil
 }
 
@@ -282,6 +310,38 @@ func printSessionInfo(info map[string]interface{}) error {
 				fmt.Printf("  Unique ID:         %v\n", value)
 			default:
 				fmt.Printf("  %-18s %v\n", strings.Title(key)+":", value)
+			}
+		}
+	}
+
+	// Print plugin data if included
+	if pluginData, ok := info["plugin_data"].(map[string]interface{}); ok && len(pluginData) > 0 {
+		fmt.Printf("\nPlugin Data:\n")
+		for key, value := range pluginData {
+			switch key {
+			case "is-claude-session":
+				if value == "✅" {
+					fmt.Printf("  Claude Session:    Yes ✅\n")
+				} else {
+					fmt.Printf("  Claude Session:    %v\n", value)
+				}
+			case "is-claude-in-progress":
+				if value == "🚧" {
+					fmt.Printf("  Claude In Progress: Yes 🚧\n")
+				} else {
+					fmt.Printf("  Claude In Progress: %v\n", value)
+				}
+			case "is-claude-in-vim-mode":
+				if value == "✏️" {
+					fmt.Printf("  Claude Vim Mode:   Yes ✏️\n")
+				} else {
+					fmt.Printf("  Claude Vim Mode:   %v\n", value)
+				}
+			default:
+				// Format plugin key nicely
+				displayKey := strings.ReplaceAll(key, "-", " ")
+				displayKey = strings.Title(displayKey)
+				fmt.Printf("  %-18s %v\n", displayKey+":", value)
 			}
 		}
 	}

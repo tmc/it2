@@ -264,7 +264,7 @@ func processNotification(notification *pb.Notification, eventType string) EventL
 		if ks := notification.GetKeystrokeNotification(); ks != nil {
 			event.SessionID = ks.GetSession()
 			event.Data["characters"] = ks.GetCharacters()
-			event.Data["keycode"] = ks.GetKeycode()
+			event.Data["keycode"] = ks.GetKeyCode()
 			event.Data["modifiers"] = ks.GetModifiers()
 		}
 
@@ -295,9 +295,11 @@ func processNotification(notification *pb.Notification, eventType string) EventL
 		if prompt := notification.GetPromptNotification(); prompt != nil {
 			event.SessionID = prompt.GetSession()
 			event.Data["unique_prompt_id"] = prompt.GetUniquePromptId()
-			if prompt.GetPrompt() != nil {
-				event.Data["working_directory"] = prompt.GetPrompt().GetWorkingDirectory()
-				event.Data["command"] = prompt.GetPrompt().GetCommand()
+			if promptNotif := prompt.GetPrompt(); promptNotif != nil {
+				if promptDetail := promptNotif.GetPrompt(); promptDetail != nil {
+					event.Data["working_directory"] = promptDetail.GetWorkingDirectory()
+					event.Data["command"] = promptDetail.GetCommand()
+				}
 			}
 		}
 
@@ -314,7 +316,7 @@ func processNotification(notification *pb.Notification, eventType string) EventL
 	case "variable":
 		if variable := notification.GetVariableChangedNotification(); variable != nil {
 			event.Data["name"] = variable.GetName()
-			event.Data["value"] = variable.GetValue()
+			event.Data["value"] = variable.GetJsonNewValue()
 			event.Data["identifier"] = variable.GetIdentifier()
 			event.Data["scope"] = variable.GetScope().String()
 		}
@@ -339,13 +341,14 @@ func processNotification(notification *pb.Notification, eventType string) EventL
 	case "profile":
 		if profile := notification.GetProfileChangedNotification(); profile != nil {
 			event.Data["guid"] = profile.GetGuid()
-			event.Data["property"] = profile.GetProperty()
+			// Note: GetProperty() not available in current protobuf version
+			event.Data["property"] = "(not available)"
 		}
 
 	case "custom":
 		if custom := notification.GetCustomEscapeSequenceNotification(); custom != nil {
 			event.SessionID = custom.GetSession()
-			event.Data["text"] = custom.GetText()
+			event.Data["payload"] = custom.GetPayload()
 		}
 
 	case "rpc":
@@ -435,14 +438,14 @@ func countSessions(node *pb.SplitTreeNode) int {
 		return 0
 	}
 
-	if node.GetSession() != nil {
-		return 1
-	}
-
 	if links := node.GetLinks(); len(links) > 0 {
 		count := 0
 		for _, link := range links {
-			count += countSessions(link.GetNode())
+			if link.GetSession() != nil {
+				count++
+			} else if subNode := link.GetNode(); subNode != nil {
+				count += countSessions(subNode)
+			}
 		}
 		return count
 	}
@@ -456,7 +459,7 @@ func formatRPCArguments(args []*pb.ServerOriginatedRPC_RPCArgument) []map[string
 	for i, arg := range args {
 		result[i] = map[string]interface{}{
 			"name":  arg.GetName(),
-			"value": arg.GetValue(),
+			"value": arg.GetJsonValue(),
 		}
 	}
 	return result

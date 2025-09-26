@@ -41,7 +41,7 @@ Basic session management:
 	it2 session send-text "echo Hello!"
 
 	# Create a new tab
-	it2 tab create
+	it2 tab create "Default"
 
 	# Split current pane
 	it2 session split --vertical
@@ -64,8 +64,9 @@ Text & Content Operations:
 
   - text: Buffer operations, cursor control, search, selection
   - selection: Control and retrieve text selection
-  - annotation: Add and manage session annotations
   - badge: Display informational badges on sessions
+  - clipboard: Manage clipboard operations
+  - screen: Screen capture utilities
 
 Shell Integration Features (requires Shell Integration):
 
@@ -87,6 +88,9 @@ Monitoring & Events:
 Advanced Features:
 
   - tmux: Control tmux integration
+  - completion: Generate completion scripts for various shells
+  - config: Manage it2 configuration
+  - help: Get help about any command
 
 ## Configuration
 
@@ -190,7 +194,7 @@ Subscribe to live iTerm2 events:
 Useful patterns for automation:
 
 	# Create development environment
-	TAB1=$(it2 tab create --format json | jq -r '.tab_id')
+	TAB1=$(it2 tab create "Default" --format json | jq -r '.tab_id')
 	it2 session send-text "cd ~/project && vim"
 	it2 session split --horizontal
 	it2 session send-text "npm run dev"
@@ -208,7 +212,7 @@ Useful patterns for automation:
 Development workflow automation:
 
 	# Setup development environment
-	it2 tab create "Development"
+	it2 tab create "Default"
 	it2 session send-text "cd ~/project"
 	it2 session split --vertical
 	it2 session send-text "npm run dev"
@@ -219,7 +223,7 @@ Remote server management:
 
 	# Connect to multiple servers
 	for server in web1 web2 db1; do
-	    it2 tab create "$server"
+	    it2 tab create "Default" --badge "$server"
 	    it2 session send-text "ssh $server"
 	done
 

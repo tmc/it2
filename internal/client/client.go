@@ -448,3 +448,76 @@ func (c *Client) GetFocus(ctx context.Context) (*FocusInfo, error) {
 
 	return nil, fmt.Errorf("unexpected response type")
 }
+
+// Placeholder client methods for commands that aren't fully implemented
+// These prevent compilation errors and provide helpful error messages
+
+// ShowAlert displays an alert dialog (placeholder)
+func (c *Client) ShowAlert(ctx context.Context, message, title string) (interface{}, error) {
+	return nil, fmt.Errorf("alert functionality not implemented - this is a placeholder")
+}
+
+// ConfirmAlert displays a confirmation alert (placeholder)
+func (c *Client) ConfirmAlert(ctx context.Context, message, title string) (interface{}, error) {
+	return nil, fmt.Errorf("alert functionality not implemented - this is a placeholder")
+}
+
+// InputAlert displays an input alert (placeholder)
+func (c *Client) InputAlert(ctx context.Context, prompt, title, defaultText string, secure bool) (interface{}, error) {
+	return nil, fmt.Errorf("alert functionality not implemented - this is a placeholder")
+}
+
+// RegisterCustomControl registers a custom control (placeholder)
+func (c *Client) RegisterCustomControl(ctx context.Context, controlID, controlType, configStr string) (interface{}, error) {
+	return nil, fmt.Errorf("custom control functionality not implemented - this is a placeholder")
+}
+
+// UpdateCustomControl updates a custom control (placeholder)
+func (c *Client) UpdateCustomControl(ctx context.Context, controlID string, data interface{}) (interface{}, error) {
+	return nil, fmt.Errorf("custom control functionality not implemented - this is a placeholder")
+}
+
+// UnregisterCustomControl unregisters a custom control (placeholder)
+func (c *Client) UnregisterCustomControl(ctx context.Context, controlID string) (interface{}, error) {
+	return nil, fmt.Errorf("custom control functionality not implemented - this is a placeholder")
+}
+
+// ListCustomControls lists custom controls (placeholder)
+func (c *Client) ListCustomControls(ctx context.Context) (interface{}, error) {
+	return nil, fmt.Errorf("custom control functionality not implemented - this is a placeholder")
+}
+
+// OpenFilePanel opens a file selection panel (placeholder)
+func (c *Client) OpenFilePanel(ctx context.Context, title, directory string, types []string, multiple bool) (interface{}, error) {
+	return nil, fmt.Errorf("file panel functionality not implemented - this is a placeholder")
+}
+
+// SaveFilePanel opens a file save panel (placeholder)
+func (c *Client) SaveFilePanel(ctx context.Context, title, directory, filename string, types []string) (interface{}, error) {
+	return nil, fmt.Errorf("file panel functionality not implemented - this is a placeholder")
+}
+
+// RegisterRPC registers an RPC handler (placeholder)
+func (c *Client) RegisterRPC(ctx context.Context, rpcName, sessionID string) (interface{}, error) {
+	return nil, fmt.Errorf("lifecycle/RPC functionality not implemented - this is a placeholder")
+}
+
+// UnregisterRPC unregisters an RPC handler (placeholder)
+func (c *Client) UnregisterRPC(ctx context.Context, rpcName, sessionID string) (interface{}, error) {
+	return nil, fmt.Errorf("lifecycle/RPC functionality not implemented - this is a placeholder")
+}
+
+// MonitorLifecycle monitors lifecycle events (placeholder)
+func (c *Client) MonitorLifecycle(ctx context.Context, sessionID string, follow bool) (interface{}, error) {
+	return nil, fmt.Errorf("lifecycle monitoring functionality not implemented - this is a placeholder")
+}
+
+// GetPreferences gets application preferences (placeholder)
+func (c *Client) GetPreferences(ctx context.Context, request interface{}) (interface{}, error) {
+	return nil, fmt.Errorf("preferences functionality not implemented - this is a placeholder")
+}
+
+// SetPreferences sets application preferences (placeholder)
+func (c *Client) SetPreferences(ctx context.Context, prefs interface{}) (interface{}, error) {
+	return nil, fmt.Errorf("preferences functionality not implemented - this is a placeholder")
+}

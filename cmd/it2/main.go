@@ -14,7 +14,7 @@ import (
 	"github.com/tmc/it2/internal/cmd/clipboard"
 	"github.com/tmc/it2/internal/cmd/color"
 
-	// "github.com/tmc/it2/internal/cmd/input"  // TODO: Fix compilation
+	"github.com/tmc/it2/internal/cmd/input"
 	"github.com/tmc/it2/internal/cmd/job"
 	"github.com/tmc/it2/internal/cmd/notification"
 	"github.com/tmc/it2/internal/cmd/profile"
@@ -70,7 +70,7 @@ EXAMPLES:
   it2 prompt list
 
   # Create a new tab
-  it2 tab create
+  it2 tab create "Default"
 
   # Split current pane vertically
   it2 session split --vertical
@@ -264,7 +264,7 @@ func init() {
 	rootCmd.AddCommand(broadcast.NewCommand())
 	rootCmd.AddCommand(clipboard.NewCommand())
 	rootCmd.AddCommand(color.NewCommand())
-	// rootCmd.AddCommand(input.NewCommand())        // TODO: Fix send-key compilation issue
+	rootCmd.AddCommand(input.NewCommand())
 	rootCmd.AddCommand(job.NewCommand())
 	rootCmd.AddCommand(notification.NewCommand())
 	rootCmd.AddCommand(profile.NewCommand())

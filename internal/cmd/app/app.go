@@ -465,26 +465,29 @@ func newVersionCommand() *cobra.Command {
 			}
 			defer c.Close()
 
-			// Try to get version property
-			version, versionErr := c.GetProperty(ctx, "version")
-			build, buildErr := c.GetProperty(ctx, "build")
-
+			// Try to get version information through available variables first
 			versionInfo := map[string]interface{}{}
-			if versionErr == nil {
-				// Parse JSON if it's valid JSON, otherwise use as string
-				var versionValue interface{}
-				if err := json.Unmarshal([]byte(version), &versionValue); err == nil {
-					versionInfo["version"] = versionValue
-				} else {
-					versionInfo["version"] = version
+
+			// Try to get app variables that might contain version info
+			if variables, err := c.GetVariable(ctx, "", ""); err == nil {
+				var variablesMap map[string]interface{}
+				if err := json.Unmarshal([]byte(variables), &variablesMap); err == nil {
+					versionInfo = variablesMap
 				}
 			}
-			if buildErr == nil {
-				var buildValue interface{}
-				if err := json.Unmarshal([]byte(build), &buildValue); err == nil {
-					versionInfo["build"] = buildValue
-				} else {
-					versionInfo["build"] = build
+
+			// If no version info available from variables, try fallback to system info
+			if len(versionInfo) == 0 {
+				versionInfo = make(map[string]interface{})
+				// Get basic app information that is available
+				if effectiveTheme, err := c.GetVariable(ctx, "", "effectiveTheme"); err == nil {
+					versionInfo["effectiveTheme"] = effectiveTheme
+				}
+				if pid, err := c.GetVariable(ctx, "", "pid"); err == nil {
+					versionInfo["pid"] = pid
+				}
+				if hostname, err := c.GetVariable(ctx, "", "localhostName"); err == nil {
+					versionInfo["hostname"] = hostname
 				}
 			}
 
@@ -495,23 +498,35 @@ func newVersionCommand() *cobra.Command {
 				fmt.Println(string(output))
 			default:
 				if len(versionInfo) == 0 {
-					fmt.Println("Version information not available")
-					if versionErr != nil {
-						fmt.Printf("Version error: %v\n", versionErr)
-					}
-					if buildErr != nil {
-						fmt.Printf("Build error: %v\n", buildErr)
-					}
+					fmt.Println("iTerm2 application information not available")
 					return nil
 				}
 
-				fmt.Println("iTerm2 Version Information:")
-				fmt.Println("---------------------------")
+				fmt.Println("iTerm2 Application Information:")
+				fmt.Println("==============================")
+
+				// Show available information
 				if v, ok := versionInfo["version"]; ok {
-					fmt.Printf("Version: %v\n", v)
+					fmt.Printf("Version:        %v\n", v)
 				}
 				if b, ok := versionInfo["build"]; ok {
-					fmt.Printf("Build:   %v\n", b)
+					fmt.Printf("Build:          %v\n", b)
+				}
+				if pid, ok := versionInfo["pid"]; ok {
+					fmt.Printf("Process ID:     %v\n", pid)
+				}
+				if theme, ok := versionInfo["effectiveTheme"]; ok {
+					fmt.Printf("Theme:          %v\n", theme)
+				}
+				if hostname, ok := versionInfo["hostname"]; ok {
+					fmt.Printf("Hostname:       %v\n", hostname)
+				}
+
+				// Show any other available variables
+				for key, value := range versionInfo {
+					if key != "version" && key != "build" && key != "pid" && key != "effectiveTheme" && key != "hostname" {
+						fmt.Printf("%-15s %v\n", key+":", value)
+					}
 				}
 			}
 

@@ -1275,6 +1275,39 @@ func (f *Formatter) FormatCursor(cursor *pb.Coord) error {
 	}
 }
 
+// Placeholder formatter methods for commands that aren't fully implemented
+// These prevent compilation errors and provide helpful error messages
+
+// FormatAlertResponse formats alert responses (placeholder)
+func (f *Formatter) FormatAlertResponse(response interface{}) error {
+	return fmt.Errorf("Alert functionality not implemented - this is a placeholder")
+}
+
+// FormatCustomControlResponse formats custom control responses (placeholder)
+func (f *Formatter) FormatCustomControlResponse(response interface{}) error {
+	return fmt.Errorf("Custom control functionality not implemented - this is a placeholder")
+}
+
+// FormatFilePanelResponse formats file panel responses (placeholder)
+func (f *Formatter) FormatFilePanelResponse(response interface{}) error {
+	return fmt.Errorf("File panel functionality not implemented - this is a placeholder")
+}
+
+// FormatLifecycleResponse formats lifecycle responses (placeholder)
+func (f *Formatter) FormatLifecycleResponse(response interface{}) error {
+	return fmt.Errorf("Lifecycle functionality not implemented - this is a placeholder")
+}
+
+// FormatStatusBarResponse formats status bar responses (placeholder)
+func (f *Formatter) FormatStatusBarResponse(response interface{}) error {
+	return fmt.Errorf("Status bar popover functionality not implemented - this is a placeholder")
+}
+
+// FormatUtilityResponse formats utility responses (placeholder)
+func (f *Formatter) FormatUtilityResponse(response interface{}) error {
+	return fmt.Errorf("Utility functionality not implemented - this is a placeholder")
+}
+
 // FormatNotification formats a notification for display
 func FormatNotification(notification *pb.Notification, notificationType string) string {
 	if notification == nil {

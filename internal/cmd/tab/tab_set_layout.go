@@ -10,10 +10,30 @@ import (
 
 func newSetLayoutCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "set-layout <tab-id> <layout>",
-		Short:          "Set the layout of a tab",
-		Long:           "Set the split layout of a tab using predefined layouts (single, split, grid)",
-		Example:        "  it2 tab set-layout TAB_ID split --horizontal",
+		Use:   "set-layout <tab-id> <layout>",
+		Short: "Set the layout of a tab (limited implementation)",
+		Long: `Set the split layout of a tab using predefined layouts.
+
+WARNING: This command has limited implementation due to the complexity of the
+iTerm2 SetTabLayout API, which requires exact tree structure matching.
+
+Currently supported operations are limited. For most layout operations, use:
+  - 'it2 session split' to create new splits
+  - 'it2 session close' to remove sessions
+  - 'it2 tab splits' to view current layout
+
+Supported layout types: single, split, grid (all currently return helpful error messages)`,
+		Example: cmdutil.Doc(`
+			# View current tab layout
+			$ it2 tab splits <tab-id>
+
+			# Create splits manually (recommended approach)
+			$ it2 session split --vertical
+			$ it2 session split --horizontal
+
+			# Attempt to set layout (will show helpful error message)
+			$ it2 tab set-layout <tab-id> split
+		`),
 		Args:           cobra.ExactArgs(2),
 		RequiresClient: true,
 		SupportsFormat: true,
@@ -33,16 +53,33 @@ func newSetLayoutCommand() *cobra.Command {
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			tabID := args[0]
 			layout := args[1]
-			horizontal, _ := sc.GetCommand().Flags().GetBool("horizontal")
+			// horizontal, _ := sc.GetCommand().Flags().GetBool("horizontal") // Not used in current implementation
 
-			// TODO: Implement set layout functionality when API supports it
-			// This is a placeholder implementation
-			_ = tabID
-			_ = layout
-			_ = horizontal
+			// Validate tab exists
+			if err := cmdutil.ValidateTabExists(sc.GetContext(), sc.GetClient(), tabID); err != nil {
+				return err
+			}
 
-			return cmdutil.NewOperationError("set tab layout",
-				fmt.Errorf("tab layout modification is not yet implemented in the iTerm2 API"))
+			// The iTerm2 SetTabLayout API requires precise SplitTreeNode structures
+			// that exactly match the current tree structure. This is complex to implement
+			// correctly without risking corrupting the existing layout.
+			//
+			// For safety, we currently only support basic layout operations.
+			// Future implementation could add support for:
+			// - Resizing panes within existing splits
+			// - Converting between horizontal/vertical splits
+			// - Creating simple predefined layouts
+
+			switch layout {
+			case "single":
+				return fmt.Errorf("converting to single pane layout not yet supported - use 'it2 session close' to close other sessions in the tab")
+			case "split":
+				return fmt.Errorf("modifying split direction not yet supported - the SetTabLayout API requires exact tree structure matching")
+			case "grid":
+				return fmt.Errorf("grid layout creation not yet supported - use 'it2 session split' to create splits manually")
+			default:
+				return fmt.Errorf("unsupported layout type: %s", layout)
+			}
 		},
 	}
 

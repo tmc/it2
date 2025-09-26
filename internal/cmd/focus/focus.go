@@ -81,7 +81,7 @@ Examples:
 			fmt.Println("Monitoring focus changes. Press Ctrl+C to stop...")
 
 			// Subscribe to focus notifications
-			err = c.SubscribeToNotification(ctx, pb.NotificationRequest_NOTIFY_ON_FOCUS_CHANGE)
+			err = c.SubscribeToNotification(ctx, pb.NotificationType_NOTIFY_ON_FOCUS_CHANGE)
 			if err != nil {
 				return fmt.Errorf("failed to subscribe to focus notifications: %w", err)
 			}
