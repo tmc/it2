@@ -1,3 +1,6 @@
+---
+title: it2 documentation
+---
 # it2 Documentation
 
 Welcome to the it2 documentation! it2 is a comprehensive command-line interface for controlling iTerm2, providing programmatic access to iTerm2's powerful features.

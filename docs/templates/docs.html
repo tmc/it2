@@ -29,7 +29,7 @@
             <h3>{{.title}}</h3>
             <ul class="nav-list">
                 {{range .items}}
-                <li><a href="{{.path}}{{if ne .path "/" }}{{$.HTMLExt}}{{end}}">{{.title}}</a></li>
+                <li><a href="{{.path}}{{if ne .path "/" }}.html{{end}}">{{.title}}</a></li>
                 {{end}}
             </ul>
         </div>
@@ -37,18 +37,18 @@
         <div class="nav-section">
             <h3>Core Command</h3>
             <ul class="nav-list">
-                <li><a href="/{{$hierarchy.cli.name}}{{$.HTMLExt}}">{{$hierarchy.cli.name}}</a></li>
+                <li><a href="/{{$hierarchy.cli.name}}.html">{{$hierarchy.cli.name}}</a></li>
             </ul>
         </div>
         {{range $parent := $hierarchy.cli.subcommands}}
         <div class="nav-section">
             <h3>{{$parent.name}}</h3>
             <ul class="nav-list">
-                <li><a href="/it2_{{$parent.name}}{{$.HTMLExt}}">{{$parent.short}}</a>
+                <li><a href="/it2_{{$parent.name}}.html">{{$parent.short}}</a>
                 {{if $parent.subcommands}}
                     <ul class="nav-list">
                         {{range $parent.subcommands}}
-                        <li><a href="/it2_{{$parent.name}}_{{.name}}{{$.HTMLExt}}">{{.name}}</a></li>
+                        <li><a href="/it2_{{$parent.name}}_{{.name}}.html">{{.name}}</a></li>
                         {{end}}
                     </ul>
                 {{end}}
