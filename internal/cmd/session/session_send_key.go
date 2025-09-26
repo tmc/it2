@@ -31,16 +31,7 @@ Supported special keys:
   end             - Send End key
   pageup          - Send Page Up
   pagedown        - Send Page Down
-  ctrl-c          - Send Ctrl+C
-  ctrl-d          - Send Ctrl+D
-  ctrl-z          - Send Ctrl+Z
-  ctrl-a          - Send Ctrl+A
-  ctrl-e          - Send Ctrl+E
-  ctrl-u          - Send Ctrl+U
-  ctrl-k          - Send Ctrl+K
-  ctrl-l          - Send Ctrl+L
-  ctrl-o          - Send Ctrl+O
-  ctrl-w          - Send Ctrl+W
+  ctrl-a thru ctrl-z  - Send Ctrl+A through Ctrl+Z
 
 You can also send any regular character (a-z, 0-9, punctuation, etc.).
 
@@ -61,7 +52,10 @@ Examples:
   it2 session send-key escape
 
   # Send Ctrl+C
-  it2 session send-key ctrl-c`,
+  it2 session send-key ctrl-c
+
+  # Send Ctrl+T (new tab in many applications)
+  it2 session send-key ctrl-t`,
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID, key string
