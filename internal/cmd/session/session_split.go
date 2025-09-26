@@ -6,18 +6,42 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
 )
 
 func newSplitCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "split <session-id>",
+		Use:   "split [session-id]",
 		Short: "Split a session pane",
-		Long:  "Split a session pane vertically or horizontally, creating a new session",
-		Args:  cobra.ExactArgs(1),
+		Long: `Split a session pane horizontally or vertically, creating a new session.
+
+If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
+Default is horizontal split.
+
+Examples:
+  # Split current session horizontally (default)
+  it2 session split
+
+  # Split current session vertically
+  it2 session split --vertical
+
+  # Split specific session horizontally
+  it2 session split SESSION-ID
+
+  # Split and just output the new session ID (for scripting)
+  it2 session split --quiet`,
+		Args: cobra.RangeArgs(0, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			sessionID := args[0]
+			var sessionID string
+			if len(args) > 0 {
+				sessionID = args[0]
+			}
+			sessionID = cmdutil.ResolveSessionID(sessionID)
+			if sessionID == "" {
+				return fmt.Errorf("no session ID provided and $ITERM_SESSION_ID not set")
+			}
 
 			wsURL, _ := cmd.Flags().GetString("url")
 			timeout, _ := cmd.Flags().GetDuration("timeout")
@@ -26,14 +50,15 @@ func newSplitCommand() *cobra.Command {
 			before, _ := cmd.Flags().GetBool("before")
 			profileName, _ := cmd.Flags().GetString("profile")
 			jsonOutput, _ := cmd.Flags().GetBool("json")
+			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			// Validate flags
 			if vertical && horizontal {
 				return fmt.Errorf("cannot specify both --vertical and --horizontal")
 			}
 
-			// Default to vertical if neither specified
-			isVertical := vertical || !horizontal
+			// Default to horizontal split (more common use case)
+			isVertical := vertical && !horizontal
 
 			// Use parent command flags if not set
 			if wsURL == "" {
@@ -62,7 +87,10 @@ func newSplitCommand() *cobra.Command {
 			case pb.SplitPaneResponse_OK:
 				newSessionIDs := response.GetSessionId()
 				if len(newSessionIDs) > 0 {
-					if jsonOutput {
+					if quiet {
+						// Just output the new session ID for easy scripting
+						fmt.Println(newSessionIDs[0])
+					} else if jsonOutput {
 						result := map[string]interface{}{
 							"success":         true,
 							"new_session_id":  newSessionIDs[0],
@@ -76,14 +104,16 @@ func newSplitCommand() *cobra.Command {
 						}
 					}
 				} else {
-					if jsonOutput {
-						result := map[string]interface{}{
-							"success": true,
-							"message": "Session split successfully but no new session ID returned",
+					if !quiet {
+						if jsonOutput {
+							result := map[string]interface{}{
+								"success": true,
+								"message": "Session split successfully but no new session ID returned",
+							}
+							return formatting.PrintJSON(result)
+						} else {
+							fmt.Printf("Session split successfully\n")
 						}
-						return formatting.PrintJSON(result)
-					} else {
-						fmt.Printf("Session split successfully\n")
 					}
 				}
 			case pb.SplitPaneResponse_SESSION_NOT_FOUND:
@@ -102,10 +132,11 @@ func newSplitCommand() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().Bool("vertical", false, "Split vertically (default)")
-	cmd.Flags().Bool("horizontal", false, "Split horizontally")
+	cmd.Flags().Bool("vertical", false, "Split vertically")
+	cmd.Flags().Bool("horizontal", false, "Split horizontally (default)")
 	cmd.Flags().Bool("before", false, "Create new pane before the current one")
 	cmd.Flags().String("profile", "", "Profile name for the new session")
 	cmd.Flags().Bool("json", false, "Output result as JSON")
+	cmd.Flags().Bool("quiet", false, "Only output the new session ID (for scripting)")
 	return cmd
 }
