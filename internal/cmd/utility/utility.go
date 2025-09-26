@@ -1,7 +1,6 @@
 package utility
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"

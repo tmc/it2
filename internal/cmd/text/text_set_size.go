@@ -11,13 +11,13 @@ import (
 
 func newSetSizeCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:             "set-size <session-id> <width> <height>",
-		Short:           "Set the terminal grid size for a session",
-		Long:            "Set the terminal grid size (width and height) for a session in characters.",
-		Args:            cobra.ExactArgs(3),
-		RequiresClient:  true,
-		SupportsFormat:  true,
-		ValidArgsFunc:   completion.SessionIDCompletion,
+		Use:            "set-size <session-id> <width> <height>",
+		Short:          "Set the terminal grid size for a session",
+		Long:           "Set the terminal grid size (width and height) for a session in characters.",
+		Args:           cobra.ExactArgs(3),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := cmdutil.NormalizeSessionID(args[0])
 			widthStr := args[1]

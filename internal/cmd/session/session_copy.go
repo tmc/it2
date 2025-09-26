@@ -25,10 +25,10 @@ Examples:
   # Select and copy in one workflow:
   it2 session select session123 10 5 20 5  # Select text
   it2 session copy session123              # Copy to clipboard`,
-		Args:            cobra.RangeArgs(0, 1),
-		RequiresClient:  true,
-		SupportsFormat:  true,
-		ValidArgsFunc:   completion.SessionIDCompletion,
+		Args:           cobra.RangeArgs(0, 1),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			var sessionID string
 			if len(args) > 0 {

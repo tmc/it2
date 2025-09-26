@@ -369,8 +369,13 @@ func (f *Formatter) FormatJobs(jobs []*client.JobInfo) error {
 		return f.formatJSON(jobs)
 	case "yaml":
 		return f.formatYAML(jobs)
-	default:
+	case "table":
+		return f.formatJobsTable(jobs)
+	case "text":
 		return f.formatJobsText(jobs)
+	default:
+		// Default to table format
+		return f.formatJobsTable(jobs)
 	}
 }
 
@@ -386,6 +391,34 @@ func (f *Formatter) formatJobsText(jobs []*client.JobInfo) error {
 	return nil
 }
 
+func (f *Formatter) formatJobsTable(jobs []*client.JobInfo) error {
+	if len(jobs) == 0 {
+		fmt.Println("No running jobs found")
+		return nil
+	}
+
+	headers := []string{"Job ID", "Status", "Command"}
+	table := NewTableData(headers)
+
+	for _, job := range jobs {
+		// Truncate long commands
+		command := job.Command
+		if len(command) > 60 {
+			command = command[:57] + "..."
+		}
+
+		row := []string{
+			job.JobID,
+			job.Status,
+			command,
+		}
+
+		table.AddRow(row)
+	}
+
+	return f.FormatTable(table)
+}
+
 func (f *Formatter) formatText(sessions []*client.SessionInfo) error {
 	if len(sessions) == 0 {
 		fmt.Println("No sessions found")
@@ -397,11 +430,12 @@ func (f *Formatter) formatText(sessions []*client.SessionInfo) error {
 		if session.WindowID != "" {
 			fmt.Printf("  Window ID: %s\n", session.WindowID)
 		}
+		fmt.Printf("  Window: %d\n", session.WindowNumber)
 		if session.TabID != "" {
 			fmt.Printf("  Tab ID: %s\n", session.TabID)
 		}
 		if session.SessionName != "" {
-			fmt.Printf("  Name: %s\n", session.SessionName)
+			fmt.Printf("  Title: %s\n", session.SessionName)
 		}
 		// Display plugin data if available
 		if len(session.PluginData) > 0 {
@@ -421,7 +455,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	}
 
 	// Determine columns to include
-	headers := []string{"ID", "Name", "Window", "Tab"}
+	headers := []string{"ID", "Title", "Window ID", "Window", "Tab"}
 
 	// Check if any sessions have plugin data to determine additional columns
 	pluginColumns := make(map[string]bool)
@@ -452,6 +486,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			fullID,
 			name,
 			session.WindowID,
+			fmt.Sprintf("%d", session.WindowNumber),
 			session.TabID,
 		}
 
@@ -538,8 +573,13 @@ func (f *Formatter) FormatWindows(windows []*WindowInfo) error {
 		return f.formatJSON(windows)
 	case "yaml":
 		return f.formatYAML(windows)
-	default:
+	case "table":
+		return f.formatWindowsTable(windows)
+	case "text":
 		return f.formatWindowsText(windows)
+	default:
+		// Default to table format
+		return f.formatWindowsTable(windows)
 	}
 }
 
@@ -568,6 +608,7 @@ func (f *Formatter) formatClientWindowsText(windows []*client.WindowInfo) error 
 
 	for _, window := range windows {
 		fmt.Printf("Window ID: %s\n", window.WindowID)
+		fmt.Printf("  Window: %d\n", window.WindowNumber)
 		if window.Title != "" {
 			fmt.Printf("  Title: %s\n", window.Title)
 		}
@@ -617,13 +658,63 @@ func (f *Formatter) formatWindowsText(windows []*WindowInfo) error {
 	return nil
 }
 
+func (f *Formatter) formatWindowsTable(windows []*WindowInfo) error {
+	if len(windows) == 0 {
+		fmt.Println("No windows found")
+		return nil
+	}
+
+	headers := []string{"ID", "Title", "Name", "Tabs", "Frame", "Fullscreen", "Miniaturized"}
+	table := NewTableData(headers)
+
+	for _, window := range windows {
+		// Truncate long window IDs
+		shortID := window.WindowID
+		if len(shortID) > 12 {
+			shortID = shortID[:9] + "..."
+		}
+
+		// Truncate long titles
+		title := window.Title
+		if len(title) > 30 {
+			title = title[:27] + "..."
+		}
+
+		// Truncate long names
+		name := window.Name
+		if len(name) > 20 {
+			name = name[:17] + "..."
+		}
+
+		// Truncate frame if too long
+		frame := window.Frame
+		if len(frame) > 20 {
+			frame = frame[:17] + "..."
+		}
+
+		row := []string{
+			shortID,
+			title,
+			name,
+			fmt.Sprintf("%d", window.TabCount),
+			frame,
+			window.Fullscreen,
+			window.Miniaturized,
+		}
+
+		table.AddRow(row)
+	}
+
+	return f.FormatTable(table)
+}
+
 func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error {
 	if len(windows) == 0 {
 		fmt.Println("No windows found")
 		return nil
 	}
 
-	headers := []string{"ID", "Title", "Tabs", "Fullscreen", "Miniaturized"}
+	headers := []string{"ID", "Window", "Title", "Tabs", "Fullscreen", "Miniaturized"}
 	table := NewTableData(headers)
 
 	for _, window := range windows {
@@ -641,6 +732,7 @@ func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error
 
 		row := []string{
 			shortID,
+			fmt.Sprintf("%d", window.WindowNumber),
 			title,
 			fmt.Sprintf("%d", window.TabCount),
 			window.Fullscreen,

@@ -12,13 +12,13 @@ import (
 
 func newSelectCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:             "select <session-id>",
-		Short:           "Control text selection in a session",
-		Long:            "Get or set text selection in a session. Use --clear to clear selection.",
-		Args:            cobra.ExactArgs(1),
-		RequiresClient:  true,
-		SupportsFormat:  true,
-		ValidArgsFunc:   completion.SessionIDCompletion,
+		Use:            "select <session-id>",
+		Short:          "Control text selection in a session",
+		Long:           "Get or set text selection in a session. Use --clear to clear selection.",
+		Args:           cobra.ExactArgs(1),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := cmdutil.NormalizeSessionID(args[0])
 

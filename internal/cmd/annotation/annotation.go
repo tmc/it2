@@ -197,10 +197,10 @@ Examples:
   it2 annotation list                  # List for current session
   it2 annotation list session123       # List for specific session
   it2 annotation list --format json    # Output as JSON for processing`,
-		Args:            cobra.RangeArgs(0, 1),
-		RequiresClient:  true,
-		SupportsFormat:  true,
-		ValidArgsFunc:   completion.SessionIDCompletion,
+		Args:           cobra.RangeArgs(0, 1),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			var sessionID string
 			if len(args) > 0 {
@@ -271,9 +271,9 @@ Examples:
 			// Report success with JSON output support
 			if sc.GetFlags().Format == "json" {
 				result := map[string]interface{}{
-					"session_id":     sessionID,
-					"cleared_count":  previousCount,
-					"action":         "cleared",
+					"session_id":    sessionID,
+					"cleared_count": previousCount,
+					"action":        "cleared",
 				}
 				return sc.FormatOutput(result)
 			}

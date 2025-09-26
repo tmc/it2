@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdutil"
 )
 
 func newSetPropertyCommand() *cobra.Command {
@@ -37,7 +38,7 @@ Examples:
   it2 session set-property sess_123 use_transparency true`,
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			sessionID := args[0]
+			sessionID := cmdutil.ResolveSessionID(args[0])
 			property := args[1]
 			value := args[2]
 

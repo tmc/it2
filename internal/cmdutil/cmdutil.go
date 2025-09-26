@@ -47,7 +47,7 @@ func GetFlags(cmd *cobra.Command) (wsURL string, timeout time.Duration, format s
 		wsURL = "ws://localhost:1912"
 	}
 	if timeout == 0 {
-		timeout = 5 * time.Second
+		timeout = 60 * time.Second
 	}
 	if format == "" {
 		format = "table"

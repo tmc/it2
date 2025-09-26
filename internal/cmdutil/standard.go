@@ -14,11 +14,11 @@ import (
 
 // StandardCommand provides the foundation for all commands with common setup
 type StandardCommand struct {
-	cmd     *cobra.Command
-	client  *client.Client
-	ctx     context.Context
-	cancel  context.CancelFunc
-	flags   *StandardFlags
+	cmd    *cobra.Command
+	client *client.Client
+	ctx    context.Context
+	cancel context.CancelFunc
+	flags  *StandardFlags
 }
 
 // StandardFlags contains common flags used across commands

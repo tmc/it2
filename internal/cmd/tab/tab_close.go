@@ -8,13 +8,13 @@ import (
 
 func newCloseCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:             "close <tab-id> [tab-id...]",
-		Short:           "Close one or more tabs",
-		Long:            "Close one or more tabs by their IDs. Use --force to close without prompting",
-		Args:            cobra.MinimumNArgs(1),
-		RequiresClient:  true,
-		SupportsFormat:  true,
-		ValidArgsFunc:   completion.TabIDCompletion,
+		Use:            "close <tab-id> [tab-id...]",
+		Short:          "Close one or more tabs",
+		Long:           "Close one or more tabs by their IDs. Use --force to close without prompting",
+		Args:           cobra.MinimumNArgs(1),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.TabIDCompletion,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			// Validate all tab IDs
 			for _, tabID := range args {

@@ -1,7 +1,6 @@
 package snippet
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"

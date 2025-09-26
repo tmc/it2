@@ -19,10 +19,10 @@ Use with caution as it modifies the actual terminal content.
 Examples:
   it2 text replace session123 "old_value" "new_value"
   it2 text replace session123 "error" "ERROR" --case-sensitive`,
-		Args:            cobra.ExactArgs(3),
-		RequiresClient:  true,
-		SupportsFormat:  true,
-		ValidArgsFunc:   completion.SessionIDCompletion,
+		Args:           cobra.ExactArgs(3),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := cmdutil.NormalizeSessionID(args[0])
 			pattern := args[1]

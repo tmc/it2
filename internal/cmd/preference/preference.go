@@ -1,7 +1,6 @@
 package preference
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"

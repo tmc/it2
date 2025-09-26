@@ -9,19 +9,19 @@ import (
 
 // CommandTemplate provides a standard command structure
 type CommandTemplate struct {
-	Use              string
-	Short            string
-	Long             string
-	Example          string
-	Args             cobra.PositionalArgs
-	RequiresClient   bool
-	RequiresSession  bool
-	SupportsSorting  bool
-	SupportsColumns  bool
-	SupportsFormat   bool
-	ValidArgsFunc    func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective)
-	PreRunE          func(cmd *cobra.Command, args []string) error
-	RunE             func(*StandardCommand, []string) error
+	Use             string
+	Short           string
+	Long            string
+	Example         string
+	Args            cobra.PositionalArgs
+	RequiresClient  bool
+	RequiresSession bool
+	SupportsSorting bool
+	SupportsColumns bool
+	SupportsFormat  bool
+	ValidArgsFunc   func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective)
+	PreRunE         func(cmd *cobra.Command, args []string) error
+	RunE            func(*StandardCommand, []string) error
 }
 
 // NewCommandFromTemplate creates a standardized cobra command from a template

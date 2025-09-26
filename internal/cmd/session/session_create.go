@@ -9,7 +9,7 @@ func newCreateCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a new session",
-		Long: `Create a new iTerm2 session in a window or tab with optional profile selection.`,
+		Long:  `Create a new iTerm2 session in a window or tab with optional profile selection.`,
 		Example: cmdutil.Doc(`
 			# Create session in current window with default profile
 			$ it2 session create

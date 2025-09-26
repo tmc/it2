@@ -187,8 +187,6 @@ func buildResponders(customPatterns []string) []*AutoResponder {
 		})
 	}
 
-
-
 	return responders
 }
 
@@ -226,7 +224,6 @@ func executeResponse(c *client.Client, sessionID string, responder *AutoResponde
 		time.Sleep(100 * time.Millisecond)
 		return c.SendText(context.Background(), sessionID, "\r")
 
-
 	default:
 		return fmt.Errorf("unknown action: %s", responder.Action)
 	}
@@ -257,12 +254,8 @@ func getSessionContent(c *client.Client, sessionID string) (string, error) {
 
 // mapKeyToCode maps key names to their corresponding escape sequences
 func mapKeyToCode(key string) string {
-	// Check if this is a complex modifier combination (e.g., cmd+ctrl+shift+a)
-	if parsed := parseComplexKey(key); parsed != "" {
-		return parsed
-	}
-
-	// Fall back to simple key mappings
+	// First check simple key mappings (including simple modifier combinations like cmd+v)
+	// This prevents parseComplexKey from interfering with common shortcuts
 	keyMap := map[string]string{
 		"enter":     "\r",
 		"return":    "\r",
@@ -272,6 +265,7 @@ func mapKeyToCode(key string) string {
 		"backspace": "\x7f",
 		"delete":    "\x7f",
 		"space":     " ",
+		"paste":     "\x16", // Special paste key - equivalent to Ctrl+V
 		"up":        "\x1b[A",
 		"down":      "\x1b[B",
 		"left":      "\x1b[D",
@@ -281,92 +275,105 @@ func mapKeyToCode(key string) string {
 		"pageup":    "\x1b[5~",
 		"pagedown":  "\x1b[6~",
 		// Support both ctrl- and ctrl+ formats
-		"ctrl-a":    "\x01",
-		"ctrl+a":    "\x01",
-		"ctrl-b":    "\x02",
-		"ctrl+b":    "\x02",
-		"ctrl-c":    "\x03",
-		"ctrl+c":    "\x03",
-		"ctrl-d":    "\x04",
-		"ctrl+d":    "\x04",
-		"ctrl-e":    "\x05",
-		"ctrl+e":    "\x05",
-		"ctrl-f":    "\x06",
-		"ctrl+f":    "\x06",
-		"ctrl-g":    "\x07",
-		"ctrl+g":    "\x07",
-		"ctrl-h":    "\x08",
-		"ctrl+h":    "\x08",
-		"ctrl-i":    "\x09",
-		"ctrl+i":    "\x09",
-		"ctrl-j":    "\x0a",
-		"ctrl+j":    "\x0a",
-		"ctrl-k":    "\x0b",
-		"ctrl+k":    "\x0b",
-		"ctrl-l":    "\x0c",
-		"ctrl+l":    "\x0c",
-		"ctrl-m":    "\x0d",
-		"ctrl+m":    "\x0d",
-		"ctrl-n":    "\x0e",
-		"ctrl+n":    "\x0e",
-		"ctrl-o":    "\x0f",
-		"ctrl+o":    "\x0f",
-		"ctrl-p":    "\x10",
-		"ctrl+p":    "\x10",
-		"ctrl-q":    "\x11",
-		"ctrl+q":    "\x11",
-		"ctrl-r":    "\x12",
-		"ctrl+r":    "\x12",
-		"ctrl-s":    "\x13",
-		"ctrl+s":    "\x13",
-		"ctrl-t":    "\x14",
-		"ctrl+t":    "\x14",
-		"ctrl-u":    "\x15",
-		"ctrl+u":    "\x15",
-		"ctrl-v":    "\x16",
-		"ctrl+v":    "\x16",
-		"ctrl-w":    "\x17",
-		"ctrl+w":    "\x17",
-		"ctrl-x":    "\x18",
-		"ctrl+x":    "\x18",
-		"ctrl-y":    "\x19",
-		"ctrl+y":    "\x19",
-		"ctrl-z":    "\x1a",
-		"ctrl+z":    "\x1a",
+		"ctrl-a": "\x01",
+		"ctrl+a": "\x01",
+		"ctrl-b": "\x02",
+		"ctrl+b": "\x02",
+		"ctrl-c": "\x03",
+		"ctrl+c": "\x03",
+		"ctrl-d": "\x04",
+		"ctrl+d": "\x04",
+		"ctrl-e": "\x05",
+		"ctrl+e": "\x05",
+		"ctrl-f": "\x06",
+		"ctrl+f": "\x06",
+		"ctrl-g": "\x07",
+		"ctrl+g": "\x07",
+		"ctrl-h": "\x08",
+		"ctrl+h": "\x08",
+		"ctrl-i": "\x09",
+		"ctrl+i": "\x09",
+		"ctrl-j": "\x0a",
+		"ctrl+j": "\x0a",
+		"ctrl-k": "\x0b",
+		"ctrl+k": "\x0b",
+		"ctrl-l": "\x0c",
+		"ctrl+l": "\x0c",
+		"ctrl-m": "\x0d",
+		"ctrl+m": "\x0d",
+		"ctrl-n": "\x0e",
+		"ctrl+n": "\x0e",
+		"ctrl-o": "\x0f",
+		"ctrl+o": "\x0f",
+		"ctrl-p": "\x10",
+		"ctrl+p": "\x10",
+		"ctrl-q": "\x11",
+		"ctrl+q": "\x11",
+		"ctrl-r": "\x12",
+		"ctrl+r": "\x12",
+		"ctrl-s": "\x13",
+		"ctrl+s": "\x13",
+		"ctrl-t": "\x14",
+		"ctrl+t": "\x14",
+		"ctrl-u": "\x15",
+		"ctrl+u": "\x15",
+		"ctrl-v": "\x16",
+		"ctrl+v": "\x16",
+		"ctrl-w": "\x17",
+		"ctrl+w": "\x17",
+		"ctrl-x": "\x18",
+		"ctrl+x": "\x18",
+		"ctrl-y": "\x19",
+		"ctrl+y": "\x19",
+		"ctrl-z": "\x1a",
+		"ctrl+z": "\x1a",
 
 		// macOS Cmd key combinations (commonly used shortcuts)
 		// Note: These send escape sequences that applications may interpret as Cmd keys
-		"cmd+a":     "\x01", // Cmd+A maps to Ctrl+A (select all in many apps)
-		"cmd-a":     "\x01",
-		"cmd+c":     "\x03", // Cmd+C maps to Ctrl+C (copy in many terminal apps)
-		"cmd-c":     "\x03",
-		"cmd+v":     "\x16", // Cmd+V maps to Ctrl+V (paste in some contexts)
-		"cmd-v":     "\x16",
-		"cmd+x":     "\x18", // Cmd+X maps to Ctrl+X (cut)
-		"cmd-x":     "\x18",
-		"cmd+z":     "\x1a", // Cmd+Z maps to Ctrl+Z (undo/suspend)
-		"cmd-z":     "\x1a",
-		"cmd+n":     "\x0e", // Cmd+N maps to Ctrl+N
-		"cmd-n":     "\x0e",
-		"cmd+o":     "\x0f", // Cmd+O maps to Ctrl+O
-		"cmd-o":     "\x0f",
-		"cmd+s":     "\x13", // Cmd+S maps to Ctrl+S (save/freeze)
-		"cmd-s":     "\x13",
-		"cmd+w":     "\x17", // Cmd+W maps to Ctrl+W (close)
-		"cmd-w":     "\x17",
-		"cmd+t":     "\x14", // Cmd+T maps to Ctrl+T
-		"cmd-t":     "\x14",
-		"cmd+f":     "\x06", // Cmd+F maps to Ctrl+F (find/forward)
-		"cmd-f":     "\x06",
-		"cmd+g":     "\x07", // Cmd+G maps to Ctrl+G
-		"cmd-g":     "\x07",
-		"cmd+r":     "\x12", // Cmd+R maps to Ctrl+R (refresh/reverse search)
-		"cmd-r":     "\x12",
-		"cmd+q":     "\x11", // Cmd+Q maps to Ctrl+Q (quit/XON)
-		"cmd-q":     "\x11",
+		"cmd+a": "\x01", // Cmd+A maps to Ctrl+A (select all in many apps)
+		"cmd-a": "\x01",
+		"cmd+c": "\x03", // Cmd+C maps to Ctrl+C (copy in many terminal apps)
+		"cmd-c": "\x03",
+		"cmd+v": "\x16", // Cmd+V maps to Ctrl+V (paste in some contexts)
+		"cmd-v": "\x16",
+		"cmd+x": "\x18", // Cmd+X maps to Ctrl+X (cut)
+		"cmd-x": "\x18",
+		"cmd+z": "\x1a", // Cmd+Z maps to Ctrl+Z (undo/suspend)
+		"cmd-z": "\x1a",
+		"cmd+n": "\x0e", // Cmd+N maps to Ctrl+N
+		"cmd-n": "\x0e",
+		"cmd+o": "\x0f", // Cmd+O maps to Ctrl+O
+		"cmd-o": "\x0f",
+		"cmd+s": "\x13", // Cmd+S maps to Ctrl+S (save/freeze)
+		"cmd-s": "\x13",
+		"cmd+w": "\x17", // Cmd+W maps to Ctrl+W (close)
+		"cmd-w": "\x17",
+		"cmd+t": "\x14", // Cmd+T maps to Ctrl+T
+		"cmd-t": "\x14",
+		"cmd+f": "\x06", // Cmd+F maps to Ctrl+F (find/forward)
+		"cmd-f": "\x06",
+		"cmd+g": "\x07", // Cmd+G maps to Ctrl+G
+		"cmd-g": "\x07",
+		"cmd+k": "\x0b", // Cmd+K maps to Ctrl+K (delete to end of line)
+		"cmd-k": "\x0b",
+		"cmd+r": "\x12", // Cmd+R maps to Ctrl+R (refresh/reverse search)
+		"cmd-r": "\x12",
+		"cmd+q": "\x11", // Cmd+Q maps to Ctrl+Q (quit/XON)
+		"cmd-q": "\x11",
 	}
 
-	return keyMap[key]
+	// Check if we have a direct mapping first
+	if result := keyMap[key]; result != "" {
+		return result
+	}
+
+	// If no simple mapping found, try complex modifier combinations
+	if parsed := parseComplexKey(key); parsed != "" {
+		return parsed
+	}
+
+	// Return empty string if no mapping found
+	return ""
 }
 
 // parseComplexKey handles complex modifier combinations like cmd+ctrl+shift+opt+a

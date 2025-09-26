@@ -17,10 +17,10 @@ Examples:
   it2 text find session123 "error"
   it2 text find session123 "log.*Error" --regex
   it2 text find session123 "function\\s+\\w+" --regex --case-sensitive`,
-		Args:            cobra.ExactArgs(2),
-		RequiresClient:  true,
-		SupportsFormat:  true,
-		ValidArgsFunc:   completion.SessionIDCompletion,
+		Args:           cobra.ExactArgs(2),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := cmdutil.NormalizeSessionID(args[0])
 			pattern := args[1]

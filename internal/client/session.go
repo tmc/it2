@@ -583,6 +583,7 @@ func (c *Client) GetSessionProfileProperty(ctx context.Context, sessionID, key s
 
 	return value, nil
 }
+
 // ListSessionProfileProperties gets multiple profile properties from a session's profile copy
 func (c *Client) ListSessionProfileProperties(ctx context.Context, sessionID string, keys []string) (map[string]interface{}, error) {
 	// If no keys specified, try common profile properties

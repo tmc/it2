@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
 )
 
@@ -39,7 +40,7 @@ Use --list to see all available properties.`,
 				return fmt.Errorf("session ID required (use --list to see available properties)")
 			}
 
-			sessionID := args[0]
+			sessionID := cmdutil.ResolveSessionID(args[0])
 
 			if len(args) < 2 {
 				return fmt.Errorf("property name required (use --list to see available properties)")
@@ -67,6 +68,7 @@ Use --list to see all available properties.`,
 			}
 			defer c.Close()
 
+			// Use the real session property API
 			value, err := c.GetSessionProperty(ctx, sessionID, property)
 			if err != nil {
 				return fmt.Errorf("failed to get session property: %w", err)
@@ -98,28 +100,9 @@ func listSessionProperties() error {
 		Type        string
 		Description string
 	}{
-		{"title", "string", "Session title displayed in tab"},
-		{"name", "string", "Session name"},
-		{"columns", "number", "Number of columns in terminal"},
-		{"rows", "number", "Number of rows in terminal"},
-		{"profile_name", "string", "Name of the associated profile"},
-		{"badge_text", "string", "Text displayed in session badge"},
-		{"use_transparency", "boolean", "Whether transparency is enabled"},
-		{"transparency", "number", "Transparency level (0.0-1.0)"},
-		{"blend", "number", "Blend level (0.0-1.0)"},
-		{"blur_radius", "number", "Background blur radius"},
-		{"cursor_guide", "boolean", "Whether cursor guide is enabled"},
-		{"cursor_boost", "boolean", "Whether cursor boost is enabled"},
-		{"mouse_reporting", "boolean", "Whether mouse reporting is enabled"},
-		{"paste_bracketing", "boolean", "Whether paste bracketing is enabled"},
-		{"application_keypad", "boolean", "Whether application keypad mode is enabled"},
-		{"focus_reporting", "boolean", "Whether focus reporting is enabled"},
-		{"unicode_normalization", "string", "Unicode normalization setting"},
-		{"unicode_version", "number", "Unicode version"},
 		{"grid_size", "object", "Grid size information {width, height}"},
-		{"cursor_type", "string", "Cursor type (block, underline, bar)"},
-		{"blink_cursor", "boolean", "Whether cursor blinks"},
-		{"auto_log", "boolean", "Whether automatic logging is enabled"},
+		{"buried", "number", "Whether session is buried (0/1)"},
+		{"number_of_lines", "object", "Line information {first_visible, overflow, grid, history}"},
 	}
 
 	fmt.Println("Available session properties:")

@@ -65,7 +65,7 @@ func TestWindowInfo_WithPluginData(t *testing.T) {
 	// Initialize plugin data
 	window.PluginData = make(map[string]interface{})
 	window.PluginData["test_plugin"] = map[string]string{
-		"status": "active",
+		"status":  "active",
 		"version": "1.0.0",
 	}
 	window.PluginData["another_plugin"] = 42

@@ -97,4 +97,3 @@ cmd+a thru cmd+z. Supports complex modifier combinations like cmd+ctrl+shift+a.`
 
 	return cmd
 }
-

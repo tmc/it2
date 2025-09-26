@@ -2,17 +2,19 @@ package session
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
 )
 
 func newGetInfoCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-info <session-id>",
+		Use:   "get-info [session-id]",
 		Short: "Get comprehensive session information",
 		Long: `Get comprehensive information about a session including:
   - Basic session details (ID, name, title)
@@ -22,15 +24,25 @@ func newGetInfoCommand() *cobra.Command {
   - Process information
 
 This command combines multiple API calls to provide a complete view of the session.`,
-		Args: cobra.ExactArgs(1),
+		Args: cobra.RangeArgs(0, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			sessionID := args[0]
+			var sessionID string
+			if len(args) == 0 {
+				var err error
+				sessionID, err = cmdutil.ResolveSessionIDWithError("")
+				if err != nil {
+					return err
+				}
+			} else {
+				sessionID = cmdutil.ResolveSessionID(args[0])
+			}
 
 			wsURL, _ := cmd.Flags().GetString("url")
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 			includeProperties, _ := cmd.Flags().GetBool("properties")
 			includePrompt, _ := cmd.Flags().GetBool("prompt")
+			extractPath, _ := cmd.Flags().GetString("extract")
 
 			// Use parent command flags if not set
 			if wsURL == "" {
@@ -55,6 +67,16 @@ This command combines multiple API calls to provide a complete view of the sessi
 				return fmt.Errorf("failed to gather session info: %w", err)
 			}
 
+			// Handle property extraction if requested
+			if extractPath != "" {
+				value, err := extractProperty(info, extractPath)
+				if err != nil {
+					return fmt.Errorf("failed to extract property '%s': %w", extractPath, err)
+				}
+				fmt.Println(value)
+				return nil
+			}
+
 			if jsonOutput {
 				return formatting.PrintJSON(info)
 			} else {
@@ -66,6 +88,7 @@ This command combines multiple API calls to provide a complete view of the sessi
 	cmd.Flags().Bool("json", false, "Output result as JSON")
 	cmd.Flags().Bool("properties", false, "Include session properties")
 	cmd.Flags().Bool("prompt", false, "Include current prompt information")
+	cmd.Flags().String("extract", "", "Extract specific property value (e.g., 'frame', 'frame.coords', 'name')")
 	return cmd
 }
 
@@ -98,6 +121,34 @@ func gatherSessionInfo(ctx context.Context, c *client.Client, sessionID string, 
 	info["window_title"] = targetSession.WindowTitle
 	info["tab_title"] = targetSession.TabTitle
 
+	// Add frame information if available
+	if targetSession.Frame != nil {
+		frame := make(map[string]interface{})
+		if origin := targetSession.Frame.GetOrigin(); origin != nil {
+			frame["origin"] = map[string]interface{}{
+				"x": origin.GetX(),
+				"y": origin.GetY(),
+			}
+		}
+		if size := targetSession.Frame.GetSize(); size != nil {
+			frame["size"] = map[string]interface{}{
+				"width":  size.GetWidth(),
+				"height": size.GetHeight(),
+			}
+		}
+		if len(frame) > 0 {
+			info["frame"] = frame
+		}
+	}
+
+	// Add grid size if available
+	if targetSession.GridSize != nil {
+		info["grid_size"] = map[string]interface{}{
+			"width":  targetSession.GridSize.GetWidth(),
+			"height": targetSession.GridSize.GetHeight(),
+		}
+	}
+
 	// Try to get session profile
 	if profile, err := c.GetSessionProfile(ctx, sessionID); err == nil {
 		info["profile"] = strings.Trim(profile, "\"")
@@ -107,10 +158,9 @@ func gatherSessionInfo(ctx context.Context, c *client.Client, sessionID string, 
 	if includeProperties {
 		properties := make(map[string]interface{})
 
-		// Common properties to fetch
+		// Only properties that actually work with the real API
 		propertiesToFetch := []string{
-			"title", "name", "columns", "rows", "profile_name",
-			"badge_text", "use_transparency", "transparency", "blend",
+			"grid_size", "buried", "number_of_lines",
 		}
 
 		for _, prop := range propertiesToFetch {
@@ -190,6 +240,23 @@ func printSessionInfo(info map[string]interface{}) error {
 		fmt.Printf("Shell PID:     %v\n", pid)
 	}
 
+	// Print frame information if available
+	if frame, ok := info["frame"].(map[string]interface{}); ok && len(frame) > 0 {
+		fmt.Printf("Frame:         ")
+		if origin, ok := frame["origin"].(map[string]interface{}); ok {
+			fmt.Printf("origin(%v,%v) ", origin["x"], origin["y"])
+		}
+		if size, ok := frame["size"].(map[string]interface{}); ok {
+			fmt.Printf("size(%v×%v)", size["width"], size["height"])
+		}
+		fmt.Printf("\n")
+	}
+
+	// Print grid size if available
+	if gridSize, ok := info["grid_size"].(map[string]interface{}); ok {
+		fmt.Printf("Grid Size:     %v×%v\n", gridSize["width"], gridSize["height"])
+	}
+
 	// Print properties if included
 	if properties, ok := info["properties"].(map[string]interface{}); ok && len(properties) > 0 {
 		fmt.Printf("\nProperties:\n")
@@ -244,4 +311,58 @@ func getShellPIDQuiet(ctx context.Context, c *client.Client, sessionID string) (
 	}
 
 	return 0, fmt.Errorf("unable to determine PID")
+}
+
+// extractProperty extracts a specific property value from session info
+func extractProperty(info map[string]interface{}, path string) (string, error) {
+	// Handle special case for frame.coords (commonly needed for screencapture)
+	if path == "frame.coords" {
+		if frame, ok := info["frame"].(map[string]interface{}); ok {
+			origin, hasOrigin := frame["origin"].(map[string]interface{})
+			size, hasSize := frame["size"].(map[string]interface{})
+			if hasOrigin && hasSize {
+				return fmt.Sprintf("%v,%v,%v,%v",
+					origin["x"], origin["y"],
+					size["width"], size["height"]), nil
+			}
+		}
+		return "", fmt.Errorf("frame coordinates not available")
+	}
+
+	// Split path for nested properties
+	parts := strings.Split(path, ".")
+	current := info
+
+	for i, part := range parts {
+		if i == len(parts)-1 {
+			// Last part - return the value
+			if val, ok := current[part]; ok {
+				return formatValue(val), nil
+			}
+			return "", fmt.Errorf("property not found")
+		}
+
+		// Navigate deeper
+		if next, ok := current[part].(map[string]interface{}); ok {
+			current = next
+		} else {
+			return "", fmt.Errorf("invalid path at '%s'", part)
+		}
+	}
+
+	return "", fmt.Errorf("property not found")
+}
+
+// formatValue formats a value for direct output
+func formatValue(val interface{}) string {
+	switch v := val.(type) {
+	case string:
+		return v
+	case map[string]interface{}:
+		// Format maps as JSON for complex structures
+		data, _ := json.Marshal(v)
+		return string(data)
+	default:
+		return fmt.Sprintf("%v", v)
+	}
 }

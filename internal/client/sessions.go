@@ -10,7 +10,7 @@ import (
 type SessionInfo struct {
 	SessionID    string
 	WindowID     string
-	WindowNumber int32  // iTerm2 window index
+	WindowNumber int32 // iTerm2 window index
 	TabID        string
 	WindowTitle  string
 	TabTitle     string

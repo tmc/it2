@@ -42,7 +42,7 @@ func DefaultConfig() *Config {
 	return &Config{
 		URL:           "ws://localhost:1912",
 		Timeout:       5 * time.Second,
-		Format:        "text",
+		Format:        "table",
 		Color:         true,
 		RetryAttempts: 3,
 		RetryDelay:    1 * time.Second,

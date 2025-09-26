@@ -19,10 +19,10 @@ Examples:
   it2 text highlight session123 "error"
   it2 text highlight session123 "\\b\\w+@\\w+\\.\\w+\\b" --regex --color red
   it2 text highlight session123 "" --clear`,
-		Args:            cobra.RangeArgs(1, 2),
-		RequiresClient:  true,
-		SupportsFormat:  true,
-		ValidArgsFunc:   completion.SessionIDCompletion,
+		Args:           cobra.RangeArgs(1, 2),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := cmdutil.NormalizeSessionID(args[0])
 

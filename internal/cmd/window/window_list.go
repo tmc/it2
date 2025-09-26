@@ -11,7 +11,7 @@ func newListCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List all iTerm2 windows",
-		Long: `List all iTerm2 windows with detailed information and filtering options.`,
+		Long:  `List all iTerm2 windows with detailed information and filtering options.`,
 		Example: cmdutil.Doc(`
 			# List all windows (table format)
 			$ it2 window list

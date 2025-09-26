@@ -28,10 +28,10 @@ Examples:
   # Copy and paste workflow:
   it2 session copy session123                    # Copy from one session
   it2 session paste session456                   # Paste to another session`,
-		Args:            cobra.RangeArgs(0, 1),
-		RequiresClient:  true,
-		SupportsFormat:  true,
-		ValidArgsFunc:   completion.SessionIDCompletion,
+		Args:           cobra.RangeArgs(0, 1),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			var sessionID string
 			if len(args) > 0 {
@@ -54,10 +54,10 @@ Examples:
 			// Report success with JSON output support
 			if sc.GetFlags().Format == "json" {
 				result := map[string]interface{}{
-					"session_id":     sessionID,
-					"action":         "paste",
-					"success":        true,
-					"restore_focus":  restoreFocus,
+					"session_id":    sessionID,
+					"action":        "paste",
+					"success":       true,
+					"restore_focus": restoreFocus,
 				}
 				return sc.FormatOutput(result)
 			}

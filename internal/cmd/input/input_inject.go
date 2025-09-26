@@ -1,4 +1,4 @@
-package text
+package input
 
 import (
 	"github.com/spf13/cobra"
