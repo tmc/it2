@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/connect"
-	"github.com/tmc/it2/internal/flags"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
 )
@@ -50,8 +49,8 @@ func newListCommand() *cobra.Command {
 				return fmt.Errorf("no session ID provided and $ITERM_SESSION_ID not set")
 			}
 
-			timeout, _ := flags.GetFlags(cmd)
-			ctx, cancel := flags.CreateContext(timeout)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
+			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)
@@ -176,8 +175,8 @@ func newGetCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			promptID := args[0]
 
-			timeout, format := flags.GetFlags(cmd)
-			ctx, cancel := flags.CreateContext(timeout)
+			_, timeout, format := cmdutil.GetFlags(cmd)
+			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)
@@ -236,13 +235,13 @@ func newMonitorCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionID := args[0]
 
-			timeout, _ := flags.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			// Create context that can be canceled but don't set timeout for monitoring
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			connectCtx, connectCancel := flags.CreateContext(timeout)
+			connectCtx, connectCancel := cmdutil.CreateContext(timeout)
 			c, err := connect.ConnectClient(connectCtx)
 			connectCancel()
 			if err != nil {
@@ -285,8 +284,8 @@ func newSearchCommand() *cobra.Command {
 			sessionID := args[0]
 			pattern = args[1]
 
-			timeout, _ := flags.GetFlags(cmd)
-			ctx, cancel := flags.CreateContext(timeout)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
+			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)

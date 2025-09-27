@@ -57,6 +57,7 @@ func newGetBufferCommand() *cobra.Command {
 			lines, _ := sc.GetCommand().Flags().GetInt32("lines")
 			colorized, _ := sc.GetCommand().Flags().GetBool("color")
 			escaped, _ := sc.GetCommand().Flags().GetBool("escaped")
+			// TODO: scrollback flag
 
 			// Get buffer contents with styles if needed
 			resp, err := sc.GetClient().GetBufferWithStyles(
@@ -83,7 +84,7 @@ func newGetBufferCommand() *cobra.Command {
 	}
 
 	cmd := cmdutil.NewCommandFromTemplate(template)
-	cmd.Flags().Int32("lines", 100, "Number of lines to retrieve")
+	cmd.Flags().Int32("lines", 10000, "Number of lines to retrieve")
 	cmd.Flags().Bool("scrollback", false, "Include scrollback history")
 	cmd.Flags().Bool("color", false, "Include ANSI color codes in output")
 	cmd.Flags().Bool("escaped", false, "Show escape sequences as visible characters (like cat -v)")

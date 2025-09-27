@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/connect"
-	"github.com/tmc/it2/internal/flags"
 	"github.com/tmc/it2/internal/formatting"
 )
 
@@ -49,8 +48,8 @@ Use --list to see all available properties.`,
 			property := args[1]
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 
-			timeout, _ := flags.GetFlags(cmd)
-			ctx, cancel := flags.CreateContext(timeout)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
+			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)

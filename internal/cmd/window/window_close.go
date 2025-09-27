@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/connect"
 )
 
 func newCloseCommand() *cobra.Command {
@@ -15,8 +17,8 @@ func newCloseCommand() *cobra.Command {
 			windowID := args[0]
 			force, _ := cmd.Flags().GetBool("force")
 
-			timeout, _ := flags.GetFlags(cmd)
-			ctx, cancel := flags.CreateContext(timeout)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
+			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
 			client, err := connect.ConnectClient(ctx)

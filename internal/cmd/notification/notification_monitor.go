@@ -60,6 +60,7 @@ func runMonitorCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	wsURL, _, _ := cmdutil.GetFlags(cmd)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -82,7 +83,7 @@ func runMonitorCommand(cmd *cobra.Command, args []string) error {
 		cancel()
 	}()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdutil.ConnectClient(ctx, wsURL)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

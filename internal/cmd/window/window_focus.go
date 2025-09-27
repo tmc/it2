@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/connect"
 )
 
 func newFocusCommand() *cobra.Command {
@@ -15,8 +17,8 @@ func newFocusCommand() *cobra.Command {
 			windowID := args[0]
 			orderFront, _ := cmd.Flags().GetBool("order-front")
 
-			timeout, _ := flags.GetFlags(cmd)
-			ctx, cancel := flags.CreateContext(timeout)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
+			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)

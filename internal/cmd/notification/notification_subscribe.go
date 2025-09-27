@@ -57,7 +57,7 @@ func runSubscribeCommand(cmd *cobra.Command, args []string) error {
 		cancel()
 	}()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdutil.ConnectClient(ctx, "ws://localhost:1912")
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

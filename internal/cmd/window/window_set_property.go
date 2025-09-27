@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/connect"
 )
 
 func newSetPropertyCommand() *cobra.Command {
@@ -21,8 +23,8 @@ func newSetPropertyCommand() *cobra.Command {
 			property := args[1]
 			value := args[2]
 
-			timeout, _ := flags.GetFlags(cmd)
-			ctx, cancel := flags.CreateContext(timeout)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
+			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)

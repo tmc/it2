@@ -182,7 +182,7 @@ Examples:
   # List with JSON output
   it2 event list --format json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, format := cmdutil.GetFlags(cmd)
+			_, _, format := cmdutil.GetFlags(cmd)
 
 			// Format output
 			switch format {
@@ -227,7 +227,7 @@ Examples:
   # Show last 20 events
   it2 event log --limit 20`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, format := cmdutil.GetFlags(cmd)
+			_, _, format := cmdutil.GetFlags(cmd)
 			limit, _ := cmd.Flags().GetInt("limit")
 
 			// This is a placeholder - in a real implementation you would
