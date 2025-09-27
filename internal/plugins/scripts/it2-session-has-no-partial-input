@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+#
+# it2-session-has-no-partial-input
+#
+# Plugin to detect if a session has NO partial input at the prompt (clean prompt state).
+# This helps prevent text concatenation issues when sending commands.
+#
+# Usage:
+#   it2-session-has-no-partial-input <session-id> [session-name]
+#
+# Returns:
+#   - "true" if the prompt is clear (no partial input)
+#   - "false" if partial input is detected
+#   - Exit code 0 for success (clean prompt), non-zero for failure (has partial input)
+#
+# Detection patterns:
+#   - Text after a shell prompt ($ or >) with no newline
+#   - Incomplete command with cursor at end
+#   - Vim insert mode with partial text
+
+set -euo pipefail
+
+# Get session ID from first argument
+SESSION_ID="${1:-}"
+if [[ -z "$SESSION_ID" ]]; then
+    echo "Error: Session ID required" >&2
+    exit 1
+fi
+
+# Optional session name from second argument (not used in this implementation)
+SESSION_NAME="${2:-}"
+
+# Use it2 to get the current screen content
+# Try to find it2 in various locations
+IT2_BIN=""
+if [[ -x "./it2" ]]; then
+    IT2_BIN="./it2"
+elif [[ -x "$HOME/go/bin/it2" ]]; then
+    IT2_BIN="$HOME/go/bin/it2"
+elif [[ -x "/usr/local/bin/it2" ]]; then
+    IT2_BIN="/usr/local/bin/it2"
+elif command -v it2 &> /dev/null; then
+    IT2_BIN="$(command -v it2)"
+fi
+
+if [[ -z "$IT2_BIN" ]]; then
+    echo "Error: it2 binary not found" >&2
+    exit 1
+fi
+
+# We need to check the last line(s) for partial input
+SCREEN_CONTENT=$($IT2_BIN text get-screen "$SESSION_ID" 2>/dev/null || echo "")
+
+if [[ -z "$SCREEN_CONTENT" ]]; then
+    # If we can't get screen content, assume prompt is clear
+    echo "true"
+    exit 0
+fi
+
+# Get the last non-empty line
+LAST_LINE=""
+while IFS= read -r line; do
+    # Remove ANSI escape sequences and trim whitespace
+    CLEAN_LINE=$(echo "$line" | sed 's/\x1b\[[0-9;]*m//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    if [[ -n "$CLEAN_LINE" ]]; then
+        LAST_LINE="$CLEAN_LINE"
+    fi
+done <<< "$SCREEN_CONTENT"
+
+if [[ -z "$LAST_LINE" ]]; then
+    echo "true"  # Empty line means clean prompt
+    exit 0
+fi
+
+# Check for common prompt patterns with text after them
+# Common shell prompts: $, >, %, #
+# Also check for common REPL prompts: >>>, .., In[, julia>
+
+# Pattern 1: Shell prompt with text after it (no command execution)
+# First check if it's just a prompt without any text after it
+if [[ "$LAST_LINE" =~ [\$\>\%\#][[:space:]]*$ ]]; then
+    # This is a clean prompt, no partial input
+    echo "true"
+    exit 0
+fi
+
+# Now check if there's text after the prompt character
+if [[ "$LAST_LINE" =~ [\$\>\%\#][[:space:]]+.+$ ]]; then
+    # There's text after the prompt - this is partial input
+    echo "false"
+    exit 1
+fi
+
+# Pattern 2: Python/IPython prompt with text
+if [[ "$LAST_LINE" =~ ^.*\>\>\>[[:space:]]*.+$ ]] || \
+   [[ "$LAST_LINE" =~ ^.*\.\.\.[[:space:]]*.+$ ]] || \
+   [[ "$LAST_LINE" =~ ^.*In[[:space:]]*\[[0-9]+\]:[[:space:]]*.+$ ]]; then
+    echo "false"  # Has partial input
+    exit 1
+fi
+
+# Pattern 3: Julia REPL with text
+if [[ "$LAST_LINE" =~ ^.*julia\>[[:space:]]*.+$ ]]; then
+    echo "false"  # Has partial input
+    exit 1
+fi
+
+# Pattern 4: Node.js REPL with text
+if [[ "$LAST_LINE" =~ ^\>[[:space:]]*.+$ ]]; then
+    echo "false"  # Has partial input
+    exit 1
+fi
+
+# Pattern 5: Custom prompts (look for common patterns)
+# Check if line ends with common prompt indicators followed by text
+if [[ "$LAST_LINE" =~ .*\][[:space:]]*.+$ ]] || \
+   [[ "$LAST_LINE" =~ .*\)[[:space:]]*.+$ ]] || \
+   [[ "$LAST_LINE" =~ .*\:[[:space:]]*.+$ ]]; then
+    # But exclude completed commands (those that likely ran already)
+    # If the line contains output patterns, it's probably not partial input
+    if [[ ! "$LAST_LINE" =~ ^(total|drwx|[\-rwx]{10}|-{3,}|\+{3,}) ]]; then
+        # Additional check: if it looks like a path followed by text, it might be partial
+        if [[ "$LAST_LINE" =~ /.*[\$\>\%\#][[:space:]]*.+$ ]]; then
+            echo "false"  # Has partial input
+            exit 1
+        fi
+    fi
+fi
+
+# Pattern 6: Vim/editor detection (if in insert mode with text)
+# Look for vim status line patterns
+if [[ "$SCREEN_CONTENT" =~ --\ INSERT\ -- ]] || \
+   [[ "$SCREEN_CONTENT" =~ --\ (insert)\ -- ]]; then
+    # In insert mode, any non-empty last line could be partial input
+    if [[ -n "$LAST_LINE" ]]; then
+        echo "false"  # Has partial input
+        exit 1
+    fi
+fi
+
+# Pattern 7: Check for incomplete quotes or brackets
+# If the last line has unmatched quotes or brackets, it's likely partial
+QUOTE_COUNT=$(echo "$LAST_LINE" | grep -o '"' | wc -l)
+SINGLE_QUOTE_COUNT=$(echo "$LAST_LINE" | grep -o "'" | wc -l)
+OPEN_PAREN=$(echo "$LAST_LINE" | grep -o '(' | wc -l)
+CLOSE_PAREN=$(echo "$LAST_LINE" | grep -o ')' | wc -l)
+OPEN_BRACKET=$(echo "$LAST_LINE" | grep -o '\[' | wc -l)
+CLOSE_BRACKET=$(echo "$LAST_LINE" | grep -o '\]' | wc -l)
+OPEN_BRACE=$(echo "$LAST_LINE" | grep -o '{' | wc -l)
+CLOSE_BRACE=$(echo "$LAST_LINE" | grep -o '}' | wc -l)
+
+if (( QUOTE_COUNT % 2 != 0 )) || \
+   (( SINGLE_QUOTE_COUNT % 2 != 0 )) || \
+   (( OPEN_PAREN != CLOSE_PAREN )) || \
+   (( OPEN_BRACKET != CLOSE_BRACKET )) || \
+   (( OPEN_BRACE != CLOSE_BRACE )); then
+    echo "false"  # Has partial input (unclosed quotes/brackets)
+    exit 1
+fi
+
+# Default: assume prompt is clear (no partial input)
+echo "true"
+exit 0

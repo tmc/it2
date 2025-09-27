@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+#
+# it2-session-is-at-prompt
+#
+# Plugin to detect if a session is at a clean prompt (ready for input).
+# Similar to has-no-partial-input but also checks for additional prompt readiness indicators.
+#
+# Usage:
+#   it2-session-is-at-prompt <session-id> [session-name]
+#
+# Returns:
+#   - "true" if at a clean prompt
+#   - "false" if not at prompt or busy
+#   - Exit code 0 for success (at prompt), non-zero for failure
+
+set -euo pipefail
+
+# Get session ID from first argument
+SESSION_ID="${1:-}"
+if [[ -z "$SESSION_ID" ]]; then
+    echo "Error: Session ID required" >&2
+    exit 1
+fi
+
+# Use it2 to get the current screen content
+# Try to find it2 in various locations
+IT2_BIN=""
+if [[ -x "./it2" ]]; then
+    IT2_BIN="./it2"
+elif [[ -x "$HOME/go/bin/it2" ]]; then
+    IT2_BIN="$HOME/go/bin/it2"
+elif [[ -x "/usr/local/bin/it2" ]]; then
+    IT2_BIN="/usr/local/bin/it2"
+elif command -v it2 &> /dev/null; then
+    IT2_BIN="$(command -v it2)"
+fi
+
+if [[ -z "$IT2_BIN" ]]; then
+    echo "Error: it2 binary not found" >&2
+    exit 1
+fi
+
+SCREEN_CONTENT=$($IT2_BIN text get-screen "$SESSION_ID" 2>/dev/null || echo "")
+
+if [[ -z "$SCREEN_CONTENT" ]]; then
+    echo "false"  # Can't determine, assume not ready
+    exit 1
+fi
+
+# Get the last non-empty line
+LAST_LINE=""
+while IFS= read -r line; do
+    # Remove ANSI escape sequences and trim whitespace
+    CLEAN_LINE=$(echo "$line" | sed 's/\x1b\[[0-9;]*m//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    if [[ -n "$CLEAN_LINE" ]]; then
+        LAST_LINE="$CLEAN_LINE"
+    fi
+done <<< "$SCREEN_CONTENT"
+
+# Check if we're at a clean prompt (common patterns)
+# Pattern 1: Shell prompts ending with $ > % # (with optional space after)
+if [[ "$LAST_LINE" =~ [\$\>\%\#][[:space:]]*$ ]]; then
+    echo "true"
+    exit 0
+fi
+
+# Pattern 2: Python prompt
+if [[ "$LAST_LINE" =~ \>\>\>[[:space:]]*$ ]]; then
+    echo "true"
+    exit 0
+fi
+
+# Pattern 3: Node.js prompt
+if [[ "$LAST_LINE" =~ ^\>[[:space:]]*$ ]]; then
+    echo "true"
+    exit 0
+fi
+
+# Pattern 4: Julia prompt
+if [[ "$LAST_LINE" =~ julia\>[[:space:]]*$ ]]; then
+    echo "true"
+    exit 0
+fi
+
+# Pattern 5: IPython prompt
+if [[ "$LAST_LINE" =~ In[[:space:]]*\[[0-9]+\]:[[:space:]]*$ ]]; then
+    echo "true"
+    exit 0
+fi
+
+# Pattern 6: Common custom prompts (ending with ] or : or ))
+if [[ "$LAST_LINE" =~ \][[:space:]]*$ ]] || \
+   [[ "$LAST_LINE" =~ \):[[:space:]]*$ ]] || \
+   [[ "$LAST_LINE" =~ \]\$[[:space:]]*$ ]]; then
+    echo "true"
+    exit 0
+fi
+
+# Default: not at a clean prompt
+echo "false"
+exit 1

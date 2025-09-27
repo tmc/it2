@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+#
+# it2-session-claude-is-safe-operation
+#
+# Plugin to determine if a Claude operation shown in a modal is safe to auto-approve.
+# Analyzes the command/operation context to decide if intervention is appropriate.
+#
+# Usage:
+#   it2-session-claude-is-safe-operation <session-id>
+#
+# Returns:
+#   - "safe" if operation can be safely auto-approved
+#   - "unsafe" if operation requires human review
+#   - "unknown" if operation cannot be determined
+#   - Exit code 0 for safe operations, 1 for unsafe/unknown
+
+set -euo pipefail
+
+SESSION_ID="${1:-}"
+if [[ -z "$SESSION_ID" ]]; then
+    echo "Error: Session ID required" >&2
+    exit 1
+fi
+
+# Find it2 binary
+IT2_BIN=""
+if [[ -x "./it2" ]]; then
+    IT2_BIN="./it2"
+elif [[ -x "$HOME/go/bin/it2" ]]; then
+    IT2_BIN="$HOME/go/bin/it2"
+elif command -v it2 &> /dev/null; then
+    IT2_BIN="$(command -v it2)"
+fi
+
+if [[ -z "$IT2_BIN" ]]; then
+    echo "Error: it2 binary not found" >&2
+    exit 1
+fi
+
+SCREEN_CONTENT=$($IT2_BIN text get-screen "$SESSION_ID" 2>/dev/null || echo "")
+
+if [[ -z "$SCREEN_CONTENT" ]]; then
+    echo "unknown"
+    exit 1
+fi
+
+# Remove ANSI escape sequences for clean analysis
+CLEAN_CONTENT=$(echo "$SCREEN_CONTENT" | sed 's/\x1b\[[0-9;]*m//g')
+
+# Extract the command/operation from modal context
+COMMAND_CONTEXT=""
+if echo "$CLEAN_CONTENT" | grep -q "│.*│"; then
+    # Extract content between box drawing characters
+    COMMAND_CONTEXT=$(echo "$CLEAN_CONTENT" | grep "│" | sed 's/.*│\s*//; s/\s*│.*//')
+fi
+
+# Combine all relevant context for analysis
+ANALYSIS_TEXT="$CLEAN_CONTENT $COMMAND_CONTEXT"
+
+# SAFE OPERATIONS - Low risk, read-only, or routine operations
+# File operations - reading/listing
+if echo "$ANALYSIS_TEXT" | grep -qE "(pbcopy|copy.*clipboard|get-buffer|get-screen|get-contents|cat|head|tail|ls|find|grep|less|more)"; then
+    echo "safe"
+    exit 0
+fi
+
+# Git operations - read-only
+if echo "$ANALYSIS_TEXT" | grep -qE "(git (status|log|diff|show|ls-files)|git.*--dry-run)"; then
+    echo "safe"
+    exit 0
+fi
+
+# Process inspection
+if echo "$ANALYSIS_TEXT" | grep -qE "(ps aux|top|htop|lsof|netstat|pgrep)"; then
+    echo "safe"
+    exit 0
+fi
+
+# System information
+if echo "$ANALYSIS_TEXT" | grep -qE "(uname|whoami|pwd|date|uptime|df|du|free|env|printenv)"; then
+    echo "safe"
+    exit 0
+fi
+
+# Package management - info only
+if echo "$ANALYSIS_TEXT" | grep -qE "(npm ls|pip list|brew list|go list|cargo tree)"; then
+    echo "safe"
+    exit 0
+fi
+
+# Documentation/help commands
+if echo "$ANALYSIS_TEXT" | grep -qE "(--help|-h|man |info |help|usage)"; then
+    echo "safe"
+    exit 0
+fi
+
+# UNSAFE OPERATIONS - High risk, destructive, or require review
+# File modifications
+if echo "$ANALYSIS_TEXT" | grep -qE "(rm |mv |cp |mkdir|rmdir|chmod|chown|ln |>|>>|tee)"; then
+    echo "unsafe"
+    exit 1
+fi
+
+# Git operations - destructive
+if echo "$ANALYSIS_TEXT" | grep -qE "(git (add|commit|push|pull|merge|rebase|reset|clean|checkout|branch|tag))"; then
+    echo "unsafe"
+    exit 1
+fi
+
+# Network operations
+if echo "$ANALYSIS_TEXT" | grep -qE "(curl|wget|nc |ssh|scp|rsync|ftp)"; then
+    echo "unsafe"
+    exit 1
+fi
+
+# Package management - modifications
+if echo "$ANALYSIS_TEXT" | grep -qE "(npm install|pip install|brew install|apt|yum|pacman|go get|cargo install)"; then
+    echo "unsafe"
+    exit 1
+fi
+
+# System modifications
+if echo "$ANALYSIS_TEXT" | grep -qE "(sudo|su |kill|killall|pkill|systemctl|service|mount|umount)"; then
+    echo "unsafe"
+    exit 1
+fi
+
+# Process control
+if echo "$ANALYSIS_TEXT" | grep -qE "(&|nohup|screen|tmux|bg |fg |jobs)"; then
+    echo "unsafe"
+    exit 1
+fi
+
+# CONTEXT-BASED SAFETY CHECKS
+
+# Check if operation is in a safe working directory
+SAFE_DIRS="/tmp|/var/tmp|.*test.*|.*demo.*|.*example.*"
+if echo "$ANALYSIS_TEXT" | grep -qE "($SAFE_DIRS)"; then
+    # More permissive in safe directories, but still check for dangerous operations
+    if echo "$ANALYSIS_TEXT" | grep -qE "(rm -rf|format|dd |mkfs)"; then
+        echo "unsafe"
+        exit 1
+    else
+        echo "safe"
+        exit 0
+    fi
+fi
+
+# Check for explicit safety indicators
+if echo "$ANALYSIS_TEXT" | grep -qE "(--dry-run|--simulate|--preview|--check)"; then
+    echo "safe"
+    exit 0
+fi
+
+# Default to unknown for unrecognized operations
+echo "unknown"
+exit 1

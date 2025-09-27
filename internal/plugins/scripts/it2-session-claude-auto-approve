@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+#
+# it2-session-claude-auto-approve
+#
+# Plugin to automatically approve safe Claude operations.
+# Combines modal detection with safety analysis to make smart approval decisions.
+#
+# Usage:
+#   it2-session-claude-auto-approve <session-id> [--dry-run]
+#
+# Returns:
+#   - "approved" if modal was auto-approved
+#   - "skipped" if modal was unsafe or requires human review
+#   - "no-modal" if no modal detected
+#   - "error" if unable to process
+#   - Exit code 0 for success, 1 for error/skip
+
+set -euo pipefail
+
+SESSION_ID="${1:-}"
+DRY_RUN="${2:-}"
+
+if [[ -z "$SESSION_ID" ]]; then
+    echo "Error: Session ID required" >&2
+    exit 1
+fi
+
+# Find it2 binary
+IT2_BIN=""
+if [[ -x "./it2" ]]; then
+    IT2_BIN="./it2"
+elif [[ -x "$HOME/go/bin/it2" ]]; then
+    IT2_BIN="$HOME/go/bin/it2"
+elif command -v it2 &> /dev/null; then
+    IT2_BIN="$(command -v it2)"
+fi
+
+if [[ -z "$IT2_BIN" ]]; then
+    echo "Error: it2 binary not found" >&2
+    exit 1
+fi
+
+# Get plugin directory
+PLUGIN_DIR="$(dirname "$0")"
+
+# Check if session has a modal
+MODAL_TYPE=$("$PLUGIN_DIR/it2-session-claude-has-modal" "$SESSION_ID" 2>/dev/null || echo "none")
+
+if [[ "$MODAL_TYPE" == "none" ]]; then
+    echo "no-modal"
+    exit 1
+fi
+
+# Check if operation is safe to approve
+SAFETY_LEVEL=$("$PLUGIN_DIR/it2-session-claude-is-safe-operation" "$SESSION_ID" 2>/dev/null || echo "unknown")
+
+if [[ "$SAFETY_LEVEL" != "safe" ]]; then
+    echo "skipped"
+    exit 1
+fi
+
+# If dry run, don't actually approve
+if [[ "$DRY_RUN" == "--dry-run" ]]; then
+    echo "approved-dry-run"
+    exit 0
+fi
+
+# Perform the appropriate approval action based on modal type
+case "$MODAL_TYPE" in
+    "approval"|"choice")
+        # Send "1" for first option (usually "Yes")
+        $IT2_BIN session send-key "$SESSION_ID" "1" 2>/dev/null
+        sleep 0.1
+        $IT2_BIN session send-key "$SESSION_ID" "Return" 2>/dev/null
+        echo "approved"
+        exit 0
+        ;;
+    "confirmation")
+        # Send "y" for yes
+        $IT2_BIN session send-key "$SESSION_ID" "y" 2>/dev/null
+        echo "approved"
+        exit 0
+        ;;
+    "input")
+        # Don't auto-approve input prompts - too risky
+        echo "skipped"
+        exit 1
+        ;;
+    *)
+        echo "error"
+        exit 1
+        ;;
+esac
