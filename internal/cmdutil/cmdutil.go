@@ -3,6 +3,7 @@ package cmdutil
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -147,6 +148,38 @@ type NoSessionIDError struct{}
 
 func (e *NoSessionIDError) Error() string {
 	return "no session ID provided and $ITERM_SESSION_ID environment variable not set"
+}
+
+// ExpandShortSessionID expands a short session ID to a full session ID
+// by querying available sessions and finding matches
+func ExpandShortSessionID(ctx context.Context, client *client.Client, shortID string) (string, error) {
+	// If it's already a full UUID, return as-is
+	if len(shortID) >= 32 && strings.Contains(shortID, "-") {
+		return shortID, nil
+	}
+
+	// Get all sessions to search for matches
+	sessions, err := client.ListSessions(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	var matches []string
+	for _, session := range sessions {
+		// Check if the session ID starts with the short ID
+		if strings.HasPrefix(session.SessionID, shortID) {
+			matches = append(matches, session.SessionID)
+		}
+	}
+
+	switch len(matches) {
+	case 0:
+		return "", fmt.Errorf("no session found matching short ID: %s", shortID)
+	case 1:
+		return matches[0], nil
+	default:
+		return "", fmt.Errorf("short ID '%s' matches multiple sessions: %v", shortID, matches)
+	}
 }
 
 // IsSessionCommand checks if the current command expects a session context
