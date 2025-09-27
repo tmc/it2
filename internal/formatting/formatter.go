@@ -424,7 +424,8 @@ func (f *Formatter) formatJobsTable(jobs []*client.JobInfo) error {
 
 func (f *Formatter) formatText(sessions []*client.SessionInfo) error {
 	if len(sessions) == 0 {
-		fmt.Println("No sessions found")
+		fmt.Println("✗ No sessions found")
+		fmt.Println("  Run 'it2 session create' to create a new session")
 		return nil
 	}
 
@@ -453,7 +454,8 @@ func (f *Formatter) formatText(sessions []*client.SessionInfo) error {
 
 func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	if len(sessions) == 0 {
-		fmt.Println("No sessions found")
+		fmt.Println("✗ No sessions found")
+		fmt.Println("  Run 'it2 session create' to create a new session")
 		return nil
 	}
 
@@ -493,19 +495,25 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			exitDisplay = fmt.Sprintf("%d", session.ExitCode)
 		}
 
-		// Shorten prompt state
+		// Shorten prompt state with state indicators
 		state := session.PromptState
 		switch state {
 		case "AT_COMMAND_LINE":
-			state = "READY"
+			state = "✓ READY"
 		case "IN_COMMAND":
-			state = "EXEC"
+			state = "+ EXEC"
 		case "AT_PASSWORD_PROMPT":
-			state = "PASS"
+			state = "! PASS"
 		case "FILE_TRANSFER":
-			state = "XFER"
+			state = "+ XFER"
 		case "UNKNOWN":
-			state = ""
+			state = "- IDLE"
+		default:
+			if session.ExitCode != 0 {
+				state = "✗ ERROR"
+			} else {
+				state = "- IDLE"
+			}
 		}
 
 		// Format parent ID - use short ID if available
@@ -1483,7 +1491,8 @@ func FormatNotification(notification *pb.Notification, notificationType string) 
 // formatSessionsTree formats sessions as a tree showing hierarchy ordered by window -> tab -> splits -> sessions
 func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 	if len(sessions) == 0 {
-		fmt.Println("No sessions found")
+		fmt.Println("✗ No sessions found")
+		fmt.Println("  Run 'it2 session create' to create a new session")
 		return nil
 	}
 
@@ -1708,19 +1717,21 @@ func printSessionNode(node *TreeNode, prefix string, isLast bool, pluginCols []s
 		pidDisplay = fmt.Sprintf("%d", node.JobPID)
 	}
 
-	// Shorten state
+	// Shorten state with indicators
 	state := node.PromptState
 	switch state {
 	case "AT_COMMAND_LINE", "PROMPT_STATE_AT_COMMAND_LINE":
-		state = "READY"
+		state = "✓ READY"
 	case "IN_COMMAND", "PROMPT_STATE_IN_COMMAND":
-		state = "EXEC"
+		state = "+ EXEC"
 	case "AT_PASSWORD_PROMPT", "PROMPT_STATE_AT_PASSWORD_PROMPT":
-		state = "PASS"
+		state = "! PASS"
 	case "FILE_TRANSFER", "PROMPT_STATE_FILE_TRANSFER":
-		state = "XFER"
+		state = "+ XFER"
 	case "UNKNOWN", "PROMPT_STATE_UNKNOWN", "":
-		state = "-"
+		state = "- IDLE"
+	default:
+		state = "- IDLE"
 	}
 
 	// Format title and command
