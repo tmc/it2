@@ -30,6 +30,11 @@
             "path": "it2 app get-variable"
           },
           {
+            "name": "launch",
+            "short": "Launch iTerm2 if not running",
+            "path": "it2 app launch"
+          },
+          {
             "name": "list-properties",
             "short": "List all available application properties",
             "path": "it2 app list-properties"
@@ -43,6 +48,11 @@
             "name": "preferences",
             "short": "Quick access to common preference operations",
             "path": "it2 app preferences"
+          },
+          {
+            "name": "quit",
+            "short": "Quit iTerm2 application",
+            "path": "it2 app quit"
           },
           {
             "name": "set-property",
@@ -75,6 +85,11 @@
             "name": "export",
             "short": "Export arrangement to file",
             "path": "it2 arrangement export"
+          },
+          {
+            "name": "import",
+            "short": "Import arrangement from file",
+            "path": "it2 arrangement import"
           },
           {
             "name": "list",
@@ -824,6 +839,11 @@
               "path": "it2 app get-variable"
             },
             {
+              "name": "launch",
+              "short": "Launch iTerm2 if not running",
+              "path": "it2 app launch"
+            },
+            {
               "name": "list-properties",
               "short": "List all available application properties",
               "path": "it2 app list-properties"
@@ -837,6 +857,11 @@
               "name": "preferences",
               "short": "Quick access to common preference operations",
               "path": "it2 app preferences"
+            },
+            {
+              "name": "quit",
+              "short": "Quit iTerm2 application",
+              "path": "it2 app quit"
             },
             {
               "name": "set-property",
@@ -1529,6 +1554,11 @@
               "path": "it2 arrangement export"
             },
             {
+              "name": "import",
+              "short": "Import arrangement from file",
+              "path": "it2 arrangement import"
+            },
+            {
               "name": "list",
               "short": "List all saved arrangements",
               "path": "it2 arrangement list"
@@ -1612,6 +1642,6 @@
       ]
     }
   ],
-  "total_commands": 150,
-  "generated_at": "2025-09-26T20:21:37Z"
+  "total_commands": 153,
+  "generated_at": "2025-09-27T17:29:34Z"
 }
