@@ -457,7 +457,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	}
 
 	// Determine columns to include
-	headers := []string{"Short ID", "Parent ID", "Title", "Window ID", "Window", "Tab"}
+	headers := []string{"ID", "Parent ID", "Title", "Window", "Tab"}
 
 	// Check if any sessions have plugin data to determine additional columns
 	pluginColumns := make(map[string]bool)
@@ -485,7 +485,6 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			session.ShortID,
 			session.ParentSessionID,
 			name,
-			session.WindowID,
 			fmt.Sprintf("%d", session.WindowNumber),
 			session.TabID,
 		}
