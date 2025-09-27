@@ -444,6 +444,11 @@ Multiple conditions can be specified and all must pass.`,
 	cmd.Flags().Duration("delay-before-return", 0*time.Millisecond, "Delay before sending carriage return")
 	cmd.Flags().MarkHidden("delay-before-return")
 
+	// Add scope support
+	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (none,window,tab,parents,siblings,peers,lineage)")
+	cmd.Flags().Bool("dry-run", false, "Show what would be affected without executing")
+	cmd.Flags().Bool("stop-on-error", false, "Stop on first error instead of continuing")
+
 	// Mark mutually exclusive flags
 	cmd.MarkFlagsMutuallyExclusive("skip-newline", "send-return")
 

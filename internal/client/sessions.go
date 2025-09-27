@@ -26,6 +26,7 @@ type SessionInfo struct {
 	ExitCode       uint32 // Last command exit status
 	PromptState    string // Shell prompt state (AT_COMMAND_LINE, IN_COMMAND, etc.)
 	CommandCount   int32  // Number of commands executed
+	JobPID         int32  // Process ID of current job
 }
 
 func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
@@ -62,6 +63,9 @@ func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
 			SessionName: buried.GetTitle(),
 		})
 	}
+
+	// Populate job information for all sessions
+	c.populateJobInfo(ctx, sessions)
 
 	return sessions, nil
 }
@@ -160,4 +164,27 @@ func extractSessionsFromNode(node *pb.SplitTreeNode, windowID string, windowNumb
 	}
 
 	return sessions
+}
+
+// populateJobInfo adds job information to sessions using GetPrompt and GetVariable
+func (c *Client) populateJobInfo(ctx context.Context, sessions []*SessionInfo) {
+	for _, session := range sessions {
+		// Get prompt information
+		if promptResp, err := c.GetPrompt(ctx, session.SessionID); err == nil {
+			session.CurrentCommand = promptResp.GetCommand()
+			session.ExitCode = promptResp.GetExitStatus()
+			session.PromptState = promptResp.GetPromptState().String()
+			// CommandCount would need to be tracked separately, for now set to 0
+			session.CommandCount = 0
+		}
+
+		// Try to get job PID from session variables
+		if pidStr, err := c.GetVariableWithScope(ctx, "session", session.SessionID, "jobPid"); err == nil && pidStr != "" {
+			// Parse PID if it's a valid number
+			var pid int32
+			if n, parseErr := fmt.Sscanf(pidStr, "%d", &pid); parseErr == nil && n == 1 {
+				session.JobPID = pid
+			}
+		}
+	}
 }

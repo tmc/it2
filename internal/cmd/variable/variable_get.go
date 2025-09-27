@@ -11,7 +11,7 @@ import (
 
 func newGetCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get <scope> <name> [session-id]",
+		Use:   "get <scope> <name> [<session-id>]",
 		Short: "Get value of a variable",
 		Long: `Get the value of a variable from a specific scope.
 

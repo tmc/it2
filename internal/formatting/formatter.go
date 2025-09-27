@@ -458,7 +458,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	}
 
 	// Determine columns to include
-	headers := []string{"ID", "Parent ID", "Title", "Command", "Exit", "State", "Window", "Tab"}
+	headers := []string{"ID", "Parent ID", "Title", "Command", "PID", "Exit", "State", "Window", "Tab"}
 
 	// Check if any sessions have plugin data to determine additional columns
 	pluginColumns := make(map[string]bool)
@@ -493,6 +493,12 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			command = command[:27] + "..."
 		}
 
+		// Format PID display
+		pidDisplay := ""
+		if session.JobPID != 0 {
+			pidDisplay = fmt.Sprintf("%d", session.JobPID)
+		}
+
 		// Format exit code display
 		exitDisplay := ""
 		if session.ExitCode != 0 {
@@ -519,6 +525,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			session.ParentSessionID,
 			name,
 			command,
+			pidDisplay,
 			exitDisplay,
 			state,
 			fmt.Sprintf("%d", session.WindowNumber),

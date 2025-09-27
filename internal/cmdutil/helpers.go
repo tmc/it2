@@ -252,3 +252,35 @@ func StripANSI(s string) string {
 
 	return result.String()
 }
+
+// PrintScopeNotice prints a notice to stderr when IT2_SCOPE is set and format is table
+func PrintScopeNotice(format string) {
+	if format != "table" && format != "" {
+		return // Only show notice for table format
+	}
+
+	envScope := os.Getenv("IT2_SCOPE")
+	if envScope != "" && envScope != "none" {
+		fmt.Fprintf(os.Stderr, "ℹ IT2_SCOPE=%s (targeting %s scope)\n", envScope, envScope)
+	}
+}
+
+// PrintScopeNoticeWithFlag prints scope notice respecting both env var and flag override
+func PrintScopeNoticeWithFlag(format string, scopeFlag string) {
+	if format != "table" && format != "" {
+		return // Only show notice for table format
+	}
+
+	effectiveScope := scopeFlag
+	if effectiveScope == "" {
+		effectiveScope = os.Getenv("IT2_SCOPE")
+	}
+
+	if effectiveScope != "" && effectiveScope != "none" {
+		if scopeFlag != "" {
+			fmt.Fprintf(os.Stderr, "ℹ --scope=%s (overriding IT2_SCOPE)\n", effectiveScope)
+		} else {
+			fmt.Fprintf(os.Stderr, "ℹ IT2_SCOPE=%s (targeting %s scope)\n", effectiveScope, effectiveScope)
+		}
+	}
+}

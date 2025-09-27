@@ -43,6 +43,10 @@ func newListCommand() *cobra.Command {
 			}
 			defer c.Close()
 
+			// Print scope notice if IT2_SCOPE is set or --scope flag is used
+			scopeFlag, _ := cmd.Flags().GetString("scope")
+			cmdutil.PrintScopeNoticeWithFlag(format, scopeFlag)
+
 			// Get filter flags
 			windowID, _ := cmd.Flags().GetString("window-id")
 			tabID, _ := cmd.Flags().GetString("tab-id")
@@ -68,6 +72,9 @@ func newListCommand() *cobra.Command {
 	// Add filtering flags
 	cmd.Flags().String("window-id", "", "Filter sessions by window ID")
 	cmd.Flags().String("tab-id", "", "Filter sessions by tab ID")
+
+	// Add scope support (informational only for list commands)
+	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (affects scope notice only)")
 
 	// Add completion functions
 	cmd.RegisterFlagCompletionFunc("window-id", completion.WindowIDCompletion)
