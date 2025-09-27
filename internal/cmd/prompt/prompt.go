@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
@@ -49,42 +48,12 @@ func newListCommand() *cobra.Command {
 				return fmt.Errorf("no session ID provided and $ITERM_SESSION_ID not set")
 			}
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-			format, _ := cmd.Flags().GetString("format")
-
-			// Use parent command flags if not set
-			if wsURL == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
-							wsURL = urlFlag.Value.String()
-						}
-					}
-				}
-			}
-			if timeout == 0 {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						timeout, _ = root.PersistentFlags().GetDuration("timeout")
-					}
-				}
-			}
-			if format == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
-							format = formatFlag.Value.String()
-						}
-					}
-				}
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			timeout, _ := flags.GetFlags(cmd)
+			ctx, cancel := flags.CreateContext(timeout)
 			defer cancel()
 
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
+			c, err := connect.ConnectClient(ctx)
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
@@ -205,42 +174,12 @@ func newGetCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			promptID := args[0]
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-			format, _ := cmd.Flags().GetString("format")
-
-			// Use parent command flags if not set
-			if wsURL == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
-							wsURL = urlFlag.Value.String()
-						}
-					}
-				}
-			}
-			if timeout == 0 {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						timeout, _ = root.PersistentFlags().GetDuration("timeout")
-					}
-				}
-			}
-			if format == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
-							format = formatFlag.Value.String()
-						}
-					}
-				}
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			timeout, format := flags.GetFlags(cmd)
+			ctx, cancel := flags.CreateContext(timeout)
 			defer cancel()
 
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
+			c, err := connect.ConnectClient(ctx)
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
@@ -295,38 +234,18 @@ func newMonitorCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionID := args[0]
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-
-			// Use parent command flags if not set
-			if wsURL == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
-							wsURL = urlFlag.Value.String()
-						}
-					}
-				}
-			}
-			if timeout == 0 {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						timeout, _ = root.PersistentFlags().GetDuration("timeout")
-					}
-				}
-			}
+			timeout, _ := flags.GetFlags(cmd)
 
 			// Create context that can be canceled but don't set timeout for monitoring
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			c := client.New(wsURL)
-			connectCtx, connectCancel := context.WithTimeout(ctx, timeout)
-			if err := c.Connect(connectCtx); err != nil {
-				connectCancel()
+			connectCtx, connectCancel := flags.CreateContext(timeout)
+			c, err := connect.ConnectClient(connectCtx)
+			connectCancel()
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
-			connectCancel()
 			defer c.Close()
 
 			// Start monitoring
@@ -364,42 +283,12 @@ func newSearchCommand() *cobra.Command {
 			sessionID := args[0]
 			pattern = args[1]
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-			format, _ := cmd.Flags().GetString("format")
-
-			// Use parent command flags if not set
-			if wsURL == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
-							wsURL = urlFlag.Value.String()
-						}
-					}
-				}
-			}
-			if timeout == 0 {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						timeout, _ = root.PersistentFlags().GetDuration("timeout")
-					}
-				}
-			}
-			if format == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
-							format = formatFlag.Value.String()
-						}
-					}
-				}
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			timeout, _ := flags.GetFlags(cmd)
+			ctx, cancel := flags.CreateContext(timeout)
 			defer cancel()
 
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
+			c, err := connect.ConnectClient(ctx)
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()

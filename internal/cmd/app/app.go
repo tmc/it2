@@ -5,10 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/launcher"
 )
 
 // NewCommand creates the app command with all subcommands.
@@ -20,6 +23,8 @@ func NewCommand() *cobra.Command {
 		Long:    "Commands for interacting with iTerm2 as a whole, including activation and window management",
 	}
 
+	cmd.AddCommand(newLaunchCommand())
+	cmd.AddCommand(newQuitCommand())
 	cmd.AddCommand(newFocusCommand())
 	cmd.AddCommand(newGetPropertyCommand())
 	cmd.AddCommand(newSetPropertyCommand())
@@ -40,37 +45,20 @@ func newFocusCommand() *cobra.Command {
 		Short: "Bring iTerm2 to the foreground",
 		Long:  "Activate iTerm2 and bring it to the foreground. This is equivalent to clicking on the app.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
 			raiseAll, _ := cmd.Flags().GetBool("raise-all")
 
-			// Use parent command flags if not set
-			if wsURL == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
-					}
-				}
-			}
-			if timeout == 0 {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						timeout, _ = root.PersistentFlags().GetDuration("timeout")
-					}
-				}
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			timeout, _ := flags.GetFlags(cmd)
+			ctx, cancel := flags.CreateContext(timeout)
 			defer cancel()
 
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
+			c, err := connect.ConnectClient(ctx)
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
 
 			// Focus the app
-			_, err := c.Focus(ctx, raiseAll)
+			_, err = c.Focus(ctx, raiseAll)
 			if err != nil {
 				return fmt.Errorf("failed to focus iTerm2: %w", err)
 			}
@@ -98,7 +86,9 @@ func newListWindowsCommand() *cobra.Command {
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -112,7 +102,9 @@ func newListWindowsCommand() *cobra.Command {
 			if format == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						format = root.PersistentFlags().Lookup("format").Value.String()
+						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
+							format = formatFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -202,7 +194,9 @@ Common variables:
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -263,7 +257,9 @@ func newSetVariableCommand() *cobra.Command {
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -324,7 +320,9 @@ Common app-level properties:
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -391,7 +389,9 @@ Example:
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -437,7 +437,9 @@ func newVersionCommand() *cobra.Command {
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -451,7 +453,9 @@ func newVersionCommand() *cobra.Command {
 			if format == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						format = root.PersistentFlags().Lookup("format").Value.String()
+						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
+							format = formatFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -549,7 +553,9 @@ func newGetInfoCommand() *cobra.Command {
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -563,7 +569,9 @@ func newGetInfoCommand() *cobra.Command {
 			if format == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						format = root.PersistentFlags().Lookup("format").Value.String()
+						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
+							format = formatFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -672,7 +680,9 @@ may be available in every version or configuration of iTerm2.`,
 			if format == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						format = root.PersistentFlags().Lookup("format").Value.String()
+						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
+							format = formatFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -771,3 +781,128 @@ using the property system.`,
 		},
 	}
 }
+
+func newLaunchCommand() *cobra.Command {
+	var wait bool
+	var timeout time.Duration
+
+	cmd := &cobra.Command{
+		Use:   "launch",
+		Short: "Launch iTerm2 if not running",
+		Long: `Launch iTerm2 if it's not already running.
+This is useful when running it2 from Terminal.app or other terminals.
+
+Examples:
+  # Launch iTerm2 and wait for it to be ready
+  $ it2 app launch
+
+  # Launch iTerm2 without waiting
+  $ it2 app launch --no-wait
+
+  # Launch with custom timeout
+  $ it2 app launch --timeout 60s`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// Check current terminal
+			termInfo := launcher.GetTerminalInfo()
+			if launcher.IsTerminalApp() {
+				fmt.Println("Running from Terminal.app")
+			} else {
+				fmt.Printf("Running from: %s\n", termInfo)
+			}
+
+			// Check if already running
+			if launcher.IsITerm2Running() {
+				fmt.Println("iTerm2 is already running")
+				if wait && !launcher.SocketExists() {
+					fmt.Println("Waiting for API socket...")
+					ctx, cancel := context.WithTimeout(context.Background(), timeout)
+					defer cancel()
+					if err := launcher.WaitForITerm2(ctx); err != nil {
+						return fmt.Errorf("failed waiting for iTerm2 socket: %w", err)
+					}
+					fmt.Println("API socket is now available")
+				} else if launcher.SocketExists() {
+					fmt.Println("API socket is available")
+				}
+				return nil
+			}
+
+			fmt.Println("Launching iTerm2...")
+			if wait {
+				ctx, cancel := context.WithTimeout(context.Background(), timeout)
+				defer cancel()
+				if err := launcher.LaunchITerm2(ctx); err != nil {
+					return fmt.Errorf("failed to launch iTerm2: %w", err)
+				}
+				fmt.Println("iTerm2 launched successfully and ready")
+			} else {
+				if err := launcher.LaunchITerm2(context.Background()); err != nil {
+					return fmt.Errorf("failed to launch iTerm2: %w", err)
+				}
+				fmt.Println("iTerm2 launch initiated")
+			}
+
+			return nil
+		},
+	}
+
+	cmd.Flags().BoolVar(&wait, "wait", true, "Wait for iTerm2 to be ready")
+	cmd.Flags().BoolVar(&wait, "no-wait", false, "Don't wait for iTerm2 to be ready (opposite of --wait)")
+	cmd.Flags().DurationVar(&timeout, "timeout", 30*time.Second, "Timeout for waiting")
+
+	return cmd
+}
+
+func newQuitCommand() *cobra.Command {
+	var force bool
+
+	cmd := &cobra.Command{
+		Use:   "quit",
+		Short: "Quit iTerm2 application",
+		Long: `Quit the iTerm2 application gracefully.
+
+Examples:
+  # Quit iTerm2
+  $ it2 app quit
+
+  # Force quit if unresponsive
+  $ it2 app quit --force`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if force {
+				// Force quit using kill
+				if launcher.IsITerm2Running() {
+					killCmd := exec.Command("pkill", "-x", "iTerm2")
+					if err := killCmd.Run(); err != nil {
+						return fmt.Errorf("failed to force quit iTerm2: %w", err)
+					}
+					fmt.Println("iTerm2 force quit")
+				} else {
+					fmt.Println("iTerm2 is not running")
+				}
+				return nil
+			}
+
+			// Graceful quit using AppleScript
+			if launcher.IsITerm2Running() {
+				quitCmd := exec.Command("osascript", "-e", `tell application "iTerm2" to quit`)
+				if err := quitCmd.Run(); err != nil {
+					// Try alternative app name
+					quitCmd = exec.Command("osascript", "-e", `tell application "iTerm" to quit`)
+					if err := quitCmd.Run(); err != nil {
+						return fmt.Errorf("failed to quit iTerm2: %w", err)
+					}
+				}
+				fmt.Println("iTerm2 quit successfully")
+			} else {
+				fmt.Println("iTerm2 is not running")
+			}
+
+			return nil
+		},
+	}
+
+	cmd.Flags().BoolVar(&force, "force", false, "Force quit iTerm2 (using pkill)")
+
+	return cmd
+}
+

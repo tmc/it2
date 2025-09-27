@@ -1,12 +1,10 @@
 package job
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/client"
 )
 
 // NewCommand creates the job command with all subcommands.
@@ -33,39 +31,13 @@ func newListCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionID := args[0]
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
 			// showAll, _ := cmd.Flags().GetBool("all")  // Reserved for future use
-			format, _ := cmd.Flags().GetString("format")
-
-			// Use parent command flags if not set
-			if wsURL == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
-					}
-				}
-			}
-			if timeout == 0 {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						timeout, _ = root.PersistentFlags().GetDuration("timeout")
-					}
-				}
-			}
-			if format == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						format = root.PersistentFlags().Lookup("format").Value.String()
-					}
-				}
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			timeout, _ := flags.GetFlags(cmd)
+			ctx, cancel := flags.CreateContext(timeout)
 			defer cancel()
 
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
+			c, err := connect.ConnectClient(ctx)
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()

@@ -3,6 +3,7 @@ package arrangement
 import (
 	"fmt"
 	"io/ioutil"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
@@ -24,6 +25,7 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newListCommand())
 	cmd.AddCommand(newDeleteCommand())
 	cmd.AddCommand(newExportCommand())
+	cmd.AddCommand(newImportCommand())
 
 	return cmd
 }
@@ -240,5 +242,36 @@ func runExportCommand(cmd *cobra.Command, args []string) error {
 	fmt.Printf("Arrangement '%s' exported to '%s'\n", name, filename)
 	fmt.Println("Note: This export contains restoration commands, not the actual layout data.")
 	fmt.Println("The actual arrangement data is stored in iTerm2's preferences.")
+	return nil
+}
+
+func newImportCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "import <file>",
+		Short: "Import arrangement from file",
+		Long: `Import a .iterm2arrangement file using macOS open command.
+This will prompt iTerm2 to import the arrangement and make it available in the saved arrangements.`,
+		Args: cobra.ExactArgs(1),
+		RunE: runImportCommand,
+	}
+	return cmd
+}
+
+func runImportCommand(cmd *cobra.Command, args []string) error {
+	filename := args[0]
+
+	// Check if file exists
+	if _, err := ioutil.ReadFile(filename); err != nil {
+		return fmt.Errorf("failed to read arrangement file: %w", err)
+	}
+
+	// Use macOS open command to import the arrangement
+	exec := exec.Command("open", filename)
+	if err := exec.Run(); err != nil {
+		return fmt.Errorf("failed to import arrangement: %w", err)
+	}
+
+	fmt.Printf("Arrangement file '%s' opened with iTerm2\n", filename)
+	fmt.Println("The arrangement should now be available in iTerm2's Window > Restore Arrangement menu")
 	return nil
 }

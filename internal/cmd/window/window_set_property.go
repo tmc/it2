@@ -1,11 +1,9 @@
 package window
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/client"
 )
 
 func newSetPropertyCommand() *cobra.Command {
@@ -23,27 +21,17 @@ func newSetPropertyCommand() *cobra.Command {
 			property := args[1]
 			value := args[2]
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-
-			// Use parent command flags if not set
-			if wsURL == "" {
-				wsURL = cmd.Parent().PersistentFlags().Lookup("url").Value.String()
-			}
-			if timeout == 0 {
-				timeout, _ = cmd.Parent().PersistentFlags().GetDuration("timeout")
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			timeout, _ := flags.GetFlags(cmd)
+			ctx, cancel := flags.CreateContext(timeout)
 			defer cancel()
 
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
+			c, err := connect.ConnectClient(ctx)
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
 
-			err := c.SetWindowProperty(ctx, windowID, property, value)
+			err = c.SetWindowProperty(ctx, windowID, property, value)
 			if err != nil {
 				return fmt.Errorf("failed to set window property: %w", err)
 			}
