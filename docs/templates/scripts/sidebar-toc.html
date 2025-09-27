@@ -1,83 +1,75 @@
 {{define "sidebar-toc-scripts"}}
     <script>
-        // Generate sidebar TOC if sidebar is enabled
-        if (document.getElementById('sidebar-toc')) {
-            function generateSidebarTOC() {
-                const headings = document.querySelectorAll('.main-content h1, .main-content h2, .main-content h3');
-                const tocContainer = document.getElementById('sidebar-toc');
+        // Generate sidebar TOC
+        function generateSidebarTOC() {
+            const tocContainer = document.getElementById('sidebar-toc');
+            if (!tocContainer) return;
 
-                if (headings.length === 0) {
-                    tocContainer.style.display = 'none';
-                    return;
-                }
+            const headings = document.querySelectorAll('.main-content h1, .main-content h2, .main-content h3');
+            if (headings.length === 0) {
+                tocContainer.style.display = 'none';
+                return;
+            }
 
-                const tocList = document.createElement('ul');
+            const tocList = document.createElement('ul');
 
-                headings.forEach((heading, index) => {
-                    const level = parseInt(heading.tagName.charAt(1));
-                    const id = heading.id || `heading-${index}`;
+            headings.forEach((heading, index) => {
+                const level = parseInt(heading.tagName.charAt(1));
+                const id = heading.id || `heading-${index}`;
 
-                    if (!heading.id) {
-                        heading.id = id;
-                    }
+                if (!heading.id) heading.id = id;
 
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.href = `#${id}`;
-                    a.textContent = heading.textContent;
-                    a.className = `level-${level}`;
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#${id}`;
+                a.textContent = heading.textContent;
+                a.className = `level-${level}`;
 
-                    // Add smooth scrolling
-                    a.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        document.getElementById(id).scrollIntoView({
-                            behavior: 'smooth'
-                        });
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
 
-                        // Update active state
-                        document.querySelectorAll('.sidebar-toc a').forEach(link =>
-                            link.classList.remove('active')
-                        );
-                        a.classList.add('active');
-                    });
-
-                    li.appendChild(a);
-                    tocList.appendChild(li);
+                    document.querySelectorAll('.sidebar-toc a').forEach(link =>
+                        link.classList.remove('active')
+                    );
+                    a.classList.add('active');
                 });
 
-                tocContainer.appendChild(tocList);
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
 
-                // Highlight current section on scroll
-                function updateActiveSection() {
-                    const headings = document.querySelectorAll('.main-content h1, .main-content h2, .main-content h3');
-                    const tocLinks = document.querySelectorAll('.sidebar-toc a');
+            tocContainer.appendChild(tocList);
 
-                    let current = '';
-                    headings.forEach(heading => {
-                        const rect = heading.getBoundingClientRect();
-                        if (rect.top <= 100) {
-                            current = heading.id;
-                        }
-                    });
+            // Update active section on scroll
+            function updateActiveSection() {
+                const headings = document.querySelectorAll('.main-content h1, .main-content h2, .main-content h3');
+                const tocLinks = document.querySelectorAll('.sidebar-toc a');
 
-                    tocLinks.forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href') === `#${current}`) {
-                            link.classList.add('active');
-                        }
-                    });
-                }
+                let current = '';
+                headings.forEach(heading => {
+                    if (heading.getBoundingClientRect().top <= 100) {
+                        current = heading.id;
+                    }
+                });
 
-                window.addEventListener('scroll', updateActiveSection);
-                updateActiveSection(); // Initial call
+                tocLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
             }
 
-            // Generate TOC when page loads
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', generateSidebarTOC);
-            } else {
-                generateSidebarTOC();
-            }
+            window.addEventListener('scroll', updateActiveSection);
+            updateActiveSection();
+        }
+
+        // Initialize when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', generateSidebarTOC);
+        } else {
+            generateSidebarTOC();
         }
     </script>
 {{end}}

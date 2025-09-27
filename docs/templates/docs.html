@@ -1,7 +1,6 @@
 {{define "layout"}}{{template "base" .}}{{end}}
 
 {{define "body-content"}}
-    <div id="status" class="connection-status">Connected</div>
     <div class="docs-layout">
         <button class="mobile-nav-toggle" id="mobile-nav-toggle">
             <span></span>
@@ -116,21 +115,6 @@
             line-height: 1.5;
         }
 
-        .connection-status {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            background: var(--success);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-size: 12px;
-            z-index: 1000;
-        }
-
-        .connection-status.disconnected {
-            background: var(--danger);
-        }
 
         /* Layout styles - GitHub docs inspired */
         .docs-layout {
@@ -451,12 +435,6 @@
                 margin: 24px 0 12px 0;
             }
 
-            .connection-status {
-                top: 8px;
-                right: 8px;
-                font-size: 10px;
-                padding: 3px 6px;
-            }
         }
 
         /* iOS Safari specific fixes */
@@ -530,71 +508,27 @@
 {{define "scripts"}}
     <script>
         (function() {
-            const status = document.getElementById('status');
             const sidebar = document.getElementById('sidebar');
             const mobileToggle = document.getElementById('mobile-nav-toggle');
 
             // Mobile nav toggle
-            mobileToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('open');
-                mobileToggle.classList.toggle('active');
-            });
+            if (mobileToggle && sidebar) {
+                mobileToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('open');
+                    mobileToggle.classList.toggle('active');
+                });
 
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth <= 768 &&
-                    !sidebar.contains(e.target) &&
-                    !mobileToggle.contains(e.target) &&
-                    sidebar.classList.contains('open')) {
-                    sidebar.classList.remove('open');
-                    mobileToggle.classList.remove('active');
-                }
-            });
-
-            // Create EventSource for SSE
-            const eventSource = new EventSource('/events');
-
-            eventSource.onopen = function() {
-                {{if .Verbose}}console.log('SSE connected');{{end}}
-                status.textContent = 'Connected';
-                status.classList.remove('disconnected');
-            };
-
-            eventSource.onmessage = function(event) {
-                {{if .Verbose}}console.log('SSE message:', event.data);{{end}}
-                if (event.data === 'reload') {
-                    {{if .Verbose}}console.log('Reloading page...');{{end}}
-                    document.body.style.opacity = '0.8';
-                    setTimeout(() => {
-                        location.reload();
-                    }, 100);
-                } else if (event.data === 'shutdown') {
-                    {{if .Verbose}}console.log('Server shutting down');{{end}}
-                    status.textContent = 'Server shutdown';
-                    status.classList.add('disconnected');
-                    eventSource.close();
-                }
-            };
-
-            eventSource.onerror = function(e) {
-                {{if .Verbose}}console.log('SSE error:', e);{{end}}
-                status.textContent = 'Disconnected';
-                status.classList.add('disconnected');
-
-                if (eventSource.readyState === EventSource.CLOSED) {
-                    {{if .Verbose}}console.log('Connection closed, attempting reconnect...');{{end}}
-                    setTimeout(function() {
-                        fetch('/events', { method: 'HEAD' })
-                            .then(() => {
-                                {{if .Verbose}}console.log('Server is back, reloading...');{{end}}
-                                window.location.reload();
-                            })
-                            .catch(() => {
-                                {{if .Verbose}}console.log('Server still down, waiting...');{{end}}
-                            });
-                    }, 2000);
-                }
-            };
+                // Close sidebar when clicking outside on mobile
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768 &&
+                        !sidebar.contains(e.target) &&
+                        !mobileToggle.contains(e.target) &&
+                        sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                        mobileToggle.classList.remove('active');
+                    }
+                });
+            }
         })();
     </script>
 
