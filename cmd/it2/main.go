@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmd/alert"
+	"github.com/tmc/it2/internal/cmd/annotation"
 	"github.com/tmc/it2/internal/cmd/app"
 	"github.com/tmc/it2/internal/cmd/arrangement"
 	"github.com/tmc/it2/internal/cmd/auth"
@@ -13,19 +15,29 @@ import (
 	"github.com/tmc/it2/internal/cmd/broadcast"
 	"github.com/tmc/it2/internal/cmd/clipboard"
 	"github.com/tmc/it2/internal/cmd/color"
-
+	"github.com/tmc/it2/internal/cmd/control"
+	"github.com/tmc/it2/internal/cmd/event"
+	"github.com/tmc/it2/internal/cmd/filepanel"
+	"github.com/tmc/it2/internal/cmd/focus"
 	"github.com/tmc/it2/internal/cmd/input"
 	"github.com/tmc/it2/internal/cmd/job"
+	"github.com/tmc/it2/internal/cmd/keyboard"
+	"github.com/tmc/it2/internal/cmd/lifecycle"
 	"github.com/tmc/it2/internal/cmd/notification"
+	"github.com/tmc/it2/internal/cmd/preference"
 	"github.com/tmc/it2/internal/cmd/profile"
 	"github.com/tmc/it2/internal/cmd/prompt"
 	"github.com/tmc/it2/internal/cmd/screen"
 	"github.com/tmc/it2/internal/cmd/selection"
 	"github.com/tmc/it2/internal/cmd/session"
+	"github.com/tmc/it2/internal/cmd/snippet"
 	"github.com/tmc/it2/internal/cmd/statusbar"
 	"github.com/tmc/it2/internal/cmd/tab"
 	"github.com/tmc/it2/internal/cmd/text"
 	"github.com/tmc/it2/internal/cmd/tmux"
+	"github.com/tmc/it2/internal/cmd/transaction"
+	"github.com/tmc/it2/internal/cmd/trigger"
+	"github.com/tmc/it2/internal/cmd/utility"
 	"github.com/tmc/it2/internal/cmd/variable"
 	"github.com/tmc/it2/internal/cmd/window"
 	"github.com/tmc/it2/internal/completion"
@@ -278,6 +290,59 @@ func init() {
 	rootCmd.AddCommand(tmux.NewCommand())
 	rootCmd.AddCommand(variable.NewCommand())
 	rootCmd.AddCommand(window.NewCommand())
+
+	// Add hidden/experimental commands
+	alertCmd := alert.NewCommand()
+	alertCmd.Hidden = true
+	rootCmd.AddCommand(alertCmd)
+
+	annotationCmd := annotation.NewCommand()
+	annotationCmd.Hidden = true
+	rootCmd.AddCommand(annotationCmd)
+
+	controlCmd := control.NewCommand()
+	controlCmd.Hidden = true
+	rootCmd.AddCommand(controlCmd)
+
+	eventCmd := event.NewCommand()
+	eventCmd.Hidden = true
+	rootCmd.AddCommand(eventCmd)
+
+	filepanelCmd := filepanel.NewCommand()
+	filepanelCmd.Hidden = true
+	rootCmd.AddCommand(filepanelCmd)
+
+	focusCmd := focus.NewCommand()
+	focusCmd.Hidden = true
+	rootCmd.AddCommand(focusCmd)
+
+	keyboardCmd := keyboard.NewCommand()
+	keyboardCmd.Hidden = true
+	rootCmd.AddCommand(keyboardCmd)
+
+	lifecycleCmd := lifecycle.NewCommand()
+	lifecycleCmd.Hidden = true
+	rootCmd.AddCommand(lifecycleCmd)
+
+	preferenceCmd := preference.NewCommand()
+	preferenceCmd.Hidden = true
+	rootCmd.AddCommand(preferenceCmd)
+
+	snippetCmd := snippet.NewCommand()
+	snippetCmd.Hidden = true
+	rootCmd.AddCommand(snippetCmd)
+
+	transactionCmd := transaction.NewCommand()
+	transactionCmd.Hidden = true
+	rootCmd.AddCommand(transactionCmd)
+
+	triggerCmd := trigger.NewCommand()
+	triggerCmd.Hidden = true
+	rootCmd.AddCommand(triggerCmd)
+
+	utilityCmd := utility.NewCommand()
+	utilityCmd.Hidden = true
+	rootCmd.AddCommand(utilityCmd)
 }
 
 func main() {
