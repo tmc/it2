@@ -2,6 +2,9 @@ package plugins
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -36,6 +39,29 @@ type WindowEnricher interface {
 
 	// EnrichWindow adds extra data to a window
 	EnrichWindow(ctx context.Context, window *client.WindowInfo) (map[string]interface{}, error)
+}
+
+// PluginEvent represents an event from a plugin
+type PluginEvent struct {
+	PluginName  string                 `json:"plugin_name"`
+	EventType   string                 `json:"event_type"`
+	SessionID   string                 `json:"session_id"`
+	Timestamp   time.Time              `json:"timestamp"`
+	Data        map[string]interface{} `json:"data"`
+	Message     string                 `json:"message,omitempty"`
+}
+
+// EventMonitor is an interface for plugins that can generate events during monitoring
+type EventMonitor interface {
+	// Name returns the name of the monitor plugin
+	Name() string
+
+	// StartMonitoring starts monitoring for events on the given session
+	// Returns a channel that will receive events and an error channel
+	StartMonitoring(ctx context.Context, sessionID string) (<-chan PluginEvent, <-chan error, error)
+
+	// StopMonitoring stops monitoring (context cancellation should also work)
+	StopMonitoring() error
 }
 
 // ExecPlugin represents a plugin that runs an external executable
@@ -169,4 +195,68 @@ func (p *ExecPlugin) EnrichWindow(ctx context.Context, window *client.WindowInfo
 	return map[string]interface{}{
 		p.name: result,
 	}, nil
+}
+
+// StartMonitoring starts monitoring for events from the plugin
+func (p *ExecPlugin) StartMonitoring(ctx context.Context, sessionID string) (<-chan PluginEvent, <-chan error, error) {
+	eventChan := make(chan PluginEvent, 100)
+	errorChan := make(chan error, 10)
+
+	cmd := exec.CommandContext(ctx, p.executable, "monitor", sessionID)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get stdout pipe: %w", err)
+	}
+
+	if err := cmd.Start(); err != nil {
+		return nil, nil, fmt.Errorf("failed to start plugin: %w", err)
+	}
+
+	// Start goroutine to read events from plugin
+	go func() {
+		defer close(eventChan)
+		defer close(errorChan)
+		defer stdout.Close()
+
+		decoder := json.NewDecoder(stdout)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				var event PluginEvent
+				if err := decoder.Decode(&event); err != nil {
+					if err == io.EOF {
+						return // Plugin finished normally
+					}
+					select {
+					case errorChan <- fmt.Errorf("failed to decode plugin event: %w", err):
+					case <-ctx.Done():
+						return
+					}
+					continue
+				}
+
+				// Ensure plugin name is set
+				if event.PluginName == "" {
+					event.PluginName = p.name
+				}
+
+				select {
+				case eventChan <- event:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+
+	return eventChan, errorChan, nil
+}
+
+// StopMonitoring stops monitoring (relies on context cancellation)
+func (p *ExecPlugin) StopMonitoring() error {
+	// Monitoring is stopped via context cancellation
+	// No additional cleanup needed for this implementation
+	return nil
 }

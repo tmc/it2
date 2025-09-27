@@ -75,6 +75,67 @@ func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, erro
 	return sessionPlugins, tabPlugins, windowPlugins, nil
 }
 
+// DiscoverEventMonitors finds all it2-* executables that support event monitoring
+func DiscoverEventMonitors() ([]EventMonitor, error) {
+	var eventMonitors []EventMonitor
+	seen := make(map[string]bool) // Track seen plugin names to avoid duplicates
+
+	// Get PATH environment variable
+	pathEnv := os.Getenv("PATH")
+	if pathEnv == "" {
+		return eventMonitors, nil
+	}
+
+	// Split PATH into directories
+	paths := strings.Split(pathEnv, string(os.PathListSeparator))
+
+	// Look for executables starting with "it2-"
+	for _, dir := range paths {
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			// Skip directories we can't read
+			continue
+		}
+
+		for _, entry := range entries {
+			if entry.IsDir() {
+				continue
+			}
+
+			name := entry.Name()
+			if !strings.HasPrefix(name, "it2-") {
+				continue
+			}
+
+			fullPath := filepath.Join(dir, name)
+
+			// Check if it's executable
+			info, err := os.Stat(fullPath)
+			if err != nil {
+				continue
+			}
+
+			// Check if file is executable (Unix-like systems)
+			if info.Mode()&0111 != 0 {
+				// Skip if we've already seen this plugin name
+				if seen[name] {
+					continue
+				}
+				seen[name] = true
+
+				plugin := NewExecPlugin(fullPath)
+
+				// All session plugins can potentially be event monitors
+				if plugin.pluginType == "session" || plugin.pluginType == "generic" {
+					eventMonitors = append(eventMonitors, plugin)
+				}
+			}
+		}
+	}
+
+	return eventMonitors, nil
+}
+
 // Registry holds discovered plugins
 type Registry struct {
 	sessionEnrichers []SessionEnricher
