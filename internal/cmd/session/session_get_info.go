@@ -38,26 +38,18 @@ This command combines multiple API calls to provide a complete view of the sessi
 				sessionID = cmdutil.ResolveSessionID(args[0])
 			}
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 			includeProperties, _ := cmd.Flags().GetBool("properties")
 			includePrompt, _ := cmd.Flags().GetBool("prompt")
 			extractPath, _ := cmd.Flags().GetString("extract")
 
-			// Use parent command flags if not set
-			if wsURL == "" {
-				wsURL = cmd.Parent().PersistentFlags().Lookup("url").Value.String()
-			}
-			if timeout == 0 {
-				timeout, _ = cmd.Parent().PersistentFlags().GetDuration("timeout")
-			}
+			timeout, _ := cmdutil.GetFlags(cmd)
 
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
+			c, err := cmdutil.ConnectClient(ctx)
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
