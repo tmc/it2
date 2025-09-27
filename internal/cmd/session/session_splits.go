@@ -26,7 +26,7 @@ type SessionNode struct {
 
 func newSplitsCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    "tree",
+		Use:    "splits",
 		Short:  "Show session hierarchy tree",
 		Long:   `Display the hierarchical relationship of sessions with parent-child relationships in a tree view.`,
 		Hidden: true, // Hidden command as requested

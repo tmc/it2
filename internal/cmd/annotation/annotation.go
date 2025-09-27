@@ -188,7 +188,7 @@ Examples:
 
 func newListCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "list [session-id]",
+		Use:   "list [<session-id>]",
 		Short: "List all annotations in a session",
 		Long: `List all annotations in a session. If no session-id is provided,
 uses $ITERM_SESSION_ID environment variable.

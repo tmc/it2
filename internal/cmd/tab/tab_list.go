@@ -10,7 +10,7 @@ import (
 
 func newListCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "list [window-id]",
+		Use:   "list [<window-id>]",
 		Short: "List tabs in windows",
 		Long: `List tabs in a specific window or all windows.
 

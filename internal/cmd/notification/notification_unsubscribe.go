@@ -11,7 +11,7 @@ import (
 
 func newUnsubscribeCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "unsubscribe <type> [session-id]",
+		Use:   "unsubscribe <type> [<session-id>]",
 		Short: "Unsubscribe from iTerm2 notifications",
 		Long:  "Stop receiving specific notification types with optional session targeting",
 		Args:  cobra.RangeArgs(1, 2),

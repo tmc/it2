@@ -9,7 +9,7 @@ import (
 
 func newGetCursorCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "get-cursor [session-id]",
+		Use:   "get-cursor [<session-id>]",
 		Short: "Get cursor position and state",
 		Long: `Get the current cursor position and state information for a session.
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.

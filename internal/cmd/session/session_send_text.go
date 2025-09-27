@@ -227,7 +227,7 @@ func formatScreenResponse(resp *pb.GetBufferResponse) string {
 
 func newSendTextCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "send-text [session-id] <text>",
+		Use:   "send-text [<session-id>] <text>",
 		Short: "Send text to a session as if typed",
 		Long: `Send text to a session as if typed.
 

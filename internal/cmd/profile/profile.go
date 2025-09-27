@@ -649,7 +649,7 @@ provides step-by-step instructions for manual creation.`,
 // newSessionSetPropertyCommand creates a command for setting profile properties on individual sessions
 func newSessionSetPropertyCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "session-set-property [session-id] <property-key> <value>",
+		Use:   "session-set-property [<session-id>] <property-key> <value>",
 		Short: "Set a profile property for a specific session only",
 		Long: `Set a profile property for a specific session without modifying the underlying profile.
 This allows per-session customization similar to the badge functionality.
@@ -729,7 +729,7 @@ Examples:
 // newSessionGetPropertyCommand creates a command for getting profile properties from individual sessions
 func newSessionGetPropertyCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "session-get-property [session-id] <property-key>",
+		Use:   "session-get-property [<session-id>] <property-key>",
 		Short: "Get a profile property value from a specific session",
 		Long: `Get a profile property value from a specific session's profile copy.
 This retrieves values that may have been customized per-session.
@@ -791,7 +791,7 @@ Examples:
 // newSessionResetCommand creates a command for resetting session-specific profile customizations
 func newSessionResetCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "session-reset [session-id] [property-key]",
+		Use:   "session-reset [<session-id>] [property-key]",
 		Short: "Reset session-specific profile customizations",
 		Long: `Reset session-specific profile customizations back to the profile defaults.
 If no property is specified, provides guidance on resetting all customizations.

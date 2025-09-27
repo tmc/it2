@@ -9,7 +9,7 @@ import (
 
 func newCreateCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "create <profile> [window-id]",
+		Use:   "create <profile> [<window-id>]",
 		Short: "Create a new tab",
 		Long:  `Create a new tab with specified profile in a window.`,
 		Example: cmdutil.Doc(`

@@ -17,7 +17,7 @@ import (
 
 func newSubscribeCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "subscribe <type> [session-id]",
+		Use:   "subscribe <type> [<session-id>]",
 		Short: "Subscribe to iTerm2 notifications",
 		Long:  "Subscribe to specific notification types with optional session targeting",
 		Args:  cobra.RangeArgs(1, 2),

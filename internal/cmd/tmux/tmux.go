@@ -57,7 +57,7 @@ func newListConnectionsCommand() *cobra.Command {
 
 func newListClientsCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-clients [connection-id]",
+		Use:   "list-clients [<connection-id>]",
 		Short: "List tmux clients",
 		Long:  "List tmux clients. If connection-id is provided, lists clients for that connection only.",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -117,7 +117,7 @@ func newListClientsCommand() *cobra.Command {
 
 func newListWindowsCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-windows [connection-id]",
+		Use:   "list-windows [<connection-id>]",
 		Short: "List tmux windows",
 		Long:  "List tmux windows. If connection-id is provided, lists windows for that connection only.",
 		RunE: func(cmd *cobra.Command, args []string) error {

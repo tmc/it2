@@ -16,6 +16,8 @@ func MapKeyToCode(key string) string {
 		return "\r"
 	case "tab":
 		return "\t"
+	case "shift-tab", "shift+tab":
+		return "\x1b[Z"
 	case "escape", "esc":
 		return "\x1b"
 	case "backspace":
@@ -129,6 +131,10 @@ func parseComplexKey(key string) string {
 
 	// Handle special keys with modifiers
 	switch baseKey {
+	case "tab":
+		if hasShift {
+			return "\x1b[Z" // Shift+Tab
+		}
 	case "c":
 		if hasCtrl {
 			return "\x03" // Ctrl+C

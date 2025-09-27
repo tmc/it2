@@ -9,7 +9,7 @@ import (
 
 func newGetBufferCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "get-buffer [session-id]",
+		Use:   "get-buffer [<session-id>]",
 		Short: "Get buffer contents of a session",
 		Long:  `Get buffer contents of a session including scrollback history.`,
 		Example: cmdutil.Doc(`

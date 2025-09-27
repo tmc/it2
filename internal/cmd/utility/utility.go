@@ -48,7 +48,7 @@ func newCursorGuideCommand() *cobra.Command {
 
 func newCursorGuideShowCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show [session-id]",
+		Use:   "show [<session-id>]",
 		Short: "Show cursor guides",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -90,7 +90,7 @@ func newCursorGuideShowCommand() *cobra.Command {
 
 func newCursorGuideHideCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "hide [session-id]",
+		Use:   "hide [<session-id>]",
 		Short: "Hide cursor guides",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -132,7 +132,7 @@ func newCursorGuideHideCommand() *cobra.Command {
 
 func newCursorGuideToggleCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "toggle [session-id]",
+		Use:   "toggle [<session-id>]",
 		Short: "Toggle cursor guides",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -188,7 +188,7 @@ func newTimestampCommand() *cobra.Command {
 
 func newTimestampShowCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show [session-id]",
+		Use:   "show [<session-id>]",
 		Short: "Show timestamps",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -242,7 +242,7 @@ func newTimestampShowCommand() *cobra.Command {
 
 func newTimestampHideCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "hide [session-id]",
+		Use:   "hide [<session-id>]",
 		Short: "Hide timestamps",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -296,7 +296,7 @@ func newTimestampHideCommand() *cobra.Command {
 
 func newTimestampToggleCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "toggle [session-id]",
+		Use:   "toggle [<session-id>]",
 		Short: "Toggle timestamps",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -1000,7 +1000,7 @@ func newBadgeCommand() *cobra.Command {
 
 func newBadgeSetCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set <text> [session-id]",
+		Use:   "set <text> [<session-id>]",
 		Short: "Set session badge text",
 		Args:  cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -1055,7 +1055,7 @@ func newBadgeSetCommand() *cobra.Command {
 
 func newBadgeClearCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "clear [session-id]",
+		Use:   "clear [<session-id>]",
 		Short: "Clear session badge",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

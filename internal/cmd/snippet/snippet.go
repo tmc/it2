@@ -443,7 +443,7 @@ func newEditCommand() *cobra.Command {
 
 func newSendCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "send <name> [session-id]",
+		Use:   "send <name> [<session-id>]",
 		Short: "Send snippet to a session",
 		Long:  "Send the text of a snippet to an iTerm2 session",
 		Args:  cobra.RangeArgs(1, 2),

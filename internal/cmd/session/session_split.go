@@ -12,7 +12,7 @@ import (
 
 func newSplitCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "split [session-id]",
+		Use:   "split [<session-id>]",
 		Short: "Split a session pane",
 		Long: `Split a session pane horizontally or vertically, creating a new session.
 

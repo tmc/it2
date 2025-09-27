@@ -8,7 +8,7 @@ import (
 
 func newSendCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "send [session-id] <text>",
+		Use:            "send [<session-id>] <text>",
 		Short:          "Send text to a session",
 		Long:           "Send text to a session. If no session-id is provided, uses $ITERM_SESSION_ID environment variable.",
 		Args:           cobra.RangeArgs(1, 2),

@@ -11,7 +11,7 @@ import (
 
 func newSendKeyCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "send-key [session-id] <key>",
+		Use:   "send-key [<session-id>] <key>",
 		Short: "Send a special key to a session",
 		Long: `Send a key or character to a session.
 

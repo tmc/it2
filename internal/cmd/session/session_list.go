@@ -56,6 +56,7 @@ func newListCommand() *cobra.Command {
 			return sharedOps.ListSessions(cmdutil.SharedListOptions{
 				WindowID:    windowID,
 				TabID:       tabID,
+				ScopeFlag:   scopeFlag,
 				Format:      format,
 				Columns:     columns,
 				SortBy:      sortBy,
@@ -73,8 +74,8 @@ func newListCommand() *cobra.Command {
 	cmd.Flags().String("window-id", "", "Filter sessions by window ID")
 	cmd.Flags().String("tab-id", "", "Filter sessions by tab ID")
 
-	// Add scope support (informational only for list commands)
-	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (affects scope notice only)")
+	// Add scope support for session filtering
+	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (none,window,tab,parents,siblings,peers,lineage)")
 
 	// Add completion functions
 	cmd.RegisterFlagCompletionFunc("window-id", completion.WindowIDCompletion)

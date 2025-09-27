@@ -8,7 +8,7 @@ import (
 
 func newCopyCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "copy [session-id]",
+		Use:   "copy [<session-id>]",
 		Short: "Copy current selection to clipboard",
 		Long: `Copy the current text selection to the system clipboard.
 

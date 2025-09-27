@@ -10,7 +10,7 @@ import (
 
 func newSplitsAliasCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:        "splits [tab-id]",
+		Use:        "splits [<tab-id>]",
 		Short:      "Show split pane layout (moved to 'tab splits')",
 		Long:       `This command has moved to 'tab splits'. Please use 'it2 tab splits' instead.`,
 		Hidden:     false, // Keep visible for now with deprecation notice

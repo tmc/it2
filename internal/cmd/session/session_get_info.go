@@ -15,7 +15,7 @@ import (
 
 func newGetInfoCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-info [session-id]",
+		Use:   "get-info [<session-id>]",
 		Short: "Get comprehensive session information",
 		Long: `Get comprehensive information about a session including:
   - Basic session details (ID, name, title)

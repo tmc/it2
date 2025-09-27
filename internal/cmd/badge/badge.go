@@ -119,7 +119,7 @@ Examples:
 
 func newGetCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "get [session-id]",
+		Use:   "get [<session-id>]",
 		Short: "Get the current badge for a session",
 		Long: `Get the current badge for a session. If no session-id is provided,
 uses $ITERM_SESSION_ID environment variable.

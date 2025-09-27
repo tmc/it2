@@ -3,6 +3,7 @@ package cmdutil
 import (
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -16,6 +17,7 @@ type SharedListOptions struct {
 	WindowID    string
 	TabID       string
 	SessionID   string
+	ScopeFlag   string
 	Format      string
 	Columns     []string
 	SortBy      string
@@ -43,9 +45,12 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 		return fmt.Errorf("failed to list sessions: %w", err)
 	}
 
+	// Apply scope filtering first
+	scopedSessions := s.applyScopeFilter(sessions, opts.ScopeFlag)
+
 	// Filter sessions based on options
 	var filteredSessions []*client.SessionInfo
-	for _, session := range sessions {
+	for _, session := range scopedSessions {
 		// Apply window filter if specified
 		if opts.WindowID != "" && session.WindowID != opts.WindowID {
 			continue
@@ -217,4 +222,70 @@ func (s *SharedListOperations) ResolveWindowID(windowIDOrIndex string) (string, 
 
 	// Index not found, return original (might be valid in some contexts)
 	return windowIDOrIndex, nil
+}
+
+// applyScopeFilter filters sessions based on scope settings
+func (s *SharedListOperations) applyScopeFilter(sessions []*client.SessionInfo, scopeFlag string) []*client.SessionInfo {
+	// Determine effective scope (flag overrides environment variable)
+	effectiveScope := scopeFlag
+	if effectiveScope == "" {
+		effectiveScope = os.Getenv("IT2_SCOPE")
+	}
+
+	// If no scope set or scope is "none", return all sessions
+	if effectiveScope == "" || effectiveScope == "none" {
+		return sessions
+	}
+
+	// Get current session ID from environment
+	currentSessionID := ResolveSessionID("")
+	if currentSessionID == "" {
+		// No current session, return all sessions
+		return sessions
+	}
+
+	// Find the current session in the list
+	var currentSession *client.SessionInfo
+	for _, session := range sessions {
+		if session.SessionID == currentSessionID {
+			currentSession = session
+			break
+		}
+	}
+
+	if currentSession == nil {
+		// Current session not found, return all sessions
+		return sessions
+	}
+
+	// Apply scope filtering based on the effective scope
+	var filteredSessions []*client.SessionInfo
+	switch effectiveScope {
+	case "window":
+		// Filter to sessions in the same window
+		for _, session := range sessions {
+			if session.WindowID == currentSession.WindowID {
+				filteredSessions = append(filteredSessions, session)
+			}
+		}
+	case "tab":
+		// Filter to sessions in the same tab
+		for _, session := range sessions {
+			if session.WindowID == currentSession.WindowID && session.TabID == currentSession.TabID {
+				filteredSessions = append(filteredSessions, session)
+			}
+		}
+	case "siblings":
+		// Filter to sessions that share the same parent session
+		for _, session := range sessions {
+			if session.ParentSessionID == currentSession.ParentSessionID && session.ParentSessionID != "" {
+				filteredSessions = append(filteredSessions, session)
+			}
+		}
+	default:
+		// Unknown scope, return all sessions
+		return sessions
+	}
+
+	return filteredSessions
 }

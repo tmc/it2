@@ -12,7 +12,7 @@ import (
 
 func newCreateCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "create [session-id]",
+		Use:   "create [<session-id>]",
 		Short: "Create a new session",
 		Long: `Create a new iTerm2 session by either:
   1. Creating a new tab (default)

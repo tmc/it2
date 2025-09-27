@@ -9,7 +9,7 @@ import (
 
 func newGetContentsCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "get-contents [session-id]",
+		Use:            "get-contents [<session-id>]",
 		Short:          "Get specific line ranges from a session buffer",
 		Long:           "Get specific line ranges from a session buffer with configurable starting line and number of lines. If no session-id is provided, uses $ITERM_SESSION_ID environment variable.",
 		Args:           cobra.RangeArgs(0, 1),

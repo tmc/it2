@@ -9,7 +9,7 @@ import (
 
 func newGetScreenCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "get-screen [session-id]",
+		Use:            "get-screen [<session-id>]",
 		Short:          "Get current screen contents of a session",
 		Long:           "Get the current visible screen contents of a session without scrollback history. If no session-id is provided, uses $ITERM_SESSION_ID environment variable.",
 		Args:           cobra.RangeArgs(0, 1),

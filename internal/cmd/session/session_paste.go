@@ -8,7 +8,7 @@ import (
 
 func newPasteCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "paste [session-id]",
+		Use:   "paste [<session-id>]",
 		Short: "Paste clipboard content to session",
 		Long: `Paste the system clipboard content to the specified session.
 

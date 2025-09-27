@@ -457,8 +457,8 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 		return nil
 	}
 
-	// Determine columns to include
-	headers := []string{"ID", "Parent ID", "Title", "Command", "PID", "Exit", "State", "Window", "Tab"}
+	// Determine columns to include - put long fields at end as requested
+	headers := []string{"ID", "Parent", "PID", "Exit", "State", "Window", "Tab", "Title", "Command"}
 
 	// Check if any sessions have plugin data to determine additional columns
 	pluginColumns := make(map[string]bool)
@@ -481,18 +481,6 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	table := NewTableData(headers)
 
 	for _, session := range sessions {
-		// Truncate long names
-		name := session.SessionName
-		if len(name) > 50 {
-			name = name[:47] + "..."
-		}
-
-		// Truncate command for display
-		command := session.CurrentCommand
-		if len(command) > 30 {
-			command = command[:27] + "..."
-		}
-
 		// Format PID display
 		pidDisplay := ""
 		if session.JobPID != 0 {
@@ -520,16 +508,44 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			state = ""
 		}
 
+		// Format parent ID - use short ID if available
+		parentDisplay := ""
+		if session.ParentSessionID != "" {
+			// Extract short form from parent session ID if possible
+			if strings.Contains(session.ParentSessionID, ":") {
+				parts := strings.Split(session.ParentSessionID, ":")
+				if len(parts) >= 2 {
+					parentDisplay = parts[0] + ":" + parts[1][:8] // Show window:session prefix
+				} else {
+					parentDisplay = session.ParentSessionID
+				}
+			} else {
+				parentDisplay = session.ParentSessionID
+			}
+			if len(parentDisplay) > 12 {
+				parentDisplay = parentDisplay[:9] + "..."
+			}
+		}
+
+		// Keep title and command longer since they're at the end
+		title := session.SessionName
+		if len(title) > 80 {
+			title = title[:77] + "..."
+		}
+
+		command := session.CurrentCommand
+		// Don't truncate command since it's the last column
+
 		row := []string{
 			session.ShortID,
-			session.ParentSessionID,
-			name,
-			command,
+			parentDisplay,
 			pidDisplay,
 			exitDisplay,
 			state,
 			fmt.Sprintf("%d", session.WindowNumber),
 			session.TabID,
+			title,
+			command,
 		}
 
 		// Add plugin data columns in same sorted order
@@ -1464,35 +1480,173 @@ func FormatNotification(notification *pb.Notification, notificationType string) 
 	return fmt.Sprintf("Unknown notification type: %T", notification)
 }
 
-// formatSessionsTree formats sessions as a tree showing hierarchy
+// formatSessionsTree formats sessions as a tree showing hierarchy ordered by window -> tab -> splits -> sessions
 func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 	if len(sessions) == 0 {
 		fmt.Println("No sessions found")
 		return nil
 	}
 
-	// Build hierarchy map
+	// Check if any sessions have plugin data to determine additional columns
+	pluginColumns := make(map[string]bool)
+	for _, session := range sessions {
+		for key := range session.PluginData {
+			pluginColumns[key] = true
+		}
+	}
+
+	// Add plugin columns to headers in sorted order for stability
+	var pluginCols []string
+	for col := range pluginColumns {
+		pluginCols = append(pluginCols, col)
+	}
+	sort.Strings(pluginCols)
+
+	// Group sessions by window -> tab structure
+	windowGroups := make(map[int32]map[string][]*client.SessionInfo)
+
+	for _, session := range sessions {
+		if windowGroups[session.WindowNumber] == nil {
+			windowGroups[session.WindowNumber] = make(map[string][]*client.SessionInfo)
+		}
+		tabKey := session.TabID
+		if tabKey == "" {
+			tabKey = "no-tab"
+		}
+		windowGroups[session.WindowNumber][tabKey] = append(windowGroups[session.WindowNumber][tabKey], session)
+	}
+
+	// Print header
+	fmt.Println("Session Hierarchy:")
+	fmt.Println()
+
+	// Build header dynamically
+	header := "%-30s %-8s %-8s %-8s %-40s %s"
+	headerArgs := []interface{}{"Tree", "ID", "PID", "State", "Title", "Command"}
+
+	divider := "%-30s %-8s %-8s %-8s %-40s %s"
+	dividerArgs := []interface{}{strings.Repeat("-", 30), "--------", "--------", "--------", strings.Repeat("-", 40), "-------"}
+
+	// Add plugin columns to header
+	for _, col := range pluginCols {
+		header += " %-12s"
+		headerArgs = append(headerArgs, strings.Title(col))
+		divider += " %-12s"
+		dividerArgs = append(dividerArgs, strings.Repeat("-", 12))
+	}
+
+	fmt.Printf(header+"\n", headerArgs...)
+	fmt.Printf(divider+"\n", dividerArgs...)
+
+	// Sort windows by number
+	var windowNumbers []int32
+	for windowNum := range windowGroups {
+		windowNumbers = append(windowNumbers, windowNum)
+	}
+	sort.Slice(windowNumbers, func(i, j int) bool {
+		return windowNumbers[i] < windowNumbers[j]
+	})
+
+	// Print tree structure: Windows -> Tabs -> Sessions (with splits)
+	for windowIndex, windowNum := range windowNumbers {
+		tabGroups := windowGroups[windowNum]
+
+		// Sort tab keys
+		var tabKeys []string
+		for tabKey := range tabGroups {
+			tabKeys = append(tabKeys, tabKey)
+		}
+		sort.Strings(tabKeys)
+
+		isLastWindow := windowIndex == len(windowNumbers)-1
+		windowConnector := "├── "
+		if isLastWindow {
+			windowConnector = "└── "
+		}
+
+		// Print window header
+		printFormattedTreeLine(fmt.Sprintf("%sWindow %d", windowConnector, windowNum), "", "", "", "", "", pluginCols, nil)
+
+		// Print tabs within this window
+		for tabIndex, tabKey := range tabKeys {
+			sessionList := tabGroups[tabKey]
+			isLastTab := tabIndex == len(tabKeys)-1
+
+			tabPrefix := "│   "
+			if isLastWindow {
+				tabPrefix = "    "
+			}
+
+			tabConnector := "├── "
+			if isLastTab {
+				tabConnector = "└── "
+			}
+
+			tabTitle := fmt.Sprintf("Tab %s", tabKey)
+			if tabKey == "no-tab" {
+				tabTitle = "Tab (no ID)"
+			}
+
+			printFormattedTreeLine(fmt.Sprintf("%s%s%s", tabPrefix, tabConnector, tabTitle), "", "", "", "", "", pluginCols, nil)
+
+			// Build session hierarchy within this tab
+			sessionHierarchy := buildSessionHierarchy(sessionList)
+
+			// Print sessions within this tab
+			sessionPrefix := tabPrefix
+			if isLastTab {
+				sessionPrefix += "    "
+			} else {
+				sessionPrefix += "│   "
+			}
+
+			printSessionHierarchy(sessionHierarchy, sessionPrefix, pluginCols)
+		}
+	}
+
+	return nil
+}
+
+// printFormattedTreeLine prints a tree line with proper column formatting
+func printFormattedTreeLine(treeStructure, sessionID, pidDisplay, state, title, command string, pluginCols []string, pluginData map[string]interface{}) {
+	// Build format string and arguments dynamically
+	format := "%-30s %-8s %-8s %-8s %-40s %s"
+	args := []interface{}{treeStructure, sessionID, pidDisplay, state, title, command}
+
+	// Add plugin data columns
+	for _, col := range pluginCols {
+		format += " %-12s"
+		if pluginData != nil {
+			if value, exists := pluginData[col]; exists {
+				args = append(args, fmt.Sprintf("%v", value))
+			} else {
+				args = append(args, "-")
+			}
+		} else {
+			args = append(args, "")
+		}
+	}
+
+	fmt.Printf(format+"\n", args...)
+}
+
+// buildSessionHierarchy builds parent-child relationships within a list of sessions
+func buildSessionHierarchy(sessions []*client.SessionInfo) map[string]*TreeNode {
 	nodeMap := make(map[string]*TreeNode)
-	var roots []*TreeNode
 
 	// First pass: create all nodes
 	for _, session := range sessions {
 		node := &TreeNode{
-			SessionID:   session.SessionID,
-			ShortID:     session.ShortID,
-			Name:        session.SessionName,
-			ParentID:    session.ParentSessionID,
-			Children:    []*TreeNode{},
-			Dimensions:  "",
+			SessionID:      session.SessionID,
+			ShortID:        session.ShortID,
+			Name:           session.SessionName,
+			ParentID:       session.ParentSessionID,
+			Children:       []*TreeNode{},
+			CurrentCommand: session.CurrentCommand,
+			JobPID:         session.JobPID,
+			PromptState:    session.PromptState,
+			PluginData:     session.PluginData,
 		}
-
-		// Format dimensions if available
-		if session.GridSize != nil {
-			node.Dimensions = fmt.Sprintf("%dx%d", session.GridSize.Width, session.GridSize.Height)
-		} else if session.Frame != nil {
-			node.Dimensions = fmt.Sprintf("%.0fx%.0f", session.Frame.Size.Width, session.Frame.Size.Height)
-		}
-
 		nodeMap[session.SessionID] = node
 	}
 
@@ -1501,47 +1655,113 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 		if node.ParentID != "" {
 			if parent, exists := nodeMap[node.ParentID]; exists {
 				parent.Children = append(parent.Children, node)
-			} else {
-				// Parent not found, treat as root
-				roots = append(roots, node)
 			}
-		} else {
-			// No parent, this is a root
-			roots = append(roots, node)
 		}
 	}
 
-	// Sort roots and children for consistent output
-	sortTreeNodes(roots)
+	// Sort children by name for consistent output
 	for _, node := range nodeMap {
 		sortTreeNodes(node.Children)
 	}
 
-	// Print the tree
-	fmt.Println("Session Hierarchy:")
-	fmt.Println()
+	return nodeMap
+}
 
-	if len(roots) == 0 {
-		fmt.Println("No root sessions found")
-		return nil
+// printSessionHierarchy prints sessions with proper hierarchy within a tab
+func printSessionHierarchy(nodeMap map[string]*TreeNode, prefix string, pluginCols []string) {
+	// Find root sessions (those without parents in this hierarchy)
+	var roots []*TreeNode
+	for _, node := range nodeMap {
+		if node.ParentID == "" {
+			roots = append(roots, node)
+		} else {
+			// Check if parent exists in this hierarchy
+			if _, exists := nodeMap[node.ParentID]; !exists {
+				// Parent doesn't exist in this hierarchy, treat as root
+				roots = append(roots, node)
+			}
+		}
 	}
 
+	// Sort roots by name for consistent output
+	sortTreeNodes(roots)
+
+	// Print each root and its children
 	for i, root := range roots {
 		isLast := i == len(roots)-1
-		printTreeNode(root, "", isLast, true)
+		printSessionNode(root, prefix, isLast, pluginCols)
+	}
+}
+
+// printSessionNode prints a session node with its children
+func printSessionNode(node *TreeNode, prefix string, isLast bool, pluginCols []string) {
+	// Determine the connector
+	connector := "├── "
+	if isLast {
+		connector = "└── "
 	}
 
-	return nil
+	// Format session information
+	sessionID := node.ShortID
+	pidDisplay := ""
+	if node.JobPID != 0 {
+		pidDisplay = fmt.Sprintf("%d", node.JobPID)
+	}
+
+	// Shorten state
+	state := node.PromptState
+	switch state {
+	case "AT_COMMAND_LINE", "PROMPT_STATE_AT_COMMAND_LINE":
+		state = "READY"
+	case "IN_COMMAND", "PROMPT_STATE_IN_COMMAND":
+		state = "EXEC"
+	case "AT_PASSWORD_PROMPT", "PROMPT_STATE_AT_PASSWORD_PROMPT":
+		state = "PASS"
+	case "FILE_TRANSFER", "PROMPT_STATE_FILE_TRANSFER":
+		state = "XFER"
+	case "UNKNOWN", "PROMPT_STATE_UNKNOWN", "":
+		state = "-"
+	}
+
+	// Format title and command
+	title := node.Name
+	if len(title) > 40 {
+		title = title[:37] + "..."
+	}
+
+	command := node.CurrentCommand
+	if command == "" {
+		command = "-"
+	}
+
+	// Print the session
+	printFormattedTreeLine(fmt.Sprintf("%s%s%s", prefix, connector, title), sessionID, pidDisplay, state, "", command, pluginCols, node.PluginData)
+
+	// Print children
+	newPrefix := prefix
+	if isLast {
+		newPrefix += "    "
+	} else {
+		newPrefix += "│   "
+	}
+
+	for i, child := range node.Children {
+		childIsLast := i == len(node.Children)-1
+		printSessionNode(child, newPrefix, childIsLast, pluginCols)
+	}
 }
 
 // TreeNode represents a session in the tree hierarchy
 type TreeNode struct {
-	SessionID  string
-	ShortID    string
-	Name       string
-	ParentID   string
-	Children   []*TreeNode
-	Dimensions string
+	SessionID      string
+	ShortID        string
+	Name           string
+	ParentID       string
+	Children       []*TreeNode
+	CurrentCommand string
+	JobPID         int32
+	PromptState    string
+	PluginData     map[string]interface{}
 }
 
 // sortTreeNodes sorts tree nodes by name for consistent output
@@ -1556,42 +1776,3 @@ func sortTreeNodes(nodes []*TreeNode) {
 	}
 }
 
-// printTreeNode prints a tree node with proper tree characters
-func printTreeNode(node *TreeNode, prefix string, isLast bool, isRoot bool) {
-	// Determine the connector
-	connector := "├── "
-	if isLast {
-		connector = "└── "
-	}
-	if isRoot {
-		connector = ""
-	}
-
-	// Format the node display
-	display := fmt.Sprintf("%s (%s)", node.Name, node.ShortID)
-	if node.Dimensions != "" {
-		display += fmt.Sprintf(" [%s]", node.Dimensions)
-	}
-
-	// Print the node
-	fmt.Printf("%s%s%s\n", prefix, connector, display)
-
-	// Determine the new prefix for children
-	newPrefix := prefix
-	if prefix != "" {
-		if isLast {
-			newPrefix += "    "
-		} else {
-			newPrefix += "│   "
-		}
-	} else {
-		// For root nodes, children get an initial indent
-		newPrefix = ""
-	}
-
-	// Print children
-	for i, child := range node.Children {
-		childIsLast := i == len(node.Children)-1
-		printTreeNode(child, newPrefix, childIsLast, false)
-	}
-}

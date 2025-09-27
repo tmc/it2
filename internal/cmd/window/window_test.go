@@ -13,8 +13,8 @@ func TestNewCommand(t *testing.T) {
 		t.Fatal("Expected non-nil command")
 	}
 
-	if cmd.Use != "window [window-id] [command]" {
-		t.Errorf("Expected Use to be 'window [window-id] [command]', got '%s'", cmd.Use)
+	if cmd.Use != "window [<window-id>] [command]" {
+		t.Errorf("Expected Use to be 'window [<window-id>] [command]', got '%s'", cmd.Use)
 	}
 
 	if cmd.Short != "Manage iTerm2 windows or navigate to window context" {

@@ -89,8 +89,8 @@ func TestTabSubcommands_Structure(t *testing.T) {
 func TestListCommand_Structure(t *testing.T) {
 	cmd := newListCommand()
 
-	if cmd.Use != "list [window-id]" {
-		t.Errorf("Expected Use to be 'list [window-id]', got '%s'", cmd.Use)
+	if cmd.Use != "list [<window-id>]" {
+		t.Errorf("Expected Use to be 'list [<window-id>]', got '%s'", cmd.Use)
 	}
 
 	if cmd.Short != "List tabs in windows" {
@@ -141,8 +141,8 @@ func TestListCommand_Flags(t *testing.T) {
 func TestCreateCommand_Structure(t *testing.T) {
 	cmd := newCreateCommand()
 
-	if cmd.Use != "create <profile> [window-id]" {
-		t.Errorf("Expected Use to be 'create <profile> [window-id]', got '%s'", cmd.Use)
+	if cmd.Use != "create <profile> [<window-id>]" {
+		t.Errorf("Expected Use to be 'create <profile> [<window-id>]', got '%s'", cmd.Use)
 	}
 
 	if cmd.Short != "Create a new tab" {

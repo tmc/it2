@@ -29,7 +29,7 @@ func NewCommand() *cobra.Command {
 
 func newCaptureCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "capture [session-id]",
+		Use:   "capture [<session-id>]",
 		Short: "Take a screenshot using macOS screencapture with absolute coordinates",
 		Long:  "Take a screenshot of the specified session using macOS screencapture utility with proper absolute screen coordinates",
 		Args:  cobra.MaximumNArgs(1),

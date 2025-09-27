@@ -32,7 +32,7 @@ func newAutoRespondCommand() *cobra.Command {
 	var verbose bool
 
 	cmd := &cobra.Command{
-		Use:   "autorespond [session-id]",
+		Use:   "autorespond [<session-id>]",
 		Short: "Monitor and automatically respond to session prompts",
 		Long: `Monitor a session and automatically respond to prompts and patterns.
 

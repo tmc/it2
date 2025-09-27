@@ -30,7 +30,7 @@ func NewCommand() *cobra.Command {
 
 func newGetCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get [session-id]",
+		Use:   "get [<session-id>]",
 		Short: "Get current text selection",
 		Long:  "Get the current text selection from the specified session (defaults to active session)",
 		Args:  cobra.MaximumNArgs(1),
@@ -79,7 +79,7 @@ func runGetCommand(cmd *cobra.Command, args []string) error {
 
 func newSetCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set [session-id]",
+		Use:   "set [<session-id>]",
 		Short: "Set text selection range",
 		Long: `Set text selection using coordinates.
 
@@ -206,7 +206,7 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 
 func newClearCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:   "clear [session-id]",
+		Use:   "clear [<session-id>]",
 		Short: "Clear current text selection",
 		Long:  "Clear the current text selection in the specified session (defaults to active session)",
 		Args:  cobra.MaximumNArgs(1),
@@ -240,7 +240,7 @@ func runClearCommand(cmd *cobra.Command, args []string) error {
 
 func newCopyCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:   "copy [session-id]",
+		Use:   "copy [<session-id>]",
 		Short: "Copy current selection to clipboard",
 		Long:  "Copy the current text selection to the system clipboard",
 		Args:  cobra.MaximumNArgs(1),

@@ -34,7 +34,7 @@ func NewCommand() *cobra.Command {
 
 func newListCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list [session-id]",
+		Use:   "list [<session-id>]",
 		Short: "List historical prompts in a session",
 		Long:  "List all historical prompt unique IDs in a session. If no session-id is provided, uses $ITERM_SESSION_ID environment variable. Requires Shell Integration to be enabled in iTerm2.",
 		Args:  cobra.RangeArgs(0, 1),

@@ -12,7 +12,7 @@ import (
 
 func newTestCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "test <type> [session-id]",
+		Use:   "test <type> [<session-id>]",
 		Short: "Test notification functionality",
 		Long:  "Test notification subscription and validate notification reception",
 		Args:  cobra.RangeArgs(1, 2),

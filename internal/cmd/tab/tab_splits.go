@@ -12,7 +12,7 @@ import (
 
 func newSplitsCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "splits [tab-id]",
+		Use:   "splits [<tab-id>]",
 		Short: "Show split pane layout and coordinates",
 		Long: `Display the split pane tree structure for a tab, including:
   - Split direction (vertical/horizontal)
