@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdutil"
 	pb "github.com/tmc/it2/proto"
 )
 
@@ -17,14 +18,11 @@ func newRestartCommand() *cobra.Command {
 			sessionID := args[0]
 			onlyIfExited, _ := cmd.Flags().GetBool("only-if-exited")
 
-			timeout, _ := flags.GetFlags(cmd)
-			ctx, cancel := flags.CreateContext(timeout)
-			defer cancel()
-
-			c, err := connect.ConnectClient(ctx)
+			c, ctx, cancel, err := cmdutil.ConnectClient(cmd)
 			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
+				return err
 			}
+			defer cancel()
 			defer c.Close()
 
 			response, err := c.RestartSession(ctx, sessionID, onlyIfExited)

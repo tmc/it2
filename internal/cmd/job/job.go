@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdutil"
 )
 
 // NewCommand creates the job command with all subcommands.
@@ -32,14 +33,11 @@ func newListCommand() *cobra.Command {
 			sessionID := args[0]
 
 			// showAll, _ := cmd.Flags().GetBool("all")  // Reserved for future use
-			timeout, _ := flags.GetFlags(cmd)
-			ctx, cancel := flags.CreateContext(timeout)
-			defer cancel()
-
-			c, err := connect.ConnectClient(ctx)
+			c, ctx, cancel, err := cmdutil.ConnectClient(cmd)
 			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
+				return err
 			}
+			defer cancel()
 			defer c.Close()
 
 			// Get prompt/command information (job tracking isn't directly available in current API)

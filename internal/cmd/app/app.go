@@ -46,19 +46,38 @@ func newFocusCommand() *cobra.Command {
 		Long:  "Activate iTerm2 and bring it to the foreground. This is equivalent to clicking on the app.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			raiseAll, _ := cmd.Flags().GetBool("raise-all")
+			wsURL, _ := cmd.Flags().GetString("url")
+			timeout, _ := cmd.Flags().GetDuration("timeout")
 
-			timeout, _ := flags.GetFlags(cmd)
-			ctx, cancel := flags.CreateContext(timeout)
+			// Use parent command flags if not set
+			if wsURL == "" {
+				if parent := cmd.Parent(); parent != nil {
+					if root := parent.Root(); root != nil {
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
+					}
+				}
+			}
+			if timeout == 0 {
+				if parent := cmd.Parent(); parent != nil {
+					if root := parent.Root(); root != nil {
+						timeout, _ = root.PersistentFlags().GetDuration("timeout")
+					}
+				}
+			}
+
+			ctx, cancel := context.WithTimeout(context.Background(), timeout)
 			defer cancel()
 
-			c, err := connect.ConnectClient(ctx)
-			if err != nil {
+			c := client.New(wsURL)
+			if err := c.Connect(ctx); err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
 
 			// Focus the app
-			_, err = c.Focus(ctx, raiseAll)
+			_, err := c.Focus(ctx, raiseAll)
 			if err != nil {
 				return fmt.Errorf("failed to focus iTerm2: %w", err)
 			}
