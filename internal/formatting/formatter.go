@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -467,8 +468,13 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 		}
 	}
 
-	// Add plugin columns to headers
+	// Add plugin columns to headers in sorted order for stability
+	var pluginCols []string
 	for col := range pluginColumns {
+		pluginCols = append(pluginCols, col)
+	}
+	sort.Strings(pluginCols)
+	for _, col := range pluginCols {
 		headers = append(headers, strings.Title(col))
 	}
 
@@ -489,8 +495,8 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			session.TabID,
 		}
 
-		// Add plugin data columns
-		for col := range pluginColumns {
+		// Add plugin data columns in same sorted order
+		for _, col := range pluginCols {
 			if value, exists := session.PluginData[col]; exists {
 				row = append(row, fmt.Sprintf("%v", value))
 			} else {
