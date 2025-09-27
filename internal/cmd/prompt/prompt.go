@@ -57,7 +57,9 @@ func newListCommand() *cobra.Command {
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -71,7 +73,9 @@ func newListCommand() *cobra.Command {
 			if format == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						format = root.PersistentFlags().Lookup("format").Value.String()
+						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
+							format = formatFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -209,7 +213,9 @@ func newGetCommand() *cobra.Command {
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -223,7 +229,9 @@ func newGetCommand() *cobra.Command {
 			if format == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						format = root.PersistentFlags().Lookup("format").Value.String()
+						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
+							format = formatFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -294,7 +302,9 @@ func newMonitorCommand() *cobra.Command {
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -362,7 +372,9 @@ func newSearchCommand() *cobra.Command {
 			if wsURL == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						wsURL = root.PersistentFlags().Lookup("url").Value.String()
+						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
+							wsURL = urlFlag.Value.String()
+						}
 					}
 				}
 			}
@@ -376,7 +388,9 @@ func newSearchCommand() *cobra.Command {
 			if format == "" {
 				if parent := cmd.Parent(); parent != nil {
 					if root := parent.Root(); root != nil {
-						format = root.PersistentFlags().Lookup("format").Value.String()
+						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
+							format = formatFlag.Value.String()
+						}
 					}
 				}
 			}
