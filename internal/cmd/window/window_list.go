@@ -47,11 +47,11 @@ func newListCommand() *cobra.Command {
 			$ it2 window focus "$WINDOW_ID"
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			wsURL, timeout, format, columns, sortBy, sortReverse := cmdutil.GetExtendedFlags(cmd)
+			timeout, format, columns, sortBy, sortReverse := cmdutil.GetExtendedFlags(cmd)
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
