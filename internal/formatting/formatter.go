@@ -458,7 +458,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	}
 
 	// Determine columns to include
-	headers := []string{"ID", "Parent ID", "Title", "Window", "Tab"}
+	headers := []string{"ID", "Parent ID", "Title", "Command", "Exit", "State", "Window", "Tab"}
 
 	// Check if any sessions have plugin data to determine additional columns
 	pluginColumns := make(map[string]bool)
@@ -487,10 +487,40 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			name = name[:47] + "..."
 		}
 
+		// Truncate command for display
+		command := session.CurrentCommand
+		if len(command) > 30 {
+			command = command[:27] + "..."
+		}
+
+		// Format exit code display
+		exitDisplay := ""
+		if session.ExitCode != 0 {
+			exitDisplay = fmt.Sprintf("%d", session.ExitCode)
+		}
+
+		// Shorten prompt state
+		state := session.PromptState
+		switch state {
+		case "AT_COMMAND_LINE":
+			state = "READY"
+		case "IN_COMMAND":
+			state = "EXEC"
+		case "AT_PASSWORD_PROMPT":
+			state = "PASS"
+		case "FILE_TRANSFER":
+			state = "XFER"
+		case "UNKNOWN":
+			state = ""
+		}
+
 		row := []string{
 			session.ShortID,
 			session.ParentSessionID,
 			name,
+			command,
+			exitDisplay,
+			state,
 			fmt.Sprintf("%d", session.WindowNumber),
 			session.TabID,
 		}

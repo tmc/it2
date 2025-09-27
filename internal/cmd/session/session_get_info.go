@@ -40,7 +40,6 @@ This command combines multiple API calls to provide a complete view of the sessi
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 			includeProperties, _ := cmd.Flags().GetBool("properties")
-			includePrompt, _ := cmd.Flags().GetBool("prompt")
 			extractPath, _ := cmd.Flags().GetString("extract")
 
 			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
@@ -60,8 +59,8 @@ This command combines multiple API calls to provide a complete view of the sessi
 				return fmt.Errorf("failed to resolve session ID: %w", err)
 			}
 
-			// Gather comprehensive session information
-			info, err := gatherSessionInfo(ctx, c, sessionID, includeProperties, includePrompt)
+			// Gather comprehensive session information (always include prompt by default)
+			info, err := gatherSessionInfo(ctx, c, sessionID, includeProperties, true)
 			if err != nil {
 				return fmt.Errorf("failed to gather session info: %w", err)
 			}
