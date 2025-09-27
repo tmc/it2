@@ -54,6 +54,12 @@ This command combines multiple API calls to provide a complete view of the sessi
 			}
 			defer c.Close()
 
+			// Expand short session ID if needed
+			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			if err != nil {
+				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
+
 			// Gather comprehensive session information
 			info, err := gatherSessionInfo(ctx, c, sessionID, includeProperties, includePrompt)
 			if err != nil {

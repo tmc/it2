@@ -42,11 +42,17 @@ Examples:
 				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
 			}
 
+			// Expand short session ID if needed
+			sessionID, err := cmdutil.ExpandShortSessionID(sc.GetContext(), sc.GetClient(), sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
+			}
+
 			// Get restore-focus flag
 			restoreFocus, _ := sc.GetCommand().Flags().GetBool("restore-focus")
 
 			// Paste clipboard content to the session
-			err := sc.GetClient().PasteFromClipboardWithOptions(sc.GetContext(), sessionID, restoreFocus)
+			err = sc.GetClient().PasteFromClipboardWithOptions(sc.GetContext(), sessionID, restoreFocus)
 			if err != nil {
 				return sc.ReportError("paste from clipboard", err)
 			}

@@ -47,6 +47,8 @@ func (f *Formatter) FormatSessions(sessions []*client.SessionInfo) error {
 		return f.formatSessionsTable(sessions)
 	case "text":
 		return f.formatText(sessions)
+	case "tree":
+		return f.formatSessionsTree(sessions)
 	default:
 		// Default to table format for better readability
 		return f.formatSessionsTable(sessions)
@@ -455,7 +457,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	}
 
 	// Determine columns to include
-	headers := []string{"ID", "Title", "Window ID", "Window", "Tab"}
+	headers := []string{"Short ID", "Parent ID", "Title", "Window ID", "Window", "Tab"}
 
 	// Check if any sessions have plugin data to determine additional columns
 	pluginColumns := make(map[string]bool)
@@ -473,9 +475,6 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	table := NewTableData(headers)
 
 	for _, session := range sessions {
-		// Show full session ID without truncation
-		fullID := session.SessionID
-
 		// Truncate long names
 		name := session.SessionName
 		if len(name) > 50 {
@@ -483,7 +482,8 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 		}
 
 		row := []string{
-			fullID,
+			session.ShortID,
+			session.ParentSessionID,
 			name,
 			session.WindowID,
 			fmt.Sprintf("%d", session.WindowNumber),
@@ -1420,4 +1420,133 @@ func FormatNotification(notification *pb.Notification, notificationType string) 
 	}
 
 	return fmt.Sprintf("Unknown notification type: %T", notification)
+}
+
+// formatSessionsTree formats sessions as a tree showing hierarchy
+func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
+	if len(sessions) == 0 {
+		fmt.Println("No sessions found")
+		return nil
+	}
+
+	// Build hierarchy map
+	nodeMap := make(map[string]*TreeNode)
+	var roots []*TreeNode
+
+	// First pass: create all nodes
+	for _, session := range sessions {
+		node := &TreeNode{
+			SessionID:   session.SessionID,
+			ShortID:     session.ShortID,
+			Name:        session.SessionName,
+			ParentID:    session.ParentSessionID,
+			Children:    []*TreeNode{},
+			Dimensions:  "",
+		}
+
+		// Format dimensions if available
+		if session.GridSize != nil {
+			node.Dimensions = fmt.Sprintf("%dx%d", session.GridSize.Width, session.GridSize.Height)
+		} else if session.Frame != nil {
+			node.Dimensions = fmt.Sprintf("%.0fx%.0f", session.Frame.Size.Width, session.Frame.Size.Height)
+		}
+
+		nodeMap[session.SessionID] = node
+	}
+
+	// Second pass: build parent-child relationships
+	for _, node := range nodeMap {
+		if node.ParentID != "" {
+			if parent, exists := nodeMap[node.ParentID]; exists {
+				parent.Children = append(parent.Children, node)
+			} else {
+				// Parent not found, treat as root
+				roots = append(roots, node)
+			}
+		} else {
+			// No parent, this is a root
+			roots = append(roots, node)
+		}
+	}
+
+	// Sort roots and children for consistent output
+	sortTreeNodes(roots)
+	for _, node := range nodeMap {
+		sortTreeNodes(node.Children)
+	}
+
+	// Print the tree
+	fmt.Println("Session Hierarchy:")
+	fmt.Println()
+
+	if len(roots) == 0 {
+		fmt.Println("No root sessions found")
+		return nil
+	}
+
+	for i, root := range roots {
+		isLast := i == len(roots)-1
+		printTreeNode(root, "", isLast)
+	}
+
+	return nil
+}
+
+// TreeNode represents a session in the tree hierarchy
+type TreeNode struct {
+	SessionID  string
+	ShortID    string
+	Name       string
+	ParentID   string
+	Children   []*TreeNode
+	Dimensions string
+}
+
+// sortTreeNodes sorts tree nodes by name for consistent output
+func sortTreeNodes(nodes []*TreeNode) {
+	// Simple bubble sort by name
+	for i := 0; i < len(nodes); i++ {
+		for j := i + 1; j < len(nodes); j++ {
+			if nodes[i].Name > nodes[j].Name {
+				nodes[i], nodes[j] = nodes[j], nodes[i]
+			}
+		}
+	}
+}
+
+// printTreeNode prints a tree node with proper tree characters
+func printTreeNode(node *TreeNode, prefix string, isLast bool) {
+	// Determine the connector
+	connector := "├── "
+	if isLast {
+		connector = "└── "
+	}
+	if prefix == "" {
+		connector = ""
+	}
+
+	// Format the node display
+	display := fmt.Sprintf("%s (%s)", node.Name, node.ShortID)
+	if node.Dimensions != "" {
+		display += fmt.Sprintf(" [%s]", node.Dimensions)
+	}
+
+	// Print the node
+	fmt.Printf("%s%s%s\n", prefix, connector, display)
+
+	// Determine the new prefix for children
+	newPrefix := prefix
+	if prefix != "" {
+		if isLast {
+			newPrefix += "    "
+		} else {
+			newPrefix += "│   "
+		}
+	}
+
+	// Print children
+	for i, child := range node.Children {
+		childIsLast := i == len(node.Children)-1
+		printTreeNode(child, newPrefix, childIsLast)
+	}
 }

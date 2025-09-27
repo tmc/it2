@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
 )
@@ -72,6 +73,12 @@ The command will run until interrupted (Ctrl+C).`,
 			}
 			defer c.Close()
 
+			// Expand short session ID if needed
+			sessionID, err := cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			if err != nil {
+				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
+
 			if !jsonOutput {
 				fmt.Printf("Monitoring session %s for events: %v\n", sessionID, eventTypes)
 				fmt.Printf("Press Ctrl+C to stop monitoring\n\n")
@@ -79,7 +86,6 @@ The command will run until interrupted (Ctrl+C).`,
 
 			// Start monitoring based on event types
 			var promptChan <-chan *pb.PromptNotification
-			var err error
 
 			for _, eventType := range eventTypes {
 				switch eventType {

@@ -26,6 +26,12 @@ func newGetScreenCommand() *cobra.Command {
 				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
 			}
 
+			// Expand short session ID if needed
+			sessionID, err := cmdutil.ExpandShortSessionID(sc.GetContext(), sc.GetClient(), sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
+			}
+
 			// Get command flags
 			colorized, _ := sc.GetCommand().Flags().GetBool("color")
 			escaped, _ := sc.GetCommand().Flags().GetBool("escaped")

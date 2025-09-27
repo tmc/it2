@@ -39,8 +39,14 @@ Examples:
 				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
 			}
 
+			// Expand short session ID if needed
+			sessionID, err := cmdutil.ExpandShortSessionID(sc.GetContext(), sc.GetClient(), sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
+			}
+
 			// Copy the current selection to clipboard
-			err := sc.GetClient().CopySelection(sc.GetContext(), sessionID)
+			err = sc.GetClient().CopySelection(sc.GetContext(), sessionID)
 			if err != nil {
 				return sc.ReportError("copy selection", err)
 			}

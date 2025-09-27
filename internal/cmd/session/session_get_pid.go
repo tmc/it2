@@ -35,6 +35,12 @@ This command attempts to extract the PID from shell integration or by running co
 			}
 			defer c.Close()
 
+			// Expand short session ID if needed
+			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			if err != nil {
+				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
+
 			// Try to get PID using shell integration first
 			pid, err := getShellPID(ctx, c, sessionID)
 			if err != nil {

@@ -41,6 +41,9 @@ func NewCommand() *cobra.Command {
 	// Text/screen commands moved here from text package
 	cmd.AddCommand(newGetScreenCommand())
 
+	// Hidden commands for advanced users
+	cmd.AddCommand(newSplitsCommand())
+
 	// Deprecated aliases for moved commands
 	cmd.AddCommand(newSplitsAliasCommand())
 

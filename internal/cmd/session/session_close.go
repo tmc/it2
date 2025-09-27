@@ -18,10 +18,18 @@ func newCloseCommand() *cobra.Command {
 		ValidArgsFunc:   completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := args[0]
+
+			// Expand short session ID if needed
+			var err error
+			sessionID, err = cmdutil.ExpandShortSessionID(sc.GetContext(), sc.GetClient(), sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
+			}
+
 			force, _ := sc.GetCommand().Flags().GetBool("force")
 
 			// Close the session
-			_, err := sc.GetClient().CloseSessions(sc.GetContext(), []string{sessionID}, force)
+			_, err = sc.GetClient().CloseSessions(sc.GetContext(), []string{sessionID}, force)
 			if err != nil {
 				return sc.ReportError("close session", err)
 			}

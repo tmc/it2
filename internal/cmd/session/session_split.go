@@ -71,6 +71,12 @@ Default is horizontal split.`,
 			}
 			defer c.Close()
 
+			// Expand short session ID if needed
+			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			if err != nil {
+				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
+
 			response, err := c.SplitPane(ctx, sessionID, isVertical, before, profileName)
 			if err != nil {
 				return fmt.Errorf("failed to split session: %w", err)

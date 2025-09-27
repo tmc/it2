@@ -58,6 +58,12 @@ Use --list to see all available properties.`,
 			}
 			defer c.Close()
 
+			// Expand short session ID if needed
+			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			if err != nil {
+				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
+
 			// Use the real session property API
 			value, err := c.GetSessionProperty(ctx, sessionID, property)
 			if err != nil {

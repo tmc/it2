@@ -12,6 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/utils"
 )
@@ -86,6 +87,12 @@ Examples:
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
+
+			// Expand short session ID if needed
+			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			if err != nil {
+				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
 
 			fmt.Printf("Auto-responding for session %s\n", sessionID)
 			fmt.Printf("Monitoring interval: %ds\n", interval)

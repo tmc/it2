@@ -19,11 +19,18 @@ func newActivateCommand() *cobra.Command {
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := args[0]
 
+			// Expand short session ID if needed
+			var err error
+			sessionID, err = cmdutil.ExpandShortSessionID(sc.GetContext(), sc.GetClient(), sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
+			}
+
 			// Get the select-session flag
 			selectSession, _ := sc.GetCommand().Flags().GetBool("select-session")
 
 			// Execute the activation
-			_, err := sc.GetClient().ActivateSession(sc.GetContext(), sessionID, selectSession)
+			_, err = sc.GetClient().ActivateSession(sc.GetContext(), sessionID, selectSession)
 			if err != nil {
 				return sc.ReportError("activate session", err)
 			}

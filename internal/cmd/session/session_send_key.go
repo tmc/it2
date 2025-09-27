@@ -85,6 +85,12 @@ cmd+a thru cmd+z. Supports complex modifier combinations like cmd+ctrl+shift+a.`
 			}
 			defer c.Close()
 
+			// Expand short session ID if needed
+			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			if err != nil {
+				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
+
 			err = c.SendText(ctx, sessionID, keyCode)
 			if err != nil {
 				return fmt.Errorf("failed to send key: %w", err)
