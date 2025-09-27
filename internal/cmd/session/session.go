@@ -44,6 +44,9 @@ func NewCommand() *cobra.Command {
 	// Hidden commands for advanced users
 	cmd.AddCommand(newSplitsCommand())
 
+	// Development/testing commands
+	// cmd.AddCommand(newScopeTestCommand()) // Temporarily disabled until module issues resolved
+
 	// Deprecated aliases for moved commands
 	cmd.AddCommand(newSplitsAliasCommand())
 

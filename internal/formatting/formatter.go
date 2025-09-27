@@ -1521,7 +1521,7 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 
 	for i, root := range roots {
 		isLast := i == len(roots)-1
-		printTreeNode(root, "", isLast)
+		printTreeNode(root, "", isLast, true)
 	}
 
 	return nil
@@ -1550,13 +1550,13 @@ func sortTreeNodes(nodes []*TreeNode) {
 }
 
 // printTreeNode prints a tree node with proper tree characters
-func printTreeNode(node *TreeNode, prefix string, isLast bool) {
+func printTreeNode(node *TreeNode, prefix string, isLast bool, isRoot bool) {
 	// Determine the connector
 	connector := "├── "
 	if isLast {
 		connector = "└── "
 	}
-	if prefix == "" {
+	if isRoot {
 		connector = ""
 	}
 
@@ -1577,11 +1577,14 @@ func printTreeNode(node *TreeNode, prefix string, isLast bool) {
 		} else {
 			newPrefix += "│   "
 		}
+	} else {
+		// For root nodes, children get an initial indent
+		newPrefix = ""
 	}
 
 	// Print children
 	for i, child := range node.Children {
 		childIsLast := i == len(node.Children)-1
-		printTreeNode(child, newPrefix, childIsLast)
+		printTreeNode(child, newPrefix, childIsLast, false)
 	}
 }
