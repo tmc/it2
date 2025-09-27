@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
@@ -26,7 +27,7 @@ type DeliveryResult struct {
 }
 
 // sendTextWithConfirmation sends text and verifies receipt by checking screen contents
-func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, text, format string, maxRetries int, retryDelay time.Duration) error {
+func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, text, terminator, format string, maxRetries int, retryDelay time.Duration) error {
 	var lastResult DeliveryResult
 
 	for attempt := 0; attempt <= maxRetries; attempt++ {
@@ -49,6 +50,14 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 		err = c.SendText(ctx, sessionID, text)
 		if err != nil {
 			return fmt.Errorf("failed to send text: %w", err)
+		}
+
+		// Send terminator if specified
+		if terminator != "" {
+			err = c.SendText(ctx, sessionID, terminator)
+			if err != nil {
+				return fmt.Errorf("failed to send terminator: %w", err)
+			}
 		}
 
 		// Wait briefly for the text to appear on screen
@@ -233,9 +242,9 @@ func newSendTextCommand() *cobra.Command {
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 
-By default, sends a newline (\\n) after the text.
+By default, sends a carriage return (\\r) after the text to execute commands.
 Use --skip-newline to send text without any line terminator.
-Use --send-return to send carriage return (\\r) for command execution.
+Use --send-lf to send line feed (\\n) to move to new line without executing.
 
 Pre-conditions:
 The --require flag allows checking pre-conditions before sending text.
@@ -373,12 +382,18 @@ Multiple conditions can be specified and all must pass.`,
 			}
 
 			// Handle text termination based on flags
+			sendCR, _ := cmd.Flags().GetBool("send-cr")
+			sendLF, _ := cmd.Flags().GetBool("send-lf")
 			skipNewline, _ := cmd.Flags().GetBool("skip-newline")
-			sendReturn, _ := cmd.Flags().GetBool("send-return")
 
 			// Validate mutually exclusive flags
-			if skipNewline && sendReturn {
-				return fmt.Errorf("flags --skip-newline and --send-return are mutually exclusive")
+			terminatorFlags := 0
+			if sendCR { terminatorFlags++ }
+			if sendLF { terminatorFlags++ }
+			if skipNewline { terminatorFlags++ }
+
+			if terminatorFlags > 1 {
+				return fmt.Errorf("terminator flags --send-cr, --send-lf, and --skip-newline are mutually exclusive")
 			}
 
 			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
@@ -392,13 +407,26 @@ Multiple conditions can be specified and all must pass.`,
 			}
 			defer c.Close()
 
+			// Determine terminator first (needed for both confirmation and non-confirmation paths)
+			var terminator string
+			if sendCR {
+				terminator = "\r"  // Carriage return - executes command
+			} else if sendLF {
+				terminator = "\n"  // Line feed - moves to new line
+			} else if skipNewline {
+				terminator = ""   // Explicitly no terminator
+			} else {
+				// NEW DEFAULT: send carriage return to execute command
+				terminator = "\r"
+			}
+
 			// Check if confirmation is disabled
 			skipConfirm, _ := cmd.Flags().GetBool("skip-confirm")
 			if !skipConfirm {
 				format, _ := cmd.Flags().GetString("format")
 				retryCount, _ := cmd.Flags().GetInt("retry")
 				retryDelay, _ := cmd.Flags().GetDuration("retry-delay")
-				return sendTextWithConfirmation(ctx, c, sessionID, text, format, retryCount, retryDelay)
+				return sendTextWithConfirmation(ctx, c, sessionID, text, terminator, format, retryCount, retryDelay)
 			}
 
 			// Send the text first
@@ -407,18 +435,11 @@ Multiple conditions can be specified and all must pass.`,
 				return fmt.Errorf("failed to send text: %w", err)
 			}
 
-			// Send appropriate line terminator based on flags
-			if !skipNewline {
-				delay, _ := cmd.Flags().GetDuration("delay-before-return")
-				time.Sleep(delay)
-
-				var terminator string
-				if sendReturn {
-					// Send carriage return for command execution
-					terminator = "\r"
-				} else {
-					// Default: send newline
-					terminator = "\n"
+			// Send terminator if one was specified
+			if terminator != "" {
+				delay, _ := cmd.Flags().GetDuration("delay-before-terminator")
+				if delay > 0 {
+					time.Sleep(delay)
 				}
 
 				err = c.SendText(ctx, sessionID, terminator)
@@ -433,7 +454,18 @@ Multiple conditions can be specified and all must pass.`,
 
 	cmd.Flags().Bool("no-broadcast", false, "Suppress broadcasting even if enabled")
 	cmd.Flags().Bool("skip-newline", false, "Don't send any line terminator")
-	cmd.Flags().Bool("send-return", false, "Send carriage return (\\r) for command execution")
+	cmd.Flags().BoolP("send-cr", "r", true, "Send carriage return (\\r) to execute command (enabled by default)")
+	cmd.Flags().Bool("send-lf", false, "Send line feed (\\n) to move to new line")
+
+	// Create alias for send-return -> send-cr
+	cmd.Flags().SetNormalizeFunc(func(f *pflag.FlagSet, name string) pflag.NormalizedName {
+		switch name {
+		case "send-return":
+			name = "send-cr"
+		}
+		return pflag.NormalizedName(name)
+	})
+	cmd.Flags().Duration("delay-before-terminator", 0, "Delay before sending line terminator")
 	cmd.Flags().StringP("file", "f", "", "Read text from file (use '-' for stdin)")
 	cmd.Flags().StringSlice("require", nil, "Pre-condition plugins to check before sending (e.g., 'has-no-partial-input', 'is-at-prompt')")
 	cmd.Flags().Duration("require-timeout", 10*time.Second, "Timeout for pre-condition checks")
@@ -450,7 +482,7 @@ Multiple conditions can be specified and all must pass.`,
 	cmd.Flags().Bool("stop-on-error", false, "Stop on first error instead of continuing")
 
 	// Mark mutually exclusive flags
-	cmd.MarkFlagsMutuallyExclusive("skip-newline", "send-return")
+	cmd.MarkFlagsMutuallyExclusive("skip-newline", "send-return", "send-cr", "send-lf")
 
 	// Add completion for session ID as first argument
 	cmd.ValidArgsFunction = completion.SessionIDCompletion
