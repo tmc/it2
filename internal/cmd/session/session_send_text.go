@@ -44,6 +44,7 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 			return fmt.Errorf("failed to get initial screen contents: %w", err)
 		}
 
+
 		// Send the text
 		err = c.SendText(ctx, sessionID, text)
 		if err != nil {
@@ -60,7 +61,7 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 		}
 
 		// Compare screen contents to detect delivery
-		result := analyzeTextDelivery(beforeResp, afterResp, text)
+		result := analyzeTextDelivery(beforeResp, afterResp, text, sessionID)
 
 		// Create result structure
 		switch result {
@@ -83,6 +84,13 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 				Status:    "none-sent",
 				Message:   "Text not delivered (session may be at modal, busy, or unresponsive)",
 				ExitCode:  3,
+				Delivered: false,
+			}
+		case "modal-detected":
+			lastResult = DeliveryResult{
+				Status:    "modal-detected",
+				Message:   "Modal dialog detected - text sending blocked for safety",
+				ExitCode:  4,
 				Delivered: false,
 			}
 		default:
@@ -138,10 +146,11 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 }
 
 // analyzeTextDelivery compares before/after screen contents to determine delivery status
-func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText string) string {
+func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionID string) string {
 	// Convert responses to string format for comparison
 	beforeStr := formatScreenResponse(before)
 	afterStr := formatScreenResponse(after)
+
 
 	// Remove newlines/carriage returns from sent text for comparison
 	cleanSentText := strings.TrimRight(strings.TrimRight(sentText, "\n"), "\r")
@@ -215,6 +224,7 @@ func formatScreenResponse(resp *pb.GetBufferResponse) string {
 	return strings.Join(lines, "\n")
 }
 
+
 func newSendTextCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "send-text [session-id] <text>",
@@ -223,9 +233,9 @@ func newSendTextCommand() *cobra.Command {
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 
-By default, adds a newline at the end of the text (legacy behavior).
-Use --no-newline to send text without a trailing newline.
-Use --with-enter to explicitly append a carriage return (Enter key).
+By default, sends a newline (\\n) after the text.
+Use --skip-newline to send text without any line terminator.
+Use --send-return to send carriage return (\\r) for command execution.
 
 Pre-conditions:
 The --require flag allows checking pre-conditions before sending text.
@@ -238,11 +248,11 @@ Multiple conditions can be specified and all must pass.`,
 			# Send to specific session
 			$ it2 session send-text w0t1p11:SESSION-ID 'hello world'
 
-			# Send text with Enter key (carriage return)
-			$ it2 session send-text --with-enter 'ls -la'
+			# Send text without any line terminator
+			$ it2 session send-text --skip-newline 'partial text'
 
-			# Send text without any newline/enter
-			$ it2 session send-text --no-newline 'partial text'
+			# Send command with carriage return for execution
+			$ it2 session send-text --send-return 'ls -la'
 
 			# Wait for session to have no partial input before sending
 			$ it2 session send-text --require has-no-partial-input 'ls -la'
@@ -363,24 +373,12 @@ Multiple conditions can be specified and all must pass.`,
 			}
 
 			// Handle text termination based on flags
-			noNewline, _ := cmd.Flags().GetBool("no-newline")
-			withEnter, _ := cmd.Flags().GetBool("with-enter")
+			skipNewline, _ := cmd.Flags().GetBool("skip-newline")
+			sendReturn, _ := cmd.Flags().GetBool("send-return")
 
-			// --with-enter and --no-newline are mutually exclusive
-			if withEnter && noNewline {
-				return fmt.Errorf("--with-enter and --no-newline cannot be used together")
-			}
-
-			if withEnter {
-				// Append carriage return (Enter key) instead of newline
-				if !strings.HasSuffix(text, "\r") {
-					text += "\r"
-				}
-			} else if !noNewline {
-				// Default behavior: add newline unless --no-newline is set
-				if !strings.HasSuffix(text, "\n") {
-					text += "\n"
-				}
+			// Validate mutually exclusive flags
+			if skipNewline && sendReturn {
+				return fmt.Errorf("flags --skip-newline and --send-return are mutually exclusive")
 			}
 
 			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
@@ -394,18 +392,39 @@ Multiple conditions can be specified and all must pass.`,
 			}
 			defer c.Close()
 
-			// Check if confirmation is requested
-			confirmReceipt, _ := cmd.Flags().GetBool("confirm")
-			if confirmReceipt {
+			// Check if confirmation is disabled
+			skipConfirm, _ := cmd.Flags().GetBool("skip-confirm")
+			if !skipConfirm {
 				format, _ := cmd.Flags().GetString("format")
 				retryCount, _ := cmd.Flags().GetInt("retry")
 				retryDelay, _ := cmd.Flags().GetDuration("retry-delay")
 				return sendTextWithConfirmation(ctx, c, sessionID, text, format, retryCount, retryDelay)
 			}
 
+			// Send the text first
 			err = c.SendText(ctx, sessionID, text)
 			if err != nil {
 				return fmt.Errorf("failed to send text: %w", err)
+			}
+
+			// Send appropriate line terminator based on flags
+			if !skipNewline {
+				delay, _ := cmd.Flags().GetDuration("delay-before-return")
+				time.Sleep(delay)
+
+				var terminator string
+				if sendReturn {
+					// Send carriage return for command execution
+					terminator = "\r"
+				} else {
+					// Default: send newline
+					terminator = "\n"
+				}
+
+				err = c.SendText(ctx, sessionID, terminator)
+				if err != nil {
+					return fmt.Errorf("failed to send line terminator: %w", err)
+				}
 			}
 
 			return nil
@@ -413,18 +432,20 @@ Multiple conditions can be specified and all must pass.`,
 	}
 
 	cmd.Flags().Bool("no-broadcast", false, "Suppress broadcasting even if enabled")
-	cmd.Flags().Bool("no-newline", false, "Don't add newline to end of text")
-	cmd.Flags().Bool("with-enter", false, "Append Enter key (carriage return) to text for command execution")
+	cmd.Flags().Bool("skip-newline", false, "Don't send any line terminator")
+	cmd.Flags().Bool("send-return", false, "Send carriage return (\\r) for command execution")
 	cmd.Flags().StringP("file", "f", "", "Read text from file (use '-' for stdin)")
 	cmd.Flags().StringSlice("require", nil, "Pre-condition plugins to check before sending (e.g., 'has-no-partial-input', 'is-at-prompt')")
 	cmd.Flags().Duration("require-timeout", 10*time.Second, "Timeout for pre-condition checks")
 	cmd.Flags().Bool("verbose", false, "Print pre-condition status messages")
-	cmd.Flags().Bool("confirm", false, "Verify text delivery by checking screen contents (returns exit codes: 0=success, 1=error, 2=partial, 3=none-sent)")
+	cmd.Flags().Bool("skip-confirm", false, "Skip text delivery confirmation (confirmation is enabled by default)")
 	cmd.Flags().Int("retry", 0, "Number of retry attempts for failed deliveries (only retries on exit codes 2 and 3)")
 	cmd.Flags().Duration("retry-delay", 1*time.Second, "Delay between retry attempts")
+	cmd.Flags().Duration("delay-before-return", 0*time.Millisecond, "Delay before sending carriage return")
+	cmd.Flags().MarkHidden("delay-before-return")
 
-	// Mark --with-enter and --no-newline as mutually exclusive
-	cmd.MarkFlagsMutuallyExclusive("with-enter", "no-newline")
+	// Mark mutually exclusive flags
+	cmd.MarkFlagsMutuallyExclusive("skip-newline", "send-return")
 
 	// Add completion for session ID as first argument
 	cmd.ValidArgsFunction = completion.SessionIDCompletion
