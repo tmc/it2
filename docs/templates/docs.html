@@ -238,6 +238,15 @@
             background: var(--bg-subtle);
             border-radius: 6px;
             margin: 0 0 16px;
+            /* iOS Safari fixes */
+            -webkit-overflow-scrolling: touch;
+            max-width: 100%;
+            white-space: pre;
+            position: relative;
+            /* Prevent iOS format detection interfering with code blocks */
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            user-select: text;
         }
 
         .main-content pre code {
@@ -247,6 +256,12 @@
             background: transparent;
             border: 0;
             font-size: 100%;
+            white-space: pre;
+            word-wrap: normal;
+            overflow-x: visible;
+            /* Allow text selection in code blocks */
+            -webkit-user-select: text;
+            user-select: text;
         }
 
         /* Navigation */
@@ -441,6 +456,69 @@
                 right: 8px;
                 font-size: 10px;
                 padding: 3px 6px;
+            }
+        }
+
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            .main-content pre {
+                /* Force proper scrolling on iOS */
+                overflow: scroll !important;
+                -webkit-overflow-scrolling: touch !important;
+                /* Prevent iOS Safari from interfering */
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                /* Force hardware acceleration */
+                transform: translate3d(0, 0, 0);
+                backface-visibility: hidden;
+                perspective: 1000;
+            }
+
+            .main-content pre code {
+                /* Allow text selection in code blocks */
+                -webkit-user-select: text !important;
+                -webkit-touch-callout: default;
+                /* Prevent format detection in code */
+                -webkit-format-detection: none;
+            }
+        }
+
+        /* Mobile responsive fixes for code blocks */
+        @media (max-width: 768px) {
+            .main-content pre {
+                margin-left: -16px;
+                margin-right: -16px;
+                padding: 16px;
+                border-radius: 0;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                white-space: pre !important;
+                word-wrap: normal !important;
+                position: relative !important;
+                background: var(--bg-subtle);
+                /* Full width on mobile */
+                display: block !important;
+                width: calc(100vw - 32px) !important;
+                max-width: calc(100vw - 32px) !important;
+                box-sizing: border-box !important;
+                /* iOS Safari text size fixes */
+                -webkit-text-size-adjust: 100%;
+                -webkit-tap-highlight-color: transparent;
+                transform: translateZ(0); /* Force GPU rendering */
+            }
+
+            .main-content pre code {
+                display: inline-block !important;
+                white-space: pre !important;
+                word-wrap: normal !important;
+                word-break: normal !important;
+                min-width: max-content;
+                font-size: 13px !important; /* Fixed size to prevent scaling */
+                line-height: 1.5 !important;
+                /* Prevent iOS text size adjustment */
+                -webkit-text-size-adjust: none;
+                text-size-adjust: none;
             }
         }
 
