@@ -56,8 +56,8 @@ var rootCmd = &cobra.Command{
 	Short: "Comprehensive command-line interface for iTerm2 automation",
 	Long: `it2 - iTerm2 API Command-Line Interface
 
-A powerful command-line tool for controlling iTerm2 programmatically through its WebSocket API.
-Provides comprehensive access to terminal automation, session management, and advanced iTerm2 features.
+A powerful command-line tool for controlling iTerm2. Provides comprehensive access to terminal automation,
+session management, and advanced iTerm2 features.
 
 FEATURES:
   • Session Management: Create, list, close, split, activate, restart sessions
@@ -99,7 +99,6 @@ EXAMPLES:
 GLOBAL FLAGS:
   --format string      Output format: table, text, json, yaml (default "table")
   --timeout duration   Connection timeout (default 5s)
-  --url string         WebSocket URL (default "ws://localhost:1912")
 
 ENVIRONMENT VARIABLES:
   ITERM_SESSION_ID     Current session ID (set by iTerm2)
@@ -250,7 +249,6 @@ func init() {
 		defaultFormat = cfg.Format
 	}
 
-	rootCmd.PersistentFlags().StringVar(&wsURL, "url", defaultURL, "WebSocket URL for iTerm2 API")
 	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", defaultTimeout, "Connection timeout")
 	rootCmd.PersistentFlags().StringVar(&format, "format", defaultFormat, "Output format (table, text, json, yaml)")
 
