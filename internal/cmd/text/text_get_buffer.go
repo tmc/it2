@@ -21,6 +21,10 @@ func newGetBufferCommand() *cobra.Command {
 
 			# Get last 100 lines only
 			$ it2 text get-buffer --lines 100
+			$ it2 text get-buffer --last 100
+
+			# Quick tail-like usage (last 20 lines)
+			$ it2 text get-buffer --last 20
 
 			# Include color/formatting information
 			$ it2 text get-buffer --color
@@ -56,6 +60,13 @@ func newGetBufferCommand() *cobra.Command {
 
 			// Get buffer-specific flags
 			lines, _ := sc.GetCommand().Flags().GetInt32("lines")
+			lastLines, _ := sc.GetCommand().Flags().GetInt32("last")
+
+			// Use --last if specified, otherwise use --lines
+			if lastLines > 0 {
+				lines = lastLines
+			}
+
 			colorized, _ := sc.GetCommand().Flags().GetBool("color")
 			escaped, _ := sc.GetCommand().Flags().GetBool("escaped")
 			// TODO: scrollback flag
@@ -86,6 +97,7 @@ func newGetBufferCommand() *cobra.Command {
 
 	cmd := cmdutil.NewCommandFromTemplate(template)
 	cmd.Flags().Int32("lines", 10000, "Number of lines to retrieve")
+	cmd.Flags().Int32("last", 0, "Number of last lines to retrieve (alias for --lines)")
 	cmd.Flags().Bool("scrollback", false, "Include scrollback history")
 	cmd.Flags().Bool("color", false, "Include ANSI color codes in output")
 	cmd.Flags().Bool("escaped", false, "Show escape sequences as visible characters (like cat -v)")
