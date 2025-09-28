@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
@@ -57,7 +58,10 @@ Default is horizontal split.`,
 			// Default to horizontal split (more common use case)
 			isVertical := vertical && !horizontal
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			timeout, _ := cmd.Flags().GetDuration("timeout")
+			if timeout == 0 {
+				timeout = 5 * time.Second
+			}
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 

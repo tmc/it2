@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
@@ -36,7 +37,10 @@ func newSplitsCommand() *cobra.Command {
 			showAll, _ := cmd.Flags().GetBool("all")
 			showIDs, _ := cmd.Flags().GetBool("show-ids")
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			timeout, _ := cmd.Flags().GetDuration("timeout")
+			if timeout == 0 {
+				timeout = 5 * time.Second
+			}
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 

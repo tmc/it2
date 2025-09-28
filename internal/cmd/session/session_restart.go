@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
@@ -19,7 +20,10 @@ func newRestartCommand() *cobra.Command {
 			sessionID := args[0]
 			onlyIfExited, _ := cmd.Flags().GetBool("only-if-exited")
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			timeout, _ := cmd.Flags().GetDuration("timeout")
+			if timeout == 0 {
+				timeout = 5 * time.Second
+			}
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 

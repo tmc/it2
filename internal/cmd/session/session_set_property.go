@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
@@ -41,7 +42,10 @@ Examples:
 			property := args[1]
 			value := args[2]
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			timeout, _ := cmd.Flags().GetDuration("timeout")
+			if timeout == 0 {
+				timeout = 5 * time.Second
+			}
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
