@@ -95,7 +95,7 @@ Examples:
 		RunE: func(cmd *cobra.Command, args []string) error {
 			eventType := args[0]
 			sessionID, _ := cmd.Flags().GetString("session")
-			wsURL, _, format := cmdutil.GetFlags(cmd)
+			_, _, format := cmdutil.GetFlags(cmd)
 
 			// Validate event type
 			var eventID int32 = -1
@@ -120,7 +120,7 @@ Examples:
 				cancel()
 			}()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

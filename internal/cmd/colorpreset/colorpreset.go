@@ -32,12 +32,12 @@ func newListCommand() *cobra.Command {
 		Use:   "list",
 		Short: "List available color presets",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			wsURL, timeout, format := cmdutil.GetFlags(cmd)
+			_, timeout, format := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -74,12 +74,12 @@ func newApplyCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			presetName := args[0]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -133,12 +133,12 @@ func newImportCommand() *cobra.Command {
 			presetName := args[0]
 			filePath := args[1]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -171,12 +171,12 @@ func newExportCommand() *cobra.Command {
 				filePath += ".itermcolors"
 			}
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -203,12 +203,12 @@ func newCreateCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			presetName := args[0]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -303,12 +303,12 @@ func newDeleteCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			presetName := args[0]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

@@ -37,11 +37,11 @@ func newShowCommand() *cobra.Command {
 }
 
 func runShowCommand(cmd *cobra.Command, args []string) error {
-	wsURL, timeout, format := cmdutil.GetFlags(cmd)
+	_, timeout, format := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -73,11 +73,11 @@ func newConfirmCommand() *cobra.Command {
 }
 
 func runConfirmCommand(cmd *cobra.Command, args []string) error {
-	wsURL, timeout, format := cmdutil.GetFlags(cmd)
+	_, timeout, format := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -111,11 +111,11 @@ func newInputCommand() *cobra.Command {
 }
 
 func runInputCommand(cmd *cobra.Command, args []string) error {
-	wsURL, timeout, format := cmdutil.GetFlags(cmd)
+	_, timeout, format := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

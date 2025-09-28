@@ -56,12 +56,12 @@ func newAddCommand() *cobra.Command {
 			pattern := args[1]
 			action := args[2]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -108,12 +108,12 @@ func newRemoveCommand() *cobra.Command {
 			sessionID := args[0]
 			triggerID := args[1]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -161,12 +161,12 @@ func newListCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionID := args[0]
 
-			wsURL, timeout, format := cmdutil.GetFlags(cmd)
+			_, timeout, format := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -232,12 +232,12 @@ func newClearCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionID := args[0]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -261,12 +261,12 @@ func newClearCommand() *cobra.Command {
 
 // setTriggerEnabled enables or disables a trigger
 func setTriggerEnabled(sessionID, triggerID string, enabled bool, cmd *cobra.Command) error {
-	wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+	_, timeout, _ := cmdutil.GetFlags(cmd)
 
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

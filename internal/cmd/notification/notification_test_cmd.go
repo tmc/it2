@@ -43,7 +43,7 @@ func runTestCommand(cmd *cobra.Command, args []string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, "ws://localhost:1912")
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

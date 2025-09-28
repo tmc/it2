@@ -54,7 +54,7 @@ func (sc *StandardCommand) ExecuteWithClient(fn func(*client.Client, context.Con
 	defer sc.cancel()
 
 	// Connect client
-	c, err := ConnectClient(sc.ctx, sc.flags.WsURL)
+	c, err := ConnectClient(sc.ctx)
 	if err != nil {
 		return NewConnectionError(err)
 	}

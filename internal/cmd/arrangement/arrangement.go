@@ -48,11 +48,11 @@ func runSaveCommand(cmd *cobra.Command, args []string) error {
 	name := args[0]
 	windowID, _ := cmd.Flags().GetString("window")
 
-	wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+	_, timeout, _ := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -90,11 +90,11 @@ func newRestoreCommand() *cobra.Command {
 func runRestoreCommand(cmd *cobra.Command, args []string) error {
 	name := args[0]
 
-	wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+	_, timeout, _ := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -130,11 +130,11 @@ func newListCommand() *cobra.Command {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) error {
-	wsURL, timeout, format := cmdutil.GetFlags(cmd)
+	_, timeout, format := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -196,11 +196,11 @@ func runExportCommand(cmd *cobra.Command, args []string) error {
 	name := args[0]
 	filename := args[1]
 
-	wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+	_, timeout, _ := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

@@ -43,12 +43,12 @@ func newExportCommand() *cobra.Command {
 			_, _ = cmd.Flags().GetString("format") // Unused but kept for future use
 			pretty, _ := cmd.Flags().GetBool("pretty")
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -135,12 +135,12 @@ func newImportCommand() *cobra.Command {
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
 			backup, _ := cmd.Flags().GetBool("backup")
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -216,12 +216,12 @@ func newResetCommand() *cobra.Command {
 				return fmt.Errorf("must specify preference keys to reset, use --all to reset everything, or --force to bypass confirmation")
 			}
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -403,12 +403,12 @@ func newGetCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			key := args[0]
 
-			wsURL, timeout, format := cmdutil.GetFlags(cmd)
+			_, timeout, format := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -452,12 +452,12 @@ func newSetCommand() *cobra.Command {
 			key := args[0]
 			value := args[1]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

@@ -38,11 +38,11 @@ func newOpenCommand() *cobra.Command {
 }
 
 func runOpenCommand(cmd *cobra.Command, args []string) error {
-	wsURL, timeout, format := cmdutil.GetFlags(cmd)
+	_, timeout, format := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -78,11 +78,11 @@ func newSaveCommand() *cobra.Command {
 }
 
 func runSaveCommand(cmd *cobra.Command, args []string) error {
-	wsURL, timeout, format := cmdutil.GetFlags(cmd)
+	_, timeout, format := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

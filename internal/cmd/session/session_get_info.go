@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
@@ -36,12 +37,14 @@ This command combines multiple API calls to provide a complete view of the sessi
 			includeProperties, _ := cmd.Flags().GetBool("properties")
 			extractPath, _ := cmd.Flags().GetString("extract")
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
-
+			timeout, _ := cmd.Flags().GetDuration("timeout")
+			if timeout == 0 {
+				timeout = 60 * time.Second
+			}
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

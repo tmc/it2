@@ -82,7 +82,9 @@ func GetExtendedFlags(cmd *cobra.Command) (wsURL string, timeout time.Duration, 
 }
 
 // ConnectClient creates and connects a client with standard timeout handling
-func ConnectClient(ctx context.Context, wsURL string) (*client.Client, error) {
+// Gets the URL from global flags, defaults to ws://localhost:1912
+func ConnectClient(ctx context.Context) (*client.Client, error) {
+	wsURL := "ws://localhost:1912" // Default URL
 	c := client.New(wsURL)
 	if err := c.Connect(ctx); err != nil {
 		return nil, err

@@ -33,12 +33,12 @@ func newListCommand() *cobra.Command {
 		Short: "List broadcast domains",
 		Long:  "List broadcast domains showing domain groups and session membership",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			wsURL, timeout, format := cmdutil.GetFlags(cmd)
+			_, timeout, format := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -64,12 +64,12 @@ func newSetCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionIDs := args
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -105,7 +105,7 @@ func newClearCommand() *cobra.Command {
 		Short: "Clear broadcast domains",
 		Long:  "Remove all broadcast domain assignments, returning sessions to individual mode",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 			force, _ := cmd.Flags().GetBool("force")
 
 			if !force {
@@ -121,7 +121,7 @@ func newClearCommand() *cobra.Command {
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -158,12 +158,12 @@ func newSendCommand() *cobra.Command {
 				text = text + "\n"
 			}
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

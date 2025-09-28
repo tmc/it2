@@ -59,11 +59,11 @@ func runBindCommand(cmd *cobra.Command, args []string) error {
 	global, _ := cmd.Flags().GetBool("global")
 	description, _ := cmd.Flags().GetString("description")
 
-	wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+	_, timeout, _ := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -101,11 +101,11 @@ func runUnbindCommand(cmd *cobra.Command, args []string) error {
 	profile, _ := cmd.Flags().GetString("profile")
 	global, _ := cmd.Flags().GetBool("global")
 
-	wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+	_, timeout, _ := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -139,11 +139,11 @@ func runListCommand(cmd *cobra.Command, args []string) error {
 	global, _ := cmd.Flags().GetBool("global")
 	filter, _ := cmd.Flags().GetString("filter")
 
-	wsURL, timeout, format := cmdutil.GetFlags(cmd)
+	_, timeout, format := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -195,11 +195,11 @@ func runExportCommand(cmd *cobra.Command, args []string) error {
 	profile, _ := cmd.Flags().GetString("profile")
 	global, _ := cmd.Flags().GetBool("global")
 
-	wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+	_, timeout, _ := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -238,11 +238,11 @@ func runImportCommand(cmd *cobra.Command, args []string) error {
 	global, _ := cmd.Flags().GetBool("global")
 	merge, _ := cmd.Flags().GetBool("merge")
 
-	wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+	_, timeout, _ := cmdutil.GetFlags(cmd)
 	ctx, cancel := cmdutil.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx, wsURL)
+	c, err := cmdutil.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

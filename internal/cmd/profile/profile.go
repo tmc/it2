@@ -46,13 +46,13 @@ func newListCommand() *cobra.Command {
 		Use:   "list",
 		Short: "List all available profiles",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			wsURL, timeout, format := cmdutil.GetFlags(cmd)
+			_, timeout, format := cmdutil.GetFlags(cmd)
 			detailed, _ := cmd.Flags().GetBool("detailed")
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -103,12 +103,12 @@ func newGetCommand() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			profileName := args[0]
-			wsURL, timeout, format := cmdutil.GetFlags(cmd)
+			_, timeout, format := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -146,12 +146,12 @@ func newGetPropertyCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			profileName := args[0]
 			propertyKey := args[1]
-			wsURL, timeout, format := cmdutil.GetFlags(cmd)
+			_, timeout, format := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -186,7 +186,7 @@ Example: it2 profile set "Default" --properties '{"Background Color": {"Red Comp
 		RunE: func(cmd *cobra.Command, args []string) error {
 			profileName := args[0]
 			propertiesJSON, _ := cmd.Flags().GetString("properties")
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			if propertiesJSON == "" {
 				return fmt.Errorf("--properties flag is required")
@@ -195,7 +195,7 @@ Example: it2 profile set "Default" --properties '{"Background Color": {"Red Comp
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -244,12 +244,12 @@ func newSetPropertyCommand() *cobra.Command {
 			profileName := args[0]
 			propertyKey := args[1]
 			propertyValue := args[2]
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -284,7 +284,7 @@ Example:
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			propertiesJSON := args[0]
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			var bulkUpdate struct {
 				Profiles   []string       `json:"profiles"`
@@ -306,7 +306,7 @@ Example:
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -342,12 +342,12 @@ func newDuplicateCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sourceProfile := args[0]
 			newProfileName := args[1]
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -386,7 +386,7 @@ func newDeleteCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			profileName := args[0]
 			force, _ := cmd.Flags().GetBool("force")
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			if profileName == "Default" && !force {
 				return fmt.Errorf("cannot delete the Default profile without --force flag")
@@ -395,7 +395,7 @@ func newDeleteCommand() *cobra.Command {
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -446,12 +446,12 @@ Otherwise, the output will be printed to stdout.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			profileName := args[0]
 			outputFile, _ := cmd.Flags().GetString("file")
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -509,7 +509,7 @@ so the target profile must exist in iTerm2.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			importFile := args[0]
 			profileName, _ := cmd.Flags().GetString("name")
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			// Read the import file
 			jsonData, err := os.ReadFile(importFile)
@@ -545,7 +545,7 @@ so the target profile must exist in iTerm2.`,
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

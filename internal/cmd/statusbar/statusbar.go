@@ -33,7 +33,7 @@ func newOpenPopoverCommand() *cobra.Command {
 			sessionID := cmdutil.NormalizeSessionID(args[1])
 			html := args[2]
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdutil.GetFlags(cmd)
 			widthFloat, _ := cmd.Flags().GetFloat32("width")
 			heightFloat, _ := cmd.Flags().GetFloat32("height")
 
@@ -43,7 +43,7 @@ func newOpenPopoverCommand() *cobra.Command {
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

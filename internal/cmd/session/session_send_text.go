@@ -338,10 +338,6 @@ Multiple conditions can be specified and all must pass.`,
 			}
 
 			// Move client connection before session resolution
-			wsURL, _ := cmd.Flags().GetString("url")
-			if wsURL == "" {
-				wsURL = "ws://localhost:1912"
-			}
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
 				timeout = 60 * time.Second
@@ -350,7 +346,7 @@ Multiple conditions can be specified and all must pass.`,
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			c, err := cmdutil.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
