@@ -18,6 +18,7 @@ type Formatter struct {
 	columns     []string
 	sortBy      string
 	sortReverse bool
+	quiet       bool
 }
 
 func New(format string) *Formatter {
@@ -25,12 +26,13 @@ func New(format string) *Formatter {
 }
 
 // NewWithOptions creates a new formatter with column and sort options
-func NewWithOptions(format string, columns []string, sortBy string, sortReverse bool) *Formatter {
+func NewWithOptions(format string, columns []string, sortBy string, sortReverse bool, quiet bool) *Formatter {
 	return &Formatter{
 		format:      format,
 		columns:     columns,
 		sortBy:      sortBy,
 		sortReverse: sortReverse,
+		quiet:       quiet,
 	}
 }
 
@@ -39,6 +41,10 @@ func (f *Formatter) GetFormat() string {
 }
 
 func (f *Formatter) FormatSessions(sessions []*client.SessionInfo) error {
+	if f.quiet {
+		return f.formatSessionsQuiet(sessions)
+	}
+
 	switch f.format {
 	case "json":
 		return f.formatJSON(sessions)
@@ -651,6 +657,10 @@ func (f *Formatter) FormatWindows(windows []*WindowInfo) error {
 
 // FormatClientWindows formats client.WindowInfo from the client package
 func (f *Formatter) FormatClientWindows(windows []*client.WindowInfo) error {
+	if f.quiet {
+		return f.formatWindowsQuiet(windows)
+	}
+
 	switch f.format {
 	case "json":
 		return f.formatJSON(windows)
@@ -831,6 +841,10 @@ func (f *Formatter) formatWindowInfoText(window *WindowInfo) error {
 
 // FormatTabs formats tab information
 func (f *Formatter) FormatTabs(tabs []*TabInfo) error {
+	if f.quiet {
+		return f.formatTabsQuiet(tabs)
+	}
+
 	switch f.format {
 	case "json":
 		return f.formatJSON(tabs)
@@ -1787,3 +1801,25 @@ func sortTreeNodes(nodes []*TreeNode) {
 	}
 }
 
+// Quiet formatting methods - output only IDs
+
+func (f *Formatter) formatSessionsQuiet(sessions []*client.SessionInfo) error {
+	for _, session := range sessions {
+		fmt.Println(session.SessionID)
+	}
+	return nil
+}
+
+func (f *Formatter) formatTabsQuiet(tabs []*TabInfo) error {
+	for _, tab := range tabs {
+		fmt.Println(tab.TabID)
+	}
+	return nil
+}
+
+func (f *Formatter) formatWindowsQuiet(windows []*client.WindowInfo) error {
+	for _, window := range windows {
+		fmt.Println(window.WindowID)
+	}
+	return nil
+}

@@ -45,7 +45,6 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 			return fmt.Errorf("failed to get initial screen contents: %w", err)
 		}
 
-
 		// Send the text
 		err = c.SendText(ctx, sessionID, text)
 		if err != nil {
@@ -160,7 +159,6 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 	beforeStr := formatScreenResponse(before)
 	afterStr := formatScreenResponse(after)
 
-
 	// Remove newlines/carriage returns from sent text for comparison
 	cleanSentText := strings.TrimRight(strings.TrimRight(sentText, "\n"), "\r")
 
@@ -232,7 +230,6 @@ func formatScreenResponse(resp *pb.GetBufferResponse) string {
 
 	return strings.Join(lines, "\n")
 }
-
 
 func newSendTextCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -340,9 +337,29 @@ Multiple conditions can be specified and all must pass.`,
 				}
 			}
 
-			sessionID = cmdutil.ResolveSessionID(sessionID)
-			if sessionID == "" {
-				return fmt.Errorf("no session ID provided and $ITERM_SESSION_ID not set")
+			// Move client connection before session resolution
+			wsURL, _ := cmd.Flags().GetString("url")
+			if wsURL == "" {
+				wsURL = "ws://localhost:1912"
+			}
+			timeout, _ := cmd.Flags().GetDuration("timeout")
+			if timeout == 0 {
+				timeout = 60 * time.Second
+			}
+
+			ctx, cancel := cmdutil.CreateContext(timeout)
+			defer cancel()
+
+			c, err := cmdutil.ConnectClient(ctx, wsURL)
+			if err != nil {
+				return fmt.Errorf("failed to connect: %w", err)
+			}
+			defer c.Close()
+
+			// Resolve session ID with environment fallback and prefix matching
+			sessionID, err = c.ResolveSessionID(ctx, sessionID)
+			if err != nil {
+				return fmt.Errorf("failed to resolve session ID: %w", err)
 			}
 
 			// Check pre-conditions if --require flag is set
@@ -388,33 +405,30 @@ Multiple conditions can be specified and all must pass.`,
 
 			// Validate mutually exclusive flags
 			terminatorFlags := 0
-			if sendCR { terminatorFlags++ }
-			if sendLF { terminatorFlags++ }
-			if skipNewline { terminatorFlags++ }
+			if sendCR {
+				terminatorFlags++
+			}
+			if sendLF {
+				terminatorFlags++
+			}
+			if skipNewline {
+				terminatorFlags++
+			}
 
 			if terminatorFlags > 1 {
 				return fmt.Errorf("terminator flags --send-cr, --send-lf, and --skip-newline are mutually exclusive")
 			}
 
-			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
-
-			ctx, cancel := cmdutil.CreateContext(timeout)
-			defer cancel()
-
-			c, err := cmdutil.ConnectClient(ctx, wsURL)
-			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
-			}
-			defer c.Close()
+			// Client already connected above
 
 			// Determine terminator first (needed for both confirmation and non-confirmation paths)
 			var terminator string
 			if sendCR {
-				terminator = "\r"  // Carriage return - executes command
+				terminator = "\r" // Carriage return - executes command
 			} else if sendLF {
-				terminator = "\n"  // Line feed - moves to new line
+				terminator = "\n" // Line feed - moves to new line
 			} else if skipNewline {
-				terminator = ""   // Explicitly no terminator
+				terminator = "" // Explicitly no terminator
 			} else {
 				// NEW DEFAULT: send carriage return to execute command
 				terminator = "\r"

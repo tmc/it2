@@ -29,6 +29,7 @@ type StandardFlags struct {
 	Columns     []string
 	SortBy      string
 	SortReverse bool
+	Quiet       bool
 }
 
 // NewStandardCommand creates a command with standard setup
@@ -132,6 +133,7 @@ func (sc *StandardCommand) FormatOutput(data interface{}) error {
 		sc.flags.Columns,
 		sc.flags.SortBy,
 		sc.flags.SortReverse,
+		sc.flags.Quiet,
 	)
 	return formatter.FormatGeneric(data)
 }

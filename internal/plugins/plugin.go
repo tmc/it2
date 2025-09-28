@@ -43,12 +43,12 @@ type WindowEnricher interface {
 
 // PluginEvent represents an event from a plugin
 type PluginEvent struct {
-	PluginName  string                 `json:"plugin_name"`
-	EventType   string                 `json:"event_type"`
-	SessionID   string                 `json:"session_id"`
-	Timestamp   time.Time              `json:"timestamp"`
-	Data        map[string]interface{} `json:"data"`
-	Message     string                 `json:"message,omitempty"`
+	PluginName string                 `json:"plugin_name"`
+	EventType  string                 `json:"event_type"`
+	SessionID  string                 `json:"session_id"`
+	Timestamp  time.Time              `json:"timestamp"`
+	Data       map[string]interface{} `json:"data"`
+	Message    string                 `json:"message,omitempty"`
 }
 
 // EventMonitor is an interface for plugins that can generate events during monitoring

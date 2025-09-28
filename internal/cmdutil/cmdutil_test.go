@@ -1,7 +1,6 @@
 package cmdutil
 
 import (
-	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -170,72 +169,6 @@ func TestNormalizeSessionID(t *testing.T) {
 				t.Errorf("Expected '%s', got '%s'", tc.expected, result)
 			}
 		})
-	}
-}
-
-func TestResolveSessionID(t *testing.T) {
-	// Test with provided session ID
-	result := ResolveSessionID("w0t1p12:ABC123")
-	if result != "ABC123" {
-		t.Errorf("Expected 'ABC123', got '%s'", result)
-	}
-
-	// Test with empty session ID and environment variable set
-	os.Setenv("ITERM_SESSION_ID", "w0t2p34:DEF456")
-	defer os.Unsetenv("ITERM_SESSION_ID")
-
-	result = ResolveSessionID("")
-	if result != "DEF456" {
-		t.Errorf("Expected 'DEF456' from environment, got '%s'", result)
-	}
-
-	// Provided session ID should override environment
-	result = ResolveSessionID("w0t3p56:GHI789")
-	if result != "GHI789" {
-		t.Errorf("Expected 'GHI789' from parameter, got '%s'", result)
-	}
-}
-
-func TestResolveSessionID_NoEnvironment(t *testing.T) {
-	os.Unsetenv("ITERM_SESSION_ID")
-	result := ResolveSessionID("")
-	if result != "" {
-		t.Errorf("Expected empty string when no session ID available, got '%s'", result)
-	}
-}
-
-func TestResolveSessionIDWithError(t *testing.T) {
-	// Test with valid session ID
-	result, err := ResolveSessionIDWithError("w0t1p12:ABC123")
-	if err != nil {
-		t.Errorf("Expected no error with valid session ID, got: %v", err)
-	}
-	if result != "ABC123" {
-		t.Errorf("Expected 'ABC123', got '%s'", result)
-	}
-
-	// Test with no session ID and no environment
-	os.Unsetenv("ITERM_SESSION_ID")
-	result, err = ResolveSessionIDWithError("")
-	if err == nil {
-		t.Error("Expected error when no session ID available")
-	}
-	if result != "" {
-		t.Errorf("Expected empty string with error, got '%s'", result)
-	}
-
-	// Check error type
-	_, ok := err.(*NoSessionIDError)
-	if !ok {
-		t.Errorf("Expected NoSessionIDError, got %T", err)
-	}
-}
-
-func TestNoSessionIDError(t *testing.T) {
-	err := &NoSessionIDError{}
-	expected := "no session ID provided and $ITERM_SESSION_ID environment variable not set"
-	if err.Error() != expected {
-		t.Errorf("Expected error message '%s', got '%s'", expected, err.Error())
 	}
 }
 

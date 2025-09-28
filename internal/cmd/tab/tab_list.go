@@ -40,6 +40,9 @@ Examples:
 				windowID = flagWindowID
 			}
 
+			// Get quiet flag
+			quiet, _ := sc.GetCommand().Flags().GetBool("quiet")
+
 			// Use shared operations
 			sharedOps := cmdutil.NewSharedListOperations(sc.GetClient(), sc.GetContext())
 			return sharedOps.ListTabs(cmdutil.SharedListOptions{
@@ -48,6 +51,7 @@ Examples:
 				Columns:     sc.GetFlags().Columns,
 				SortBy:      sc.GetFlags().SortBy,
 				SortReverse: sc.GetFlags().SortReverse,
+				Quiet:       quiet,
 			})
 		},
 	}
@@ -56,6 +60,9 @@ Examples:
 
 	// Add window-id flag for consistency with session list
 	cmd.Flags().String("window-id", "", "Filter tabs by window ID")
+
+	// Add quiet flag
+	cmd.Flags().BoolP("quiet", "q", false, "Output only tab IDs")
 
 	// Add completion functions
 	cmd.RegisterFlagCompletionFunc("window-id", completion.WindowIDCompletion)

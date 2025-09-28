@@ -39,12 +39,11 @@ Use --list to see all available properties.`,
 				return fmt.Errorf("session ID required (use --list to see available properties)")
 			}
 
-			sessionID := cmdutil.ResolveSessionID(args[0])
-
 			if len(args) < 2 {
 				return fmt.Errorf("property name required (use --list to see available properties)")
 			}
 
+			sessionID := args[0]
 			property := args[1]
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 
@@ -58,8 +57,8 @@ Use --list to see all available properties.`,
 			}
 			defer c.Close()
 
-			// Expand short session ID if needed
-			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			// Resolve session ID with proper client method
+			sessionID, err = c.ResolveSessionID(ctx, sessionID)
 			if err != nil {
 				return fmt.Errorf("failed to resolve session ID: %w", err)
 			}

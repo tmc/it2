@@ -85,14 +85,18 @@ func NewCommandFromTemplate(template CommandTemplate) *cobra.Command {
 				if template.RequiresSession {
 					// If no args and session required, try to resolve from environment
 					if len(args) == 0 {
-						sessionID, err := ResolveSessionIDWithError("")
+						sessionID, err := c.ResolveSessionID(ctx, "")
 						if err != nil {
 							return err
 						}
 						args = []string{sessionID}
 					} else {
-						// Normalize the session ID in the first argument
-						args[0] = NormalizeSessionID(args[0])
+						// Resolve the session ID in the first argument with prefix matching
+						resolvedID, err := c.ResolveSessionID(ctx, args[0])
+						if err != nil {
+							return err
+						}
+						args[0] = resolvedID
 					}
 				}
 

@@ -19,9 +19,9 @@ func newCloseCommand() *cobra.Command {
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := args[0]
 
-			// Expand short session ID if needed
+			// Resolve session ID if needed
 			var err error
-			sessionID, err = cmdutil.ExpandShortSessionID(sc.GetContext(), sc.GetClient(), sessionID)
+			sessionID, err = sc.GetClient().ResolveSessionID(sc.GetContext(), sessionID)
 			if err != nil {
 				return sc.ReportError("resolve session ID", err)
 			}

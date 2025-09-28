@@ -9,8 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
-	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
 )
 
@@ -35,8 +35,8 @@ This command attempts to extract the PID from shell integration or by running co
 			}
 			defer c.Close()
 
-			// Expand short session ID if needed
-			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			// Resolve session ID if needed
+			sessionID, err = c.ResolveSessionID(ctx, sessionID)
 			if err != nil {
 				return fmt.Errorf("failed to resolve session ID: %w", err)
 			}

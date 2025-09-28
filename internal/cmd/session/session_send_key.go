@@ -62,11 +62,6 @@ cmd+a thru cmd+z. Supports complex modifier combinations like cmd+ctrl+shift+a.`
 				key = args[1]
 			}
 
-			sessionID = cmdutil.ResolveSessionID(sessionID)
-			if sessionID == "" {
-				return fmt.Errorf("no session ID provided and $ITERM_SESSION_ID not set")
-			}
-
 			// Map key names to actual key codes or use the character directly
 			keyCode := utils.MapKeyToCode(strings.ToLower(key))
 			if keyCode == "" {
@@ -85,8 +80,8 @@ cmd+a thru cmd+z. Supports complex modifier combinations like cmd+ctrl+shift+a.`
 			}
 			defer c.Close()
 
-			// Expand short session ID if needed
-			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			// Resolve session ID with environment fallback and prefix matching
+			sessionID, err = c.ResolveSessionID(ctx, sessionID)
 			if err != nil {
 				return fmt.Errorf("failed to resolve session ID: %w", err)
 			}

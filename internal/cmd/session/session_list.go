@@ -43,6 +43,9 @@ func newListCommand() *cobra.Command {
 			}
 			defer c.Close()
 
+			// Get quiet flag
+			quiet, _ := cmd.Flags().GetBool("quiet")
+
 			// Print scope notice if IT2_SCOPE is set or --scope flag is used
 			scopeFlag, _ := cmd.Flags().GetString("scope")
 			cmdutil.PrintScopeNoticeWithFlag(format, scopeFlag)
@@ -61,6 +64,7 @@ func newListCommand() *cobra.Command {
 				Columns:     columns,
 				SortBy:      sortBy,
 				SortReverse: sortReverse,
+				Quiet:       quiet,
 			})
 		},
 	}
@@ -76,6 +80,9 @@ func newListCommand() *cobra.Command {
 
 	// Add scope support for session filtering
 	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (none,window,tab,parents,siblings,peers,lineage)")
+
+	// Add quiet flag
+	cmd.Flags().BoolP("quiet", "q", false, "Output only session IDs")
 
 	// Add completion functions
 	cmd.RegisterFlagCompletionFunc("window-id", completion.WindowIDCompletion)

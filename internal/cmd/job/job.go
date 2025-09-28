@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/connect"
 )
 
 // NewCommand creates the job command with all subcommands.

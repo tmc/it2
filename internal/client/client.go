@@ -20,6 +20,7 @@ import (
 	protobuf "google.golang.org/protobuf/proto"
 )
 
+// TODO: commeant well
 type Client struct {
 	conn           *websocket.Conn
 	url            string
@@ -559,7 +560,6 @@ func (c *Client) UnregisterCustomControl(ctx context.Context, controlID string) 
 func (c *Client) ListCustomControls(ctx context.Context) (interface{}, error) {
 	return nil, fmt.Errorf("custom control functionality not implemented - this is a placeholder")
 }
-
 
 // RegisterRPC registers an RPC handler (placeholder)
 func (c *Client) RegisterRPC(ctx context.Context, rpcName, sessionID string) (interface{}, error) {

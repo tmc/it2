@@ -22,6 +22,7 @@ type SharedListOptions struct {
 	Columns     []string
 	SortBy      string
 	SortReverse bool
+	Quiet       bool
 }
 
 // SharedListOperations provides shared listing functionality for both flat and hierarchical commands
@@ -88,7 +89,7 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 	}
 
 	// Format and output
-	formatter := formatting.NewWithOptions(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse)
+	formatter := formatting.NewWithOptions(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet)
 	return formatter.FormatSessions(filteredSessions)
 }
 
@@ -121,7 +122,7 @@ func (s *SharedListOperations) ListTabs(opts SharedListOptions) error {
 	}
 
 	// Format and output
-	formatter := formatting.NewWithOptions(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse)
+	formatter := formatting.NewWithOptions(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet)
 	return formatter.FormatTabs(tabInfos)
 }
 
@@ -153,7 +154,7 @@ func (s *SharedListOperations) ListWindows(opts SharedListOptions) error {
 		}
 	}
 
-	formatter := formatting.NewWithOptions(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse)
+	formatter := formatting.NewWithOptions(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet)
 	return formatter.FormatClientWindows(windows)
 }
 
@@ -238,7 +239,10 @@ func (s *SharedListOperations) applyScopeFilter(sessions []*client.SessionInfo, 
 	}
 
 	// Get current session ID from environment
-	currentSessionID := ResolveSessionID("")
+	currentSessionID := os.Getenv("ITERM_SESSION_ID")
+	if currentSessionID != "" {
+		currentSessionID = NormalizeSessionID(currentSessionID)
+	}
 	if currentSessionID == "" {
 		// No current session, return all sessions
 		return sessions

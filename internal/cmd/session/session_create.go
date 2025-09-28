@@ -57,9 +57,9 @@ When a session-id is provided, splits that session to create a new session.`,
 				return createSessionByNewTab(sc, profile, windowID, command)
 			} else {
 				// Split existing session
-				sessionID := cmdutil.ResolveSessionID(args[0])
-				if sessionID == "" {
-					return fmt.Errorf("no session ID provided and $ITERM_SESSION_ID not set")
+				sessionID, err := sc.GetClient().ResolveSessionID(sc.GetContext(), args[0])
+				if err != nil {
+					return sc.ReportError("resolve session ID", err)
 				}
 				return createSessionBySplit(sc, sessionID, profile, splitDirection)
 			}

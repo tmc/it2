@@ -28,14 +28,8 @@ This command combines multiple API calls to provide a complete view of the sessi
 		Args: cobra.RangeArgs(0, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID string
-			if len(args) == 0 {
-				var err error
-				sessionID, err = cmdutil.ResolveSessionIDWithError("")
-				if err != nil {
-					return err
-				}
-			} else {
-				sessionID = cmdutil.ResolveSessionID(args[0])
+			if len(args) > 0 {
+				sessionID = args[0]
 			}
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
@@ -53,8 +47,8 @@ This command combines multiple API calls to provide a complete view of the sessi
 			}
 			defer c.Close()
 
-			// Expand short session ID if needed
-			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			// Resolve session ID with proper client method
+			sessionID, err = c.ResolveSessionID(ctx, sessionID)
 			if err != nil {
 				return fmt.Errorf("failed to resolve session ID: %w", err)
 			}

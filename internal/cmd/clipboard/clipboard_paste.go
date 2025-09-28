@@ -37,16 +37,18 @@ Examples:
 			if len(args) > 0 {
 				sessionID = args[0]
 			}
-			sessionID = cmdutil.ResolveSessionID(sessionID)
-			if sessionID == "" {
-				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+			// Resolve session ID with environment fallback and prefix matching
+			ctx := sc.GetContext()
+			sessionID, err := sc.GetClient().ResolveSessionID(ctx, sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
 			}
 
 			// Get restore-focus flag
 			restoreFocus, _ := sc.GetCommand().Flags().GetBool("restore-focus")
 
 			// Paste clipboard content to the session
-			err := sc.GetClient().PasteFromClipboardWithOptions(sc.GetContext(), sessionID, restoreFocus)
+			err = sc.GetClient().PasteFromClipboardWithOptions(sc.GetContext(), sessionID, restoreFocus)
 			if err != nil {
 				return sc.ReportError("paste from clipboard", err)
 			}

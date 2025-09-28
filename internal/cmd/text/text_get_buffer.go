@@ -47,10 +47,11 @@ func newGetBufferCommand() *cobra.Command {
 				sessionID = args[0]
 			}
 
-			// Resolve session ID with environment fallback
-			sessionID = cmdutil.ResolveSessionID(sessionID)
-			if sessionID == "" {
-				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+			// Resolve session ID with environment fallback and prefix matching
+			ctx := sc.GetContext()
+			sessionID, err := sc.GetClient().ResolveSessionID(ctx, sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
 			}
 
 			// Get buffer-specific flags

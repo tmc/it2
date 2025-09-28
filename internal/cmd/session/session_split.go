@@ -40,10 +40,6 @@ Default is horizontal split.`,
 			if len(args) > 0 {
 				sessionID = args[0]
 			}
-			sessionID = cmdutil.ResolveSessionID(sessionID)
-			if sessionID == "" {
-				return fmt.Errorf("no session ID provided and $ITERM_SESSION_ID not set")
-			}
 
 			vertical, _ := cmd.Flags().GetBool("vertical")
 			horizontal, _ := cmd.Flags().GetBool("horizontal")
@@ -71,8 +67,8 @@ Default is horizontal split.`,
 			}
 			defer c.Close()
 
-			// Expand short session ID if needed
-			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			// Resolve session ID with environment fallback and prefix matching
+			sessionID, err = c.ResolveSessionID(ctx, sessionID)
 			if err != nil {
 				return fmt.Errorf("failed to resolve session ID: %w", err)
 			}

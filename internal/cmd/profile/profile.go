@@ -165,7 +165,7 @@ func newGetPropertyCommand() *cobra.Command {
 
 			formatter := formatting.New(format)
 			if format == "json" || format == "yaml" {
-				result := map[string]interface{}{propertyKey: value}
+				result := map[string]any{propertyKey: value}
 				return formatter.FormatGeneric(result)
 			} else {
 				fmt.Printf("%v\n", value)
@@ -202,7 +202,7 @@ Example: it2 profile set "Default" --properties '{"Background Color": {"Red Comp
 			defer c.Close()
 
 			// Parse JSON properties
-			var properties map[string]interface{}
+			var properties map[string]any
 			if err := json.Unmarshal([]byte(propertiesJSON), &properties); err != nil {
 				return fmt.Errorf("failed to parse properties JSON: %w", err)
 			}
@@ -256,7 +256,7 @@ func newSetPropertyCommand() *cobra.Command {
 			defer c.Close()
 
 			// Try to parse as JSON first, if that fails treat as string
-			var value interface{}
+			var value any
 			if err := json.Unmarshal([]byte(propertyValue), &value); err != nil {
 				// If JSON parsing fails, use as string
 				value = propertyValue
@@ -287,8 +287,8 @@ Example:
 			wsURL, timeout, _ := cmdutil.GetFlags(cmd)
 
 			var bulkUpdate struct {
-				Profiles   []string               `json:"profiles"`
-				Properties map[string]interface{} `json:"properties"`
+				Profiles   []string       `json:"profiles"`
+				Properties map[string]any `json:"properties"`
 			}
 
 			if err := json.Unmarshal([]byte(propertiesJSON), &bulkUpdate); err != nil {
@@ -464,7 +464,7 @@ Otherwise, the output will be printed to stdout.`,
 			}
 
 			// Create export structure
-			exportData := map[string]interface{}{
+			exportData := map[string]any{
 				"profile_name": profileName,
 				"exported_at":  time.Now().Format(time.RFC3339),
 				"properties":   properties,
@@ -519,9 +519,9 @@ so the target profile must exist in iTerm2.`,
 
 			// Parse the export data
 			var importData struct {
-				ProfileName string                 `json:"profile_name"`
-				ExportedAt  string                 `json:"exported_at"`
-				Properties  map[string]interface{} `json:"properties"`
+				ProfileName string         `json:"profile_name"`
+				ExportedAt  string         `json:"exported_at"`
+				Properties  map[string]any `json:"properties"`
 			}
 
 			if err := json.Unmarshal(jsonData, &importData); err != nil {
@@ -575,7 +575,7 @@ so the target profile must exist in iTerm2.`,
 			fmt.Printf("Importing %d properties to profile '%s'...\n", len(importData.Properties), targetProfileName)
 
 			// Filter out properties that shouldn't be imported
-			filteredProperties := make(map[string]interface{})
+			filteredProperties := make(map[string]any)
 			for key, value := range importData.Properties {
 				// Skip certain properties that shouldn't be imported
 				if key == "Guid" || (key == "Name" && profileName == "") {
@@ -672,27 +672,30 @@ Examples:
 		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			var sessionID, propertyKey, propertyValue string
+			var err error
 
 			if len(args) == 2 {
 				// No session ID provided, use current session
-				sessionID = cmdutil.ResolveSessionID("")
-				if sessionID == "" {
-					return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+				ctx := sc.GetContext()
+				sessionID, err = sc.GetClient().ResolveSessionID(ctx, "")
+				if err != nil {
+					return sc.ReportError("resolve session ID", err)
 				}
 				propertyKey = args[0]
 				propertyValue = args[1]
 			} else {
 				// Session ID provided
-				sessionID = cmdutil.ResolveSessionID(args[0])
-				if sessionID == "" {
-					return cmdutil.NewRequiredArgumentError("session ID")
+				ctx := sc.GetContext()
+				sessionID, err = sc.GetClient().ResolveSessionID(ctx, args[0])
+				if err != nil {
+					return sc.ReportError("resolve session ID", err)
 				}
 				propertyKey = args[1]
 				propertyValue = args[2]
 			}
 
 			// Parse value - try JSON first, fall back to string
-			var value interface{}
+			var value any
 			if err := json.Unmarshal([]byte(propertyValue), &value); err != nil {
 				// If JSON parsing fails, use as string with quotes for iTerm2 API
 				value = fmt.Sprintf(`"%s"`, propertyValue)
@@ -702,14 +705,14 @@ Examples:
 				value = string(jsonValue)
 			}
 
-			err := sc.GetClient().SetSessionProfileProperty(sc.GetContext(), sessionID, propertyKey, value.(string))
+			err = sc.GetClient().SetSessionProfileProperty(sc.GetContext(), sessionID, propertyKey, value.(string))
 			if err != nil {
 				return sc.ReportError("set session profile property", err)
 			}
 
 			// Report success with JSON output support
 			if sc.GetFlags().Format == "json" {
-				result := map[string]interface{}{
+				result := map[string]any{
 					"session_id": sessionID,
 					"property":   propertyKey,
 					"value":      propertyValue,
@@ -744,19 +747,22 @@ Examples:
 		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			var sessionID, propertyKey string
+			var err error
 
 			if len(args) == 1 {
 				// No session ID provided, use current session
-				sessionID = cmdutil.ResolveSessionID("")
-				if sessionID == "" {
-					return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+				ctx := sc.GetContext()
+				sessionID, err = sc.GetClient().ResolveSessionID(ctx, "")
+				if err != nil {
+					return sc.ReportError("resolve session ID", err)
 				}
 				propertyKey = args[0]
 			} else {
 				// Session ID provided
-				sessionID = cmdutil.ResolveSessionID(args[0])
-				if sessionID == "" {
-					return cmdutil.NewRequiredArgumentError("session ID")
+				ctx := sc.GetContext()
+				sessionID, err = sc.GetClient().ResolveSessionID(ctx, args[0])
+				if err != nil {
+					return sc.ReportError("resolve session ID", err)
 				}
 				propertyKey = args[1]
 			}
@@ -768,7 +774,7 @@ Examples:
 
 			// Format output based on format flag
 			if sc.GetFlags().Format == "json" {
-				result := map[string]interface{}{
+				result := map[string]any{
 					"session_id": sessionID,
 					"property":   propertyKey,
 					"value":      value,
@@ -807,32 +813,36 @@ Examples:
 		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			var sessionID, propertyKey string
+			var err error
 
 			if len(args) == 0 {
 				// No session ID provided, use current session
-				sessionID = cmdutil.ResolveSessionID("")
-				if sessionID == "" {
-					return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+				ctx := sc.GetContext()
+				sessionID, err = sc.GetClient().ResolveSessionID(ctx, "")
+				if err != nil {
+					return sc.ReportError("resolve session ID", err)
 				}
 			} else if len(args) == 1 {
 				// Could be session ID or property key
-				resolved := cmdutil.ResolveSessionID(args[0])
-				if resolved != "" && resolved != args[0] {
+				ctx := sc.GetContext()
+				resolved, resolveErr := sc.GetClient().ResolveSessionID(ctx, args[0])
+				if resolveErr == nil {
 					// It's a session ID
 					sessionID = resolved
 				} else {
 					// It's a property key, use current session
-					sessionID = cmdutil.ResolveSessionID("")
-					if sessionID == "" {
-						return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+					sessionID, err = sc.GetClient().ResolveSessionID(ctx, "")
+					if err != nil {
+						return sc.ReportError("resolve session ID", err)
 					}
 					propertyKey = args[0]
 				}
 			} else {
 				// Both session ID and property key provided
-				sessionID = cmdutil.ResolveSessionID(args[0])
-				if sessionID == "" {
-					return cmdutil.NewRequiredArgumentError("session ID")
+				ctx := sc.GetContext()
+				sessionID, err = sc.GetClient().ResolveSessionID(ctx, args[0])
+				if err != nil {
+					return sc.ReportError("resolve session ID", err)
 				}
 				propertyKey = args[1]
 			}
@@ -846,7 +856,7 @@ Examples:
 
 				// Report success with JSON output support
 				if sc.GetFlags().Format == "json" {
-					result := map[string]interface{}{
+					result := map[string]any{
 						"session_id": sessionID,
 						"property":   propertyKey,
 						"action":     "reset",

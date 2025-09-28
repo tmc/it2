@@ -37,13 +37,6 @@ func newCaptureCommand() *cobra.Command {
 			var sessionID string
 			if len(args) > 0 {
 				sessionID = args[0]
-			} else {
-				// Try to resolve the active session ID
-				var err error
-				sessionID, err = cmdutil.ResolveSessionIDWithError("")
-				if err != nil {
-					return err
-				}
 			}
 
 			output, _ := cmd.Flags().GetString("output")
@@ -59,6 +52,12 @@ func newCaptureCommand() *cobra.Command {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
+
+			// Resolve session ID with environment fallback and prefix matching
+			sessionID, err = c.ResolveSessionID(ctx, sessionID)
+			if err != nil {
+				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
 
 			// Get session information to find the session frame and window ID
 			sessions, err := c.ListSessions(ctx)

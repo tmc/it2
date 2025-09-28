@@ -34,13 +34,15 @@ Examples:
 			if len(args) > 0 {
 				sessionID = args[0]
 			}
-			sessionID = cmdutil.ResolveSessionID(sessionID)
-			if sessionID == "" {
-				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+			// Resolve session ID with environment fallback and prefix matching
+			ctx := sc.GetContext()
+			sessionID, err := sc.GetClient().ResolveSessionID(ctx, sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
 			}
 
 			// Copy the current selection to clipboard
-			err := sc.GetClient().CopySelection(sc.GetContext(), sessionID)
+			err = sc.GetClient().CopySelection(sc.GetContext(), sessionID)
 			if err != nil {
 				return sc.ReportError("copy selection", err)
 			}

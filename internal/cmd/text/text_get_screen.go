@@ -21,9 +21,10 @@ func newGetScreenCommand() *cobra.Command {
 			if len(args) > 0 {
 				sessionID = args[0]
 			}
-			sessionID = cmdutil.ResolveSessionID(sessionID)
-			if sessionID == "" {
-				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+			ctx := sc.GetContext()
+			sessionID, err := sc.GetClient().ResolveSessionID(ctx, sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
 			}
 
 			// Get command flags

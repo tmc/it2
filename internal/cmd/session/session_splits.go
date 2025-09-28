@@ -15,13 +15,13 @@ import (
 
 // SessionNode represents a session in the hierarchy
 type SessionNode struct {
-	SessionID  string
-	ShortID    string
-	Name       string
-	ParentID   string
-	Children   []*SessionNode
-	IsActive   bool
-	IsCurrent  bool
+	SessionID string
+	ShortID   string
+	Name      string
+	ParentID  string
+	Children  []*SessionNode
+	IsActive  bool
+	IsCurrent bool
 }
 
 func newSplitsCommand() *cobra.Command {
@@ -53,7 +53,7 @@ func newSplitsCommand() *cobra.Command {
 			}
 
 			// Build session hierarchy
-			nodes := buildSessionHierarchy(ctx, sessions)
+			nodes := buildSessionHierarchy(ctx, c, sessions)
 
 			// Find root sessions (those without parents)
 			var roots []*SessionNode
@@ -101,9 +101,9 @@ func newSplitsCommand() *cobra.Command {
 	return cmd
 }
 
-func buildSessionHierarchy(ctx context.Context, sessions []*client.SessionInfo) map[string]*SessionNode {
+func buildSessionHierarchy(ctx context.Context, c *client.Client, sessions []*client.SessionInfo) map[string]*SessionNode {
 	nodes := make(map[string]*SessionNode)
-	currentSessionID := cmdutil.ResolveSessionID("")
+	currentSessionID, _ := c.ResolveSessionID(ctx, "")
 
 	// First pass: create all nodes
 	for _, session := range sessions {
@@ -190,12 +190,12 @@ func printTree(node *SessionNode, prefix string, isLast bool, showFullIDs bool) 
 func outputJSON(roots []*SessionNode) error {
 	// Convert to a simpler structure for JSON output
 	type JSONNode struct {
-		SessionID  string      `json:"session_id"`
-		ShortID    string      `json:"short_id"`
-		Name       string      `json:"name"`
-		ParentID   string      `json:"parent_id,omitempty"`
-		IsCurrent  bool        `json:"is_current,omitempty"`
-		Children   []JSONNode  `json:"children,omitempty"`
+		SessionID string     `json:"session_id"`
+		ShortID   string     `json:"short_id"`
+		Name      string     `json:"name"`
+		ParentID  string     `json:"parent_id,omitempty"`
+		IsCurrent bool       `json:"is_current,omitempty"`
+		Children  []JSONNode `json:"children,omitempty"`
 	}
 
 	var convertNode func(*SessionNode) JSONNode

@@ -43,7 +43,7 @@ func TestSessionInfo_Struct(t *testing.T) {
 }
 
 func TestExtractSessionsFromNode_NilNode(t *testing.T) {
-	sessions := extractSessionsFromNode(nil, "window-1", 1, "tab-1")
+	sessions := extractSessionsFromNode(nil, "window-1", 1, "tab-1", "")
 	if sessions != nil {
 		t.Error("Expected nil sessions for nil node")
 	}
@@ -51,7 +51,7 @@ func TestExtractSessionsFromNode_NilNode(t *testing.T) {
 
 func TestExtractSessionsFromNode_EmptyNode(t *testing.T) {
 	node := &pb.SplitTreeNode{}
-	sessions := extractSessionsFromNode(node, "window-1", 1, "tab-1")
+	sessions := extractSessionsFromNode(node, "window-1", 1, "tab-1", "")
 	if len(sessions) != 0 {
 		t.Errorf("Expected 0 sessions for empty node, got %d", len(sessions))
 	}
@@ -76,7 +76,7 @@ func TestExtractSessionsFromNode_WithSession(t *testing.T) {
 		Links: []*pb.SplitTreeNode_SplitTreeLink{link},
 	}
 
-	sessions := extractSessionsFromNode(node, "window-1", 1, "tab-1")
+	sessions := extractSessionsFromNode(node, "window-1", 1, "tab-1", "")
 
 	if len(sessions) != 1 {
 		t.Fatalf("Expected 1 session, got %d", len(sessions))
@@ -126,7 +126,7 @@ func TestExtractSessionsFromNode_WithNestedNode(t *testing.T) {
 		Links: []*pb.SplitTreeNode_SplitTreeLink{parentLink},
 	}
 
-	sessions := extractSessionsFromNode(parentNode, "window-1", 1, "tab-1")
+	sessions := extractSessionsFromNode(parentNode, "window-1", 1, "tab-1", "")
 
 	if len(sessions) != 1 {
 		t.Fatalf("Expected 1 session from nested node, got %d", len(sessions))
@@ -174,7 +174,7 @@ func TestExtractSessionsFromNode_WithMultipleSessions(t *testing.T) {
 		Links: []*pb.SplitTreeNode_SplitTreeLink{link1, link2},
 	}
 
-	sessions := extractSessionsFromNode(node, "window-1", 1, "tab-1")
+	sessions := extractSessionsFromNode(node, "window-1", 1, "tab-1", "")
 
 	if len(sessions) != 2 {
 		t.Fatalf("Expected 2 sessions, got %d", len(sessions))
@@ -203,7 +203,7 @@ func TestExtractSessionsFromNode_NilSession(t *testing.T) {
 		Links: []*pb.SplitTreeNode_SplitTreeLink{link},
 	}
 
-	sessions := extractSessionsFromNode(node, "window-1", 1, "tab-1")
+	sessions := extractSessionsFromNode(node, "window-1", 1, "tab-1", "")
 
 	if len(sessions) != 0 {
 		t.Errorf("Expected 0 sessions for nil session, got %d", len(sessions))

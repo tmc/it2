@@ -37,7 +37,7 @@ Examples:
   it2 session set-property sess_123 use_transparency true`,
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			sessionID := cmdutil.ResolveSessionID(args[0])
+			sessionID := args[0]
 			property := args[1]
 			value := args[2]
 
@@ -51,8 +51,8 @@ Examples:
 			}
 			defer c.Close()
 
-			// Expand short session ID if needed
-			sessionID, err = cmdutil.ExpandShortSessionID(ctx, c, sessionID)
+			// Resolve session ID with proper client method
+			sessionID, err = c.ResolveSessionID(ctx, sessionID)
 			if err != nil {
 				return fmt.Errorf("failed to resolve session ID: %w", err)
 			}

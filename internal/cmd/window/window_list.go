@@ -57,6 +57,9 @@ func newListCommand() *cobra.Command {
 			}
 			defer c.Close()
 
+			// Get quiet flag
+			quiet, _ := cmd.Flags().GetBool("quiet")
+
 			// Use shared operations
 			sharedOps := cmdutil.NewSharedListOperations(c, ctx)
 			return sharedOps.ListWindows(cmdutil.SharedListOptions{
@@ -64,6 +67,7 @@ func newListCommand() *cobra.Command {
 				Columns:     columns,
 				SortBy:      sortBy,
 				SortReverse: sortReverse,
+				Quiet:       quiet,
 			})
 		},
 	}
@@ -72,6 +76,9 @@ func newListCommand() *cobra.Command {
 	cmd.Flags().String("columns", "", "Comma-separated list of columns to display (e.g., 'window id,name,bounds')")
 	cmd.Flags().String("sort", "", "Column to sort by (e.g., 'Window ID', 'Name', 'Frame')")
 	cmd.Flags().Bool("reverse", false, "Reverse sort order (descending)")
+
+	// Add quiet flag
+	cmd.Flags().BoolP("quiet", "q", false, "Output only window IDs")
 
 	return cmd
 }

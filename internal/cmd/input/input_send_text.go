@@ -28,14 +28,18 @@ func newSendCommand() *cobra.Command {
 				text = args[1]
 			}
 
-			// Resolve session ID with environment fallback
-			sessionID = cmdutil.ResolveSessionID(sessionID)
-			if sessionID == "" {
-				return cmdutil.NewRequiredArgumentError("session ID (or $ITERM_SESSION_ID)")
+			// Get client and resolve session ID with environment fallback
+			c := sc.GetClient()
+			ctx := sc.GetContext()
+
+			resolvedSessionID, err := c.ResolveSessionID(ctx, sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
 			}
+			sessionID = resolvedSessionID
 
 			// Send the text
-			if err := sc.GetClient().SendText(sc.GetContext(), sessionID, text); err != nil {
+			if err := c.SendText(ctx, sessionID, text); err != nil {
 				return sc.ReportError("send text", err)
 			}
 

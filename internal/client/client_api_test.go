@@ -214,7 +214,6 @@ func TestPreferencesRequestCreation(t *testing.T) {
 	})
 }
 
-
 func TestAlertInvocationStrings(t *testing.T) {
 	// Test that alert methods create the expected invocation strings
 	// Note: These tests verify the invocation format but don't test actual iTerm2 integration
