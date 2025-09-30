@@ -131,6 +131,14 @@ func NewCommand() *cobra.Command {
 	setPropertyCmd.GroupID = "monitoring"
 	cmd.AddCommand(setPropertyCmd)
 
+	getVariableCmd := newGetVariableCommand()
+	getVariableCmd.GroupID = "monitoring"
+	cmd.AddCommand(getVariableCmd)
+
+	setVariableCmd := newSetVariableCommand()
+	setVariableCmd.GroupID = "monitoring"
+	cmd.AddCommand(setVariableCmd)
+
 	monitorCmd := newMonitorCommand()
 	monitorCmd.GroupID = "monitoring"
 	cmd.AddCommand(monitorCmd)
