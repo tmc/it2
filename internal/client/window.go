@@ -151,15 +151,21 @@ type WindowInfo struct {
 	PluginData   map[string]interface{} `json:"plugin_data,omitempty"`
 }
 
-// SetWindowTitle sets the window title by setting the "user.title" variable in window scope
+// SetWindowTitle sets the window title by setting the user.title variable
 func (c *Client) SetWindowTitle(ctx context.Context, windowID, title string) error {
-	// Note: The built-in "titleOverride" variable is read-only.
-	// We use "user.title" which can be used in title format strings.
+	// We set user.title which can be referenced in window title format strings
+	// Note: The actual titleOverride variable is read-only and computed from the format
 	return c.SetVariableWithScope(ctx, "window", windowID, "user.title", fmt.Sprintf("%q", title))
 }
 
-// GetWindowTitle gets the window title from the "user.title" variable in window scope
+// GetWindowTitle gets the window title from the titleOverride variable
 func (c *Client) GetWindowTitle(ctx context.Context, windowID string) (string, error) {
+	// First try to get the computed titleOverride (the actual displayed title)
+	title, err := c.GetVariableWithScope(ctx, "window", windowID, "titleOverride")
+	if err == nil && title != "" && title != "null" {
+		return title, nil
+	}
+	// Fall back to user.title if titleOverride isn't set
 	return c.GetVariableWithScope(ctx, "window", windowID, "user.title")
 }
 
