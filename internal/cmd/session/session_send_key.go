@@ -1,7 +1,9 @@
 package session
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -20,7 +22,8 @@ If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 
 Supported special keys: enter, tab, escape, backspace, delete, space, paste,
 up/down/left/right arrows, home, end, pageup/pagedown, ctrl-a thru ctrl-z,
-cmd+a thru cmd+z. Supports complex modifier combinations like cmd+ctrl+shift+a.`,
+cmd+a thru cmd+z. Also supports caret notation (^C, ^D, etc.) for Ctrl keys.
+Supports complex modifier combinations like cmd+ctrl+shift+a.`,
 		Example: cmdutil.Doc(`
 			# Send Enter to current session
 			$ it2 session send-key enter
@@ -34,12 +37,14 @@ cmd+a thru cmd+z. Supports complex modifier combinations like cmd+ctrl+shift+a.`
 			# Send Escape
 			$ it2 session send-key escape
 
-			# Send Ctrl+C (both formats work)
+			# Send Ctrl+C (all formats work)
 			$ it2 session send-key ctrl-c
 			$ it2 session send-key ctrl+c
+			$ it2 session send-key ^C
 
 			# Send Ctrl+T (transpose characters)
 			$ it2 session send-key ctrl-t
+			$ it2 session send-key ^T
 
 			# Send Cmd+V (paste)
 			$ it2 session send-key cmd+v
@@ -52,6 +57,7 @@ cmd+a thru cmd+z. Supports complex modifier combinations like cmd+ctrl+shift+a.`
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID, key string
+			explicitSessionID := len(args) == 2
 
 			if len(args) == 1 {
 				// Only key provided, use environment variable for session ID
@@ -89,6 +95,39 @@ cmd+a thru cmd+z. Supports complex modifier combinations like cmd+ctrl+shift+a.`
 				return fmt.Errorf("failed to resolve session ID: %w", err)
 			}
 
+			// Prompt for confirmation if using implicit session ID and --confirm flag is set
+			confirm, _ := cmd.Flags().GetBool("confirm")
+			if confirm && !explicitSessionID {
+				// Get session info for display
+				sessions, err := c.ListSessions(ctx)
+				if err != nil {
+					return fmt.Errorf("failed to list sessions: %w", err)
+				}
+				var sessionName string
+				for _, s := range sessions {
+					if s.SessionID == sessionID {
+						sessionName = s.SessionName
+						break
+					}
+				}
+
+				fmt.Fprintf(os.Stderr, "Send key '%s' to session %s?\n", key, sessionID)
+				if sessionName != "" {
+					fmt.Fprintf(os.Stderr, "  Name: %s\n", sessionName)
+				}
+				fmt.Fprintf(os.Stderr, "Proceed? (y/N): ")
+
+				reader := bufio.NewReader(os.Stdin)
+				response, err := reader.ReadString('\n')
+				if err != nil {
+					return fmt.Errorf("failed to read confirmation: %w", err)
+				}
+				response = strings.TrimSpace(strings.ToLower(response))
+				if response != "y" && response != "yes" {
+					return fmt.Errorf("cancelled by user")
+				}
+			}
+
 			err = c.SendText(ctx, sessionID, keyCode)
 			if err != nil {
 				return fmt.Errorf("failed to send key: %w", err)
@@ -99,6 +138,7 @@ cmd+a thru cmd+z. Supports complex modifier combinations like cmd+ctrl+shift+a.`
 	}
 
 	cmd.Flags().Bool("no-broadcast", false, "Suppress broadcasting even if enabled")
+	cmd.Flags().Bool("confirm", false, "Prompt for confirmation when using implicit session ID ($ITERM_SESSION_ID)")
 
 	// Add scope support
 	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (none,window,tab,parents,siblings,peers,lineage)")

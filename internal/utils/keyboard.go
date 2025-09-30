@@ -8,6 +8,7 @@ import (
 // MapKeyToCode maps special key names to their corresponding character codes or escape sequences.
 // Returns empty string if the key is not a special key (should be used as-is).
 func MapKeyToCode(key string) string {
+	origKey := key // Preserve original for caret notation
 	key = strings.ToLower(key)
 
 	// Handle basic special keys
@@ -44,6 +45,15 @@ func MapKeyToCode(key string) string {
 		return "\x1b[5~"
 	case "pagedown":
 		return "\x1b[6~"
+	}
+
+	// Handle caret notation (^C, ^c, etc.) for Ctrl key combinations
+	if strings.HasPrefix(origKey, "^") && len(origKey) == 2 {
+		keyChar := strings.ToLower(string(origKey[1]))
+		if len(keyChar) == 1 && keyChar[0] >= 'a' && keyChar[0] <= 'z' {
+			// Convert to control character (Ctrl+A = 0x01, Ctrl+B = 0x02, etc.)
+			return string(rune(keyChar[0] - 'a' + 1))
+		}
 	}
 
 	// Handle Ctrl+key combinations (both ctrl-x and ctrl+x formats)

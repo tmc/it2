@@ -1,6 +1,7 @@
 package session
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -293,6 +294,7 @@ Multiple conditions can be specified and all must pass.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID, text string
 			var err error
+			var explicitSessionID bool
 
 			file, _ := cmd.Flags().GetString("file")
 
@@ -319,8 +321,10 @@ Multiple conditions can be specified and all must pass.`,
 				// Session ID handling when using file
 				if len(args) == 1 {
 					sessionID = args[0]
+					explicitSessionID = true
 				} else {
 					sessionID = ""
+					explicitSessionID = false
 				}
 			} else {
 				// Original text argument handling
@@ -330,10 +334,12 @@ Multiple conditions can be specified and all must pass.`,
 					// Only text provided, use environment variable for session ID
 					sessionID = ""
 					text = args[0]
+					explicitSessionID = false
 				} else {
 					// Both session ID and text provided
 					sessionID = args[0]
 					text = args[1]
+					explicitSessionID = true
 				}
 			}
 
@@ -356,6 +362,44 @@ Multiple conditions can be specified and all must pass.`,
 			sessionID, err = c.ResolveSessionID(ctx, sessionID)
 			if err != nil {
 				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
+
+			// Prompt for confirmation if using implicit session ID and --confirm flag is set
+			confirm, _ := cmd.Flags().GetBool("confirm")
+			if confirm && !explicitSessionID {
+				// Get session info for display
+				sessions, err := c.ListSessions(ctx)
+				if err != nil {
+					return fmt.Errorf("failed to list sessions: %w", err)
+				}
+				var sessionName string
+				for _, s := range sessions {
+					if s.SessionID == sessionID {
+						sessionName = s.SessionName
+						break
+					}
+				}
+
+				// Show preview of text (truncate if too long)
+				previewText := text
+				if len(previewText) > 50 {
+					previewText = previewText[:47] + "..."
+				}
+				fmt.Fprintf(os.Stderr, "Send text '%s' to session %s?\n", previewText, sessionID)
+				if sessionName != "" {
+					fmt.Fprintf(os.Stderr, "  Name: %s\n", sessionName)
+				}
+				fmt.Fprintf(os.Stderr, "Proceed? (y/N): ")
+
+				reader := bufio.NewReader(os.Stdin)
+				response, err := reader.ReadString('\n')
+				if err != nil {
+					return fmt.Errorf("failed to read confirmation: %w", err)
+				}
+				response = strings.TrimSpace(strings.ToLower(response))
+				if response != "y" && response != "yes" {
+					return fmt.Errorf("cancelled by user")
+				}
 			}
 
 			// Check pre-conditions if --require flag is set
@@ -463,6 +507,7 @@ Multiple conditions can be specified and all must pass.`,
 	}
 
 	cmd.Flags().Bool("no-broadcast", false, "Suppress broadcasting even if enabled")
+	cmd.Flags().Bool("confirm", false, "Prompt for confirmation when using implicit session ID ($ITERM_SESSION_ID)")
 	cmd.Flags().Bool("skip-newline", false, "Don't send any line terminator")
 	cmd.Flags().BoolP("send-cr", "r", true, "Send carriage return (\\r) to execute command (enabled by default)")
 	cmd.Flags().Bool("send-lf", false, "Send line feed (\\n) to move to new line")
