@@ -453,6 +453,16 @@
             "path": "it2 session autorespond"
           },
           {
+            "name": "clear-badge",
+            "short": "Clear the badge of a session",
+            "path": "it2 session clear-badge"
+          },
+          {
+            "name": "clear-title",
+            "short": "Clear the title of a session",
+            "path": "it2 session clear-title"
+          },
+          {
             "name": "close",
             "short": "Close a session",
             "path": "it2 session close"
@@ -471,6 +481,16 @@
             "name": "current",
             "short": "Show the current session ID",
             "path": "it2 session current"
+          },
+          {
+            "name": "get-badge",
+            "short": "Get the badge of a session",
+            "path": "it2 session get-badge"
+          },
+          {
+            "name": "get-buffer",
+            "short": "Get buffer contents of a session",
+            "path": "it2 session get-buffer"
           },
           {
             "name": "get-info",
@@ -493,6 +513,11 @@
             "path": "it2 session get-screen"
           },
           {
+            "name": "get-title",
+            "short": "Get the title of a session",
+            "path": "it2 session get-title"
+          },
+          {
             "name": "list",
             "short": "List all iTerm2 sessions",
             "path": "it2 session list"
@@ -501,6 +526,11 @@
             "name": "monitor",
             "short": "Monitor session events in real-time",
             "path": "it2 session monitor"
+          },
+          {
+            "name": "parent",
+            "short": "Get the parent session ID of a session",
+            "path": "it2 session parent"
           },
           {
             "name": "paste",
@@ -528,9 +558,19 @@
             "path": "it2 session send-text"
           },
           {
+            "name": "set-badge",
+            "short": "Set the badge of a session",
+            "path": "it2 session set-badge"
+          },
+          {
             "name": "set-property",
             "short": "Set a session property value",
             "path": "it2 session set-property"
+          },
+          {
+            "name": "set-title",
+            "short": "Set the title of a session",
+            "path": "it2 session set-title"
           },
           {
             "name": "split",
@@ -572,6 +612,11 @@
             "path": "it2 tab activate"
           },
           {
+            "name": "clear-title",
+            "short": "Clear the title of a tab",
+            "path": "it2 tab clear-title"
+          },
+          {
             "name": "close",
             "short": "Close one or more tabs",
             "path": "it2 tab close"
@@ -585,6 +630,11 @@
             "name": "get-info",
             "short": "Get detailed information about a tab",
             "path": "it2 tab get-info"
+          },
+          {
+            "name": "get-title",
+            "short": "Get the title of a tab",
+            "path": "it2 tab get-title"
           },
           {
             "name": "list",
@@ -630,7 +680,7 @@
           },
           {
             "name": "get-buffer",
-            "short": "Get buffer contents of a session",
+            "short": "Get buffer contents of a session (alias to 'session get-buffer')",
             "path": "it2 text get-buffer"
           },
           {
@@ -775,6 +825,11 @@
         "path": "it2 window",
         "subcommands": [
           {
+            "name": "clear-title",
+            "short": "Clear the title of a window",
+            "path": "it2 window clear-title"
+          },
+          {
             "name": "close",
             "short": "Close a window",
             "path": "it2 window close"
@@ -795,6 +850,11 @@
             "path": "it2 window get-property"
           },
           {
+            "name": "get-title",
+            "short": "Get the title of a window",
+            "path": "it2 window get-title"
+          },
+          {
             "name": "list",
             "short": "List all iTerm2 windows",
             "path": "it2 window list"
@@ -803,6 +863,11 @@
             "name": "set-property",
             "short": "Set a window property",
             "path": "it2 window set-property"
+          },
+          {
+            "name": "set-title",
+            "short": "Set the title of a window",
+            "path": "it2 window set-title"
           }
         ]
       }
@@ -896,6 +961,16 @@
               "path": "it2 session autorespond"
             },
             {
+              "name": "clear-badge",
+              "short": "Clear the badge of a session",
+              "path": "it2 session clear-badge"
+            },
+            {
+              "name": "clear-title",
+              "short": "Clear the title of a session",
+              "path": "it2 session clear-title"
+            },
+            {
               "name": "close",
               "short": "Close a session",
               "path": "it2 session close"
@@ -914,6 +989,16 @@
               "name": "current",
               "short": "Show the current session ID",
               "path": "it2 session current"
+            },
+            {
+              "name": "get-badge",
+              "short": "Get the badge of a session",
+              "path": "it2 session get-badge"
+            },
+            {
+              "name": "get-buffer",
+              "short": "Get buffer contents of a session",
+              "path": "it2 session get-buffer"
             },
             {
               "name": "get-info",
@@ -936,6 +1021,11 @@
               "path": "it2 session get-screen"
             },
             {
+              "name": "get-title",
+              "short": "Get the title of a session",
+              "path": "it2 session get-title"
+            },
+            {
               "name": "list",
               "short": "List all iTerm2 sessions",
               "path": "it2 session list"
@@ -944,6 +1034,11 @@
               "name": "monitor",
               "short": "Monitor session events in real-time",
               "path": "it2 session monitor"
+            },
+            {
+              "name": "parent",
+              "short": "Get the parent session ID of a session",
+              "path": "it2 session parent"
             },
             {
               "name": "paste",
@@ -971,9 +1066,19 @@
               "path": "it2 session send-text"
             },
             {
+              "name": "set-badge",
+              "short": "Set the badge of a session",
+              "path": "it2 session set-badge"
+            },
+            {
               "name": "set-property",
               "short": "Set a session property value",
               "path": "it2 session set-property"
+            },
+            {
+              "name": "set-title",
+              "short": "Set the title of a session",
+              "path": "it2 session set-title"
             },
             {
               "name": "split",
@@ -1003,6 +1108,11 @@
               "path": "it2 tab activate"
             },
             {
+              "name": "clear-title",
+              "short": "Clear the title of a tab",
+              "path": "it2 tab clear-title"
+            },
+            {
               "name": "close",
               "short": "Close one or more tabs",
               "path": "it2 tab close"
@@ -1016,6 +1126,11 @@
               "name": "get-info",
               "short": "Get detailed information about a tab",
               "path": "it2 tab get-info"
+            },
+            {
+              "name": "get-title",
+              "short": "Get the title of a tab",
+              "path": "it2 tab get-title"
             },
             {
               "name": "list",
@@ -1050,6 +1165,11 @@
           "path": "it2 window",
           "subcommands": [
             {
+              "name": "clear-title",
+              "short": "Clear the title of a window",
+              "path": "it2 window clear-title"
+            },
+            {
               "name": "close",
               "short": "Close a window",
               "path": "it2 window close"
@@ -1070,6 +1190,11 @@
               "path": "it2 window get-property"
             },
             {
+              "name": "get-title",
+              "short": "Get the title of a window",
+              "path": "it2 window get-title"
+            },
+            {
               "name": "list",
               "short": "List all iTerm2 windows",
               "path": "it2 window list"
@@ -1078,6 +1203,11 @@
               "name": "set-property",
               "short": "Set a window property",
               "path": "it2 window set-property"
+            },
+            {
+              "name": "set-title",
+              "short": "Set the title of a window",
+              "path": "it2 window set-title"
             }
           ]
         }
@@ -1187,7 +1317,7 @@
             },
             {
               "name": "get-buffer",
-              "short": "Get buffer contents of a session",
+              "short": "Get buffer contents of a session (alias to 'session get-buffer')",
               "path": "it2 text get-buffer"
             },
             {
@@ -1642,6 +1772,6 @@
       ]
     }
   ],
-  "total_commands": 153,
-  "generated_at": "2025-09-27T19:55:50Z"
+  "total_commands": 166,
+  "generated_at": "2025-09-30T09:26:48Z"
 }
