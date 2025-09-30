@@ -1215,20 +1215,10 @@ func (f *Formatter) formatBroadcastDomainsText(domains []*client.BroadcastDomain
 			continue
 		}
 
-		// First session ID is treated as group name if it looks like a name
-		groupName := domain.SessionIds[0]
-		sessions := domain.SessionIds[1:]
-
-		if len(sessions) == 0 {
-			// If only one session ID, treat it as a regular session
-			fmt.Printf("  %d. Session: %s\n", i+1, groupName)
-		} else {
-			// Multiple sessions, first is group name
-			fmt.Printf("  %d. Group: %s\n", i+1, groupName)
-			fmt.Printf("     Sessions (%d):\n", len(sessions))
-			for j, sessionID := range sessions {
-				fmt.Printf("       %d. %s\n", j+1, sessionID)
-			}
+		// Show all sessions in the domain
+		fmt.Printf("  %d. Broadcast Domain with %d session(s):\n", i+1, len(domain.SessionIds))
+		for j, sessionID := range domain.SessionIds {
+			fmt.Printf("       %d. %s\n", j+1, sessionID)
 		}
 		fmt.Println()
 	}
