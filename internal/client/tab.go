@@ -142,9 +142,10 @@ func (c *Client) GetTabTitle(ctx context.Context, tabID string) (string, error) 
 	return c.GetVariableWithScope(ctx, "tab", tabID, "user.title")
 }
 
-// ClearTabTitle clears the tab title by setting it to empty string
+// ClearTabTitle clears the tab title by deleting the user.title variable
 func (c *Client) ClearTabTitle(ctx context.Context, tabID string) error {
-	return c.SetTabTitle(ctx, tabID, "")
+	// Delete the variable so it falls back to profile default
+	return c.DeleteVariableWithScope(ctx, "tab", tabID, "user.title")
 }
 
 // SetTabLayout sets the layout of a tab

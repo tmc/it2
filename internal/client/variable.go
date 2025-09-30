@@ -245,8 +245,9 @@ func (c *Client) ListVariablesWithScope(ctx context.Context, scope string, id st
 
 // DeleteVariableWithScope deletes/unsets a variable with explicit scope control
 func (c *Client) DeleteVariableWithScope(ctx context.Context, scope string, id string, name string) error {
-	// To delete a variable, we set it to an empty value
-	return c.SetVariableWithScope(ctx, scope, id, name, "")
+	// To delete a variable, we set it to null (JSON)
+	// This causes iTerm2 to unset the variable and fall back to default values
+	return c.SetVariableWithScope(ctx, scope, id, name, "null")
 }
 
 // VariableInfo represents variable information for listing

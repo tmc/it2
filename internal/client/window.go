@@ -163,9 +163,10 @@ func (c *Client) GetWindowTitle(ctx context.Context, windowID string) (string, e
 	return c.GetVariableWithScope(ctx, "window", windowID, "user.title")
 }
 
-// ClearWindowTitle clears the window title by setting it to empty string
+// ClearWindowTitle clears the window title by deleting the user.title variable
 func (c *Client) ClearWindowTitle(ctx context.Context, windowID string) error {
-	return c.SetWindowTitle(ctx, windowID, "")
+	// Delete the variable so it falls back to profile default
+	return c.DeleteVariableWithScope(ctx, "window", windowID, "user.title")
 }
 
 // ListWindows gets a list of all windows with their information

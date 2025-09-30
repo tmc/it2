@@ -603,9 +603,10 @@ func (c *Client) GetSessionBadge(ctx context.Context, sessionID string) (string,
 	return c.GetVariableWithScope(ctx, "session", sessionID, "user.badge")
 }
 
-// ClearSessionBadge clears the session badge by setting it to empty string
+// ClearSessionBadge clears the session badge by deleting the user.badge variable
 func (c *Client) ClearSessionBadge(ctx context.Context, sessionID string) error {
-	return c.SetSessionBadge(ctx, sessionID, "")
+	// Delete the variable so it falls back to profile default
+	return c.DeleteVariableWithScope(ctx, "session", sessionID, "user.badge")
 }
 
 // ListSessionProfileProperties gets multiple profile properties from a session's profile copy
