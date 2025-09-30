@@ -1,25 +1,23 @@
 package window
 
 import (
-	"encoding/json"
-
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 )
 
-func newGetTitleCommand() *cobra.Command {
+func newClearTitleCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "get-title [<window-id>]",
-		Short:          "Get the title of a window",
-		Long:           "Get the title of a window. If no window ID is provided, uses the current window.",
+		Use:            "clear-title [<window-id>]",
+		Short:          "Clear the title of a window",
+		Long:           "Clear the title of a window, reverting to the default title. If no window ID is provided, uses the current window.",
 		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.WindowIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
-			var windowID string
-			if len(args) == 1 {
+			windowID := ""
+			if len(args) > 0 {
 				windowID = args[0]
 			}
 
@@ -29,29 +27,22 @@ func newGetTitleCommand() *cobra.Command {
 				return sc.ReportError("resolve window ID", err)
 			}
 
-			// Get the window title
-			title, err := sc.GetClient().GetWindowTitle(sc.GetContext(), windowID)
+			// Clear the window title
+			err = sc.GetClient().ClearWindowTitle(sc.GetContext(), windowID)
 			if err != nil {
-				return sc.ReportError("get window title", err)
+				return sc.ReportError("clear window title", err)
 			}
 
-			// Parse JSON value if needed
-			var titleStr string
-			if err := json.Unmarshal([]byte(title), &titleStr); err != nil {
-				// If not valid JSON, use raw value
-				titleStr = title
-			}
-
-			// Report with format support
+			// Report success with JSON output support
 			if sc.GetFlags().Format == "json" {
 				result := map[string]interface{}{
 					"window_id": windowID,
-					"title":     titleStr,
+					"cleared":   true,
 				}
 				return sc.FormatOutput(result)
 			}
 
-			sc.ReportSuccess(titleStr)
+			sc.ReportSuccess("Successfully cleared title of window %s", windowID)
 			return nil
 		},
 	}

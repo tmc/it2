@@ -584,6 +584,30 @@ func (c *Client) GetSessionProfileProperty(ctx context.Context, sessionID, key s
 	return value, nil
 }
 
+// SetSessionName sets the session name by setting the Name profile property
+func (c *Client) SetSessionName(ctx context.Context, sessionID, name string) error {
+	// Session name is set via the "Name" profile property
+	// This is what iTerm2's setName: method does internally
+	return c.SetSessionProfileProperty(ctx, sessionID, "Name", fmt.Sprintf("%q", name))
+}
+
+// SetSessionBadge sets the session badge by setting the "user.badge" variable in session scope
+func (c *Client) SetSessionBadge(ctx context.Context, sessionID, badge string) error {
+	// Note: The built-in "badge" variable is read-only and computed from profile settings.
+	// We use "user.badge" which can be referenced in the profile's badge configuration.
+	return c.SetVariableWithScope(ctx, "session", sessionID, "user.badge", fmt.Sprintf("%q", badge))
+}
+
+// GetSessionBadge gets the session badge from the "user.badge" variable in session scope
+func (c *Client) GetSessionBadge(ctx context.Context, sessionID string) (string, error) {
+	return c.GetVariableWithScope(ctx, "session", sessionID, "user.badge")
+}
+
+// ClearSessionBadge clears the session badge by setting it to empty string
+func (c *Client) ClearSessionBadge(ctx context.Context, sessionID string) error {
+	return c.SetSessionBadge(ctx, sessionID, "")
+}
+
 // ListSessionProfileProperties gets multiple profile properties from a session's profile copy
 func (c *Client) ListSessionProfileProperties(ctx context.Context, sessionID string, keys []string) (map[string]interface{}, error) {
 	// If no keys specified, try common profile properties

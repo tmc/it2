@@ -51,9 +51,8 @@ func newSetTitleCommand() *cobra.Command {
 				return sc.ReportError("resolve tab ID", err)
 			}
 
-			// Set the tab title using a user-defined variable
-			// iTerm2 requires user-defined variables to start with "user."
-			err = sc.GetClient().SetTabVariable(sc.GetContext(), tabID, "user.title", title)
+			// Set the tab title using iTerm2's Python API method
+			err = sc.GetClient().SetTabTitle(sc.GetContext(), tabID, title)
 			if err != nil {
 				return sc.ReportError("set tab title", err)
 			}

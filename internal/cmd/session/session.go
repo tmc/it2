@@ -13,50 +13,135 @@ func NewCommand() *cobra.Command {
 		GroupID: "core",
 	}
 
-	// Add all subcommands
-	cmd.AddCommand(newListCommand())
-	cmd.AddCommand(newCreateCommand())
-	cmd.AddCommand(newCloseCommand())
-	cmd.AddCommand(newActivateCommand())
-	cmd.AddCommand(newSendTextCommand())
-	cmd.AddCommand(newSendKeyCommand())
-	cmd.AddCommand(newCurrentCommand())
-	cmd.AddCommand(newCopyCommand())
-	cmd.AddCommand(newPasteCommand())
-	cmd.AddCommand(newSelectCommand())
+	// Define command groups
+	cmd.AddGroup(&cobra.Group{
+		ID:    "management",
+		Title: "Session Management Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "display",
+		Title: "Display & Appearance Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "interaction",
+		Title: "Session Interaction Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "monitoring",
+		Title: "Monitoring & Information Commands:",
+	})
 
-	// Phase 2A implementations - Session Enhancement
-	cmd.AddCommand(newRestartCommand())
-	cmd.AddCommand(newSplitCommand())
-	cmd.AddCommand(newGetPIDCommand())
-	cmd.AddCommand(newGetPropertyCommand())
-	cmd.AddCommand(newSetPropertyCommand())
-	cmd.AddCommand(newGetTitleCommand())
-	cmd.AddCommand(newSetTitleCommand())
-	cmd.AddCommand(newMonitorCommand())
-	cmd.AddCommand(newGetInfoCommand())
+	// Session Management Commands
+	listCmd := newListCommand()
+	listCmd.GroupID = "management"
+	cmd.AddCommand(listCmd)
 
-	// Enhanced monitoring commands
-	cmd.AddCommand(newAutoRespondCommand())
-	cmd.AddCommand(newWatchCommand())
+	createCmd := newCreateCommand()
+	createCmd.GroupID = "management"
+	cmd.AddCommand(createCmd)
 
-	// Text/screen commands moved here from text package
-	cmd.AddCommand(newGetScreenCommand())
+	closeCmd := newCloseCommand()
+	closeCmd.GroupID = "management"
+	cmd.AddCommand(closeCmd)
 
-	// Hidden commands for advanced users
+	activateCmd := newActivateCommand()
+	activateCmd.GroupID = "management"
+	cmd.AddCommand(activateCmd)
+
+	restartCmd := newRestartCommand()
+	restartCmd.GroupID = "management"
+	cmd.AddCommand(restartCmd)
+
+	splitCmd := newSplitCommand()
+	splitCmd.GroupID = "management"
+	cmd.AddCommand(splitCmd)
+
+	currentCmd := newCurrentCommand()
+	currentCmd.GroupID = "management"
+	cmd.AddCommand(currentCmd)
+
+	// Display & Appearance Commands
+	getTitleCmd := newGetTitleCommand()
+	getTitleCmd.GroupID = "display"
+	cmd.AddCommand(getTitleCmd)
+
+	setTitleCmd := newSetTitleCommand()
+	setTitleCmd.GroupID = "display"
+	cmd.AddCommand(setTitleCmd)
+
+	clearTitleCmd := newClearTitleCommand()
+	clearTitleCmd.GroupID = "display"
+	cmd.AddCommand(clearTitleCmd)
+
+	getBadgeCmd := newGetBadgeCommand()
+	getBadgeCmd.GroupID = "display"
+	cmd.AddCommand(getBadgeCmd)
+
+	setBadgeCmd := newSetBadgeCommand()
+	setBadgeCmd.GroupID = "display"
+	cmd.AddCommand(setBadgeCmd)
+
+	clearBadgeCmd := newClearBadgeCommand()
+	clearBadgeCmd.GroupID = "display"
+	cmd.AddCommand(clearBadgeCmd)
+
+	// Interaction Commands
+	sendTextCmd := newSendTextCommand()
+	sendTextCmd.GroupID = "interaction"
+	cmd.AddCommand(sendTextCmd)
+
+	sendKeyCmd := newSendKeyCommand()
+	sendKeyCmd.GroupID = "interaction"
+	cmd.AddCommand(sendKeyCmd)
+
+	copyCmd := newCopyCommand()
+	copyCmd.GroupID = "interaction"
+	cmd.AddCommand(copyCmd)
+
+	pasteCmd := newPasteCommand()
+	pasteCmd.GroupID = "interaction"
+	cmd.AddCommand(pasteCmd)
+
+	selectCmd := newSelectCommand()
+	selectCmd.GroupID = "interaction"
+	cmd.AddCommand(selectCmd)
+
+	getScreenCmd := newGetScreenCommand()
+	getScreenCmd.GroupID = "interaction"
+	cmd.AddCommand(getScreenCmd)
+
+	// Monitoring & Information Commands
+	getPIDCmd := newGetPIDCommand()
+	getPIDCmd.GroupID = "monitoring"
+	cmd.AddCommand(getPIDCmd)
+
+	getPropertyCmd := newGetPropertyCommand()
+	getPropertyCmd.GroupID = "monitoring"
+	cmd.AddCommand(getPropertyCmd)
+
+	setPropertyCmd := newSetPropertyCommand()
+	setPropertyCmd.GroupID = "monitoring"
+	cmd.AddCommand(setPropertyCmd)
+
+	monitorCmd := newMonitorCommand()
+	monitorCmd.GroupID = "monitoring"
+	cmd.AddCommand(monitorCmd)
+
+	getInfoCmd := newGetInfoCommand()
+	getInfoCmd.GroupID = "monitoring"
+	cmd.AddCommand(getInfoCmd)
+
+	autoRespondCmd := newAutoRespondCommand()
+	autoRespondCmd.GroupID = "monitoring"
+	cmd.AddCommand(autoRespondCmd)
+
+	watchCmd := newWatchCommand()
+	watchCmd.GroupID = "monitoring"
+	cmd.AddCommand(watchCmd)
+
+	// Hidden/Advanced commands (no group)
 	cmd.AddCommand(newSplitsCommand())
-
-	// Development/testing commands
-	// cmd.AddCommand(newScopeTestCommand()) // Temporarily disabled until module issues resolved
-
-	// Deprecated aliases for moved commands
 	cmd.AddCommand(newSplitsAliasCommand())
-
-	// TODO: Extract these remaining commands to separate files:
-	// cmd.AddCommand(newLastCommandCommand())
-	// cmd.AddCommand(newCoprocessStartCommand())
-	// cmd.AddCommand(newCoprocessStopCommand())
-	// cmd.AddCommand(newSetProfileCommand())
 
 	return cmd
 }

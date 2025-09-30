@@ -130,6 +130,23 @@ func (c *Client) ReorderTabs(ctx context.Context, assignments map[string][]strin
 	return nil, fmt.Errorf("unexpected response type")
 }
 
+// SetTabTitle sets the tab title by setting the "user.title" variable in tab scope
+func (c *Client) SetTabTitle(ctx context.Context, tabID, title string) error {
+	// Note: The built-in "title" variable is read-only and computed.
+	// We use "user.title" which can be used in title format strings.
+	return c.SetVariableWithScope(ctx, "tab", tabID, "user.title", fmt.Sprintf("%q", title))
+}
+
+// GetTabTitle gets the tab title from the "user.title" variable in tab scope
+func (c *Client) GetTabTitle(ctx context.Context, tabID string) (string, error) {
+	return c.GetVariableWithScope(ctx, "tab", tabID, "user.title")
+}
+
+// ClearTabTitle clears the tab title by setting it to empty string
+func (c *Client) ClearTabTitle(ctx context.Context, tabID string) error {
+	return c.SetTabTitle(ctx, tabID, "")
+}
+
 // SetTabLayout sets the layout of a tab
 func (c *Client) SetTabLayout(ctx context.Context, tabID string, root *pb.SplitTreeNode) (*pb.SetTabLayoutResponse, error) {
 	msg := &pb.ClientOriginatedMessage{

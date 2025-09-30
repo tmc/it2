@@ -1,6 +1,8 @@
 package tab
 
 import (
+	"encoding/json"
+
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
@@ -36,27 +38,29 @@ func newGetTitleCommand() *cobra.Command {
 				return sc.ReportError("resolve tab ID", err)
 			}
 
-			// Get the tab title from the user-defined variable
-			title, err := sc.GetClient().GetTabVariable(sc.GetContext(), tabID, "user.title")
+			// Get the tab title
+			title, err := sc.GetClient().GetTabTitle(sc.GetContext(), tabID)
 			if err != nil {
 				return sc.ReportError("get tab title", err)
 			}
 
-			// Handle null/empty values
-			if title == "" || title == "null" {
-				title = "(not set)"
+			// Parse JSON value if needed
+			var titleStr string
+			if err := json.Unmarshal([]byte(title), &titleStr); err != nil {
+				// If not valid JSON, use raw value
+				titleStr = title
 			}
 
-			// Report success with JSON output support
+			// Report with format support
 			if sc.GetFlags().Format == "json" {
 				result := map[string]interface{}{
 					"tab_id": tabID,
-					"title":  title,
+					"title":  titleStr,
 				}
 				return sc.FormatOutput(result)
 			}
 
-			sc.ReportSuccess(title)
+			sc.ReportSuccess(titleStr)
 			return nil
 		},
 	}

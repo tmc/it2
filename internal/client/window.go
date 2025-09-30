@@ -151,6 +151,23 @@ type WindowInfo struct {
 	PluginData   map[string]interface{} `json:"plugin_data,omitempty"`
 }
 
+// SetWindowTitle sets the window title by setting the "user.title" variable in window scope
+func (c *Client) SetWindowTitle(ctx context.Context, windowID, title string) error {
+	// Note: The built-in "titleOverride" variable is read-only.
+	// We use "user.title" which can be used in title format strings.
+	return c.SetVariableWithScope(ctx, "window", windowID, "user.title", fmt.Sprintf("%q", title))
+}
+
+// GetWindowTitle gets the window title from the "user.title" variable in window scope
+func (c *Client) GetWindowTitle(ctx context.Context, windowID string) (string, error) {
+	return c.GetVariableWithScope(ctx, "window", windowID, "user.title")
+}
+
+// ClearWindowTitle clears the window title by setting it to empty string
+func (c *Client) ClearWindowTitle(ctx context.Context, windowID string) error {
+	return c.SetWindowTitle(ctx, windowID, "")
+}
+
 // ListWindows gets a list of all windows with their information
 func (c *Client) ListWindows(ctx context.Context) ([]*WindowInfo, error) {
 	msg := &pb.ClientOriginatedMessage{

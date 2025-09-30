@@ -59,15 +59,58 @@ full compatibility with existing flat commands.`,
 		},
 	}
 
-	// Add core window management commands (flat mode)
-	cmd.AddCommand(newListCommand())
-	cmd.AddCommand(newCreateCommand())
-	cmd.AddCommand(newCloseCommand())
-	cmd.AddCommand(newFocusCommand())
-	cmd.AddCommand(newGetPropertyCommand())
-	cmd.AddCommand(newSetPropertyCommand())
-	cmd.AddCommand(newGetTitleCommand())
-	cmd.AddCommand(newSetTitleCommand())
+	// Define command groups
+	cmd.AddGroup(&cobra.Group{
+		ID:    "management",
+		Title: "Window Management Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "display",
+		Title: "Display & Appearance Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "properties",
+		Title: "Property Commands:",
+	})
+
+	// Window Management Commands
+	listCmd := newListCommand()
+	listCmd.GroupID = "management"
+	cmd.AddCommand(listCmd)
+
+	createCmd := newCreateCommand()
+	createCmd.GroupID = "management"
+	cmd.AddCommand(createCmd)
+
+	closeCmd := newCloseCommand()
+	closeCmd.GroupID = "management"
+	cmd.AddCommand(closeCmd)
+
+	focusCmd := newFocusCommand()
+	focusCmd.GroupID = "management"
+	cmd.AddCommand(focusCmd)
+
+	// Display & Appearance Commands
+	getTitleCmd := newGetTitleCommand()
+	getTitleCmd.GroupID = "display"
+	cmd.AddCommand(getTitleCmd)
+
+	setTitleCmd := newSetTitleCommand()
+	setTitleCmd.GroupID = "display"
+	cmd.AddCommand(setTitleCmd)
+
+	clearTitleCmd := newClearTitleCommand()
+	clearTitleCmd.GroupID = "display"
+	cmd.AddCommand(clearTitleCmd)
+
+	// Property Commands
+	getPropCmd := newGetPropertyCommand()
+	getPropCmd.GroupID = "properties"
+	cmd.AddCommand(getPropCmd)
+
+	setPropCmd := newSetPropertyCommand()
+	setPropCmd.GroupID = "properties"
+	cmd.AddCommand(setPropCmd)
 
 	// Add hierarchical completion
 	cmd.ValidArgsFunction = completion.HierarchicalWindowCompletion

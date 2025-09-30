@@ -13,17 +13,66 @@ func NewCommand() *cobra.Command {
 		GroupID: "core",
 	}
 
-	// Register subcommands
-	cmd.AddCommand(newListCommand())
-	cmd.AddCommand(newCreateCommand())
-	cmd.AddCommand(newCloseCommand())
-	cmd.AddCommand(newActivateCommand())
-	cmd.AddCommand(newReorderCommand())
-	cmd.AddCommand(newGetTitleCommand())
-	cmd.AddCommand(newSetTitleCommand())
-	cmd.AddCommand(newSetLayoutCommand())
-	cmd.AddCommand(newGetInfoCommand())
-	cmd.AddCommand(newSplitsCommand())
+	// Define command groups
+	cmd.AddGroup(&cobra.Group{
+		ID:    "management",
+		Title: "Tab Management Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "display",
+		Title: "Display & Appearance Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "layout",
+		Title: "Layout Commands:",
+	})
+
+	// Tab Management Commands
+	listCmd := newListCommand()
+	listCmd.GroupID = "management"
+	cmd.AddCommand(listCmd)
+
+	createCmd := newCreateCommand()
+	createCmd.GroupID = "management"
+	cmd.AddCommand(createCmd)
+
+	closeCmd := newCloseCommand()
+	closeCmd.GroupID = "management"
+	cmd.AddCommand(closeCmd)
+
+	activateCmd := newActivateCommand()
+	activateCmd.GroupID = "management"
+	cmd.AddCommand(activateCmd)
+
+	reorderCmd := newReorderCommand()
+	reorderCmd.GroupID = "management"
+	cmd.AddCommand(reorderCmd)
+
+	getInfoCmd := newGetInfoCommand()
+	getInfoCmd.GroupID = "management"
+	cmd.AddCommand(getInfoCmd)
+
+	// Display & Appearance Commands
+	getTitleCmd := newGetTitleCommand()
+	getTitleCmd.GroupID = "display"
+	cmd.AddCommand(getTitleCmd)
+
+	setTitleCmd := newSetTitleCommand()
+	setTitleCmd.GroupID = "display"
+	cmd.AddCommand(setTitleCmd)
+
+	clearTitleCmd := newClearTitleCommand()
+	clearTitleCmd.GroupID = "display"
+	cmd.AddCommand(clearTitleCmd)
+
+	// Layout Commands
+	setLayoutCmd := newSetLayoutCommand()
+	setLayoutCmd.GroupID = "layout"
+	cmd.AddCommand(setLayoutCmd)
+
+	splitsCmd := newSplitsCommand()
+	splitsCmd.GroupID = "layout"
+	cmd.AddCommand(splitsCmd)
 
 	return cmd
 }

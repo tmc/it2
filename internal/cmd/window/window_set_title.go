@@ -51,9 +51,8 @@ func newSetTitleCommand() *cobra.Command {
 				return sc.ReportError("resolve window ID", err)
 			}
 
-			// Set the window title using a user-defined variable
-			// iTerm2 requires user-defined variables to start with "user."
-			err = sc.GetClient().SetWindowVariable(sc.GetContext(), windowID, "user.title", title)
+			// Set the window title using iTerm2's Python API method
+			err = sc.GetClient().SetWindowTitle(sc.GetContext(), windowID, title)
 			if err != nil {
 				return sc.ReportError("set window title", err)
 			}
