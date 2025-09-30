@@ -1,13 +1,18 @@
 package broadcast
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/plugins"
 )
 
 // NewCommand creates the broadcast command with all subcommands.
@@ -147,18 +152,36 @@ func newSendCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "send <text>",
 		Short: "Send text to broadcast domain",
-		Long:  "Send text to all sessions in active broadcast domain",
-		Args:  cobra.ExactArgs(1),
+		Long: `Send text to all sessions in active broadcast domain.
+
+By default, sends a carriage return (\\r) after the text to execute commands.
+Use --skip-newline to send text without any line terminator.
+Use --send-lf to send line feed (\\n) to move to new line without executing.
+
+Pre-conditions:
+The --require flag allows checking pre-conditions on ALL sessions before sending.
+This ensures all sessions are ready before broadcasting.`,
+		Example: cmdutil.Doc(`
+			# Send to all sessions in broadcast domain
+			$ it2 broadcast send 'echo hello'
+
+			# Send without line terminator
+			$ it2 broadcast send --skip-newline 'partial text'
+
+			# Wait for all sessions to be ready before sending
+			$ it2 broadcast send --require is-at-prompt 'ls -la'
+
+			# Multiple pre-conditions with custom timeout
+			$ it2 broadcast send --require is-at-prompt --require has-no-partial-input --require-timeout 30s 'pwd'
+		`),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			text := args[0]
-			noNewline, _ := cmd.Flags().GetBool("no-newline")
 
-			// Append newline by default unless --no-newline is specified
-			if !noNewline {
-				text = text + "\n"
+			timeout, _ := cmd.Flags().GetDuration("timeout")
+			if timeout == 0 {
+				timeout = 60 * time.Second
 			}
-
-			_, timeout, _ := cmdutil.GetFlags(cmd)
 
 			ctx, cancel := cmdutil.CreateContext(timeout)
 			defer cancel()
@@ -179,25 +202,174 @@ func newSendCommand() *cobra.Command {
 				return fmt.Errorf("no broadcast domains configured")
 			}
 
-			// Send text to all sessions in all domains
-			var totalSessions int
+			// Collect all session IDs from all domains
+			var allSessions []string
 			for _, domain := range domains {
 				for _, sessionID := range domain.SessionIds {
-					normalizedID := cmdutil.NormalizeSessionID(sessionID)
-					err := c.SendText(ctx, normalizedID, text)
-					if err != nil {
-						return fmt.Errorf("failed to send text to session %s: %w", sessionID, err)
-					}
-					totalSessions++
+					allSessions = append(allSessions, cmdutil.NormalizeSessionID(sessionID))
 				}
 			}
 
-			fmt.Printf("Sent text to %d sessions in broadcast domain\n", totalSessions)
+			// Prompt for confirmation if requested
+			confirm, _ := cmd.Flags().GetBool("confirm")
+			if confirm {
+				fmt.Fprintf(os.Stderr, "Send text '%s' to %d sessions in broadcast domain?\n", text, len(allSessions))
+				fmt.Fprintf(os.Stderr, "Proceed? (y/N): ")
+
+				reader := bufio.NewReader(os.Stdin)
+				response, err := reader.ReadString('\n')
+				if err != nil {
+					return fmt.Errorf("failed to read confirmation: %w", err)
+				}
+				response = strings.TrimSpace(strings.ToLower(response))
+				if response != "y" && response != "yes" {
+					return fmt.Errorf("cancelled by user")
+				}
+			}
+
+			// Check pre-conditions for ALL sessions if --require flag is set
+			requireFlags, _ := cmd.Flags().GetStringSlice("require")
+			requireTimeout, _ := cmd.Flags().GetDuration("require-timeout")
+			verbose, _ := cmd.Flags().GetBool("verbose")
+
+			for _, condition := range requireFlags {
+				if condition == "" {
+					continue
+				}
+
+				if verbose {
+					fmt.Fprintf(os.Stderr, "Checking pre-condition '%s' on %d sessions...\n", condition, len(allSessions))
+				}
+
+				// Check condition on all sessions
+				for i, sessionID := range allSessions {
+					args := []string{sessionID, text}
+
+					ctx, cancel := cmdutil.CreateContext(requireTimeout)
+					defer cancel()
+
+					result, err := plugins.WaitForCondition(ctx, condition, args, requireTimeout)
+					if err != nil {
+						return fmt.Errorf("pre-condition check failed for session %d/%d (%s): %w", i+1, len(allSessions), sessionID[:8], err)
+					}
+
+					if !result.Success {
+						return fmt.Errorf("pre-condition not met for session %d/%d (%s): %s", i+1, len(allSessions), sessionID[:8], result.Message)
+					}
+
+					if verbose {
+						fmt.Fprintf(os.Stderr, "  ✓ Session %d/%d (%s): %s\n", i+1, len(allSessions), sessionID[:8], result.Message)
+					}
+				}
+
+				if verbose {
+					fmt.Fprintf(os.Stderr, "Pre-condition '%s' satisfied for all sessions\n", condition)
+				}
+			}
+
+			// Handle text termination based on flags
+			sendCR, _ := cmd.Flags().GetBool("send-cr")
+			sendLF, _ := cmd.Flags().GetBool("send-lf")
+			skipNewline, _ := cmd.Flags().GetBool("skip-newline")
+
+			// Validate mutually exclusive flags
+			terminatorFlags := 0
+			if sendCR {
+				terminatorFlags++
+			}
+			if sendLF {
+				terminatorFlags++
+			}
+			if skipNewline {
+				terminatorFlags++
+			}
+
+			if terminatorFlags > 1 {
+				return fmt.Errorf("terminator flags --send-cr, --send-lf, and --skip-newline are mutually exclusive")
+			}
+
+			// Determine terminator
+			var terminator string
+			if sendCR {
+				terminator = "\r" // Carriage return - executes command
+			} else if sendLF {
+				terminator = "\n" // Line feed - moves to new line
+			} else if skipNewline {
+				terminator = "" // Explicitly no terminator
+			} else {
+				// Default: send carriage return to execute command
+				terminator = "\r"
+			}
+
+			// Send text to all sessions
+			stopOnError, _ := cmd.Flags().GetBool("stop-on-error")
+			var successCount, errorCount int
+
+			for _, sessionID := range allSessions {
+				// Send the text first
+				err := c.SendText(ctx, sessionID, text)
+				if err != nil {
+					errorCount++
+					if stopOnError {
+						return fmt.Errorf("failed to send text to session %s: %w", sessionID, err)
+					}
+					fmt.Fprintf(os.Stderr, "Warning: failed to send text to session %s: %v\n", sessionID[:8], err)
+					continue
+				}
+
+				// Send terminator if one was specified
+				if terminator != "" {
+					delay, _ := cmd.Flags().GetDuration("delay-before-terminator")
+					if delay > 0 {
+						time.Sleep(delay)
+					}
+
+					err = c.SendText(ctx, sessionID, terminator)
+					if err != nil {
+						errorCount++
+						if stopOnError {
+							return fmt.Errorf("failed to send terminator to session %s: %w", sessionID, err)
+						}
+						fmt.Fprintf(os.Stderr, "Warning: failed to send terminator to session %s: %v\n", sessionID[:8], err)
+						continue
+					}
+				}
+
+				successCount++
+			}
+
+			if errorCount > 0 {
+				fmt.Fprintf(os.Stderr, "Sent to %d/%d sessions (%d errors)\n", successCount, len(allSessions), errorCount)
+			} else {
+				fmt.Fprintf(os.Stderr, "Sent to %d sessions in broadcast domain\n", successCount)
+			}
+
 			return nil
 		},
 	}
 
-	cmd.Flags().Bool("no-newline", false, "Do not append newline to text")
+	cmd.Flags().Bool("confirm", false, "Prompt for confirmation before sending")
+	cmd.Flags().Bool("skip-newline", false, "Don't send any line terminator")
+	cmd.Flags().BoolP("send-cr", "r", false, "Send carriage return (\\r) to execute command (default)")
+	cmd.Flags().Bool("send-lf", false, "Send line feed (\\n) to move to new line")
+
+	// Create alias for send-return -> send-cr
+	cmd.Flags().SetNormalizeFunc(func(f *pflag.FlagSet, name string) pflag.NormalizedName {
+		switch name {
+		case "send-return":
+			name = "send-cr"
+		}
+		return pflag.NormalizedName(name)
+	})
+
+	cmd.Flags().Duration("delay-before-terminator", 0, "Delay before sending line terminator")
+	cmd.Flags().StringSlice("require", nil, "Pre-condition plugins to check on ALL sessions before sending (e.g., 'has-no-partial-input', 'is-at-prompt')")
+	cmd.Flags().Duration("require-timeout", 10*time.Second, "Timeout for pre-condition checks per session")
+	cmd.Flags().Bool("verbose", false, "Print pre-condition status messages")
+	cmd.Flags().Bool("stop-on-error", false, "Stop on first error instead of continuing")
+
+	// Mark mutually exclusive flags
+	cmd.MarkFlagsMutuallyExclusive("skip-newline", "send-return", "send-cr", "send-lf")
 
 	return cmd
 }
