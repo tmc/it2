@@ -506,7 +506,6 @@ Multiple conditions can be specified and all must pass.`,
 		},
 	}
 
-	cmd.Flags().Bool("no-broadcast", false, "Suppress broadcasting even if enabled")
 	cmd.Flags().Bool("confirm", false, "Prompt for confirmation when using implicit session ID ($ITERM_SESSION_ID)")
 	cmd.Flags().Bool("skip-newline", false, "Don't send any line terminator")
 	cmd.Flags().BoolP("send-cr", "r", true, "Send carriage return (\\r) to execute command (enabled by default)")
