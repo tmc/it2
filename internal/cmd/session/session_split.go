@@ -1,6 +1,7 @@
 package session
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -18,16 +19,17 @@ func newSplitCommand() *cobra.Command {
 		Long: `Split a session pane horizontally or vertically, creating a new session.
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
-Default is horizontal split.`,
+If neither --horizontal nor --vertical is specified, automatically chooses based on
+session dimensions: vertical split when width > height, horizontal otherwise.`,
 		Example: cmdutil.Doc(`
-			# Split current session horizontally (default)
+			# Split current session (auto-detects best direction)
 			$ it2 session split
 
 			# Split current session vertically
 			$ it2 session split --vertical
 
 			# Split specific session horizontally
-			$ it2 session split SESSION-ID
+			$ it2 session split SESSION-ID --horizontal
 
 			# Split with badge text
 			$ it2 session split --badge "Build"
@@ -55,8 +57,9 @@ Default is horizontal split.`,
 				return fmt.Errorf("cannot specify both --vertical and --horizontal")
 			}
 
-			// Default to horizontal split (more common use case)
-			isVertical := vertical && !horizontal
+			// If neither flag is specified, we'll auto-detect based on dimensions
+			autoDetect := !vertical && !horizontal
+			isVertical := vertical
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -75,6 +78,48 @@ Default is horizontal split.`,
 			sessionID, err = c.ResolveSessionID(ctx, sessionID)
 			if err != nil {
 				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
+
+			// Auto-detect split direction based on dimensions if needed
+			if autoDetect {
+				gridSizeJSON, err := c.GetSessionProperty(ctx, sessionID, "grid_size")
+				if err != nil {
+					// If we can't get dimensions, fall back to horizontal (safer default)
+					isVertical = false
+				} else {
+					var gridSize struct {
+						Width  int `json:"width"`
+						Height int `json:"height"`
+					}
+					if err := json.Unmarshal([]byte(gridSizeJSON), &gridSize); err != nil {
+						// Fall back to horizontal on parse error
+						isVertical = false
+					} else {
+						// Choose split direction based on dimensions
+						// Prefer horizontal split if vertical would make width < 80
+						// unless horizontal would make height < 25
+						const minWidth = 80
+						const minHeight = 25
+
+						wouldBeNarrow := gridSize.Width/2 < minWidth
+						wouldBeShort := gridSize.Height/2 < minHeight
+
+						if wouldBeNarrow && !wouldBeShort {
+							// Would be too narrow, use horizontal instead
+							isVertical = false
+						} else if wouldBeShort && !wouldBeNarrow {
+							// Would be too short, use vertical instead
+							isVertical = true
+						} else if wouldBeNarrow && wouldBeShort {
+							// Both would be problematic - choose the lesser evil
+							// Prefer to keep width >= 80 if possible by going horizontal
+							isVertical = false
+						} else {
+							// Both are acceptable, use dimension comparison
+							isVertical = gridSize.Width > gridSize.Height
+						}
+					}
+				}
 			}
 
 			response, err := c.SplitPane(ctx, sessionID, isVertical, before, profileName)
@@ -150,11 +195,11 @@ Default is horizontal split.`,
 	}
 
 	cmd.Flags().Bool("vertical", false, "Split vertically")
-	cmd.Flags().Bool("horizontal", false, "Split horizontally (default)")
+	cmd.Flags().Bool("horizontal", false, "Split horizontally")
 	cmd.Flags().Bool("before", false, "Create new pane before the current one")
 	cmd.Flags().String("profile", "", "Profile name for the new session (optional, uses default if not specified)")
 	cmd.Flags().String("badge", "", "Set badge text on new session(s)")
 	cmd.Flags().Bool("json", false, "Output result as JSON")
-	cmd.Flags().Bool("quiet", false, "Only output the new session ID (for scripting)")
+	cmd.Flags().BoolP("quiet", "q", false, "Only output the new session ID (for scripting)")
 	return cmd
 }

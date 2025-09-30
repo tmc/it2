@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -110,11 +111,13 @@ func gatherSessionInfo(ctx context.Context, c *client.Client, sessionID string, 
 	}
 
 	// Basic session details
-	info["name"] = targetSession.SessionName
 	info["window_id"] = targetSession.WindowID
 	info["tab_id"] = targetSession.TabID
 	info["window_title"] = targetSession.WindowTitle
 	info["tab_title"] = targetSession.TabTitle
+	if targetSession.ParentSessionID != "" {
+		info["parent_session_id"] = targetSession.ParentSessionID
+	}
 
 	// Add frame information if available
 	if targetSession.Frame != nil {
@@ -144,9 +147,20 @@ func gatherSessionInfo(ctx context.Context, c *client.Client, sessionID string, 
 		}
 	}
 
-	// Try to get session profile
-	if profile, err := c.GetSessionProfile(ctx, sessionID); err == nil {
-		info["profile"] = strings.Trim(profile, "\"")
+	// Session title is the SessionName
+	if targetSession.SessionName != "" {
+		info["session_title"] = targetSession.SessionName
+	}
+
+	// Try to get session badge from profile property
+	if badge, err := c.GetSessionBadge(ctx, sessionID); err == nil && badge != "" {
+		// Parse JSON if needed
+		var badgeStr string
+		if err := json.Unmarshal([]byte(badge), &badgeStr); err == nil {
+			info["session_badge"] = badgeStr
+		} else {
+			info["session_badge"] = badge
+		}
 	}
 
 	// Include properties if requested
@@ -200,9 +214,13 @@ func gatherSessionInfo(ctx context.Context, c *client.Client, sessionID string, 
 		}
 	}
 
-	// Try to get PID information
-	if pid, err := getShellPIDQuiet(ctx, c, sessionID); err == nil && pid > 0 {
-		info["shell_pid"] = pid
+	// Get job PID and process name if available
+	if targetSession.JobPID > 0 {
+		info["job_pid"] = targetSession.JobPID
+		// Try to get the process name from the PID
+		if processName, err := getProcessName(int(targetSession.JobPID)); err == nil && processName != "" {
+			info["process"] = processName
+		}
 	}
 
 	// Apply plugin enrichment
@@ -239,27 +257,48 @@ func printSessionInfo(info map[string]interface{}) error {
 	fmt.Printf("Session Information\n")
 	fmt.Printf("==================\n\n")
 
+	// Order: session, parent, tab, window, badge, title, window title, tab title, command, pid
 	fmt.Printf("Session ID:    %v\n", info["session_id"])
-	if name, ok := info["name"]; ok && name != "" {
-		fmt.Printf("Name:          %v\n", name)
+
+	if parentID, ok := info["parent_session_id"]; ok && parentID != "" {
+		fmt.Printf("Parent ID:     %v\n", parentID)
 	}
-	if windowID, ok := info["window_id"]; ok && windowID != "" {
-		fmt.Printf("Window ID:     %v\n", windowID)
-	}
+
 	if tabID, ok := info["tab_id"]; ok && tabID != "" {
 		fmt.Printf("Tab ID:        %v\n", tabID)
 	}
+
+	if windowID, ok := info["window_id"]; ok && windowID != "" {
+		fmt.Printf("Window ID:     %v\n", windowID)
+	}
+
+	// Show badge
+	if badge, ok := info["session_badge"]; ok && badge != "" {
+		fmt.Printf("Badge:         %v\n", badge)
+	}
+
+	// Show session title
+	if title, ok := info["session_title"]; ok && title != "" {
+		fmt.Printf("Title:         %v\n", title)
+	}
+
+	// Show window title
 	if windowTitle, ok := info["window_title"]; ok && windowTitle != "" {
 		fmt.Printf("Window Title:  %v\n", windowTitle)
 	}
+
+	// Show tab title
 	if tabTitle, ok := info["tab_title"]; ok && tabTitle != "" {
 		fmt.Printf("Tab Title:     %v\n", tabTitle)
 	}
-	if profile, ok := info["profile"]; ok && profile != "" {
-		fmt.Printf("Profile:       %v\n", profile)
+
+	// Show process name if available (the main running program, not the shell)
+	if process, ok := info["process"]; ok && process != "" {
+		fmt.Printf("Process:       %v\n", process)
 	}
-	if pid, ok := info["shell_pid"]; ok {
-		fmt.Printf("Shell PID:     %v\n", pid)
+
+	if pid, ok := info["job_pid"]; ok {
+		fmt.Printf("PID:           %v\n", pid)
 	}
 
 	// Print frame information if available
@@ -287,24 +326,27 @@ func printSessionInfo(info map[string]interface{}) error {
 		}
 	}
 
-	// Print prompt information if included
+	// Print prompt information if included (in stable order)
 	if prompt, ok := info["prompt"].(map[string]interface{}); ok && len(prompt) > 0 {
 		fmt.Printf("\nCurrent Prompt:\n")
-		for key, value := range prompt {
-			switch key {
-			case "working_directory":
-				fmt.Printf("  Working Dir:       %v\n", value)
-			case "command":
-				fmt.Printf("  Command:           %v\n", value)
-			case "state":
-				fmt.Printf("  State:             %v\n", value)
-			case "exit_status":
-				fmt.Printf("  Exit Status:       %v\n", value)
-			case "unique_id":
-				fmt.Printf("  Unique ID:         %v\n", value)
-			default:
-				fmt.Printf("  %-18s %v\n", strings.Title(key)+":", value)
-			}
+		// Print in stable order
+		if status, ok := prompt["status"]; ok {
+			fmt.Printf("  Status:            %v\n", status)
+		}
+		if state, ok := prompt["state"]; ok {
+			fmt.Printf("  State:             %v\n", state)
+		}
+		if workingDir, ok := prompt["working_directory"]; ok {
+			fmt.Printf("  Working Dir:       %v\n", workingDir)
+		}
+		if command, ok := prompt["command"]; ok {
+			fmt.Printf("  Command:           %v\n", command)
+		}
+		if exitStatus, ok := prompt["exit_status"]; ok {
+			fmt.Printf("  Exit Status:       %v\n", exitStatus)
+		}
+		if uniqueID, ok := prompt["unique_id"]; ok {
+			fmt.Printf("  Unique ID:         %v\n", uniqueID)
 		}
 	}
 
@@ -419,4 +461,14 @@ func formatValue(val interface{}) string {
 	default:
 		return fmt.Sprintf("%v", v)
 	}
+}
+
+// getProcessName retrieves the process name for a given PID using ps
+func getProcessName(pid int) (string, error) {
+	cmd := exec.Command("ps", "-p", fmt.Sprintf("%d", pid), "-o", "comm=")
+	output, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(output)), nil
 }

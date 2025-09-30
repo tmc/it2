@@ -60,6 +60,10 @@ func NewCommand() *cobra.Command {
 	currentCmd.GroupID = "management"
 	cmd.AddCommand(currentCmd)
 
+	parentCmd := newParentCommand()
+	parentCmd.GroupID = "management"
+	cmd.AddCommand(parentCmd)
+
 	// Display & Appearance Commands
 	getTitleCmd := newGetTitleCommand()
 	getTitleCmd.GroupID = "display"
