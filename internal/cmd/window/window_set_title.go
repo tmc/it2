@@ -1,4 +1,4 @@
-package tab
+package window
 
 import (
 	"github.com/spf13/cobra"
@@ -8,16 +8,16 @@ import (
 
 func newSetTitleCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "set-title <tab-id> <title>",
-		Short:          "Set the title of a tab",
-		Long:           "Set the title of a tab using iTerm2's variable system",
+		Use:            "set-title <window-id> <title>",
+		Short:          "Set the title of a window",
+		Long:           "Set the title of a window using iTerm2's variable system",
 		Args:           cobra.ExactArgs(2),
 		RequiresClient: true,
 		SupportsFormat: true,
-		ValidArgsFunc:  completion.TabIDCompletion,
+		ValidArgsFunc:  completion.WindowIDCompletion,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			// Validate tab ID
-			if err := cmdutil.ValidateTabID(args[0]); err != nil {
+			// Validate window ID
+			if err := cmdutil.ValidateWindowID(args[0]); err != nil {
 				return err
 			}
 			// Validate title is not empty
@@ -27,27 +27,27 @@ func newSetTitleCommand() *cobra.Command {
 			return nil
 		},
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
-			tabID := args[0]
+			windowID := args[0]
 			title := args[1]
 
-			// Set the tab title using a user-defined variable
+			// Set the window title using a user-defined variable
 			// iTerm2 requires user-defined variables to start with "user."
-			err := sc.GetClient().SetTabVariable(sc.GetContext(), tabID, "user.title", title)
+			err := sc.GetClient().SetWindowVariable(sc.GetContext(), windowID, "user.title", title)
 			if err != nil {
-				return sc.ReportError("set tab title", err)
+				return sc.ReportError("set window title", err)
 			}
 
 			// Report success with JSON output support
 			if sc.GetFlags().Format == "json" {
 				result := map[string]interface{}{
-					"tab_id": tabID,
-					"title":  title,
-					"set":    true,
+					"window_id": windowID,
+					"title":     title,
+					"set":       true,
 				}
 				return sc.FormatOutput(result)
 			}
 
-			sc.ReportSuccess("Successfully set title of tab %s to: %s", tabID, title)
+			sc.ReportSuccess("Successfully set title of window %s to: %s", windowID, title)
 			return nil
 		},
 	}

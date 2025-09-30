@@ -37,28 +37,35 @@ func ValidateSessionID(id string) error {
 }
 
 // ValidateWindowID validates a window ID format
+// Window IDs from iTerm2 are in the format "pty-<UUID>"
 func ValidateWindowID(id string) error {
 	if id == "" {
 		return NewValidationError("window_id", "cannot be empty")
 	}
 
-	if !uuidPattern.MatchString(id) {
-		return NewValidationError("window_id", fmt.Sprintf("invalid format: %s", id))
+	// Window IDs start with "pty-" followed by a UUID
+	if !strings.HasPrefix(id, "pty-") {
+		return NewValidationError("window_id", fmt.Sprintf("must start with 'pty-': %s", id))
+	}
+
+	// Validate the UUID part after "pty-"
+	uuidPart := id[4:] // Skip "pty-"
+	if !uuidPattern.MatchString(uuidPart) {
+		return NewValidationError("window_id", fmt.Sprintf("invalid UUID format: %s", id))
 	}
 
 	return nil
 }
 
 // ValidateTabID validates a tab ID format
+// Tab IDs from iTerm2 are simple numeric strings, not UUIDs
 func ValidateTabID(id string) error {
 	if id == "" {
 		return NewValidationError("tab_id", "cannot be empty")
 	}
 
-	if !uuidPattern.MatchString(id) {
-		return NewValidationError("tab_id", fmt.Sprintf("invalid format: %s", id))
-	}
-
+	// Tab IDs are numeric strings from iTerm2's API
+	// No strict format validation needed beyond non-empty
 	return nil
 }
 

@@ -66,6 +66,7 @@ full compatibility with existing flat commands.`,
 	cmd.AddCommand(newFocusCommand())
 	cmd.AddCommand(newGetPropertyCommand())
 	cmd.AddCommand(newSetPropertyCommand())
+	cmd.AddCommand(newSetTitleCommand())
 
 	// Add hierarchical completion
 	cmd.ValidArgsFunction = completion.HierarchicalWindowCompletion
