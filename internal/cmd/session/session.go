@@ -114,6 +114,10 @@ func NewCommand() *cobra.Command {
 	getScreenCmd.GroupID = "interaction"
 	cmd.AddCommand(getScreenCmd)
 
+	getBufferCmd := newGetBufferCommand()
+	getBufferCmd.GroupID = "interaction"
+	cmd.AddCommand(getBufferCmd)
+
 	// Monitoring & Information Commands
 	getPIDCmd := newGetPIDCommand()
 	getPIDCmd.GroupID = "monitoring"

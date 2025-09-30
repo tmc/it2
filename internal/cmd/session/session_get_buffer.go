@@ -1,4 +1,4 @@
-package text
+package session
 
 import (
 	"github.com/spf13/cobra"
@@ -14,32 +14,32 @@ func newGetBufferCommand() *cobra.Command {
 		Long:  `Get buffer contents of a session including scrollback history.`,
 		Example: cmdutil.Doc(`
 			# Get current session buffer
-			$ it2 text get-buffer
+			$ it2 session get-buffer
 
 			# Get specific session buffer
-			$ it2 text get-buffer SESSION123
+			$ it2 session get-buffer SESSION123
 
 			# Get last 100 lines only
-			$ it2 text get-buffer --lines 100
-			$ it2 text get-buffer --last 100
+			$ it2 session get-buffer --lines 100
+			$ it2 session get-buffer --last 100
 
 			# Quick tail-like usage (last 20 lines)
-			$ it2 text get-buffer --last 20
+			$ it2 session get-buffer --last 20
 
 			# Include color/formatting information
-			$ it2 text get-buffer --color
+			$ it2 session get-buffer --color
 
 			# Save session output to file
-			$ it2 text get-buffer > session-output.txt
+			$ it2 session get-buffer > session-output.txt
 
 			# Get JSON format with metadata
-			$ it2 text get-buffer --format json
+			$ it2 session get-buffer --format json
 
 			# Search through buffer contents
-			$ it2 text get-buffer | grep "ERROR"
+			$ it2 session get-buffer | grep "ERROR"
 
 			# Archive session output daily
-			$ it2 text get-buffer SESSION123 > "logs/$(date +%Y%m%d)-session.log"
+			$ it2 session get-buffer SESSION123 > "logs/$(date +%Y%m%d)-session.log"
 		`),
 		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,

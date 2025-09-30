@@ -14,7 +14,8 @@ func NewCommand() *cobra.Command {
 	}
 
 	// Core buffer operations (Phase 1D roadmap)
-	cmd.AddCommand(newGetBufferCommand())
+	// get-buffer is now in session package, create alias here for backward compatibility
+	cmd.AddCommand(newGetBufferAliasCommand())
 	cmd.AddCommand(newInjectCommand())
 	cmd.AddCommand(newGetScreenCommand())
 	cmd.AddCommand(newClearBufferCommand())
