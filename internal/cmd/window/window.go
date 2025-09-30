@@ -41,6 +41,15 @@ full compatibility with existing flat commands.`,
 				return cmd.Help()
 			}
 
+			// Check if first arg is a subcommand
+			// This allows subcommands like "current" to be handled by cobra
+			for _, subCmd := range cmd.Commands() {
+				if subCmd.Name() == args[0] || subCmd.HasAlias(args[0]) {
+					// Let cobra handle the subcommand
+					return nil
+				}
+			}
+
 			// Check if first arg is a number (window index for hierarchical mode)
 			if windowID, err := strconv.Atoi(args[0]); err == nil {
 				// Hierarchical mode with numeric index: it2 window <index> [subcommand]
@@ -89,6 +98,10 @@ full compatibility with existing flat commands.`,
 	focusCmd := newFocusCommand()
 	focusCmd.GroupID = "management"
 	cmd.AddCommand(focusCmd)
+
+	currentCmd := newCurrentCommand()
+	currentCmd.GroupID = "management"
+	cmd.AddCommand(currentCmd)
 
 	// Display & Appearance Commands
 	getTitleCmd := newGetTitleCommand()
