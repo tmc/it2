@@ -591,22 +591,29 @@ func (c *Client) SetSessionName(ctx context.Context, sessionID, name string) err
 	return c.SetSessionProfileProperty(ctx, sessionID, "Name", fmt.Sprintf("%q", name))
 }
 
-// SetSessionBadge sets the session badge by setting the "user.badge" variable in session scope
+// SetSessionBadge sets the session badge by setting the "Badge Text" profile property
 func (c *Client) SetSessionBadge(ctx context.Context, sessionID, badge string) error {
-	// Note: The built-in "badge" variable is read-only and computed from profile settings.
-	// We use "user.badge" which can be referenced in the profile's badge configuration.
-	return c.SetVariableWithScope(ctx, "session", sessionID, "user.badge", fmt.Sprintf("%q", badge))
+	// Badge text is set via the "Badge Text" profile property
+	// This is what iTerm2's Python API uses (profile.set_badge_text)
+	return c.SetSessionProfileProperty(ctx, sessionID, "Badge Text", fmt.Sprintf("%q", badge))
 }
 
-// GetSessionBadge gets the session badge from the "user.badge" variable in session scope
+// GetSessionBadge gets the session badge from the "Badge Text" profile property
 func (c *Client) GetSessionBadge(ctx context.Context, sessionID string) (string, error) {
-	return c.GetVariableWithScope(ctx, "session", sessionID, "user.badge")
+	val, err := c.GetSessionProfileProperty(ctx, sessionID, "Badge Text")
+	if err != nil {
+		return "", err
+	}
+	if str, ok := val.(string); ok {
+		return str, nil
+	}
+	return fmt.Sprintf("%v", val), nil
 }
 
-// ClearSessionBadge clears the session badge by deleting the user.badge variable
+// ClearSessionBadge clears the session badge by setting Badge Text to empty
 func (c *Client) ClearSessionBadge(ctx context.Context, sessionID string) error {
-	// Delete the variable so it falls back to profile default
-	return c.DeleteVariableWithScope(ctx, "session", sessionID, "user.badge")
+	// Clear by setting to empty string - profile default will be used
+	return c.SetSessionProfileProperty(ctx, sessionID, "Badge Text", "\"\"")
 }
 
 // ListSessionProfileProperties gets multiple profile properties from a session's profile copy
