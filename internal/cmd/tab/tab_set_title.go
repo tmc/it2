@@ -8,31 +8,52 @@ import (
 
 func newSetTitleCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "set-title <tab-id> <title>",
+		Use:            "set-title [<tab-id>] <title>",
 		Short:          "Set the title of a tab",
-		Long:           "Set the title of a tab using iTerm2's variable system",
-		Args:           cobra.ExactArgs(2),
+		Long:           "Set the title of a tab using iTerm2's variable system. If no tab ID is provided, uses the current tab.",
+		Args:           cobra.RangeArgs(1, 2),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.TabIDCompletion,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			// Validate tab ID
-			if err := cmdutil.ValidateTabID(args[0]); err != nil {
-				return err
-			}
-			// Validate title is not empty
-			if err := cmdutil.ValidateNonEmpty(args[1], "title"); err != nil {
-				return err
+			// If one arg, it's the title (tab ID will be resolved from current session)
+			// If two args, first is tab ID, second is title
+			if len(args) == 2 {
+				// Validate tab ID
+				if err := cmdutil.ValidateTabID(args[0]); err != nil {
+					return err
+				}
+				// Validate title is not empty
+				if err := cmdutil.ValidateNonEmpty(args[1], "title"); err != nil {
+					return err
+				}
+			} else {
+				// Validate title is not empty
+				if err := cmdutil.ValidateNonEmpty(args[0], "title"); err != nil {
+					return err
+				}
 			}
 			return nil
 		},
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
-			tabID := args[0]
-			title := args[1]
+			var tabID, title string
+			if len(args) == 2 {
+				tabID = args[0]
+				title = args[1]
+			} else {
+				tabID = ""
+				title = args[0]
+			}
+
+			// Resolve tab ID (handles empty string by using current session's tab)
+			tabID, err := sc.GetClient().ResolveTabID(sc.GetContext(), tabID)
+			if err != nil {
+				return sc.ReportError("resolve tab ID", err)
+			}
 
 			// Set the tab title using a user-defined variable
 			// iTerm2 requires user-defined variables to start with "user."
-			err := sc.GetClient().SetTabVariable(sc.GetContext(), tabID, "user.title", title)
+			err = sc.GetClient().SetTabVariable(sc.GetContext(), tabID, "user.title", title)
 			if err != nil {
 				return sc.ReportError("set tab title", err)
 			}

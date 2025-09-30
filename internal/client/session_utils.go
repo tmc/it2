@@ -63,3 +63,63 @@ func (c *Client) ResolveSessionID(ctx context.Context, sessionID string) (string
 		return "", fmt.Errorf("ambiguous session ID prefix '%s' matches %d sessions: %v", sessionID, len(matches), matches)
 	}
 }
+
+// ResolveTabID resolves a tab ID with intelligent fallback
+// 1. If tabID is empty, finds the tab ID of the current session
+// 2. Returns the tab ID as-is if provided (tab IDs are simple numeric strings)
+func (c *Client) ResolveTabID(ctx context.Context, tabID string) (string, error) {
+	// If no tab ID provided, get it from current session
+	if tabID == "" {
+		sessionID, err := c.ResolveSessionID(ctx, "")
+		if err != nil {
+			return "", fmt.Errorf("failed to resolve current session: %w", err)
+		}
+
+		// Find the tab ID for this session
+		sessions, err := c.ListSessions(ctx)
+		if err != nil {
+			return "", fmt.Errorf("failed to list sessions: %w", err)
+		}
+
+		for _, session := range sessions {
+			if session.SessionID == sessionID {
+				return session.TabID, nil
+			}
+		}
+
+		return "", fmt.Errorf("session %s not found in session list", sessionID)
+	}
+
+	// Tab IDs are simple strings, return as-is
+	return tabID, nil
+}
+
+// ResolveWindowID resolves a window ID with intelligent fallback
+// 1. If windowID is empty, finds the window ID of the current session
+// 2. Returns the window ID as-is if provided
+func (c *Client) ResolveWindowID(ctx context.Context, windowID string) (string, error) {
+	// If no window ID provided, get it from current session
+	if windowID == "" {
+		sessionID, err := c.ResolveSessionID(ctx, "")
+		if err != nil {
+			return "", fmt.Errorf("failed to resolve current session: %w", err)
+		}
+
+		// Find the window ID for this session
+		sessions, err := c.ListSessions(ctx)
+		if err != nil {
+			return "", fmt.Errorf("failed to list sessions: %w", err)
+		}
+
+		for _, session := range sessions {
+			if session.SessionID == sessionID {
+				return session.WindowID, nil
+			}
+		}
+
+		return "", fmt.Errorf("session %s not found in session list", sessionID)
+	}
+
+	// Window IDs are in format "pty-UUID", return as-is
+	return windowID, nil
+}

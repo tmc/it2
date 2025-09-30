@@ -31,6 +31,7 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newGetPIDCommand())
 	cmd.AddCommand(newGetPropertyCommand())
 	cmd.AddCommand(newSetPropertyCommand())
+	cmd.AddCommand(newGetTitleCommand())
 	cmd.AddCommand(newSetTitleCommand())
 	cmd.AddCommand(newMonitorCommand())
 	cmd.AddCommand(newGetInfoCommand())

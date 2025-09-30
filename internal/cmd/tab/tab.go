@@ -19,6 +19,7 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newCloseCommand())
 	cmd.AddCommand(newActivateCommand())
 	cmd.AddCommand(newReorderCommand())
+	cmd.AddCommand(newGetTitleCommand())
 	cmd.AddCommand(newSetTitleCommand())
 	cmd.AddCommand(newSetLayoutCommand())
 	cmd.AddCommand(newGetInfoCommand())
