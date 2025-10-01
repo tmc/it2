@@ -179,20 +179,16 @@ func printProcessData(jobPID, shellPID int, format string) error {
 }
 
 func printProcessTreeFormat(jobPID, shellPID int, maxDepth int, showPIDs bool) error {
-	// Print job process if available
-	if jobPID > 0 {
-		procName, _ := getProcessName(jobPID)
-		if showPIDs {
-			fmt.Printf("Job:   %s (PID %d)\n", procName, jobPID)
-		} else {
-			fmt.Printf("Job:   %s\n", procName)
-		}
+	fmt.Println("Process Tree:")
+
+	// Start from job PID if available, otherwise shell PID
+	startPID := jobPID
+	if startPID == 0 {
+		startPID = shellPID
 	}
 
-	// Print shell and its ancestors
-	if shellPID > 0 {
-		fmt.Println("\nProcess Tree:")
-		printProcessTree(shellPID, maxDepth, showPIDs, 0)
+	if startPID > 0 {
+		printProcessTree(startPID, maxDepth, showPIDs, 0)
 	}
 
 	return nil
