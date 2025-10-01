@@ -133,6 +133,16 @@ func setupPluginEnv(cmd *exec.Cmd) {
 	}
 }
 
+// getPluginDeadline returns the configured plugin deadline from environment or default
+func getPluginDeadline() time.Duration {
+	if deadline := os.Getenv("IT2_PLUGIN_DEADLINE"); deadline != "" {
+		if d, err := time.ParseDuration(deadline); err == nil && d > 0 {
+			return d
+		}
+	}
+	return 5 * time.Second // Default deadline
+}
+
 // EnrichSession runs the executable with the session ID and parses the output
 func (p *ExecPlugin) EnrichSession(ctx context.Context, session *client.SessionInfo) (map[string]interface{}, error) {
 	// Record execution start time
@@ -142,8 +152,8 @@ func (p *ExecPlugin) EnrichSession(ctx context.Context, session *client.SessionI
 		GetMetricsStore().RecordExecution(p.name, duration)
 	}()
 
-	// Use a longer timeout for plugins to ensure they can complete
-	pluginCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	// Use configurable deadline for plugin execution
+	pluginCtx, cancel := context.WithTimeout(ctx, getPluginDeadline())
 	defer cancel()
 
 	// Pass session ID and session name as arguments
@@ -186,8 +196,8 @@ func (p *ExecPlugin) EnrichTab(ctx context.Context, tab *formatting.TabInfo) (ma
 		GetMetricsStore().RecordExecution(p.name, time.Since(start))
 	}()
 
-	// Use a longer timeout for plugins to ensure they can complete
-	pluginCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	// Use configurable deadline for plugin execution
+	pluginCtx, cancel := context.WithTimeout(ctx, getPluginDeadline())
 	defer cancel()
 
 	// Pass tab ID, window ID, and title as arguments
@@ -220,8 +230,8 @@ func (p *ExecPlugin) EnrichWindow(ctx context.Context, window *client.WindowInfo
 		GetMetricsStore().RecordExecution(p.name, time.Since(start))
 	}()
 
-	// Use a longer timeout for plugins to ensure they can complete
-	pluginCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	// Use configurable deadline for plugin execution
+	pluginCtx, cancel := context.WithTimeout(ctx, getPluginDeadline())
 	defer cancel()
 
 	// Pass window ID and title as arguments
@@ -254,8 +264,8 @@ func (p *ExecPlugin) EnrichProcess(ctx context.Context, sessionID string, pid in
 		GetMetricsStore().RecordExecution(p.name, time.Since(start))
 	}()
 
-	// Use a longer timeout for plugins to ensure they can complete
-	pluginCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	// Use configurable deadline for plugin execution
+	pluginCtx, cancel := context.WithTimeout(ctx, getPluginDeadline())
 	defer cancel()
 
 	// Pass session ID and PID as arguments

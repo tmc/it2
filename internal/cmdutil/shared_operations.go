@@ -67,27 +67,64 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 		filteredSessions = append(filteredSessions, session)
 	}
 
-	// Apply plugin enrichment
-	registry := plugins.NewRegistry()
-	if err := registry.DiscoverAndRegister(); err == nil {
-		enrichers := registry.GetEnrichers()
-		for _, session := range filteredSessions {
-			// Initialize plugin data map if needed
-			if session.PluginData == nil {
-				session.PluginData = make(map[string]interface{})
+	// Apply plugin enrichment - only if plugin columns are requested or no columns specified
+	shouldRunPlugins := len(opts.Columns) == 0 // Run all plugins if no columns specified
+	if !shouldRunPlugins {
+		// Check if any plugin column is requested
+		for _, col := range opts.Columns {
+			colLower := strings.ToLower(col)
+			// Check if this looks like a plugin column (not a standard column)
+			standardCols := map[string]bool{
+				"id": true, "parent": true, "pid": true, "exit": true, "state": true,
+				"window": true, "tab": true, "title": true, "command": true,
 			}
-			// Apply each enricher
-			for _, enricher := range enrichers {
-				data, err := enricher.EnrichSession(s.ctx, session)
-				if err == nil && len(data) > 0 {
-					for k, v := range data {
-						session.PluginData[k] = v
+			if !standardCols[colLower] {
+				shouldRunPlugins = true
+				break
+			}
+		}
+	}
+
+	if shouldRunPlugins {
+		registry := plugins.NewRegistry()
+		if err := registry.DiscoverAndRegister(); err == nil {
+			enrichers := registry.GetEnrichers()
+
+			// Build set of requested plugin names if columns are specified
+			requestedPlugins := make(map[string]bool)
+			if len(opts.Columns) > 0 {
+				for _, col := range opts.Columns {
+					colLower := strings.ToLower(col)
+					requestedPlugins[colLower] = true
+				}
+			}
+
+			for _, session := range filteredSessions {
+				// Initialize plugin data map if needed
+				if session.PluginData == nil {
+					session.PluginData = make(map[string]interface{})
+				}
+				// Apply each enricher
+				for _, enricher := range enrichers {
+					// Skip this plugin if columns are specified and this plugin isn't requested
+					if len(requestedPlugins) > 0 {
+						pluginName := strings.ToLower(enricher.Name())
+						if !requestedPlugins[pluginName] {
+							continue
+						}
+					}
+
+					data, err := enricher.EnrichSession(s.ctx, session)
+					if err == nil && len(data) > 0 {
+						for k, v := range data {
+							session.PluginData[k] = v
+						}
 					}
 				}
 			}
+			// Save metrics after enrichment
+			plugins.GetMetricsStore().Save()
 		}
-		// Save metrics after enrichment
-		plugins.GetMetricsStore().Save()
 	}
 
 	// Format and output

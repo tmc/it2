@@ -48,11 +48,12 @@ import (
 )
 
 var (
-	wsURL       string
-	timeout     time.Duration
-	format      string
-	pluginPaths []string
-	configCmd   *cobra.Command
+	wsURL          string
+	timeout        time.Duration
+	format         string
+	pluginPaths    []string
+	pluginDeadline time.Duration
+	configCmd      *cobra.Command
 )
 
 var rootCmd = &cobra.Command{
@@ -62,6 +63,10 @@ var rootCmd = &cobra.Command{
 		// Set IT2_PLUGIN_PATHS environment variable from flag
 		if len(pluginPaths) > 0 {
 			os.Setenv("IT2_PLUGIN_PATHS", strings.Join(pluginPaths, string(os.PathListSeparator)))
+		}
+		// Set IT2_PLUGIN_DEADLINE environment variable from flag
+		if pluginDeadline > 0 {
+			os.Setenv("IT2_PLUGIN_DEADLINE", pluginDeadline.String())
 		}
 	},
 	Long: `it2 - iTerm2 API Command-Line Interface
@@ -263,6 +268,8 @@ func init() {
 	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", defaultTimeout, "Connection timeout")
 	rootCmd.PersistentFlags().StringVar(&format, "format", defaultFormat, "Output format (table, text, json, yaml)")
 	rootCmd.PersistentFlags().StringSliceVar(&pluginPaths, "plugin-path", nil, "Additional plugin search paths (higher priority than embedded plugins)")
+	rootCmd.PersistentFlags().DurationVar(&pluginDeadline, "plugin-deadline", 0, "Plugin execution deadline (hidden flag, default 5s)")
+	rootCmd.PersistentFlags().MarkHidden("plugin-deadline")
 
 	// Add flag completion
 	rootCmd.RegisterFlagCompletionFunc("format", completion.FormatCompletion)
