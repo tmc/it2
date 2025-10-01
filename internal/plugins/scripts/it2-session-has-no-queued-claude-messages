@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+#
+# it2-session-has-no-queued-claude-messages
+#
+# Plugin to check if there are no queued messages in a Claude session.
+# Queued messages appear when Claude is processing or has pending responses.
+#
+# Usage:
+#   it2-session-has-no-queued-claude-messages <session-id>
+#
+# Returns:
+#   - "true" if no queued messages
+#   - "false" if messages are queued or Claude is busy
+#   - Exit code 0 for success, non-zero for failure
+
+set -euo pipefail
+
+SESSION_ID="${1:-}"
+if [[ -z "$SESSION_ID" ]]; then
+    echo "Error: Session ID required" >&2
+    exit 1
+fi
+
+# Find it2 binary
+IT2_BIN=""
+if [[ -x "./it2" ]]; then
+    IT2_BIN="./it2"
+elif [[ -x "$HOME/go/bin/it2" ]]; then
+    IT2_BIN="$HOME/go/bin/it2"
+elif command -v it2 &> /dev/null; then
+    IT2_BIN="$(command -v it2)"
+fi
+
+if [[ -z "$IT2_BIN" ]]; then
+    echo "Error: it2 binary not found" >&2
+    exit 1
+fi
+
+SCREEN_CONTENT=$($IT2_BIN text get-screen "$SESSION_ID" 2>/dev/null || echo "")
+
+if [[ -z "$SCREEN_CONTENT" ]]; then
+    echo "false"
+    exit 1
+fi
+
+# Remove ANSI escape sequences
+CLEAN_CONTENT=$(echo "$SCREEN_CONTENT" | sed 's/\x1b\[[0-9;]*m//g')
+
+# Check for indicators that Claude is processing or has queued messages
+
+# Pattern 1: "Thinking..." or similar processing indicators
+if echo "$CLEAN_CONTENT" | grep -qiE "(thinking\.\.\.|generating|processing)"; then
+    echo "false"  # Claude is actively processing
+    exit 1
+fi
+
+# Pattern 2: Loading spinners or progress indicators
+if echo "$CLEAN_CONTENT" | grep -qE "(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏)"; then
+    echo "false"  # Loading spinner present
+    exit 1
+fi
+
+# Pattern 3: "Working on it" or similar status messages
+if echo "$CLEAN_CONTENT" | grep -qiE "(working on|please wait|one moment)"; then
+    echo "false"  # Status message indicating work in progress
+    exit 1
+fi
+
+# Pattern 4: Tool use indicators (when Claude is calling tools)
+if echo "$CLEAN_CONTENT" | grep -qE "(<tool_use>|Using tool|Tool call|Executing)"; then
+    echo "false"  # Tool execution in progress
+    exit 1
+fi
+
+# Pattern 5: Streaming text indicators (▌ or similar)
+if echo "$CLEAN_CONTENT" | grep -qE "(▌|▍|▎|▏)"; then
+    echo "false"  # Streaming response in progress
+    exit 1
+fi
+
+# Pattern 6: Queue depth indicators or pending message counts
+# Some Claude interfaces show "(1 pending)" or similar
+if echo "$CLEAN_CONTENT" | grep -qiE "([0-9]+ pending|[0-9]+ queued|messages? in queue)"; then
+    echo "false"  # Explicit queue indicator found
+    exit 1
+fi
+
+# Pattern 7: "Waiting for" indicators
+if echo "$CLEAN_CONTENT" | grep -qiE "waiting for"; then
+    echo "false"  # Waiting for something
+    exit 1
+fi
+
+# Pattern 8: Response generation markers
+if echo "$CLEAN_CONTENT" | grep -qE "(Generating response|Composing|Drafting)"; then
+    echo "false"  # Response being generated
+    exit 1
+fi
+
+# Pattern 9: Check if the last line shows continuing output (no prompt yet)
+LAST_LINE=""
+while IFS= read -r line; do
+    CLEAN_LINE=$(echo "$line" | sed 's/\x1b\[[0-9;]*m//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    if [[ -n "$CLEAN_LINE" ]]; then
+        LAST_LINE="$CLEAN_LINE"
+    fi
+done <<< "$SCREEN_CONTENT"
+
+# If last line ends with ellipsis, might indicate more content coming
+if [[ "$LAST_LINE" =~ \.\.\.$ ]]; then
+    echo "false"  # Possible continuation indicator
+    exit 1
+fi
+
+# Pattern 10: Button/action prompts that indicate pending approval
+if echo "$CLEAN_CONTENT" | grep -q "Do you want to proceed?"; then
+    echo "false"  # Approval dialog present (queued action)
+    exit 1
+fi
+
+# Pattern 11: Look for "continue" buttons or pagination
+if echo "$CLEAN_CONTENT" | grep -qiE "(continue|show more|load more|\.\.\. more)"; then
+    # Could indicate truncated output, but this might be acceptable
+    # Only fail if it looks like actively loading
+    if echo "$CLEAN_CONTENT" | grep -qiE "loading|fetching"; then
+        echo "false"
+        exit 1
+    fi
+fi
+
+# All checks passed - no queued messages detected
+echo "true"
+exit 0

@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+#
+# it2-session-is-at-empty-claude-prompt
+#
+# Plugin to check if a session is a Claude session at an empty prompt.
+# An empty Claude prompt has no partial input and is ready to accept commands.
+#
+# Usage:
+#   it2-session-is-at-empty-claude-prompt <session-id>
+#
+# Returns:
+#   - "true" if at empty Claude prompt
+#   - "false" if not at Claude prompt, has partial input, or not ready
+#   - Exit code 0 for success, non-zero for failure
+
+set -euo pipefail
+
+SESSION_ID="${1:-}"
+if [[ -z "$SESSION_ID" ]]; then
+    echo "Error: Session ID required" >&2
+    exit 1
+fi
+
+# Find it2 binary
+IT2_BIN=""
+if [[ -x "./it2" ]]; then
+    IT2_BIN="./it2"
+elif [[ -x "$HOME/go/bin/it2" ]]; then
+    IT2_BIN="$HOME/go/bin/it2"
+elif command -v it2 &> /dev/null; then
+    IT2_BIN="$(command -v it2)"
+fi
+
+if [[ -z "$IT2_BIN" ]]; then
+    echo "Error: it2 binary not found" >&2
+    exit 1
+fi
+
+SCREEN_CONTENT=$($IT2_BIN text get-screen "$SESSION_ID" 2>/dev/null || echo "")
+
+if [[ -z "$SCREEN_CONTENT" ]]; then
+    echo "false"
+    exit 1
+fi
+
+# Remove ANSI escape sequences
+CLEAN_CONTENT=$(echo "$SCREEN_CONTENT" | sed 's/\x1b\[[0-9;]*m//g')
+
+# Check for Claude prompt patterns
+# Pattern 1: Standard Claude prompt (starts with letter or number in circle/badge)
+# Pattern 2: Empty input line after prompt marker
+# Pattern 3: No partial commands visible
+
+# Look for Claude-specific indicators
+HAS_CLAUDE_PROMPT=false
+
+# Check for Claude badge/prompt patterns (① ② ③ or similar)
+if echo "$CLEAN_CONTENT" | grep -qE "[①②③④⑤⑥⑦⑧⑨]"; then
+    HAS_CLAUDE_PROMPT=true
+fi
+
+# Check for "Claude" branding in the screen
+if echo "$CLEAN_CONTENT" | grep -qi "claude"; then
+    HAS_CLAUDE_PROMPT=true
+fi
+
+# Check for typical Claude interface patterns
+if echo "$CLEAN_CONTENT" | grep -qE "(Ask Claude|New conversation|Continue)"; then
+    HAS_CLAUDE_PROMPT=true
+fi
+
+if [[ "$HAS_CLAUDE_PROMPT" == "false" ]]; then
+    echo "false"  # Not a Claude session
+    exit 1
+fi
+
+# Get the last few lines to check for empty prompt
+LAST_LINES=$(echo "$CLEAN_CONTENT" | tail -5)
+
+# Check if there's a modal dialog present
+if echo "$CLEAN_CONTENT" | grep -q "Do you want to proceed?"; then
+    echo "false"  # Modal present, not ready for input
+    exit 1
+fi
+
+# Check if there's a numbered choice dialog
+if echo "$CLEAN_CONTENT" | grep -q "❯.*[0-9]\."; then
+    echo "false"  # Choice dialog present
+    exit 1
+fi
+
+# Get the very last non-empty line
+LAST_LINE=""
+while IFS= read -r line; do
+    CLEAN_LINE=$(echo "$line" | sed 's/\x1b\[[0-9;]*m//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    if [[ -n "$CLEAN_LINE" ]]; then
+        LAST_LINE="$CLEAN_LINE"
+    fi
+done <<< "$SCREEN_CONTENT"
+
+# Empty prompt patterns for Claude:
+# 1. Cursor blinking at start of line with no text
+# 2. Just the prompt indicator with no following text
+# 3. Empty line after a completed response
+
+# Check if the last line is just whitespace or empty (cursor at beginning)
+if [[ -z "$LAST_LINE" ]]; then
+    echo "true"
+    exit 0
+fi
+
+# Check if last line has only prompt characters and cursor (no actual input)
+# Claude typically shows just a cursor when ready for input
+if [[ ${#LAST_LINE} -le 3 ]]; then
+    echo "true"
+    exit 0
+fi
+
+# Check if screen shows "thinking" or "generating" indicators
+if echo "$CLEAN_CONTENT" | grep -qiE "(thinking|generating|processing)"; then
+    echo "false"  # Claude is busy
+    exit 1
+fi
+
+# Check for partial input (looks like a command was started but not executed)
+# If there's text after the last prompt character that doesn't look like output
+if echo "$LAST_LINE" | grep -qE "^[a-z]"; then
+    # Looks like partial command input
+    echo "false"
+    exit 1
+fi
+
+# Default: assume at empty prompt if we got this far
+echo "true"
+exit 0
