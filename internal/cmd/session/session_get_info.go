@@ -229,6 +229,11 @@ func gatherSessionInfo(ctx context.Context, c *client.Client, sessionID string, 
 		}
 	}
 
+	// Get shell PID if available
+	if targetSession.ShellPID > 0 {
+		info["shell_pid"] = targetSession.ShellPID
+	}
+
 	// Get job PID and process name if available
 	if targetSession.JobPID > 0 {
 		info["job_pid"] = targetSession.JobPID
@@ -312,8 +317,14 @@ func printSessionInfo(info map[string]interface{}) error {
 		fmt.Printf("Process:       %v\n", process)
 	}
 
-	if pid, ok := info["job_pid"]; ok {
-		fmt.Printf("PID:           %v\n", pid)
+	// Show shell PID if available
+	if shellPID, ok := info["shell_pid"]; ok {
+		fmt.Printf("Shell PID:     %v\n", shellPID)
+	}
+
+	// Show job PID if available
+	if jobPID, ok := info["job_pid"]; ok {
+		fmt.Printf("Job PID:       %v\n", jobPID)
 	}
 
 	// Print frame information if available
