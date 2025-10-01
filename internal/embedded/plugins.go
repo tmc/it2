@@ -1,13 +1,13 @@
 package embedded
 
 import (
-	"crypto/sha256"
 	"embed"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime/debug"
+	"time"
 )
 
 //go:embed plugins/*
@@ -92,7 +92,9 @@ func ExtractPlugins() (string, error) {
 	return pluginsDir, nil
 }
 
-// cleanupOldPluginDirs removes old plugin directories except the current one
+// cleanupOldPluginDirs removes old plugin directories except recent ones
+// Keeps the current directory plus any accessed in the last 7 days to support
+// concurrent use of different it2 versions
 func cleanupOldPluginDirs(currentDir string) {
 	pluginsBase := filepath.Dir(currentDir)
 	entries, err := os.ReadDir(pluginsBase)
@@ -101,6 +103,9 @@ func cleanupOldPluginDirs(currentDir string) {
 	}
 
 	currentHash := filepath.Base(currentDir)
+	now := time.Now()
+	sevenDaysAgo := now.Add(-7 * 24 * time.Hour)
+
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -108,13 +113,26 @@ func cleanupOldPluginDirs(currentDir string) {
 		if entry.Name() == currentHash {
 			continue // Don't remove current directory
 		}
-		// Remove old plugin directory
+
 		oldDir := filepath.Join(pluginsBase, entry.Name())
-		os.RemoveAll(oldDir) // Ignore errors
+
+		// Check last access time of the directory
+		info, err := os.Stat(oldDir)
+		if err != nil {
+			continue
+		}
+
+		// Only remove directories not accessed in the last 7 days
+		// This allows concurrent use of different it2 versions
+		if info.ModTime().Before(sevenDaysAgo) {
+			os.RemoveAll(oldDir) // Ignore errors
+		}
 	}
 }
 
-// getBuildHash returns a hash of the build info to use as plugin directory name
+// getBuildHash returns a version-aware directory name for plugin extraction
+// Format uses module version from BuildInfo which includes timestamp and commit
+// Example: v0.0.0-20251001042908-d843f51e2780+dirty
 func getBuildHash() string {
 	info, ok := debug.ReadBuildInfo()
 	if !ok {
@@ -122,17 +140,22 @@ func getBuildHash() string {
 		return "dev"
 	}
 
-	// Create hash from build info
-	h := sha256.New()
-	h.Write([]byte(info.Main.Path))
-	h.Write([]byte(info.Main.Version))
+	// Use the full module version which includes pseudo-version format
+	if info.Main.Version != "" && info.Main.Version != "(devel)" {
+		return info.Main.Version
+	}
 
-	// Include VCS info if available
+	// Fallback to VCS revision if no version
 	for _, setting := range info.Settings {
-		if setting.Key == "vcs.revision" || setting.Key == "vcs.time" {
-			h.Write([]byte(setting.Value))
+		if setting.Key == "vcs.revision" {
+			revision := setting.Value
+			if len(revision) > 8 {
+				return revision[:8]
+			}
+			return revision
 		}
 	}
 
-	return fmt.Sprintf("%x", h.Sum(nil))[:12]
+	// Fallback to dev if no VCS info
+	return "dev"
 }
