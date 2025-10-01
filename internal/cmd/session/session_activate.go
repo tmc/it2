@@ -8,10 +8,26 @@ import (
 
 func newActivateCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:             "activate <session-id>",
-		Short:           "Activate a session",
-		Long:            "Activate the specified iTerm2 session, optionally selecting it in its tab",
-		Args:            cobra.ExactArgs(1),
+		Use:   "activate <session-id>",
+		Short: "Activate a session",
+		Long:  "Activate the specified iTerm2 session, optionally selecting it in its tab",
+		Example: cmdutil.Doc(`
+			# Activate a specific session (brings it to front and selects it)
+			$ it2 session activate abc123
+
+			# Activate without selecting in tab
+			$ it2 session activate --select-session=false abc123
+
+			# Activate with JSON output
+			$ it2 session activate --format json abc123
+
+			# Activate session by partial ID match
+			$ it2 session activate abc
+
+			# Activate most recently created session
+			$ it2 session activate $(it2 session list --format id | head -1)
+		`),
+		Args: cobra.ExactArgs(1),
 		RequiresClient:  true,
 		RequiresSession: true,
 		SupportsFormat:  true,

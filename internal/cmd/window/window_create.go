@@ -13,7 +13,23 @@ func newCreateCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create [profile]",
 		Short: "Create a new window",
-		Args:  cobra.MaximumNArgs(1),
+		Example: cmdutil.Doc(`
+			# Create new window with default profile
+			$ it2 window create
+
+			# Create window with specific profile
+			$ it2 window create "My Profile"
+
+			# Create window and capture ID for later use
+			$ WINDOW_ID=$(it2 window create --format json | jq -r .window_id)
+
+			# Create multiple windows
+			$ for i in {1..3}; do it2 window create; done
+
+			# Create window with custom profile
+			$ it2 window create --profile "Hotkey Window"
+		`),
+		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			profile := "Default"
 			if len(args) > 0 {

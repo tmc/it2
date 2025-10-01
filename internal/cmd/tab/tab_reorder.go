@@ -12,10 +12,29 @@ import (
 
 func newReorderCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "reorder <tab-id> <new-index>",
-		Short:          "Reorder tabs within a window",
-		Long:           "Reorder tabs by specifying new position for a tab within its window",
-		Args:           cobra.ExactArgs(2),
+		Use:   "reorder <tab-id> <new-index>",
+		Short: "Reorder tabs within a window",
+		Long:  "Reorder tabs by specifying new position for a tab within its window",
+		Example: cmdutil.Doc(`
+			# Move tab to first position
+			$ it2 tab reorder tab-123 0
+
+			# Move tab to second position
+			$ it2 tab reorder tab-123 1
+
+			# Move tab to last position
+			$ it2 tab reorder tab-123 99
+
+			# Move current tab to first position
+			$ it2 tab reorder $(it2 tab current) 0
+
+			# Reorder with JSON output
+			$ it2 tab reorder --format json tab-123 2
+
+			# Swap two tabs by moving them
+			$ it2 tab reorder tab-123 1 && it2 tab reorder tab-456 0
+		`),
+		Args: cobra.ExactArgs(2),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.TabIDCompletion,

@@ -8,10 +8,31 @@ import (
 
 func newCloseCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "close <tab-id> [tab-id...]",
-		Short:          "Close one or more tabs",
-		Long:           "Close one or more tabs by their IDs. Use --force to close without prompting",
-		Args:           cobra.MinimumNArgs(1),
+		Use:   "close <tab-id> [tab-id...]",
+		Short: "Close one or more tabs",
+		Long:  "Close one or more tabs by their IDs. Use --force to close without prompting",
+		Example: cmdutil.Doc(`
+			# Close a specific tab
+			$ it2 tab close tab-123
+
+			# Close multiple tabs
+			$ it2 tab close tab-123 tab-456 tab-789
+
+			# Close current tab
+			$ it2 tab close $(it2 tab current)
+
+			# Force close without confirmation
+			$ it2 tab close --force tab-123
+
+			# Close with JSON output
+			$ it2 tab close --format json tab-123
+
+			# Close all tabs in current window except current
+			$ for tid in $(it2 tab list --format id); do
+			    [[ "$tid" != "$(it2 tab current)" ]] && it2 tab close --force $tid
+			  done
+		`),
+		Args: cobra.MinimumNArgs(1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.TabIDCompletion,

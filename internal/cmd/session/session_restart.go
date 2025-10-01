@@ -15,7 +15,25 @@ func newRestartCommand() *cobra.Command {
 		Use:   "restart <session-id>",
 		Short: "Restart a session",
 		Long:  "Restart a session, optionally only if it has already exited",
-		Args:  cobra.ExactArgs(1),
+		Example: cmdutil.Doc(`
+			# Restart a crashed or exited session
+			$ it2 session restart abc123
+
+			# Only restart if session has already exited
+			$ it2 session restart --only-if-exited abc123
+
+			# Restart current session
+			$ it2 session restart $ITERM_SESSION_ID
+
+			# Restart all exited sessions in window
+			$ for sid in $(it2 session list --format id); do
+			    it2 session restart --only-if-exited $sid 2>/dev/null
+			  done
+
+			# Restart session with custom timeout
+			$ it2 session restart --timeout 10s abc123
+		`),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionID := args[0]
 			onlyIfExited, _ := cmd.Flags().GetBool("only-if-exited")

@@ -8,10 +8,29 @@ import (
 
 func newActivateCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "activate <tab-id>",
-		Short:          "Activate a tab",
-		Long:           "Activate and optionally select a tab in the iTerm2 interface",
-		Args:           cobra.ExactArgs(1),
+		Use:   "activate <tab-id>",
+		Short: "Activate a tab",
+		Long:  "Activate and optionally select a tab in the iTerm2 interface",
+		Example: cmdutil.Doc(`
+			# Activate a specific tab
+			$ it2 tab activate tab-123
+
+			# Activate without selecting
+			$ it2 tab activate --select-tab=false tab-123
+
+			# Activate with JSON output
+			$ it2 tab activate --format json tab-123
+
+			# Activate next tab
+			$ it2 tab activate $(it2 tab list --format id | head -2 | tail -1)
+
+			# Activate first tab
+			$ it2 tab activate $(it2 tab list --format id | head -1)
+
+			# Activate last tab
+			$ it2 tab activate $(it2 tab list --format id | tail -1)
+		`),
+		Args: cobra.ExactArgs(1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.TabIDCompletion,
