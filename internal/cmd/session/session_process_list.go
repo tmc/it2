@@ -283,6 +283,11 @@ func printProcessTable(ctx context.Context, sessionID string, jobPID, shellPID i
 		}
 	}
 
+	// Reverse the chain so shell is first, job is last
+	for i, j := 0, len(chain)-1; i < j; i, j = i+1, j-1 {
+		chain[i], chain[j] = chain[j], chain[i]
+	}
+
 	// Discover process enricher plugins
 	registry := plugins.NewRegistry()
 	if err := registry.DiscoverAndRegister(); err == nil {
