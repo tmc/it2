@@ -518,6 +518,11 @@
             "path": "it2 session get-title"
           },
           {
+            "name": "get-variable",
+            "short": "Get a session variable value",
+            "path": "it2 session get-variable"
+          },
+          {
             "name": "list",
             "short": "List all iTerm2 sessions",
             "path": "it2 session list"
@@ -573,6 +578,11 @@
             "path": "it2 session set-title"
           },
           {
+            "name": "set-variable",
+            "short": "Set a session variable value",
+            "path": "it2 session set-variable"
+          },
+          {
             "name": "split",
             "short": "Split a session pane",
             "path": "it2 session split"
@@ -625,6 +635,11 @@
             "name": "create",
             "short": "Create a new tab",
             "path": "it2 tab create"
+          },
+          {
+            "name": "current",
+            "short": "Show the current tab ID",
+            "path": "it2 tab current"
           },
           {
             "name": "get-info",
@@ -840,6 +855,11 @@
             "path": "it2 window create"
           },
           {
+            "name": "current",
+            "short": "Show the current window ID",
+            "path": "it2 window current"
+          },
+          {
             "name": "focus",
             "short": "Focus/activate a window",
             "path": "it2 window focus"
@@ -1026,6 +1046,11 @@
               "path": "it2 session get-title"
             },
             {
+              "name": "get-variable",
+              "short": "Get a session variable value",
+              "path": "it2 session get-variable"
+            },
+            {
               "name": "list",
               "short": "List all iTerm2 sessions",
               "path": "it2 session list"
@@ -1081,6 +1106,11 @@
               "path": "it2 session set-title"
             },
             {
+              "name": "set-variable",
+              "short": "Set a session variable value",
+              "path": "it2 session set-variable"
+            },
+            {
               "name": "split",
               "short": "Split a session pane",
               "path": "it2 session split"
@@ -1121,6 +1151,11 @@
               "name": "create",
               "short": "Create a new tab",
               "path": "it2 tab create"
+            },
+            {
+              "name": "current",
+              "short": "Show the current tab ID",
+              "path": "it2 tab current"
             },
             {
               "name": "get-info",
@@ -1178,6 +1213,11 @@
               "name": "create",
               "short": "Create a new window",
               "path": "it2 window create"
+            },
+            {
+              "name": "current",
+              "short": "Show the current window ID",
+              "path": "it2 window current"
             },
             {
               "name": "focus",
@@ -1772,6 +1812,6 @@
       ]
     }
   ],
-  "total_commands": 166,
-  "generated_at": "2025-09-30T09:26:48Z"
+  "total_commands": 170,
+  "generated_at": "2025-10-01T02:40:31Z"
 }
