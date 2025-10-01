@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Plugin to verify auth credentials - copy of show-auth with different display
+# This demonstrates that multiple plugins in one run get the same credentials
+
+session_id="$1"
+
+if [ -n "$ITERM2_COOKIE" ]; then
+    # Show last 8 chars instead of first to prove it's the same cookie
+    cookie_suffix="${ITERM2_COOKIE: -8}"
+    echo "...$cookie_suffix"
+else
+    echo "missing"
+fi
