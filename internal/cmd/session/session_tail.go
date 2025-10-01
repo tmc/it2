@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -134,16 +135,16 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
-	// Track last known content length to detect new output
-	var lastSize int
+	// Track the last line we've seen to detect new output
+	var lastContent string
 
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			// Get current buffer
-			resp, err := sc.GetClient().GetBufferWithStyles(ctx, sessionID, 10000, colorized)
+			// Get current buffer (last 100 lines should be enough for most cases)
+			resp, err := sc.GetClient().GetBufferWithStyles(ctx, sessionID, 100, colorized)
 			if err != nil {
 				// Check if context was cancelled (user hit Ctrl+C)
 				if ctx.Err() != nil {
@@ -152,20 +153,61 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 				return sc.ReportError("get buffer", err)
 			}
 
-			// Calculate new content
-			currentSize := len(resp.GetContents())
-			if currentSize > lastSize {
-				// Extract only new content
-				newLines := resp.GetContents()[lastSize:]
-
-				// Print new lines
-				for _, line := range newLines {
-					text := line.GetText()
-					fmt.Println(text)
-				}
-
-				lastSize = currentSize
+			contents := resp.GetContents()
+			if len(contents) == 0 {
+				continue
 			}
+
+			// Build the current buffer content
+			var currentLines []string
+			for _, line := range contents {
+				currentLines = append(currentLines, line.GetText())
+			}
+			currentContent := strings.Join(currentLines, "\n")
+
+			// First poll - just record what we have, don't print
+			if lastContent == "" {
+				lastContent = currentContent
+				continue
+			}
+
+			// No change - skip
+			if currentContent == lastContent {
+				continue
+			}
+
+			// Find new content by comparing with last known state
+			// Find where the old content ends in the new content
+			if strings.Contains(currentContent, lastContent) {
+				// Old content is a prefix - extract just the new part
+				newPart := strings.TrimPrefix(currentContent, lastContent)
+				newPart = strings.TrimPrefix(newPart, "\n")
+				if newPart != "" {
+					fmt.Println(newPart)
+				}
+			} else {
+				// Content has changed significantly (scrollback, clear, etc)
+				// Try to find common suffix
+				lastLines := strings.Split(lastContent, "\n")
+				if len(lastLines) > 0 {
+					lastLine := lastLines[len(lastLines)-1]
+					// Find where the last line appears in current content
+					idx := strings.LastIndex(currentContent, lastLine)
+					if idx >= 0 {
+						// Found it - print everything after
+						newPart := currentContent[idx+len(lastLine):]
+						newPart = strings.TrimPrefix(newPart, "\n")
+						if newPart != "" {
+							fmt.Println(newPart)
+						}
+					} else {
+						// Can't find common ground - print all new lines
+						fmt.Print(currentContent)
+						fmt.Println()
+					}
+				}
+			}
+			lastContent = currentContent
 		}
 	}
 }
