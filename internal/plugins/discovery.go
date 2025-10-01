@@ -9,6 +9,10 @@ import (
 )
 
 // DiscoverPlugins finds all it2-* executables in PATH and categorizes them
+// Search order (highest to lowest priority):
+//  1. Directories from PATH environment variable (highest priority)
+//  2. Directories from IT2_PLUGIN_PATHS (--plugin-path flag, middle priority)
+//  3. Embedded plugins directory (lowest priority, fallback)
 func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, []ProcessEnricher, error) {
 	var sessionPlugins []SessionEnricher
 	var tabPlugins []TabEnricher
@@ -16,19 +20,24 @@ func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, []Pr
 	var processPlugins []ProcessEnricher
 	seen := make(map[string]bool) // Track seen plugin names to avoid duplicates
 
-	// Extract embedded plugins and prepend to search paths
-	pluginsDir, err := embedded.ExtractPlugins()
 	var paths []string
-	if err == nil {
-		// Add embedded plugins directory at the end of search paths (lower priority)
-		paths = append(paths, pluginsDir)
-	}
 
-	// Get PATH environment variable
+	// Priority 1: User's PATH directories (highest priority)
 	pathEnv := os.Getenv("PATH")
 	if pathEnv != "" {
-		// Prepend user's PATH directories (higher priority)
-		paths = append(strings.Split(pathEnv, string(os.PathListSeparator)), paths...)
+		paths = append(paths, strings.Split(pathEnv, string(os.PathListSeparator))...)
+	}
+
+	// Priority 2: Additional plugin paths from --plugin-path flag (middle priority)
+	pluginPathsEnv := os.Getenv("IT2_PLUGIN_PATHS")
+	if pluginPathsEnv != "" {
+		paths = append(paths, strings.Split(pluginPathsEnv, string(os.PathListSeparator))...)
+	}
+
+	// Priority 3: Embedded plugins directory (lowest priority, fallback)
+	pluginsDir, err := embedded.ExtractPlugins()
+	if err == nil {
+		paths = append(paths, pluginsDir)
 	}
 
 	if len(paths) == 0 {
@@ -92,23 +101,32 @@ func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, []Pr
 }
 
 // DiscoverEventMonitors finds all it2-* executables that support event monitoring
+// Search order (highest to lowest priority):
+//  1. Directories from PATH environment variable (highest priority)
+//  2. Directories from IT2_PLUGIN_PATHS (--plugin-path flag, middle priority)
+//  3. Embedded plugins directory (lowest priority, fallback)
 func DiscoverEventMonitors() ([]EventMonitor, error) {
 	var eventMonitors []EventMonitor
 	seen := make(map[string]bool) // Track seen plugin names to avoid duplicates
 
-	// Extract embedded plugins and prepend to search paths
-	pluginsDir, err := embedded.ExtractPlugins()
 	var paths []string
-	if err == nil {
-		// Add embedded plugins directory at the end of search paths (lower priority)
-		paths = append(paths, pluginsDir)
-	}
 
-	// Get PATH environment variable
+	// Priority 1: User's PATH directories (highest priority)
 	pathEnv := os.Getenv("PATH")
 	if pathEnv != "" {
-		// Prepend user's PATH directories (higher priority)
-		paths = append(strings.Split(pathEnv, string(os.PathListSeparator)), paths...)
+		paths = append(paths, strings.Split(pathEnv, string(os.PathListSeparator))...)
+	}
+
+	// Priority 2: Additional plugin paths from --plugin-path flag (middle priority)
+	pluginPathsEnv := os.Getenv("IT2_PLUGIN_PATHS")
+	if pluginPathsEnv != "" {
+		paths = append(paths, strings.Split(pluginPathsEnv, string(os.PathListSeparator))...)
+	}
+
+	// Priority 3: Embedded plugins directory (lowest priority, fallback)
+	pluginsDir, err := embedded.ExtractPlugins()
+	if err == nil {
+		paths = append(paths, pluginsDir)
 	}
 
 	if len(paths) == 0 {

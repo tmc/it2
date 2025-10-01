@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -46,15 +48,22 @@ import (
 )
 
 var (
-	wsURL     string
-	timeout   time.Duration
-	format    string
-	configCmd *cobra.Command
+	wsURL       string
+	timeout     time.Duration
+	format      string
+	pluginPaths []string
+	configCmd   *cobra.Command
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "it2",
 	Short: "Comprehensive command-line interface for iTerm2 automation",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		// Set IT2_PLUGIN_PATHS environment variable from flag
+		if len(pluginPaths) > 0 {
+			os.Setenv("IT2_PLUGIN_PATHS", strings.Join(pluginPaths, string(os.PathListSeparator)))
+		}
+	},
 	Long: `it2 - iTerm2 API Command-Line Interface
 
 A powerful command-line tool for controlling iTerm2. Provides comprehensive access to terminal automation,
@@ -253,6 +262,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&wsURL, "url", defaultURL, "WebSocket URL to connect to iTerm2")
 	rootCmd.PersistentFlags().DurationVar(&timeout, "timeout", defaultTimeout, "Connection timeout")
 	rootCmd.PersistentFlags().StringVar(&format, "format", defaultFormat, "Output format (table, text, json, yaml)")
+	rootCmd.PersistentFlags().StringSliceVar(&pluginPaths, "plugin-path", nil, "Additional plugin search paths (higher priority than embedded plugins)")
 
 	// Add flag completion
 	rootCmd.RegisterFlagCompletionFunc("format", completion.FormatCompletion)
