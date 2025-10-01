@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -541,6 +542,44 @@ func (c *Client) SetSessionProfileProperty(ctx context.Context, sessionID, key, 
 	return nil
 }
 
+// DeleteSessionProfileProperty removes a session-specific profile property override by omitting json_value
+// This causes iTerm2 to delete the override and fall back to the profile's default value
+func (c *Client) DeleteSessionProfileProperty(ctx context.Context, sessionID, key string) error {
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_SetProfilePropertyRequest{
+			SetProfilePropertyRequest: &pb.SetProfilePropertyRequest{
+				Target: &pb.SetProfilePropertyRequest_Session{
+					Session: sessionID,
+				},
+				Assignments: []*pb.SetProfilePropertyRequest_Assignment{
+					{
+						Key: &key,
+						// Omit JsonValue entirely - this sends nil instead of NSNull,
+						// which triggers deletion in PTYSession.m:386-388
+						JsonValue: nil,
+					},
+				},
+			},
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return fmt.Errorf("failed to delete session profile property: %w", err)
+	}
+
+	resp := response.GetSetProfilePropertyResponse()
+	if resp == nil {
+		return fmt.Errorf("no set profile property response received")
+	}
+
+	if resp.GetStatus() != pb.SetProfilePropertyResponse_OK {
+		return fmt.Errorf("failed to delete session profile property: %v", resp.GetStatus())
+	}
+
+	return nil
+}
+
 // GetSessionProfileProperty gets a profile property from a specific sessions copy of the profile
 func (c *Client) GetSessionProfileProperty(ctx context.Context, sessionID, key string) (interface{}, error) {
 	msg := &pb.ClientOriginatedMessage{
@@ -610,10 +649,49 @@ func (c *Client) GetSessionBadge(ctx context.Context, sessionID string) (string,
 	return fmt.Sprintf("%v", val), nil
 }
 
-// ClearSessionBadge clears the session badge by setting Badge Text to empty
+// ClearSessionBadge clears the session badge by setting it to empty string
 func (c *Client) ClearSessionBadge(ctx context.Context, sessionID string) error {
-	// Clear by setting to empty string - profile default will be used
+	// Note: Ideally we'd delete the override (nil json_value) to fall back to profile badge,
+	// but iTerm2 has a bug where valueIsLegal validation (PTYSession.m:18606) runs BEFORE
+	// NSNull removal (line 6922), causing REQUEST_MALFORMED for Badge Text.
+	// Setting to empty string "" clears the visible badge but keeps it as a session override.
 	return c.SetSessionProfileProperty(ctx, sessionID, "Badge Text", "\"\"")
+}
+
+// ResetSessionBadgeToProfile copies the profile's badge to the session badge
+func (c *Client) ResetSessionBadgeToProfile(ctx context.Context, sessionID string) error {
+	// Get the session's profile name
+	profileNameValue, err := c.GetVariableWithScope(ctx, "session", sessionID, "profileName")
+	if err != nil {
+		return fmt.Errorf("failed to get profile name: %w", err)
+	}
+
+	// Parse JSON-encoded profile name
+	var profileName string
+	if err := json.Unmarshal([]byte(profileNameValue), &profileName); err != nil {
+		profileName = profileNameValue
+	}
+
+	// Get the profile's badge (returns JSON-encoded string like "\"\\(id)\"")
+	badgeValue, err := c.GetProfileProperty(ctx, profileName, "Badge Text")
+	if err != nil {
+		return fmt.Errorf("failed to get profile badge: %w", err)
+	}
+
+	// Convert to string
+	badgeStr, ok := badgeValue.(string)
+	if !ok {
+		return fmt.Errorf("unexpected badge value type: %T", badgeValue)
+	}
+
+	// Parse the JSON-encoded badge to get the actual value
+	var badge string
+	if err := json.Unmarshal([]byte(badgeStr), &badge); err != nil {
+		badge = badgeStr // Use raw if not JSON
+	}
+
+	// Now re-encode it for SetSessionProfileProperty (which expects JSON)
+	return c.SetSessionBadge(ctx, sessionID, badge)
 }
 
 // ListSessionProfileProperties gets multiple profile properties from a session's profile copy
