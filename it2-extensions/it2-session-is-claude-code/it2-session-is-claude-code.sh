@@ -1,5 +1,5 @@
 #!/bin/bash
-# it2-session-is-claude-session
+# it2-session-is-claude-code
 # Plugin to detect Claude Code sessions by checking if the main process is claude
 
 # Get session ID - use argument if provided, otherwise use current session
@@ -7,7 +7,7 @@ SESSION_ID="${1:-$(it2 session current 2>/dev/null)}"
 
 # Debug output if ITERM2_DEBUG is set
 if [ "$ITERM2_DEBUG" = "1" ]; then
-    echo "[DEBUG] it2-session-is-claude-session: SESSION_ID=$SESSION_ID" >&2
+    echo "[DEBUG] it2-session-is-claude-code: SESSION_ID=$SESSION_ID" >&2
 fi
 
 # If no session ID, cannot determine

@@ -7,7 +7,7 @@ import (
 	"os/exec"
 )
 
-//go:embed it2-session-is-claude-session.sh
+//go:embed it2-session-is-claude-code.sh
 var script string
 
 func main() {
