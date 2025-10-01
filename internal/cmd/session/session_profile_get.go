@@ -24,12 +24,28 @@ Common profile properties:
   - Title: Session title
   - Name: Session name
   - Background Color: Background color
-  - Foreground Color: Text color
+  - Foreground Color: Text color`,
+		Example: cmdutil.Doc(`
+			# Get badge text from current session
+			$ it2 session profile get "Badge Text"
 
-Examples:
-  it2 session profile get "Badge Text"
-  it2 session profile get Title
-  it2 session profile get sess_123 "Background Color"`,
+			# Get title from current session
+			$ it2 session profile get Title
+
+			# Get property from specific session
+			$ it2 session profile get abc123 "Background Color"
+
+			# Get with JSON output
+			$ it2 session profile get --format json Title
+
+			# Get all common properties
+			$ for prop in "Badge Text" Title Name; do
+			    echo "$prop: $(it2 session profile get "$prop")"
+			  done
+
+			# Get foreground color
+			$ it2 session profile get "Foreground Color"
+		`),
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID, property string

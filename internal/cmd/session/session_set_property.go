@@ -30,12 +30,29 @@ Common session properties that can be set:
   - blur_radius: Background blur radius (number)
   - cursor_guide: Enable/disable cursor guide (true/false)
   - cursor_boost: Enable/disable cursor boost (true/false)
-  - blink_cursor: Enable/disable cursor blinking (true/false)
+  - blink_cursor: Enable/disable cursor blinking (true/false)`,
+		Example: cmdutil.Doc(`
+			# Set session title
+			$ it2 session set-property abc123 title "My Session"
 
-Examples:
-  it2 session set-property sess_123 title "My Session"
-  it2 session set-property sess_123 transparency 0.8
-  it2 session set-property sess_123 use_transparency true`,
+			# Set transparency level
+			$ it2 session set-property abc123 transparency 0.8
+
+			# Enable transparency
+			$ it2 session set-property abc123 use_transparency true
+
+			# Disable cursor blinking
+			$ it2 session set-property abc123 blink_cursor false
+
+			# Set blur radius
+			$ it2 session set-property abc123 blur_radius 10
+
+			# Enable cursor guide
+			$ it2 session set-property abc123 cursor_guide true
+
+			# Set for current session
+			$ it2 session set-property $ITERM_SESSION_ID title "Build"
+		`),
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionID := args[0]

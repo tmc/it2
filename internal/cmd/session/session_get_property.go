@@ -23,6 +23,25 @@ Available session properties:
   - number_of_lines: Line information {first_visible, overflow, grid, history}
 
 Use --list to see detailed property information.`,
+		Example: cmdutil.Doc(`
+			# Get grid size
+			$ it2 session get-property abc123 grid_size
+
+			# Get buried status
+			$ it2 session get-property abc123 buried
+
+			# Get with JSON output
+			$ it2 session get-property --json abc123 grid_size
+
+			# List all available properties
+			$ it2 session get-property --list
+
+			# Get number of lines
+			$ it2 session get-property abc123 number_of_lines
+
+			# Check if current session is buried
+			$ it2 session get-property $ITERM_SESSION_ID buried
+		`),
 		Args: cobra.RangeArgs(0, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			listProperties, _ := cmd.Flags().GetBool("list")

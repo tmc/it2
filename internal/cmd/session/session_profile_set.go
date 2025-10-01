@@ -30,12 +30,30 @@ Common profile properties:
   - Title: Session title (string)
   - Name: Session name (string)
   - Background Color: Background color (color dict)
-  - Foreground Color: Text color (color dict)
+  - Foreground Color: Text color (color dict)`,
+		Example: cmdutil.Doc(`
+			# Set badge text for current session
+			$ it2 session profile set "Badge Text" "PROD"
 
-Examples:
-  it2 session profile set "Badge Text" "PROD"
-  it2 session profile set Title "My Session"
-  it2 session profile set sess_123 Name "Build Server"`,
+			# Set title for current session
+			$ it2 session profile set Title "My Session"
+
+			# Set property for specific session
+			$ it2 session profile set abc123 Name "Build Server"
+
+			# Set badge with environment indicator
+			$ it2 session profile set "Badge Text" "🔴 PROD"
+
+			# Clear badge text
+			$ it2 session profile set "Badge Text" ""
+
+			# Set multiple properties
+			$ it2 session profile set Title "Database" && \
+			  it2 session profile set "Badge Text" "DB"
+
+			# Set based on hostname
+			$ it2 session profile set "Badge Text" "$(hostname -s)"
+		`),
 		Args: cobra.RangeArgs(2, 3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID, property, value string
