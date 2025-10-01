@@ -1,12 +1,24 @@
 package plugins
 
 import (
+	"crypto/sha256"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/tmc/it2/internal/embedded"
 )
+
+// PluginMetadata contains detailed information about a discovered plugin
+type PluginMetadata struct {
+	Name       string
+	Path       string
+	Source     string // "PATH", "custom", or "embedded"
+	SHA256     string
+	Duplicates int // Count of other plugins with same name
+}
 
 // DiscoverPlugins finds all it2-* executables in PATH and categorizes them
 // Search order (highest to lowest priority):
@@ -254,4 +266,140 @@ func (r *Registry) GetProcessEnrichers() []ProcessEnricher {
 // AddProcessEnricher manually adds a process enricher to the registry
 func (r *Registry) AddProcessEnricher(enricher ProcessEnricher) {
 	r.processEnrichers = append(r.processEnrichers, enricher)
+}
+
+// DiscoverPluginMetadata returns detailed metadata about all discovered plugins
+func DiscoverPluginMetadata() ([]PluginMetadata, error) {
+	var metadata []PluginMetadata
+	nameCount := make(map[string]int) // Track duplicates
+
+	var paths []string
+	var pathSources []string // Track which source each path comes from
+
+	// Priority 1: User's PATH directories (highest priority)
+	pathEnv := os.Getenv("PATH")
+	if pathEnv != "" {
+		pathDirs := strings.Split(pathEnv, string(os.PathListSeparator))
+		for _, dir := range pathDirs {
+			paths = append(paths, dir)
+			pathSources = append(pathSources, "PATH")
+		}
+	}
+
+	// Priority 2: Additional plugin paths from --plugin-path flag
+	pluginPathsEnv := os.Getenv("IT2_PLUGIN_PATHS")
+	if pluginPathsEnv != "" {
+		pluginDirs := strings.Split(pluginPathsEnv, string(os.PathListSeparator))
+		for _, dir := range pluginDirs {
+			paths = append(paths, dir)
+			pathSources = append(pathSources, "custom")
+		}
+	}
+
+	// Priority 3: Embedded plugins directory
+	pluginsDir, err := embedded.ExtractPlugins()
+	if err == nil {
+		paths = append(paths, pluginsDir)
+		pathSources = append(pathSources, "embedded")
+	}
+
+	// First pass: collect all plugins and count duplicates
+	allPlugins := make(map[string][]PluginMetadata) // name -> list of metadata
+
+	for i, dir := range paths {
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			continue
+		}
+
+		for _, entry := range entries {
+			if entry.IsDir() {
+				continue
+			}
+
+			name := entry.Name()
+			if !strings.HasPrefix(name, "it2-") {
+				continue
+			}
+
+			fullPath := filepath.Join(dir, name)
+			info, err := os.Stat(fullPath)
+			if err != nil || info.Mode()&0111 == 0 {
+				continue
+			}
+
+			// Calculate SHA256
+			f, err := os.Open(fullPath)
+			if err != nil {
+				continue
+			}
+			h := sha256.New()
+			if _, err := io.Copy(h, f); err != nil {
+				f.Close()
+				continue
+			}
+			f.Close()
+			sha := fmt.Sprintf("%x", h.Sum(nil))[:16] // First 16 chars
+
+			// Determine plugin name (remove prefix)
+			plugin := NewExecPlugin(fullPath)
+			pluginName := plugin.Name()
+
+			meta := PluginMetadata{
+				Name:   pluginName,
+				Path:   fullPath,
+				Source: pathSources[i],
+				SHA256: sha,
+			}
+
+			allPlugins[pluginName] = append(allPlugins[pluginName], meta)
+			nameCount[pluginName]++
+		}
+	}
+
+	// Second pass: assign duplicate counts and collect first occurrence of each
+	seen := make(map[string]bool)
+	for _, dir := range paths {
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			continue
+		}
+
+		for _, entry := range entries {
+			if entry.IsDir() {
+				continue
+			}
+
+			name := entry.Name()
+			if !strings.HasPrefix(name, "it2-") {
+				continue
+			}
+
+			fullPath := filepath.Join(dir, name)
+			info, err := os.Stat(fullPath)
+			if err != nil || info.Mode()&0111 == 0 {
+				continue
+			}
+
+			plugin := NewExecPlugin(fullPath)
+			pluginName := plugin.Name()
+
+			// Only include first occurrence (highest priority)
+			if seen[pluginName] {
+				continue
+			}
+			seen[pluginName] = true
+
+			// Find this plugin's metadata
+			for _, meta := range allPlugins[pluginName] {
+				if meta.Path == fullPath {
+					meta.Duplicates = nameCount[pluginName] - 1 // Don't count itself
+					metadata = append(metadata, meta)
+					break
+				}
+			}
+		}
+	}
+
+	return metadata, nil
 }
