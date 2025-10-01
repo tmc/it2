@@ -1695,6 +1695,7 @@ func buildSessionHierarchy(sessions []*client.SessionInfo) map[string]*TreeNode 
 			ParentID:       session.ParentSessionID,
 			Children:       []*TreeNode{},
 			CurrentCommand: session.CurrentCommand,
+			ShellPID:       session.ShellPID,
 			JobPID:         session.JobPID,
 			PromptState:    session.PromptState,
 			PluginData:     session.PluginData,
@@ -1756,8 +1757,15 @@ func printSessionNode(node *TreeNode, prefix string, isLast bool, pluginCols []s
 	// Format session information
 	sessionID := node.ShortID
 	pidDisplay := ""
-	if node.JobPID != 0 {
+	if node.ShellPID != 0 && node.JobPID != 0 && node.ShellPID != node.JobPID {
+		// Show both PIDs when they differ (shell/job)
+		pidDisplay = fmt.Sprintf("%d/%d", node.ShellPID, node.JobPID)
+	} else if node.JobPID != 0 {
+		// Show only job PID if available
 		pidDisplay = fmt.Sprintf("%d", node.JobPID)
+	} else if node.ShellPID != 0 {
+		// Fall back to shell PID if no job PID
+		pidDisplay = fmt.Sprintf("%d", node.ShellPID)
 	}
 
 	// Shorten state with indicators
@@ -1806,6 +1814,7 @@ type TreeNode struct {
 	ParentID       string
 	Children       []*TreeNode
 	CurrentCommand string
+	ShellPID       int32
 	JobPID         int32
 	PromptState    string
 	PluginData     map[string]interface{}

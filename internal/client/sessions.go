@@ -26,6 +26,7 @@ type SessionInfo struct {
 	ExitCode       uint32 // Last command exit status
 	PromptState    string // Shell prompt state (AT_COMMAND_LINE, IN_COMMAND, etc.)
 	CommandCount   int32  // Number of commands executed
+	ShellPID       int32  // Process ID of the shell
 	JobPID         int32  // Process ID of current job
 }
 
@@ -176,6 +177,15 @@ func (c *Client) populateJobInfo(ctx context.Context, sessions []*SessionInfo) {
 			session.PromptState = promptResp.GetPromptState().String()
 			// CommandCount would need to be tracked separately, for now set to 0
 			session.CommandCount = 0
+		}
+
+		// Try to get shell PID from session variables
+		if pidStr, err := c.GetVariableWithScope(ctx, "session", session.SessionID, "pid"); err == nil && pidStr != "" {
+			// Parse PID if it's a valid number
+			var pid int32
+			if n, parseErr := fmt.Sscanf(pidStr, "%d", &pid); parseErr == nil && n == 1 {
+				session.ShellPID = pid
+			}
 		}
 
 		// Try to get job PID from session variables
