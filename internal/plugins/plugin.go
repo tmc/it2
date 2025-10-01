@@ -42,6 +42,15 @@ type WindowEnricher interface {
 	EnrichWindow(ctx context.Context, window *client.WindowInfo) (map[string]interface{}, error)
 }
 
+// ProcessEnricher is an interface for plugins that can add extra process data
+type ProcessEnricher interface {
+	// Name returns the name of the enricher
+	Name() string
+
+	// EnrichProcess adds extra data about a process given its PID and session ID
+	EnrichProcess(ctx context.Context, sessionID string, pid int) (map[string]interface{}, error)
+}
+
 // PluginEvent represents an event from a plugin
 type PluginEvent struct {
 	PluginName string                 `json:"plugin_name"`
@@ -78,7 +87,10 @@ func NewExecPlugin(executable string) *ExecPlugin {
 
 	// Determine plugin type and clean name based on prefix
 	var pluginType, name string
-	if strings.HasPrefix(baseName, "it2-session-") {
+	if strings.HasPrefix(baseName, "it2-session-process-") {
+		pluginType = "session-process"
+		name = strings.TrimPrefix(baseName, "it2-session-process-")
+	} else if strings.HasPrefix(baseName, "it2-session-") {
 		pluginType = "session"
 		name = strings.TrimPrefix(baseName, "it2-session-")
 	} else if strings.HasPrefix(baseName, "it2-tab-") {
@@ -198,6 +210,31 @@ func (p *ExecPlugin) EnrichWindow(ctx context.Context, window *client.WindowInfo
 	if window.Title != "" {
 		args = append(args, window.Title)
 	}
+	cmd := exec.CommandContext(pluginCtx, p.executable, args...)
+	setupPluginEnv(cmd)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return map[string]interface{}{}, nil
+	}
+
+	result := strings.TrimSpace(string(output))
+	if result == "" {
+		return map[string]interface{}{}, nil
+	}
+
+	return map[string]interface{}{
+		p.name: result,
+	}, nil
+}
+
+// EnrichProcess runs the executable with process information and parses the output
+func (p *ExecPlugin) EnrichProcess(ctx context.Context, sessionID string, pid int) (map[string]interface{}, error) {
+	// Use a longer timeout for plugins to ensure they can complete
+	pluginCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	// Pass session ID and PID as arguments
+	args := []string{sessionID, fmt.Sprintf("%d", pid)}
 	cmd := exec.CommandContext(pluginCtx, p.executable, args...)
 	setupPluginEnv(cmd)
 	output, err := cmd.CombinedOutput()

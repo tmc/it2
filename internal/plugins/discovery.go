@@ -4,19 +4,22 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/tmc/it2/internal/embedded"
 )
 
 // DiscoverPlugins finds all it2-* executables in PATH and categorizes them
-func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, error) {
+func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, []ProcessEnricher, error) {
 	var sessionPlugins []SessionEnricher
 	var tabPlugins []TabEnricher
 	var windowPlugins []WindowEnricher
+	var processPlugins []ProcessEnricher
 	seen := make(map[string]bool) // Track seen plugin names to avoid duplicates
 
 	// Get PATH environment variable
 	pathEnv := os.Getenv("PATH")
 	if pathEnv == "" {
-		return sessionPlugins, tabPlugins, windowPlugins, nil
+		return sessionPlugins, tabPlugins, windowPlugins, processPlugins, nil
 	}
 
 	// Split PATH into directories
@@ -68,11 +71,14 @@ func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, erro
 				if plugin.pluginType == "window" || plugin.pluginType == "generic" {
 					windowPlugins = append(windowPlugins, plugin)
 				}
+				if plugin.pluginType == "session-process" {
+					processPlugins = append(processPlugins, plugin)
+				}
 			}
 		}
 	}
 
-	return sessionPlugins, tabPlugins, windowPlugins, nil
+	return sessionPlugins, tabPlugins, windowPlugins, processPlugins, nil
 }
 
 // DiscoverEventMonitors finds all it2-* executables that support event monitoring
@@ -141,6 +147,7 @@ type Registry struct {
 	sessionEnrichers []SessionEnricher
 	tabEnrichers     []TabEnricher
 	windowEnrichers  []WindowEnricher
+	processEnrichers []ProcessEnricher
 }
 
 // NewRegistry creates a new plugin registry
@@ -149,18 +156,20 @@ func NewRegistry() *Registry {
 		sessionEnrichers: []SessionEnricher{},
 		tabEnrichers:     []TabEnricher{},
 		windowEnrichers:  []WindowEnricher{},
+		processEnrichers: []ProcessEnricher{},
 	}
 }
 
 // DiscoverAndRegister discovers and registers all plugins
 func (r *Registry) DiscoverAndRegister() error {
-	sessionPlugins, tabPlugins, windowPlugins, err := DiscoverPlugins()
+	sessionPlugins, tabPlugins, windowPlugins, processPlugins, err := DiscoverPlugins()
 	if err != nil {
 		return err
 	}
 	r.sessionEnrichers = sessionPlugins
 	r.tabEnrichers = tabPlugins
 	r.windowEnrichers = windowPlugins
+	r.processEnrichers = processPlugins
 	return nil
 }
 
@@ -197,4 +206,14 @@ func (r *Registry) AddTabEnricher(enricher TabEnricher) {
 // AddWindowEnricher manually adds a window enricher to the registry
 func (r *Registry) AddWindowEnricher(enricher WindowEnricher) {
 	r.windowEnrichers = append(r.windowEnrichers, enricher)
+}
+
+// GetProcessEnrichers returns all registered process enrichers
+func (r *Registry) GetProcessEnrichers() []ProcessEnricher {
+	return r.processEnrichers
+}
+
+// AddProcessEnricher manually adds a process enricher to the registry
+func (r *Registry) AddProcessEnricher(enricher ProcessEnricher) {
+	r.processEnrichers = append(r.processEnrichers, enricher)
 }
