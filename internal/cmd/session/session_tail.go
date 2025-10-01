@@ -22,6 +22,7 @@ func newTailCommand() *cobra.Command {
 
 This command polls the session buffer at regular intervals and displays new content
 as it appears. Useful for monitoring long-running commands or watching session output.`,
+		NoTimeout: true, // Tail can run indefinitely in follow mode
 		Example: cmdutil.Doc(`
 			# Tail current session output
 			$ it2 session tail

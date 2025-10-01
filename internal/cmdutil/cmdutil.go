@@ -134,6 +134,10 @@ func GetFormat(cmd *cobra.Command) string {
 
 // CreateContext creates a context with the specified timeout
 func CreateContext(timeout time.Duration) (context.Context, context.CancelFunc) {
+	if timeout == 0 {
+		// No timeout - use a cancellable context
+		return context.WithCancel(context.Background())
+	}
 	return context.WithTimeout(context.Background(), timeout)
 }
 

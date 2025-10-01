@@ -19,6 +19,7 @@ type CommandTemplate struct {
 	SupportsSorting bool
 	SupportsColumns bool
 	SupportsFormat  bool
+	NoTimeout       bool // Override default timeout for long-running commands
 	ValidArgsFunc   func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective)
 	PreRunE         func(cmd *cobra.Command, args []string) error
 	RunE            func(*StandardCommand, []string) error
@@ -65,6 +66,11 @@ func NewCommandFromTemplate(template CommandTemplate) *cobra.Command {
 		// Parse flags into the StandardCommand
 		if err := sc.ParseFlags(); err != nil {
 			return err
+		}
+
+		// Override timeout if NoTimeout is set
+		if template.NoTimeout {
+			sc.flags.Timeout = 0
 		}
 
 		// Validate format if supported
