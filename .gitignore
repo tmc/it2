@@ -23,3 +23,7 @@ coverage.out
 
 # OS generated files
 Thumbs.db
+tmp/
+
+# Session collaboration and research artifacts
+tmp/
