@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"regexp"
 	"strings"
 	"syscall"
 	"time"
@@ -37,15 +38,24 @@ as it appears. Useful for monitoring long-running commands or watching session o
 			# Tail with initial context (show last 20 lines first)
 			$ it2 session tail --lines 20
 
-			# Tail and grep for errors
-			$ it2 session tail | grep -i error
+			# Tail and filter for errors
+			$ it2 session tail --grep error
+
+			# Tail and exclude debug messages
+			$ it2 session tail --grep-v DEBUG
+
+			# Case-insensitive pattern matching
+			$ it2 session tail --grep error --ignore-case
+
+			# Show only command output (hide prompts)
+			$ it2 session tail --output-only
 
 			# Tail multiple sessions side-by-side (in different terminals)
 			$ it2 session tail sess1 &
 			$ it2 session tail sess2 &
 
-			# Monitor build output
-			$ it2 session tail build-session --interval 1s
+			# Monitor build output with faster polling
+			$ it2 session tail build-session --interval 500ms --grep "✓\|✗"
 		`),
 		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,
@@ -68,6 +78,35 @@ as it appears. Useful for monitoring long-running commands or watching session o
 			initialLines, _ := sc.GetCommand().Flags().GetInt32("lines")
 			followMode, _ := sc.GetCommand().Flags().GetBool("follow")
 			colorized, _ := sc.GetCommand().Flags().GetBool("color")
+			grepPattern, _ := sc.GetCommand().Flags().GetString("grep")
+			grepInvert, _ := sc.GetCommand().Flags().GetString("grep-v")
+			ignoreCase, _ := sc.GetCommand().Flags().GetBool("ignore-case")
+			outputOnly, _ := sc.GetCommand().Flags().GetBool("output-only")
+
+			// Compile grep patterns
+			var grepRE, grepInvertRE *regexp.Regexp
+			if grepPattern != "" {
+				flags := ""
+				if ignoreCase {
+					flags = "(?i)"
+				}
+				var err error
+				grepRE, err = regexp.Compile(flags + grepPattern)
+				if err != nil {
+					return sc.ReportError("compile grep pattern", err)
+				}
+			}
+			if grepInvert != "" {
+				flags := ""
+				if ignoreCase {
+					flags = "(?i)"
+				}
+				var err error
+				grepInvertRE, err = regexp.Compile(flags + grepInvert)
+				if err != nil {
+					return sc.ReportError("compile grep-v pattern", err)
+				}
+			}
 
 			if !followMode {
 				// Just show initial lines and exit (like tail without -f)
@@ -81,8 +120,15 @@ as it appears. Useful for monitoring long-running commands or watching session o
 				}
 			}
 
-			// Start tailing
-			return tailSession(ctx, sc, sessionID, interval, colorized)
+			// Start tailing with filters
+			opts := tailOptions{
+				interval:      interval,
+				colorized:     colorized,
+				grepPattern:   grepRE,
+				grepInvert:    grepInvertRE,
+				outputOnly:    outputOnly,
+			}
+			return tailSession(ctx, sc, sessionID, opts)
 		},
 	}
 
@@ -91,8 +137,21 @@ as it appears. Useful for monitoring long-running commands or watching session o
 	cmd.Flags().Int32("lines", 10, "Number of initial lines to show (0 for none)")
 	cmd.Flags().BoolP("follow", "f", true, "Follow output (disable to just show last N lines)")
 	cmd.Flags().Bool("color", false, "Preserve ANSI color codes")
+	cmd.Flags().String("grep", "", "Only show lines matching this pattern")
+	cmd.Flags().String("grep-v", "", "Only show lines NOT matching this pattern")
+	cmd.Flags().BoolP("ignore-case", "i", false, "Case-insensitive pattern matching")
+	cmd.Flags().Bool("output-only", false, "Hide command echoes and prompts, show only output")
 
 	return cmd
+}
+
+// tailOptions contains configuration for the tail operation
+type tailOptions struct {
+	interval    time.Duration
+	colorized   bool
+	grepPattern *regexp.Regexp
+	grepInvert  *regexp.Regexp
+	outputOnly  bool
 }
 
 // getBufferLines fetches and displays the last N lines from a session
@@ -119,7 +178,7 @@ func getBufferLines(sc *cmdutil.StandardCommand, sessionID string, lines int32, 
 }
 
 // tailSession continuously monitors a session for new content
-func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID string, interval time.Duration, colorized bool) error {
+func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID string, opts tailOptions) error {
 	// Setup signal handling for graceful shutdown
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -132,7 +191,7 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 		cancel()
 	}()
 
-	ticker := time.NewTicker(interval)
+	ticker := time.NewTicker(opts.interval)
 	defer ticker.Stop()
 
 	// Track lines we've seen using line-by-line comparison
@@ -146,7 +205,7 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 			return nil
 		case <-ticker.C:
 			// Get current buffer (last 100 lines should be enough for most cases)
-			resp, err := sc.GetClient().GetBufferWithStyles(ctx, sessionID, 100, colorized)
+			resp, err := sc.GetClient().GetBufferWithStyles(ctx, sessionID, 100, opts.colorized)
 			if err != nil {
 				// Check if context was cancelled (user hit Ctrl+C)
 				if ctx.Err() != nil {
@@ -195,7 +254,7 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 			if len(currentLines) > lastLineCount {
 				// Simple case: buffer grew, print new lines
 				for i := lastLineCount; i < len(currentLines); i++ {
-					fmt.Println(currentLines[i])
+					printLine(currentLines[i], opts)
 				}
 			} else {
 				// Buffer size stayed same or shrunk - content likely scrolled
@@ -231,7 +290,7 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 
 					if commonPrefixLen < endIdx {
 						for i := commonPrefixLen; i < endIdx; i++ {
-							fmt.Println(currentLines[i])
+							printLine(currentLines[i], opts)
 						}
 					}
 				}
@@ -249,4 +308,48 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// printLine prints a line after applying filters and output-only logic
+func printLine(line string, opts tailOptions) {
+	trimmed := strings.TrimSpace(line)
+
+	// Skip empty lines in output-only mode
+	if opts.outputOnly && trimmed == "" {
+		return
+	}
+
+	// Skip prompts in output-only mode
+	if opts.outputOnly {
+		// Heuristic: lines with @ and $ are likely prompts
+		// Also skip lines that start with common shell prompt characters
+		if (strings.Contains(line, "@") && strings.Contains(line, "$")) ||
+			strings.HasPrefix(trimmed, "$") ||
+			strings.HasPrefix(trimmed, "#") ||
+			strings.HasPrefix(trimmed, ">") {
+			return
+		}
+
+		// Skip timestamp/git info lines (common in custom prompts)
+		if strings.Contains(line, "git:") && strings.Contains(line, "PDT") {
+			return
+		}
+	}
+
+	// Apply grep filter
+	if opts.grepPattern != nil {
+		if !opts.grepPattern.MatchString(line) {
+			return
+		}
+	}
+
+	// Apply inverted grep filter
+	if opts.grepInvert != nil {
+		if opts.grepInvert.MatchString(line) {
+			return
+		}
+	}
+
+	// Print the line
+	fmt.Println(line)
 }
