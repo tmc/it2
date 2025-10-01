@@ -31,6 +31,16 @@ func newListCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
 		Short: "List available color presets",
+		Example: cmdutil.Doc(`
+			# List all color presets
+			$ it2 color-preset list
+
+			# List with JSON output
+			$ it2 color-preset list --format json
+
+			# List and count
+			$ it2 color-preset list | wc -l
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_, timeout, format := cmdutil.GetFlags(cmd)
 
@@ -70,7 +80,20 @@ func newApplyCommand() *cobra.Command {
 		Use:   "apply <preset-name> [profile-name]",
 		Short: "Apply a color preset to a profile",
 		Long:  "Apply the specified color preset to a profile. If no profile is specified, applies to the current session's profile.",
-		Args:  cobra.RangeArgs(1, 2),
+		Example: cmdutil.Doc(`
+			# Apply preset to current profile
+			$ it2 color-preset apply "Solarized Dark"
+
+			# Apply preset to specific profile
+			$ it2 color-preset apply "Monokai" "Development"
+
+			# Apply dark theme
+			$ it2 color-preset apply "Dracula"
+
+			# Apply light theme
+			$ it2 color-preset apply "Solarized Light" "Work"
+		`),
+		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			presetName := args[0]
 
@@ -128,8 +151,19 @@ func newImportCommand() *cobra.Command {
 		Use:   "import <preset-name> <file-path>",
 		Short: "Import a color preset from an .itermcolors file",
 		Long:  "Import a color preset from an .itermcolors file and save it with the specified name.",
-		Args:  cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Example: cmdutil.Doc(`
+			# Import color scheme
+			$ it2 color-preset import "Custom" ~/Downloads/theme.itermcolors
+
+			# Import from URL (download first)
+			$ curl -o nord.itermcolors https://example.com/nord.itermcolors
+			$ it2 color-preset import "Nord" nord.itermcolors
+
+			# Import company theme
+			$ it2 color-preset import "Company" ~/themes/company.itermcolors
+		`),
+		Args: cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error{
 			presetName := args[0]
 			filePath := args[1]
 
@@ -161,7 +195,17 @@ func newExportCommand() *cobra.Command {
 		Use:   "export <preset-name> <file-path>",
 		Short: "Export a color preset to an .itermcolors file",
 		Long:  "Export the specified color preset to an .itermcolors file.",
-		Args:  cobra.ExactArgs(2),
+		Example: cmdutil.Doc(`
+			# Export color preset
+			$ it2 color-preset export "Solarized Dark" solarized
+
+			# Export to specific path
+			$ it2 color-preset export "Custom" ~/backups/custom.itermcolors
+
+			# Export and share
+			$ it2 color-preset export "My Theme" my-theme.itermcolors
+		`),
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			presetName := args[0]
 			filePath := args[1]

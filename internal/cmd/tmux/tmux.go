@@ -32,6 +32,16 @@ func newListConnectionsCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "list-connections",
 		Short: "List all tmux connections",
+		Example: cmdutil.Doc(`
+			# List tmux connections
+			$ it2 tmux list-connections
+
+			# List with JSON format
+			$ it2 tmux list-connections --format json
+
+			# Get connection count
+			$ it2 tmux list-connections | wc -l
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_, timeout, format := cmdutil.GetFlags(cmd)
 
@@ -179,7 +189,23 @@ func newSendCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "send <connection-id> <command>",
 		Short: "Send command to tmux",
-		Args:  cobra.ExactArgs(2),
+		Example: cmdutil.Doc(`
+			# Send tmux command
+			$ it2 tmux send conn-123 "list-sessions"
+
+			# Create new window
+			$ it2 tmux send conn-123 "new-window"
+
+			# Switch to window
+			$ it2 tmux send conn-123 "select-window -t 1"
+
+			# Rename window
+			$ it2 tmux send conn-123 "rename-window 'build'"
+
+			# Split pane
+			$ it2 tmux send conn-123 "split-window -h"
+		`),
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			connectionID := args[0]
 			command := args[1]
@@ -213,7 +239,17 @@ func newAttachCommand() *cobra.Command {
 		Use:   "attach <connection-id> [session-name]",
 		Short: "Attach to tmux session",
 		Long:  "Attach to a tmux session. If session-name is provided, attaches to that specific session.",
-		Args:  cobra.MinimumNArgs(1),
+		Example: cmdutil.Doc(`
+			# Attach to default session
+			$ it2 tmux attach conn-123
+
+			# Attach to specific session
+			$ it2 tmux attach conn-123 development
+
+			# Attach to numbered session
+			$ it2 tmux attach conn-123 0
+		`),
+		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			connectionID := args[0]
 			var sessionName string
@@ -261,7 +297,17 @@ func newDetachCommand() *cobra.Command {
 		Use:   "detach <connection-id> [client-name]",
 		Short: "Detach from tmux session",
 		Long:  "Detach from a tmux session. If client-name is provided, detaches that specific client.",
-		Args:  cobra.MinimumNArgs(1),
+		Example: cmdutil.Doc(`
+			# Detach current client
+			$ it2 tmux detach conn-123
+
+			# Detach specific client
+			$ it2 tmux detach conn-123 /dev/ttys001
+
+			# Detach all clients
+			$ it2 tmux detach conn-123 -a
+		`),
+		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			connectionID := args[0]
 			var clientName string
