@@ -16,14 +16,24 @@ func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, []Pr
 	var processPlugins []ProcessEnricher
 	seen := make(map[string]bool) // Track seen plugin names to avoid duplicates
 
-	// Get PATH environment variable
-	pathEnv := os.Getenv("PATH")
-	if pathEnv == "" {
-		return sessionPlugins, tabPlugins, windowPlugins, processPlugins, nil
+	// Extract embedded plugins and prepend to search paths
+	pluginsDir, err := embedded.ExtractPlugins()
+	var paths []string
+	if err == nil {
+		// Add embedded plugins directory at the end of search paths (lower priority)
+		paths = append(paths, pluginsDir)
 	}
 
-	// Split PATH into directories
-	paths := strings.Split(pathEnv, string(os.PathListSeparator))
+	// Get PATH environment variable
+	pathEnv := os.Getenv("PATH")
+	if pathEnv != "" {
+		// Prepend user's PATH directories (higher priority)
+		paths = append(strings.Split(pathEnv, string(os.PathListSeparator)), paths...)
+	}
+
+	if len(paths) == 0 {
+		return sessionPlugins, tabPlugins, windowPlugins, processPlugins, nil
+	}
 
 	// Look for executables starting with "it2-"
 	for _, dir := range paths {
@@ -86,14 +96,24 @@ func DiscoverEventMonitors() ([]EventMonitor, error) {
 	var eventMonitors []EventMonitor
 	seen := make(map[string]bool) // Track seen plugin names to avoid duplicates
 
-	// Get PATH environment variable
-	pathEnv := os.Getenv("PATH")
-	if pathEnv == "" {
-		return eventMonitors, nil
+	// Extract embedded plugins and prepend to search paths
+	pluginsDir, err := embedded.ExtractPlugins()
+	var paths []string
+	if err == nil {
+		// Add embedded plugins directory at the end of search paths (lower priority)
+		paths = append(paths, pluginsDir)
 	}
 
-	// Split PATH into directories
-	paths := strings.Split(pathEnv, string(os.PathListSeparator))
+	// Get PATH environment variable
+	pathEnv := os.Getenv("PATH")
+	if pathEnv != "" {
+		// Prepend user's PATH directories (higher priority)
+		paths = append(strings.Split(pathEnv, string(os.PathListSeparator)), paths...)
+	}
+
+	if len(paths) == 0 {
+		return eventMonitors, nil
+	}
 
 	// Look for executables starting with "it2-"
 	for _, dir := range paths {
