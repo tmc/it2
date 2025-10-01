@@ -35,8 +35,24 @@ func newSaveCommand() *cobra.Command {
 		Use:   "save <name>",
 		Short: "Save current window layout",
 		Long:  "Save the current window layout as an arrangement with the given name",
-		Args:  cobra.ExactArgs(1),
-		RunE:  runSaveCommand,
+		Example: cmdutil.Doc(`
+			# Save current layout
+			$ it2 arrangement save "my-layout"
+
+			# Save specific window layout
+			$ it2 arrangement save --window window-123 "dev-layout"
+
+			# Save with descriptive name
+			$ it2 arrangement save "3-panel-development"
+
+			# Save work setup
+			$ it2 arrangement save "work-$(date +%Y%m%d)"
+
+			# Save current arrangement with timestamp
+			$ it2 arrangement save "backup-$(date +%H%M)"
+		`),
+		Args: cobra.ExactArgs(1),
+		RunE: runSaveCommand,
 	}
 
 	cmd.Flags().String("window", "", "Window ID to save (saves current layout of specific window only)")
@@ -80,8 +96,24 @@ func newRestoreCommand() *cobra.Command {
 		Use:   "restore <name>",
 		Short: "Restore saved layout",
 		Long:  "Restore a saved window arrangement by name",
-		Args:  cobra.ExactArgs(1),
-		RunE:  runRestoreCommand,
+		Example: cmdutil.Doc(`
+			# Restore saved arrangement
+			$ it2 arrangement restore "my-layout"
+
+			# Restore development layout
+			$ it2 arrangement restore "dev-layout"
+
+			# Restore with error handling
+			$ it2 arrangement restore "3-panel-development" || echo "Layout not found"
+
+			# Restore latest backup
+			$ it2 arrangement restore "backup-1430"
+
+			# Restore work setup
+			$ it2 arrangement restore "work-$(date +%Y%m%d)"
+		`),
+		Args: cobra.ExactArgs(1),
+		RunE: runRestoreCommand,
 	}
 
 	return cmd
@@ -185,8 +217,21 @@ func newExportCommand() *cobra.Command {
 		Use:   "export <name> <file>",
 		Short: "Export arrangement to file",
 		Long:  "Export a saved arrangement to a file (note: this exports the arrangement name, not the actual layout data)",
-		Args:  cobra.ExactArgs(2),
-		RunE:  runExportCommand,
+		Example: cmdutil.Doc(`
+			# Export arrangement to file
+			$ it2 arrangement export "my-layout" layout.sh
+
+			# Export with descriptive filename
+			$ it2 arrangement export "dev-layout" dev-setup.sh
+
+			# Export to backup directory
+			$ it2 arrangement export "work-layout" ~/backups/work.sh
+
+			# Export with timestamp
+			$ it2 arrangement export "my-layout" "backup-$(date +%Y%m%d).sh"
+		`),
+		Args: cobra.ExactArgs(2),
+		RunE: runExportCommand,
 	}
 
 	return cmd
@@ -251,6 +296,20 @@ func newImportCommand() *cobra.Command {
 		Short: "Import arrangement from file",
 		Long: `Import a .iterm2arrangement file using macOS open command.
 This will prompt iTerm2 to import the arrangement and make it available in the saved arrangements.`,
+		Example: cmdutil.Doc(`
+			# Import arrangement file
+			$ it2 arrangement import layout.iterm2arrangement
+
+			# Import from backup
+			$ it2 arrangement import ~/backups/work.iterm2arrangement
+
+			# Import and then restore
+			$ it2 arrangement import dev.iterm2arrangement && \
+			  it2 arrangement restore "dev-layout"
+
+			# Import downloaded arrangement
+			$ it2 arrangement import ~/Downloads/team-layout.iterm2arrangement
+		`),
 		Args: cobra.ExactArgs(1),
 		RunE: runImportCommand,
 	}

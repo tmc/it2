@@ -37,6 +37,16 @@ func newListCommand() *cobra.Command {
 		Use:   "list",
 		Short: "List broadcast domains",
 		Long:  "List broadcast domains showing domain groups and session membership",
+		Example: cmdutil.Doc(`
+			# List broadcast domains
+			$ it2 broadcast list
+
+			# List with JSON output
+			$ it2 broadcast list --format json
+
+			# Check current broadcast configuration
+			$ it2 broadcast list --format yaml
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_, timeout, format := cmdutil.GetFlags(cmd)
 
@@ -65,7 +75,20 @@ func newSetCommand() *cobra.Command {
 		Use:   "set <session-ids...>",
 		Short: "Set broadcast domain",
 		Long:  "Create broadcast groups with multiple sessions. Session IDs are normalized.",
-		Args:  cobra.MinimumNArgs(1),
+		Example: cmdutil.Doc(`
+			# Create broadcast domain with two sessions
+			$ it2 broadcast set abc123 def456
+
+			# Broadcast to all sessions in current window
+			$ it2 broadcast set $(it2 session list --format id --scope window)
+
+			# Set up 3-session broadcast
+			$ it2 broadcast set sess1 sess2 sess3
+
+			# Broadcast to all sessions in current tab
+			$ it2 broadcast set $(it2 session list --format id --scope tab)
+		`),
+		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionIDs := args
 
@@ -109,6 +132,16 @@ func newClearCommand() *cobra.Command {
 		Use:   "clear",
 		Short: "Clear broadcast domains",
 		Long:  "Remove all broadcast domain assignments, returning sessions to individual mode",
+		Example: cmdutil.Doc(`
+			# Clear all broadcast domains
+			$ it2 broadcast clear
+
+			# Clear without confirmation
+			$ it2 broadcast clear --force
+
+			# Clear and verify
+			$ it2 broadcast clear --force && it2 broadcast list
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_, timeout, _ := cmdutil.GetFlags(cmd)
 			force, _ := cmd.Flags().GetBool("force")
