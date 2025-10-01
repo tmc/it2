@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -16,17 +15,15 @@ import (
 
 // SharedListOptions contains common options for list operations
 type SharedListOptions struct {
-	WindowID      string
-	TabID         string
-	SessionID     string
-	ScopeFlag     string
-	Format        string
-	Columns       []string
-	SortBy        string
-	SortReverse   bool
-	Quiet         bool
-	NoPlugins     bool
-	PluginsFilter string
+	WindowID    string
+	TabID       string
+	SessionID   string
+	ScopeFlag   string
+	Format      string
+	Columns     []string
+	SortBy      string
+	SortReverse bool
+	Quiet       bool
 }
 
 // SharedListOperations provides shared listing functionality for both flat and hierarchical commands
@@ -71,14 +68,8 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 		filteredSessions = append(filteredSessions, session)
 	}
 
-	// Skip plugins entirely if --no-plugins flag is set
-	if opts.NoPlugins {
-		formatter := formatting.NewWithOptions(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet)
-		return formatter.FormatSessions(filteredSessions)
-	}
-
-	// Apply plugin enrichment - only if plugin columns are requested, --plugins filter is set, or no columns specified
-	shouldRunPlugins := len(opts.Columns) == 0 || opts.PluginsFilter != "" // Run all plugins if no columns specified or filter is set
+	// Apply plugin enrichment - only if plugin columns are requested or no columns specified
+	shouldRunPlugins := len(opts.Columns) == 0 // Run all plugins if no columns specified
 	if !shouldRunPlugins {
 		// Check if any plugin column is requested
 		for _, col := range opts.Columns {
@@ -109,24 +100,15 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 				}
 			}
 
-			// Filter enrichers based on requested plugins or regex filter
+			// Filter enrichers based on requested plugins
 			var activeEnrichers []plugins.SessionEnricher
 			for _, enricher := range enrichers {
-				pluginName := strings.ToLower(enricher.Name())
-
-				// Skip if columns are specified and this plugin isn't requested
-				if len(requestedPlugins) > 0 && !requestedPlugins[pluginName] {
-					continue
-				}
-
-				// Skip if --plugins filter is specified and plugin doesn't match
-				if opts.PluginsFilter != "" {
-					matched, err := regexp.MatchString(opts.PluginsFilter, pluginName)
-					if err != nil || !matched {
+				if len(requestedPlugins) > 0 {
+					pluginName := strings.ToLower(enricher.Name())
+					if !requestedPlugins[pluginName] {
 						continue
 					}
 				}
-
 				activeEnrichers = append(activeEnrichers, enricher)
 			}
 

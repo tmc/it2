@@ -54,23 +54,17 @@ func newListCommand() *cobra.Command {
 			windowID, _ := cmd.Flags().GetString("window-id")
 			tabID, _ := cmd.Flags().GetString("tab-id")
 
-			// Get plugin flags
-			noPlugins, _ := cmd.Flags().GetBool("no-plugins")
-			pluginsFilter, _ := cmd.Flags().GetString("plugins")
-
 			// Use shared operations
 			sharedOps := cmdutil.NewSharedListOperations(c, ctx)
 			return sharedOps.ListSessions(cmdutil.SharedListOptions{
-				WindowID:      windowID,
-				TabID:         tabID,
-				ScopeFlag:     scopeFlag,
-				Format:        format,
-				Columns:       columns,
-				SortBy:        sortBy,
-				SortReverse:   sortReverse,
-				Quiet:         quiet,
-				NoPlugins:     noPlugins,
-				PluginsFilter: pluginsFilter,
+				WindowID:    windowID,
+				TabID:       tabID,
+				ScopeFlag:   scopeFlag,
+				Format:      format,
+				Columns:     columns,
+				SortBy:      sortBy,
+				SortReverse: sortReverse,
+				Quiet:       quiet,
 			})
 		},
 	}
@@ -89,10 +83,6 @@ func newListCommand() *cobra.Command {
 
 	// Add quiet flag
 	cmd.Flags().BoolP("quiet", "q", false, "Output only session IDs")
-
-	// Add plugin control flags
-	cmd.Flags().Bool("no-plugins", false, "Skip all plugin execution")
-	cmd.Flags().String("plugins", "", "Filter plugins by regex pattern (e.g., 'is-.*' or 'auth')")
 
 	// Add completion functions
 	cmd.RegisterFlagCompletionFunc("window-id", completion.WindowIDCompletion)
