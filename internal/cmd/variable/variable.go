@@ -16,13 +16,50 @@ func NewCommand() *cobra.Command {
 		Long:    "Commands for getting, setting, listing, monitoring, and managing iTerm2 variables",
 	}
 
-	cmd.AddCommand(newGetCommand())
-	cmd.AddCommand(newSetCommand())
-	cmd.AddCommand(newListCommand())
-	cmd.AddCommand(newMonitorCommand())
-	cmd.AddCommand(newDeleteCommand())
-	cmd.AddCommand(newExportCommand())
-	cmd.AddCommand(newImportCommand())
+	// Define command groups
+	cmd.AddGroup(&cobra.Group{
+		ID:    "basic",
+		Title: "Basic Operations:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "monitoring",
+		Title: "Monitoring Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "import-export",
+		Title: "Import/Export Commands:",
+	})
+
+	// Basic Operations
+	getCmd := newGetCommand()
+	getCmd.GroupID = "basic"
+	cmd.AddCommand(getCmd)
+
+	setCmd := newSetCommand()
+	setCmd.GroupID = "basic"
+	cmd.AddCommand(setCmd)
+
+	listCmd := newListCommand()
+	listCmd.GroupID = "basic"
+	cmd.AddCommand(listCmd)
+
+	deleteCmd := newDeleteCommand()
+	deleteCmd.GroupID = "basic"
+	cmd.AddCommand(deleteCmd)
+
+	// Monitoring Commands
+	monitorCmd := newMonitorCommand()
+	monitorCmd.GroupID = "monitoring"
+	cmd.AddCommand(monitorCmd)
+
+	// Import/Export Commands
+	exportCmd := newExportCommand()
+	exportCmd.GroupID = "import-export"
+	cmd.AddCommand(exportCmd)
+
+	importCmd := newImportCommand()
+	importCmd.GroupID = "import-export"
+	cmd.AddCommand(importCmd)
 
 	return cmd
 }
