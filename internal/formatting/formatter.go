@@ -591,10 +591,14 @@ func PrintJSON(v interface{}) error {
 	return encoder.Encode(v)
 }
 
-func (f *Formatter) formatYAML(v interface{}) error {
+func PrintYAML(v interface{}) error {
 	encoder := yaml.NewEncoder(os.Stdout)
 	defer encoder.Close()
 	return encoder.Encode(v)
+}
+
+func (f *Formatter) formatYAML(v interface{}) error {
+	return PrintYAML(v)
 }
 
 func (f *Formatter) FormatSelection(selection *pb.Selection) error {

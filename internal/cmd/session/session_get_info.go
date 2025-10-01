@@ -34,9 +34,18 @@ This command combines multiple API calls to provide a complete view of the sessi
 				sessionID = args[0]
 			}
 
+			format, _ := cmd.Flags().GetString("format")
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 			includeProperties, _ := cmd.Flags().GetBool("properties")
 			extractPath, _ := cmd.Flags().GetString("extract")
+
+			// Handle --json flag for backwards compatibility
+			if jsonOutput {
+				format = "json"
+			}
+			if format == "" {
+				format = "text"
+			}
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -73,15 +82,21 @@ This command combines multiple API calls to provide a complete view of the sessi
 				return nil
 			}
 
-			if jsonOutput {
+			switch format {
+			case "json":
 				return formatting.PrintJSON(info)
-			} else {
+			case "yaml":
+				return formatting.PrintYAML(info)
+			case "text":
 				return printSessionInfo(info)
+			default:
+				return fmt.Errorf("unsupported format: %s (supported: text, json, yaml)", format)
 			}
 		},
 	}
 
-	cmd.Flags().Bool("json", false, "Output result as JSON")
+	cmd.Flags().String("format", "", "Output format: text, json, yaml (default: text)")
+	cmd.Flags().Bool("json", false, "Output result as JSON (deprecated, use --format=json)")
 	cmd.Flags().Bool("properties", false, "Include session properties")
 	cmd.Flags().Bool("prompt", false, "Include current prompt information")
 	cmd.Flags().String("extract", "", "Extract specific property value (e.g., 'frame', 'frame.coords', 'name')")
