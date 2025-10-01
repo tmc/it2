@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -1546,12 +1547,24 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 	for windowIndex, windowNum := range windowNumbers {
 		tabGroups := windowGroups[windowNum]
 
-		// Sort tab keys
+		// Sort tab keys numerically
 		var tabKeys []string
 		for tabKey := range tabGroups {
 			tabKeys = append(tabKeys, tabKey)
 		}
-		sort.Strings(tabKeys)
+		sort.Slice(tabKeys, func(i, j int) bool {
+			// Try to parse as numbers for proper numeric sorting
+			numI, errI := strconv.Atoi(tabKeys[i])
+			numJ, errJ := strconv.Atoi(tabKeys[j])
+
+			// If both are numbers, sort numerically
+			if errI == nil && errJ == nil {
+				return numI < numJ
+			}
+
+			// Otherwise fall back to string sorting
+			return tabKeys[i] < tabKeys[j]
+		})
 
 		isLastWindow := windowIndex == len(windowNumbers)-1
 		windowConnector := "├─"
