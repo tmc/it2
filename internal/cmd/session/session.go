@@ -122,6 +122,10 @@ func NewCommand() *cobra.Command {
 	getBufferCmd.GroupID = "interaction"
 	cmd.AddCommand(getBufferCmd)
 
+	tailCmd := newTailCommand()
+	tailCmd.GroupID = "monitoring"
+	cmd.AddCommand(tailCmd)
+
 	// Properties & Variables Commands
 	getPropertyCmd := newGetPropertyCommand()
 	getPropertyCmd.GroupID = "properties"
