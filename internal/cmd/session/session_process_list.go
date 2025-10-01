@@ -137,17 +137,57 @@ func printProcessText(jobPID, shellPID int) error {
 	fmt.Println("=================")
 	fmt.Println()
 
-	if shellPID > 0 {
-		shellProc, _ := getProcessName(shellPID)
-		fmt.Printf("Shell PID:     %d\n", shellPID)
-		fmt.Printf("Shell Process: %s\n", shellProc)
-		fmt.Println()
+	// Collect process chain from job to shell
+	var chain []struct {
+		pid  int
+		name string
 	}
 
-	if jobPID > 0 {
-		jobProc, _ := getProcessName(jobPID)
-		fmt.Printf("Job PID:       %d\n", jobPID)
-		fmt.Printf("Job Process:   %s\n", jobProc)
+	// Start from job PID and walk up to shell PID
+	currentPID := jobPID
+	for currentPID > 0 {
+		procName, _ := getProcessName(currentPID)
+		chain = append(chain, struct {
+			pid  int
+			name string
+		}{currentPID, procName})
+
+		// Stop if we reached the shell PID
+		if currentPID == shellPID {
+			break
+		}
+
+		// Get parent PID
+		cmd := exec.Command("ps", "-p", strconv.Itoa(currentPID), "-o", "ppid=")
+		output, err := cmd.Output()
+		if err != nil {
+			break
+		}
+
+		ppidStr := strings.TrimSpace(string(output))
+		ppid, err := strconv.Atoi(ppidStr)
+		if err != nil || ppid <= 1 {
+			break
+		}
+
+		currentPID = ppid
+
+		// Safety: limit depth
+		if len(chain) > 20 {
+			break
+		}
+	}
+
+	// Print the chain
+	if len(chain) > 0 {
+		fmt.Println("Process Chain (job → shell):")
+		for i, proc := range chain {
+			prefix := "├─"
+			if i == len(chain)-1 {
+				prefix = "└─"
+			}
+			fmt.Printf("%s PID %d: %s\n", prefix, proc.pid, proc.name)
+		}
 	}
 
 	return nil
