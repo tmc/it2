@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 // GetFlags extracts common flags from a command, falling back to parent/root flags
@@ -159,13 +160,11 @@ func Int32Ptr(i int32) *int32 {
 
 // NormalizeSessionID removes the ITERM_SESSION_ID prefix if present
 // Handles formats like "w0t1p12:UUID" and returns just "UUID"
+//
+// Deprecated: Use [sessionid.Normalize]
 func NormalizeSessionID(sessionID string) string {
-	if idx := strings.LastIndex(sessionID, ":"); idx != -1 {
-		return sessionID[idx+1:]
-	}
-	return sessionID
+	return sessionid.Normalize(sessionID)
 }
-
 
 // IsSessionCommand checks if the current command expects a session context
 func IsSessionCommand(cmd *cobra.Command) bool {

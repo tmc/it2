@@ -190,16 +190,7 @@ func (r *Resolver) resolveParent(ctx context.Context) (string, error) {
 
 // FromEnvironment gets the session ID from the ITERM_SESSION_ID environment variable
 func FromEnvironment() string {
-	envValue := os.Getenv("ITERM_SESSION_ID")
-	if envValue == "" {
-		return ""
-	}
-	// Extract just the UUID part (after the colon)
-	parts := strings.Split(envValue, ":")
-	if len(parts) >= 2 {
-		return parts[1]
-	}
-	return envValue
+	return Normalize(os.Getenv("ITERM_SESSION_ID"))
 }
 
 // IsFullID checks if the given string looks like a full session UUID
@@ -219,7 +210,20 @@ func IsFullID(id string) bool {
 	return true
 }
 
-// ShortID returns the first 8 characters of a session ID for display
+// Normalize removes the ITERM_SESSION_ID prefix if present.
+// Handles formats like "w0t1p12:UUID" and returns just "UUID".
+func Normalize(sessionID string) string {
+	if sessionID == "" {
+		return ""
+	}
+	// Extract just the UUID part (after the colon)
+	if idx := strings.LastIndex(sessionID, ":"); idx != -1 {
+		return sessionID[idx+1:]
+	}
+	return sessionID
+}
+
+// ShortID returns the first 8 characters of a full session ID for display
 func ShortID(fullID string) string {
 	if len(fullID) > 8 {
 		return fullID[:8]
