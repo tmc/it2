@@ -86,7 +86,32 @@ func ExtractPlugins() (string, error) {
 		return "", fmt.Errorf("failed to create marker file: %w", err)
 	}
 
+	// Clean up old plugin directories (keep only current one)
+	cleanupOldPluginDirs(pluginsDir)
+
 	return pluginsDir, nil
+}
+
+// cleanupOldPluginDirs removes old plugin directories except the current one
+func cleanupOldPluginDirs(currentDir string) {
+	pluginsBase := filepath.Dir(currentDir)
+	entries, err := os.ReadDir(pluginsBase)
+	if err != nil {
+		return // Silently fail cleanup
+	}
+
+	currentHash := filepath.Base(currentDir)
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		if entry.Name() == currentHash {
+			continue // Don't remove current directory
+		}
+		// Remove old plugin directory
+		oldDir := filepath.Join(pluginsBase, entry.Name())
+		os.RemoveAll(oldDir) // Ignore errors
+	}
 }
 
 // getBuildHash returns a hash of the build info to use as plugin directory name
