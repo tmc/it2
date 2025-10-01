@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -106,6 +107,20 @@ func (p *ExecPlugin) Name() string {
 	return p.name
 }
 
+// setupPluginEnv adds iTerm2 authentication credentials to the command environment
+func setupPluginEnv(cmd *exec.Cmd) {
+	// Inherit parent environment
+	cmd.Env = os.Environ()
+
+	// Add iTerm2 authentication if available
+	if cookie := os.Getenv("ITERM2_COOKIE"); cookie != "" {
+		cmd.Env = append(cmd.Env, "ITERM2_COOKIE="+cookie)
+	}
+	if key := os.Getenv("ITERM2_KEY"); key != "" {
+		cmd.Env = append(cmd.Env, "ITERM2_KEY="+key)
+	}
+}
+
 // EnrichSession runs the executable with the session ID and parses the output
 func (p *ExecPlugin) EnrichSession(ctx context.Context, session *client.SessionInfo) (map[string]interface{}, error) {
 	// Use a longer timeout for plugins to ensure they can complete
@@ -118,6 +133,7 @@ func (p *ExecPlugin) EnrichSession(ctx context.Context, session *client.SessionI
 		args = append(args, session.SessionName)
 	}
 	cmd := exec.CommandContext(pluginCtx, p.executable, args...)
+	setupPluginEnv(cmd)
 	output, err := cmd.CombinedOutput() // Get both stdout and stderr
 	if err != nil {
 		// If the command fails, return empty data instead of error
@@ -155,6 +171,7 @@ func (p *ExecPlugin) EnrichTab(ctx context.Context, tab *formatting.TabInfo) (ma
 		args = append(args, tab.Title)
 	}
 	cmd := exec.CommandContext(pluginCtx, p.executable, args...)
+	setupPluginEnv(cmd)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return map[string]interface{}{}, nil
@@ -182,6 +199,7 @@ func (p *ExecPlugin) EnrichWindow(ctx context.Context, window *client.WindowInfo
 		args = append(args, window.Title)
 	}
 	cmd := exec.CommandContext(pluginCtx, p.executable, args...)
+	setupPluginEnv(cmd)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return map[string]interface{}{}, nil
@@ -203,6 +221,7 @@ func (p *ExecPlugin) StartMonitoring(ctx context.Context, sessionID string) (<-c
 	errorChan := make(chan error, 10)
 
 	cmd := exec.CommandContext(ctx, p.executable, "monitor", sessionID)
+	setupPluginEnv(cmd)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get stdout pipe: %w", err)
