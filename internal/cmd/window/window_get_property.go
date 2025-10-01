@@ -13,11 +13,9 @@ func newGetPropertyCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "get-property <window-id> <property>",
 		Short: "Get a window property",
-		Long: `Get a window property. Common properties include:
-  - title
-  - frame
-  - fullscreen
-  - miniaturized`,
+		Long: `Get a window property. Available properties:
+  - frame: Window position and size {origin: {x, y}, size: {width, height}}
+  - fullscreen: Whether window is fullscreen (true/false)`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			windowID := args[0]

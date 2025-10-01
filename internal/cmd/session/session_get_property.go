@@ -17,18 +17,12 @@ func newGetPropertyCommand() *cobra.Command {
 		Short: "Get a session property value",
 		Long: `Get a session property value.
 
-Common session properties include:
-  - title: Session title
-  - name: Session name
-  - columns: Number of columns
-  - rows: Number of rows
-  - profile_name: Associated profile name
-  - badge_text: Badge text
-  - use_transparency: Whether transparency is enabled
-  - transparency: Transparency level
-  - blend: Blend level
+Available session properties:
+  - grid_size: Grid size information {width, height}
+  - buried: Whether session is buried (0/1)
+  - number_of_lines: Line information {first_visible, overflow, grid, history}
 
-Use --list to see all available properties.`,
+Use --list to see detailed property information.`,
 		Args: cobra.RangeArgs(0, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			listProperties, _ := cmd.Flags().GetBool("list")
@@ -115,7 +109,7 @@ func listSessionProperties() error {
 
 	fmt.Println()
 	fmt.Println("Usage: it2 session get-property <session-id> <property>")
-	fmt.Println("Example: it2 session get-property sess_123 title")
+	fmt.Println("Example: it2 session get-property sess_123 grid_size")
 
 	return nil
 }

@@ -12,11 +12,11 @@ func newSetPropertyCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "set-property <window-id> <property> <value>",
 		Short: "Set a window property",
-		Long: `Set a window property. Common properties include:
-  - title (string value)
-  - fullscreen (true/false)
-  - miniaturized (true/false)
-  - frame (JSON object with origin and size)`,
+		Long: `Set a window property. Available properties:
+  - fullscreen: Set fullscreen state (true/false)
+  - frame: Set window position and size (JSON: {"origin": {"x": 0, "y": 0}, "size": {"width": 800, "height": 600}})
+
+Note: Not all properties are settable. Use get-property to see current values.`,
 		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			windowID := args[0]
