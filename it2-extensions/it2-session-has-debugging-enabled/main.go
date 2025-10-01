@@ -61,11 +61,11 @@ func main() {
 
 	if *jsonOutput {
 		result := map[string]interface{}{
-			"session_id":        sessionID,
-			"pid":              pid,
-			"has_debugging":    debugInfo.HasDebugging,
-			"inspector_port":   debugInfo.InspectorPort,
-			"debug_flags":      debugInfo.DebugFlags,
+			"session_id":     sessionID,
+			"pid":            pid,
+			"has_debugging":  debugInfo.HasDebugging,
+			"inspector_port": debugInfo.InspectorPort,
+			"debug_flags":    debugInfo.DebugFlags,
 		}
 		json.NewEncoder(os.Stdout).Encode(result)
 	} else {
