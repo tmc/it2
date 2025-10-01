@@ -8,10 +8,26 @@ import (
 
 func newCloseCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:             "close <session-id>",
-		Short:           "Close a session",
-		Long:            "Close the specified iTerm2 session. Use --force to close without prompting",
-		Args:            cobra.ExactArgs(1),
+		Use:   "close <session-id>",
+		Short: "Close a session",
+		Long:  "Close the specified iTerm2 session. Use --force to close without prompting",
+		Example: cmdutil.Doc(`
+			# Close a specific session
+			$ it2 session close abc123
+
+			# Close current session
+			$ it2 session close $ITERM_SESSION_ID
+
+			# Force close without confirmation
+			$ it2 session close --force abc123
+
+			# Close with JSON output
+			$ it2 session close --format json abc123
+
+			# Close all sessions in window
+			$ IT2_SCOPE=window it2 session close $(it2 session list --format id)
+		`),
+		Args: cobra.ExactArgs(1),
 		RequiresClient:  true,
 		RequiresSession: true,
 		SupportsFormat:  true,

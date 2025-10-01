@@ -20,7 +20,6 @@ import (
 	"github.com/tmc/it2/internal/cmd/notification"
 	"github.com/tmc/it2/internal/cmd/profile"
 	"github.com/tmc/it2/internal/cmd/prompt"
-	"github.com/tmc/it2/internal/cmd/screen"
 	"github.com/tmc/it2/internal/cmd/selection"
 	"github.com/tmc/it2/internal/cmd/session"
 	"github.com/tmc/it2/internal/cmd/statusbar"
@@ -189,11 +188,6 @@ It supports both traditional flat command syntax and intuitive hierarchical navi
 	statusbarCmd := statusbar.NewCommand()
 	statusbarCmd.GroupID = "config"
 	rootCmd.AddCommand(statusbarCmd)
-
-	// Content & Text - screen operations
-	screenCmd := screen.NewCommand()
-	screenCmd.GroupID = "content"
-	rootCmd.AddCommand(screenCmd)
 
 	// Monitoring - observation and tracking
 	jobCmd := job.NewCommand()

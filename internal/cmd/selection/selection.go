@@ -23,7 +23,6 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newGetCommand())
 	cmd.AddCommand(newSetCommand())
 	cmd.AddCommand(newClearCommand())
-	cmd.AddCommand(newCopyCommand())
 
 	return cmd
 }
@@ -235,39 +234,5 @@ func runClearCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Println("Selection cleared")
-	return nil
-}
-
-func newCopyCommand() *cobra.Command {
-	return &cobra.Command{
-		Use:   "copy [<session-id>]",
-		Short: "Copy current selection to clipboard",
-		Long:  "Copy the current text selection to the system clipboard",
-		Args:  cobra.MaximumNArgs(1),
-		RunE:  runCopyCommand,
-	}
-}
-
-func runCopyCommand(cmd *cobra.Command, args []string) error {
-	sessionID := "active"
-	if len(args) > 0 {
-		sessionID = client.NormalizeSessionID(args[0])
-	}
-
-	_, timeout, _ := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
-	defer cancel()
-
-	c, err := cmdutil.ConnectClient(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to connect: %w", err)
-	}
-	defer c.Close()
-
-	if err := c.CopySelection(ctx, sessionID); err != nil {
-		return fmt.Errorf("failed to copy selection: %w", err)
-	}
-
-	fmt.Println("Selection copied to clipboard")
 	return nil
 }

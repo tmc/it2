@@ -20,7 +20,6 @@ import (
 	"github.com/tmc/it2/internal/cmd/event"
 	"github.com/tmc/it2/internal/cmd/filepanel"
 	"github.com/tmc/it2/internal/cmd/focus"
-	"github.com/tmc/it2/internal/cmd/input"
 	"github.com/tmc/it2/internal/cmd/job"
 	"github.com/tmc/it2/internal/cmd/keyboard"
 	"github.com/tmc/it2/internal/cmd/lifecycle"
@@ -29,7 +28,6 @@ import (
 	"github.com/tmc/it2/internal/cmd/preference"
 	"github.com/tmc/it2/internal/cmd/profile"
 	"github.com/tmc/it2/internal/cmd/prompt"
-	"github.com/tmc/it2/internal/cmd/screen"
 	"github.com/tmc/it2/internal/cmd/selection"
 	"github.com/tmc/it2/internal/cmd/session"
 	"github.com/tmc/it2/internal/cmd/snippet"
@@ -291,13 +289,11 @@ func init() {
 	rootCmd.AddCommand(badge.NewCommand())
 	rootCmd.AddCommand(broadcast.NewCommand())
 	rootCmd.AddCommand(color.NewCommand())
-	rootCmd.AddCommand(input.NewCommand())
 	rootCmd.AddCommand(job.NewCommand())
 	rootCmd.AddCommand(notification.NewCommand())
 	rootCmd.AddCommand(plugins.NewCommand())
 	rootCmd.AddCommand(profile.NewCommand())
 	rootCmd.AddCommand(prompt.NewCommand())
-	rootCmd.AddCommand(screen.NewCommand())
 	rootCmd.AddCommand(selection.NewCommand())
 	rootCmd.AddCommand(session.NewCommand())
 	rootCmd.AddCommand(statusbar.NewCommand())
