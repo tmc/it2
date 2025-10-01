@@ -37,13 +37,18 @@ func (c *Client) SubscribeToGenericNotifications(ctx context.Context, notificati
 
 	// Subscribe to notifications
 	subscribe := true
+	req := &pb.NotificationRequest{
+		Subscribe:        &subscribe,
+		NotificationType: &notifType,
+	}
+	// Only set session if provided (nil means all sessions)
+	if sessionID != "" {
+		req.Session = &sessionID
+	}
+
 	msg := &pb.ClientOriginatedMessage{
 		Submessage: &pb.ClientOriginatedMessage_NotificationRequest{
-			NotificationRequest: &pb.NotificationRequest{
-				Subscribe:        &subscribe,
-				NotificationType: &notifType,
-				Session:          &sessionID, // Can be empty for all sessions
-			},
+			NotificationRequest: req,
 		},
 	}
 
@@ -205,13 +210,18 @@ func (c *Client) UnsubscribeFromNotifications(ctx context.Context, notificationT
 
 	// Send unsubscription request
 	subscribe := false
+	req := &pb.NotificationRequest{
+		Subscribe:        &subscribe,
+		NotificationType: &notifType,
+	}
+	// Only set session if provided (nil means all sessions)
+	if sessionID != "" {
+		req.Session = &sessionID
+	}
+
 	msg := &pb.ClientOriginatedMessage{
 		Submessage: &pb.ClientOriginatedMessage_NotificationRequest{
-			NotificationRequest: &pb.NotificationRequest{
-				Subscribe:        &subscribe,
-				NotificationType: &notifType,
-				Session:          &sessionID, // Can be empty for all sessions
-			},
+			NotificationRequest: req,
 		},
 	}
 
