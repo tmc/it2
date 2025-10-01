@@ -21,19 +21,81 @@ func NewCommand() *cobra.Command {
 		Long:    "Commands for listing, viewing, and modifying iTerm2 profiles",
 	}
 
-	cmd.AddCommand(newListCommand())
-	cmd.AddCommand(newGetCommand())
-	cmd.AddCommand(newSetCommand())
-	cmd.AddCommand(newGetPropertyCommand())
-	cmd.AddCommand(newSetPropertyCommand())
-	cmd.AddCommand(newBulkUpdateCommand())
-	cmd.AddCommand(newDuplicateCommand())
-	cmd.AddCommand(newDeleteCommand())
-	cmd.AddCommand(newExportCommand())
-	cmd.AddCommand(newImportCommand())
-	cmd.AddCommand(newCreateCommand())
+	// Define command groups
+	cmd.AddGroup(&cobra.Group{
+		ID:    "lifecycle",
+		Title: "Profile Management Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "property",
+		Title: "Property Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "import-export",
+		Title: "Import/Export Commands:",
+	})
 
-	// Per-session profile commands
+	// Profile Management Commands
+	listCmd := newListCommand()
+	listCmd.GroupID = "lifecycle"
+	cmd.AddCommand(listCmd)
+
+	getCmd := newGetCommand()
+	getCmd.GroupID = "lifecycle"
+	cmd.AddCommand(getCmd)
+
+	createCmd := newCreateCommand()
+	createCmd.GroupID = "lifecycle"
+	cmd.AddCommand(createCmd)
+
+	duplicateCmd := newDuplicateCommand()
+	duplicateCmd.GroupID = "lifecycle"
+	cmd.AddCommand(duplicateCmd)
+
+	deleteCmd := newDeleteCommand()
+	deleteCmd.GroupID = "lifecycle"
+	cmd.AddCommand(deleteCmd)
+
+	// Property Commands
+	getPropertyCmd := newGetPropertyCommand()
+	getPropertyCmd.GroupID = "property"
+	cmd.AddCommand(getPropertyCmd)
+
+	setPropertyCmd := newSetPropertyCommand()
+	setPropertyCmd.GroupID = "property"
+	cmd.AddCommand(setPropertyCmd)
+
+	setCmd := newSetCommand()
+	setCmd.GroupID = "property"
+	cmd.AddCommand(setCmd)
+
+	bulkUpdateCmd := newBulkUpdateCommand()
+	bulkUpdateCmd.GroupID = "property"
+	cmd.AddCommand(bulkUpdateCmd)
+
+	// Badge shortcuts
+	getBadgeCmd := newGetBadgeCommand()
+	getBadgeCmd.GroupID = "property"
+	cmd.AddCommand(getBadgeCmd)
+
+	setBadgeCmd := newSetBadgeCommand()
+	setBadgeCmd.GroupID = "property"
+	cmd.AddCommand(setBadgeCmd)
+
+	clearBadgeCmd := newClearBadgeCommand()
+	clearBadgeCmd.GroupID = "property"
+	cmd.AddCommand(clearBadgeCmd)
+
+	// Import/Export Commands
+	exportCmd := newExportCommand()
+	exportCmd.GroupID = "import-export"
+	cmd.AddCommand(exportCmd)
+
+	importCmd := newImportCommand()
+	importCmd.GroupID = "import-export"
+	cmd.AddCommand(importCmd)
+
+	// Per-session profile commands (hidden from main groups)
 	cmd.AddCommand(newSessionSetPropertyCommand())
 	cmd.AddCommand(newSessionGetPropertyCommand())
 	cmd.AddCommand(newSessionResetCommand())
