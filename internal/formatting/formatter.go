@@ -542,14 +542,16 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			}
 		}
 
-		// Keep title and command longer since they're at the end
+		// Keep title and command at the same length
 		title := session.SessionName
 		if len(title) > 80 {
 			title = title[:77] + "..."
 		}
 
 		command := session.CurrentCommand
-		// Don't truncate command since it's the last column
+		if len(command) > 80 {
+			command = command[:77] + "..."
+		}
 
 		row := []string{
 			session.ShortID,
