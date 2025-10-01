@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/formatting"
@@ -99,29 +100,21 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 				}
 			}
 
-			for _, session := range filteredSessions {
-				// Initialize plugin data map if needed
-				if session.PluginData == nil {
-					session.PluginData = make(map[string]interface{})
-				}
-				// Apply each enricher
-				for _, enricher := range enrichers {
-					// Skip this plugin if columns are specified and this plugin isn't requested
-					if len(requestedPlugins) > 0 {
-						pluginName := strings.ToLower(enricher.Name())
-						if !requestedPlugins[pluginName] {
-							continue
-						}
-					}
-
-					data, err := enricher.EnrichSession(s.ctx, session)
-					if err == nil && len(data) > 0 {
-						for k, v := range data {
-							session.PluginData[k] = v
-						}
+			// Filter enrichers based on requested plugins
+			var activeEnrichers []plugins.SessionEnricher
+			for _, enricher := range enrichers {
+				if len(requestedPlugins) > 0 {
+					pluginName := strings.ToLower(enricher.Name())
+					if !requestedPlugins[pluginName] {
+						continue
 					}
 				}
+				activeEnrichers = append(activeEnrichers, enricher)
 			}
+
+			// Parallelize plugin execution across all sessions
+			s.enrichSessionsParallel(filteredSessions, activeEnrichers)
+
 			// Save metrics after enrichment
 			plugins.GetMetricsStore().Save()
 		}
@@ -331,4 +324,60 @@ func (s *SharedListOperations) applyScopeFilter(sessions []*client.SessionInfo, 
 	}
 
 	return filteredSessions
+}
+
+// enrichSessionsParallel runs plugins concurrently for each session and collects results
+func (s *SharedListOperations) enrichSessionsParallel(sessions []*client.SessionInfo, enrichers []plugins.SessionEnricher) {
+	if len(enrichers) == 0 {
+		return
+	}
+
+	// Create a semaphore to limit concurrency (e.g., max 20 concurrent plugin executions)
+	semaphore := make(chan struct{}, 20)
+
+	// Use a WaitGroup to wait for all goroutines
+	var wg sync.WaitGroup
+
+	// Create a mutex per session for safe concurrent writes
+	type sessionMutex struct {
+		session *client.SessionInfo
+		mu      sync.Mutex
+	}
+
+	sessionMutexes := make([]*sessionMutex, len(sessions))
+	for i, session := range sessions {
+		// Initialize plugin data map if needed
+		if session.PluginData == nil {
+			session.PluginData = make(map[string]interface{})
+		}
+		sessionMutexes[i] = &sessionMutex{session: session}
+	}
+
+	// Process each session with parallel enrichers
+	for _, sm := range sessionMutexes {
+		for _, enricher := range enrichers {
+			wg.Add(1)
+			go func(sm *sessionMutex, enr plugins.SessionEnricher) {
+				defer wg.Done()
+
+				// Acquire semaphore to limit concurrency
+				semaphore <- struct{}{}
+				defer func() { <-semaphore }()
+
+				// Execute the enricher
+				data, err := enr.EnrichSession(s.ctx, sm.session)
+				if err == nil && len(data) > 0 {
+					// Lock this session's mutex for safe writes
+					sm.mu.Lock()
+					for k, v := range data {
+						sm.session.PluginData[k] = v
+					}
+					sm.mu.Unlock()
+				}
+			}(sm, enricher)
+		}
+	}
+
+	// Wait for all enrichers to complete
+	wg.Wait()
 }
