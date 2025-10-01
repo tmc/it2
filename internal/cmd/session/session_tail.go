@@ -135,8 +135,10 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
-	// Track the last line we've seen to detect new output
-	var lastContent string
+	// Track lines we've seen using line-by-line comparison
+	// This approach is more robust against dynamic prompts
+	var lastLines []string
+	var lastLineCount int
 
 	for {
 		select {
@@ -158,56 +160,93 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 				continue
 			}
 
-			// Build the current buffer content
+			// Build the current buffer as a slice of lines
 			var currentLines []string
 			for _, line := range contents {
 				currentLines = append(currentLines, line.GetText())
 			}
-			currentContent := strings.Join(currentLines, "\n")
 
 			// First poll - just record what we have, don't print
-			if lastContent == "" {
-				lastContent = currentContent
+			if lastLineCount == 0 {
+				lastLines = currentLines
+				lastLineCount = len(currentLines)
 				continue
 			}
 
-			// No change - skip
-			if currentContent == lastContent {
-				continue
+			// No change in line count - check if content changed
+			if len(currentLines) == lastLineCount {
+				// With fixed-size buffers, we need to detect when content has scrolled
+				// by comparing all lines, not just the last few
+				changed := false
+				for i := 0; i < len(currentLines) && i < len(lastLines); i++ {
+					if currentLines[i] != lastLines[i] {
+						changed = true
+						break
+					}
+				}
+				if !changed {
+					continue
+				}
+				// Content changed but line count didn't = scrolling happened
+				// Fall through to the logic below to find and print new lines
 			}
 
-			// Find new content by comparing with last known state
-			// Find where the old content ends in the new content
-			if strings.Contains(currentContent, lastContent) {
-				// Old content is a prefix - extract just the new part
-				newPart := strings.TrimPrefix(currentContent, lastContent)
-				newPart = strings.TrimPrefix(newPart, "\n")
-				if newPart != "" {
-					fmt.Println(newPart)
+			// Detect new lines: everything after the last known line count
+			if len(currentLines) > lastLineCount {
+				// Simple case: buffer grew, print new lines
+				for i := lastLineCount; i < len(currentLines); i++ {
+					fmt.Println(currentLines[i])
 				}
 			} else {
-				// Content has changed significantly (scrollback, clear, etc)
-				// Try to find common suffix
-				lastLines := strings.Split(lastContent, "\n")
-				if len(lastLines) > 0 {
-					lastLine := lastLines[len(lastLines)-1]
-					// Find where the last line appears in current content
-					idx := strings.LastIndex(currentContent, lastLine)
-					if idx >= 0 {
-						// Found it - print everything after
-						newPart := currentContent[idx+len(lastLine):]
-						newPart = strings.TrimPrefix(newPart, "\n")
-						if newPart != "" {
-							fmt.Println(newPart)
-						}
+				// Buffer size stayed same or shrunk - content likely scrolled
+				// We need to find what's NEW in current that wasn't in last
+
+				// Strategy: Compare from the beginning to find the common prefix
+				// Everything after the common prefix is new
+				commonPrefixLen := 0
+				minLen := min(len(currentLines), len(lastLines))
+
+				for i := 0; i < minLen; i++ {
+					if currentLines[i] == lastLines[i] {
+						commonPrefixLen++
 					} else {
-						// Can't find common ground - print all new lines
-						fmt.Print(currentContent)
-						fmt.Println()
+						break
+					}
+				}
+
+				// If there's new content after the common prefix, print it
+				// But skip the trailing prompt lines
+				if commonPrefixLen < len(currentLines) {
+					// Find where to stop - don't print the final prompt
+					endIdx := len(currentLines)
+					// Skip empty lines and prompts at the end
+					for i := len(currentLines) - 1; i >= commonPrefixLen; i-- {
+						line := strings.TrimSpace(currentLines[i])
+						if line == "" || strings.Contains(line, "@") && strings.Contains(line, "$") {
+							endIdx = i
+						} else {
+							break
+						}
+					}
+
+					if commonPrefixLen < endIdx {
+						for i := commonPrefixLen; i < endIdx; i++ {
+							fmt.Println(currentLines[i])
+						}
 					}
 				}
 			}
-			lastContent = currentContent
+
+			lastLines = currentLines
+			lastLineCount = len(currentLines)
 		}
 	}
+}
+
+// min returns the minimum of two integers
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
