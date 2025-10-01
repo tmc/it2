@@ -20,13 +20,27 @@ Scopes:
   tab      - Tab-specific variables (requires tab-id)
   window   - Window-specific variables (requires window-id)
 
-Note: Variable names must begin with "user." for user-defined variables.
+Note: Variable names must begin with "user." for user-defined variables.`,
+		Example: `  # Set app-level variable
+  $ it2 variable set app user.my_var "hello world"
 
-Examples:
-  it2 variable set app user.my_var "hello world"
-  it2 variable set session user.session_var "session data" <session-id>
-  it2 variable set tab user.tab_var "tab data" <tab-id>
-  it2 variable set window user.window_var "window data" <window-id>`,
+  # Set session variable
+  $ it2 variable set session user.env "production" abc123
+
+  # Set current session variable
+  $ it2 variable set session user.status "active" $ITERM_SESSION_ID
+
+  # Set tab variable
+  $ it2 variable set tab user.tab_name "build" tab-123
+
+  # Set window variable
+  $ it2 variable set window user.window_type "dev" window-123
+
+  # Set variable with command output
+  $ it2 variable set app user.hostname "$(hostname)"
+
+  # Set timestamp
+  $ it2 variable set session user.start_time "$(date +%s)" $ITERM_SESSION_ID`,
 		Args: cobra.RangeArgs(3, 4),
 		RunE: runSetCommand,
 	}

@@ -8,10 +8,29 @@ import (
 
 func newInjectCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:             "inject <session-id> <data>",
-		Short:           "Inject data into a session as if it came from the program",
-		Long:            "Inject data directly into a session's output stream, as if the running program had produced it. Supports hex-encoded data with --hex flag.",
-		Args:            cobra.ExactArgs(2),
+		Use:   "inject <session-id> <data>",
+		Short: "Inject data into a session as if it came from the program",
+		Long:  "Inject data directly into a session's output stream, as if the running program had produced it. Supports hex-encoded data with --hex flag.",
+		Example: cmdutil.Doc(`
+			# Inject text into session
+			$ it2 text inject abc123 "Hello World"
+
+			# Inject ANSI color codes
+			$ it2 text inject abc123 $'\033[31mRed Text\033[0m'
+
+			# Inject hex-encoded data
+			$ it2 text inject --hex abc123 "48656c6c6f"
+
+			# Inject newline
+			$ it2 text inject abc123 $'\n'
+
+			# Inject escape sequence
+			$ it2 text inject abc123 $'\033[2J'
+
+			# Inject with JSON output
+			$ it2 text inject --format json abc123 "test"
+		`),
+		Args: cobra.ExactArgs(2),
 		RequiresClient:  true,
 		RequiresSession: true,
 		SupportsFormat:  true,

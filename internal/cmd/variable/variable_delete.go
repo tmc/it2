@@ -18,13 +18,24 @@ Scopes:
   app      - Application-wide variables
   session  - Session-specific variables (requires session-id)
   tab      - Tab-specific variables (requires tab-id)
-  window   - Window-specific variables (requires window-id)
+  window   - Window-specific variables (requires window-id)`,
+		Example: `  # Delete app-level variable
+  $ it2 variable delete app user.my_var
 
-Examples:
-  it2 variable delete app user.my_var
-  it2 variable delete session user.session_var <session-id>
-  it2 variable delete tab user.tab_var <tab-id>
-  it2 variable delete window user.window_var <window-id>`,
+  # Delete session variable
+  $ it2 variable delete session user.env abc123
+
+  # Delete with force (no confirmation)
+  $ it2 variable delete --force app user.temp_var
+
+  # Delete current session variable
+  $ it2 variable delete session user.status $ITERM_SESSION_ID
+
+  # Delete tab variable
+  $ it2 variable delete tab user.tab_data tab-123
+
+  # Delete window variable
+  $ it2 variable delete window user.window_state window-123`,
 		Args: cobra.RangeArgs(2, 3),
 		RunE: runDeleteCommand,
 	}

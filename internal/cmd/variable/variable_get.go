@@ -19,13 +19,24 @@ Scopes:
   app      - Application-wide variables
   session  - Session-specific variables (requires session-id)
   tab      - Tab-specific variables (requires tab-id)
-  window   - Window-specific variables (requires window-id)
+  window   - Window-specific variables (requires window-id)`,
+		Example: `  # Get app-level variable
+  $ it2 variable get app user.my_var
 
-Examples:
-  it2 variable get app user.my_var
-  it2 variable get session user.session_var <session-id>
-  it2 variable get tab user.tab_var <tab-id>
-  it2 variable get window user.window_var <window-id>`,
+  # Get session variable
+  $ it2 variable get session user.session_var abc123
+
+  # Get current session variable
+  $ it2 variable get session user.status $ITERM_SESSION_ID
+
+  # Get with JSON output
+  $ it2 variable get --format json app user.config
+
+  # Get tab variable
+  $ it2 variable get tab user.tab_var tab-123
+
+  # Get window variable
+  $ it2 variable get window user.window_var window-123`,
 		Args: cobra.RangeArgs(2, 3),
 		RunE: runGetCommand,
 	}

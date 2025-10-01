@@ -14,12 +14,27 @@ func newReplaceCommand() *cobra.Command {
 		Long: `Replace text patterns in the session buffer.
 
 Note: This command injects replacement text at found locations.
-Use with caution as it modifies the actual terminal content.
+Use with caution as it modifies the actual terminal content.`,
+		Example: cmdutil.Doc(`
+			# Replace text in buffer
+			$ it2 text replace abc123 "old_value" "new_value"
 
-Examples:
-  it2 text replace session123 "old_value" "new_value"
-  it2 text replace session123 "error" "ERROR" --case-sensitive`,
-		Args:           cobra.ExactArgs(3),
+			# Case-sensitive replacement
+			$ it2 text replace --case-sensitive abc123 "error" "ERROR"
+
+			# Replace with regex
+			$ it2 text replace --regex abc123 "foo\d+" "bar"
+
+			# Whole word replacement
+			$ it2 text replace --whole-word abc123 "test" "prod"
+
+			# Limit replacements
+			$ it2 text replace --max-replacements 5 abc123 "x" "y"
+
+			# Replace without confirmation
+			$ it2 text replace --confirm=false abc123 "old" "new"
+		`),
+		Args: cobra.ExactArgs(3),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.SessionIDCompletion,

@@ -14,12 +14,24 @@ func newSetCursorCommand() *cobra.Command {
 		Short: "Set cursor position",
 		Long: `Set the cursor to a specific position in the terminal grid.
 
-Coordinates are 0-based with (0,0) at the top-left corner.
+Coordinates are 0-based with (0,0) at the top-left corner.`,
+		Example: cmdutil.Doc(`
+			# Set cursor to position (10, 5)
+			$ it2 text set-cursor abc123 10 5
 
-Examples:
-  it2 text set-cursor session123 10 5
-  it2 text set-cursor session123 0 0`,
-		Args:            cobra.ExactArgs(3),
+			# Move cursor to top-left
+			$ it2 text set-cursor abc123 0 0
+
+			# Move cursor to column 20, row 10
+			$ it2 text set-cursor abc123 20 10
+
+			# Set with JSON output
+			$ it2 text set-cursor --format json abc123 5 3
+
+			# Move to bottom-left (column 0, row 50)
+			$ it2 text set-cursor abc123 0 50
+		`),
+		Args: cobra.ExactArgs(3),
 		RequiresClient:  true,
 		RequiresSession: true,
 		SupportsFormat:  true,
