@@ -467,7 +467,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	}
 
 	// Determine columns to include - put long fields at end as requested
-	headers := []string{"ID", "Parent", "PID", "Exit", "State", "Window", "Tab", "Title", "Command"}
+	headers := []string{"ID", "Parent", "PID", "State", "Window", "Tab", "Title", "Command"}
 
 	// Check if any sessions have plugin data to determine additional columns
 	pluginColumns := make(map[string]bool)
@@ -484,7 +484,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	}
 	sort.Strings(pluginCols)
 	for _, col := range pluginCols {
-		headers = append(headers, strings.Title(col))
+		headers = append(headers, col)
 	}
 
 	table := NewTableData(headers)
@@ -494,12 +494,6 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 		pidDisplay := ""
 		if session.JobPID != 0 {
 			pidDisplay = fmt.Sprintf("%d", session.JobPID)
-		}
-
-		// Format exit code display
-		exitDisplay := ""
-		if session.ExitCode != 0 {
-			exitDisplay = fmt.Sprintf("%d", session.ExitCode)
 		}
 
 		// Shorten prompt state with state indicators
@@ -523,22 +517,14 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			}
 		}
 
-		// Format parent ID - use short ID if available
+		// Format parent ID - use short form (last 8 chars)
 		parentDisplay := ""
 		if session.ParentSessionID != "" {
-			// Extract short form from parent session ID if possible
-			if strings.Contains(session.ParentSessionID, ":") {
-				parts := strings.Split(session.ParentSessionID, ":")
-				if len(parts) >= 2 {
-					parentDisplay = parts[0] + ":" + parts[1][:8] // Show window:session prefix
-				} else {
-					parentDisplay = session.ParentSessionID
-				}
+			// Extract last 8 characters for short ID
+			if len(session.ParentSessionID) >= 8 {
+				parentDisplay = session.ParentSessionID[len(session.ParentSessionID)-8:]
 			} else {
 				parentDisplay = session.ParentSessionID
-			}
-			if len(parentDisplay) > 12 {
-				parentDisplay = parentDisplay[:9] + "..."
 			}
 		}
 
@@ -557,7 +543,6 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			session.ShortID,
 			parentDisplay,
 			pidDisplay,
-			exitDisplay,
 			state,
 			fmt.Sprintf("%d", session.WindowNumber),
 			session.TabID,
