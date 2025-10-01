@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -16,6 +17,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/tmc/it2/internal/auth"
+	"github.com/tmc/it2/internal/iterm2settings"
 	pb "github.com/tmc/it2/proto"
 	protobuf "google.golang.org/protobuf/proto"
 )
@@ -71,10 +73,29 @@ func (c *Client) requestAuth() {
 }
 
 func (c *Client) Connect(ctx context.Context) error {
+	// First, check if automation is enabled
+	if err := auth.CheckAutomationEnabled(); err != nil {
+		// If automation is not enabled, offer to enable it interactively
+		if _, ok := err.(*auth.AutomationNotEnabledError); ok {
+			if offerToEnableAutomation() {
+				// User chose to enable, try connecting again
+				if err := auth.CheckAutomationEnabled(); err != nil {
+					return err
+				}
+			} else {
+				// User declined, return the original error
+				return err
+			}
+		} else {
+			// Other error, return it
+			return err
+		}
+	}
+
 	// Check if URL is for Unix socket
 	if strings.HasPrefix(c.url, "unix://") {
 		socketPath := strings.TrimPrefix(c.url, "unix://")
-		return c.connectUnixSocket(ctx, socketPath)
+		return c.formatConnectionError(c.connectUnixSocket(ctx, socketPath))
 	}
 
 	// Try Unix socket first if using default URL
@@ -125,7 +146,7 @@ func (c *Client) Connect(ctx context.Context) error {
 		if resp != nil && resp.StatusCode == 401 {
 			return fmt.Errorf("authentication required: set ITERM2_COOKIE and ITERM2_KEY environment variables")
 		}
-		return fmt.Errorf("connection failed: %w", err)
+		return c.formatConnectionError(fmt.Errorf("connection failed: %w", err))
 	}
 
 	c.conn = conn
@@ -165,6 +186,86 @@ func (c *Client) connectUnixSocket(ctx context.Context, socketPath string) error
 	}
 
 	return nil
+}
+
+// formatConnectionError formats connection errors with helpful hints
+func (c *Client) formatConnectionError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	errMsg := err.Error()
+
+	// Already well-formatted errors
+	if strings.Contains(errMsg, "API automation") ||
+	   strings.Contains(errMsg, "authentication required") {
+		return err
+	}
+
+	// Connection refused - diagnose the specific cause
+	if strings.Contains(errMsg, "connection refused") {
+		// Check if API is actually enabled
+		apiEnabled := iterm2settings.IsAPIEnabled()
+
+		// Check if iTerm2 is running
+		if !iterm2settings.IsRunning() {
+			if apiEnabled {
+				return fmt.Errorf("iTerm2 is not running.\n\nAPI automation is enabled but iTerm2 isn't running.\nPlease start iTerm2 and try again.")
+			}
+			return fmt.Errorf("iTerm2 is not running.\n\nPlease start iTerm2.\n\nNote: You'll also need to enable API automation:\n  Run: it2 auth enable")
+		}
+
+		// iTerm2 is running, check if API is enabled
+		if !apiEnabled {
+			return fmt.Errorf("iTerm2 API automation is not enabled.\n\niTerm2 is running but API automation is disabled in preferences.\n\nTo enable it:\n  Run: it2 auth enable\n  Or: iTerm2 → Settings → General → Magic → Enable Python API")
+		}
+
+		// API enabled and iTerm2 running - check socket
+		if !iterm2settings.SocketExists() {
+			return fmt.Errorf("iTerm2 API socket is missing.\n\niTerm2 is running and the API is enabled, but the socket doesn't exist:\n  %s\n\nTry:\n  1. Restart iTerm2 (the API server may not have started)\n  2. Check Console.app for iTerm2 startup errors", iterm2settings.GetSocketPath())
+		}
+
+		// Everything looks good but still connection refused - rare case
+		return fmt.Errorf("iTerm2 API server is not responding.\n\niTerm2 is running, API is enabled, and socket exists, but connection failed.\n\nTry:\n  1. Restart iTerm2\n  2. Wait 5-10 seconds after starting iTerm2\n  3. Check Console.app for iTerm2 API errors")
+	}
+
+	// Timeout errors
+	if strings.Contains(errMsg, "timeout") || strings.Contains(errMsg, "deadline exceeded") {
+		return fmt.Errorf("connection timed out.\n\nTry:\n  - Increasing timeout with --timeout flag\n  - Checking if iTerm2 is responsive\n  - Running 'it2 auth status' to verify API is enabled")
+	}
+
+	// Return error as-is for other cases
+	return err
+}
+
+// offerToEnableAutomation prompts the user to enable automation if it's disabled
+// Returns true if automation was enabled, false otherwise
+func offerToEnableAutomation() bool {
+	fmt.Fprintln(os.Stderr, "\niTerm2 API automation is not enabled.")
+	fmt.Fprintln(os.Stderr)
+	fmt.Fprint(os.Stderr, "Would you like to enable it now? [Y/n]: ")
+
+	reader := bufio.NewReader(os.Stdin)
+	response, err := reader.ReadString('\n')
+	if err != nil {
+		return false
+	}
+
+	response = strings.TrimSpace(strings.ToLower(response))
+
+	// Default to yes if empty
+	if response == "" || response == "y" || response == "yes" {
+		fmt.Fprintln(os.Stderr, "\nEnabling API automation...")
+		if err := auth.EnableAutomation(); err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to enable automation: %v\n", err)
+			return false
+		}
+		fmt.Fprintln(os.Stderr, "✓ API automation enabled")
+		fmt.Fprintln(os.Stderr)
+		return true
+	}
+
+	return false
 }
 
 func (c *Client) Close() error {

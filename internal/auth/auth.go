@@ -9,6 +9,52 @@ import (
 	"syscall"
 )
 
+// CheckAutomationEnabled checks if iTerm2 automation is properly enabled
+// Returns nil if enabled, or an error with helpful instructions if not
+func CheckAutomationEnabled() error {
+	// If auth is disabled via special file, it's enabled
+	if AuthDisabled() {
+		return nil
+	}
+
+	// If we have credentials, assume enabled
+	if HasAuthentication() {
+		return nil
+	}
+
+	// First check: Read the EnableAPIServer preference directly
+	cmd := exec.Command("defaults", "read", "com.googlecode.iterm2", "EnableAPIServer")
+	output, err := cmd.Output()
+
+	// If the key doesn't exist or is 0, API is not enabled
+	if err != nil || strings.TrimSpace(string(output)) != "1" {
+		return &AutomationNotEnabledError{}
+	}
+
+	// API is enabled according to preferences
+	return nil
+}
+
+// AutomationNotEnabledError represents the error when iTerm2 automation is not enabled
+type AutomationNotEnabledError struct{}
+
+func (e *AutomationNotEnabledError) Error() string {
+	return `iTerm2 API automation is not enabled.
+
+To enable iTerm2 automation:
+
+  1. Open iTerm2 → Settings (⌘,)
+  2. Go to General → Magic
+  3. Check "Enable Python API"
+  4. Restart iTerm2 if needed
+
+For more information, see:
+  https://iterm2.com/python-api/tutorial/running.html
+
+Alternatively, if you want to disable authentication entirely:
+  https://iterm2.com/python-api-auth.html`
+}
+
 // RequestAuthentication requests cookie and key from iTerm2 via AppleScript
 func RequestAuthentication() error {
 	// Check if authentication is disabled
@@ -116,4 +162,22 @@ func HasAuthentication() bool {
 func ClearAuthentication() {
 	os.Unsetenv("ITERM2_COOKIE")
 	os.Unsetenv("ITERM2_KEY")
+}
+
+// EnableAutomation enables iTerm2 API automation by setting EnableAPIServer to true
+func EnableAutomation() error {
+	cmd := exec.Command("defaults", "write", "com.googlecode.iterm2", "EnableAPIServer", "-bool", "true")
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to enable API server: %w\nOutput: %s", err, string(output))
+	}
+	return nil
+}
+
+// DisableAutomation disables iTerm2 API automation by setting EnableAPIServer to false
+func DisableAutomation() error {
+	cmd := exec.Command("defaults", "write", "com.googlecode.iterm2", "EnableAPIServer", "-bool", "false")
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to disable API server: %w\nOutput: %s", err, string(output))
+	}
+	return nil
 }

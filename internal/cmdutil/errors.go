@@ -2,6 +2,7 @@ package cmdutil
 
 import (
 	"fmt"
+	"strings"
 )
 
 // StandardError provides consistent error formatting across commands
@@ -34,11 +35,19 @@ func NewOperationError(operation string, cause error) error {
 
 // NewConnectionError creates a standardized connection error
 func NewConnectionError(cause error) error {
+	hint := "Ensure iTerm2 is running and the Python API is enabled in Settings → General → Magic"
+
+	// Check if this is an automation error and provide specific guidance
+	if cause != nil && (cause.Error() == "iTerm2 is not running" ||
+	   strings.Contains(cause.Error(), "Python API")) {
+		hint = cause.Error()
+	}
+
 	return &StandardError{
 		Operation: "connect to iTerm2",
 		Cause:     cause,
 		Details: map[string]interface{}{
-			"hint": "Ensure iTerm2 is running and the API is enabled",
+			"hint": hint,
 		},
 	}
 }

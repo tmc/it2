@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/tmc/it2/internal/auth"
 )
 
 // ParseColumnList parses a comma-separated list of columns
@@ -282,5 +284,13 @@ func PrintScopeNoticeWithFlag(format string, scopeFlag string) {
 		} else {
 			fmt.Fprintf(os.Stderr, "ℹ IT2_SCOPE=%s (targeting %s scope)\n", effectiveScope, effectiveScope)
 		}
+	}
+}
+
+// CheckAutomationOrExit checks if iTerm2 automation is enabled and exits with helpful error if not
+func CheckAutomationOrExit() {
+	if err := auth.CheckAutomationEnabled(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }
