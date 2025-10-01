@@ -264,8 +264,14 @@ Multiple conditions can be specified and all must pass.`,
 			# Wait for session to have no partial input before sending
 			$ it2 session send-text --require has-no-partial-input 'ls -la'
 
-			# Multiple pre-conditions with custom timeout
+			# Multiple pre-conditions (comma-separated)
+			$ it2 session send-text --require is-at-prompt,has-no-partial-input 'pwd'
+
+			# Multiple pre-conditions (multiple flags or comma-separated)
 			$ it2 session send-text --require is-at-prompt --require has-no-partial-input --require-timeout 30s 'pwd'
+
+			# Multiple conditions for Claude sessions
+			$ it2 session send-text --require is-claude-session,is-at-prompt,is-at-empty-prompt,has-no-queued-messages 'your command'
 
 			# Send from file
 			$ it2 session send-text -f file.txt
@@ -521,7 +527,7 @@ Multiple conditions can be specified and all must pass.`,
 	})
 	cmd.Flags().Duration("delay-before-terminator", 0, "Delay before sending line terminator")
 	cmd.Flags().StringP("file", "f", "", "Read text from file (use '-' for stdin)")
-	cmd.Flags().StringSlice("require", nil, "Pre-condition plugins to check before sending (e.g., 'has-no-partial-input', 'is-at-prompt')")
+	cmd.Flags().StringSlice("require", nil, "Pre-condition plugins to check before sending (comma-separated or multiple flags, e.g., 'is-at-prompt,has-no-partial-input')")
 	cmd.Flags().Duration("require-timeout", 10*time.Second, "Timeout for pre-condition checks")
 	cmd.Flags().Bool("verbose", false, "Print pre-condition status messages")
 	cmd.Flags().Bool("skip-confirm", false, "Skip text delivery confirmation (confirmation is enabled by default)")
