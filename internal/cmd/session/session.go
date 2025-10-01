@@ -27,6 +27,10 @@ func NewCommand() *cobra.Command {
 		Title: "Session Interaction Commands:",
 	})
 	cmd.AddGroup(&cobra.Group{
+		ID:    "properties",
+		Title: "Properties & Variables Commands:",
+	})
+	cmd.AddGroup(&cobra.Group{
 		ID:    "monitoring",
 		Title: "Monitoring & Information Commands:",
 	})
@@ -118,26 +122,39 @@ func NewCommand() *cobra.Command {
 	getBufferCmd.GroupID = "interaction"
 	cmd.AddCommand(getBufferCmd)
 
+	// Properties & Variables Commands
+	getPropertyCmd := newGetPropertyCommand()
+	getPropertyCmd.GroupID = "properties"
+	cmd.AddCommand(getPropertyCmd)
+
+	setPropertyCmd := newSetPropertyCommand()
+	setPropertyCmd.GroupID = "properties"
+	cmd.AddCommand(setPropertyCmd)
+
+	getVariableCmd := newGetVariableCommand()
+	getVariableCmd.GroupID = "properties"
+	cmd.AddCommand(getVariableCmd)
+
+	setVariableCmd := newSetVariableCommand()
+	setVariableCmd.GroupID = "properties"
+	cmd.AddCommand(setVariableCmd)
+
+	listVariablesCmd := newListVariablesCommand()
+	listVariablesCmd.GroupID = "properties"
+	cmd.AddCommand(listVariablesCmd)
+
+	clearVariableCmd := newClearVariableCommand()
+	clearVariableCmd.GroupID = "properties"
+	cmd.AddCommand(clearVariableCmd)
+
+	profileCmd := NewProfileCommand()
+	profileCmd.GroupID = "properties"
+	cmd.AddCommand(profileCmd)
+
 	// Monitoring & Information Commands
 	getPIDCmd := newGetPIDCommand()
 	getPIDCmd.GroupID = "monitoring"
 	cmd.AddCommand(getPIDCmd)
-
-	getPropertyCmd := newGetPropertyCommand()
-	getPropertyCmd.GroupID = "monitoring"
-	cmd.AddCommand(getPropertyCmd)
-
-	setPropertyCmd := newSetPropertyCommand()
-	setPropertyCmd.GroupID = "monitoring"
-	cmd.AddCommand(setPropertyCmd)
-
-	getVariableCmd := newGetVariableCommand()
-	getVariableCmd.GroupID = "monitoring"
-	cmd.AddCommand(getVariableCmd)
-
-	setVariableCmd := newSetVariableCommand()
-	setVariableCmd.GroupID = "monitoring"
-	cmd.AddCommand(setVariableCmd)
 
 	monitorCmd := newMonitorCommand()
 	monitorCmd.GroupID = "monitoring"
