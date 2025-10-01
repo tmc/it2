@@ -156,6 +156,10 @@ func NewCommand() *cobra.Command {
 	getPIDCmd.GroupID = "monitoring"
 	cmd.AddCommand(getPIDCmd)
 
+	hasProcessCmd := newHasProcessCommand()
+	hasProcessCmd.GroupID = "monitoring"
+	cmd.AddCommand(hasProcessCmd)
+
 	monitorCmd := newMonitorCommand()
 	monitorCmd.GroupID = "monitoring"
 	cmd.AddCommand(monitorCmd)
