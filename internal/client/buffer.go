@@ -15,15 +15,25 @@ func (c *Client) GetBuffer(ctx context.Context, sessionID string, lines int32) (
 // GetBufferWithStyles retrieves the buffer contents of a session with optional style information
 func (c *Client) GetBufferWithStyles(ctx context.Context, sessionID string, lines int32, includeStyles bool) (*pb.GetBufferResponse, error) {
 	normalizedID := NormalizeSessionID(sessionID)
-	screenOnly := false
+
+	// Build LineRange based on requested lines
+	// According to iTerm2 API: must set EITHER screen_contents_only OR trailing_lines
+	lineRange := &pb.LineRange{}
+	if lines > 0 {
+		// Request specific number of trailing lines (includes scrollback)
+		lineRange.TrailingLines = &lines
+	} else {
+		// lines == 0 or negative: get screen contents only (visible area)
+		screenOnly := true
+		lineRange.ScreenContentsOnly = &screenOnly
+	}
+
 	msg := &pb.ClientOriginatedMessage{
 		Submessage: &pb.ClientOriginatedMessage_GetBufferRequest{
 			GetBufferRequest: &pb.GetBufferRequest{
 				Session:       &normalizedID,
 				IncludeStyles: &includeStyles,
-				LineRange: &pb.LineRange{
-					ScreenContentsOnly: &screenOnly,
-				},
+				LineRange:     lineRange,
 			},
 		},
 	}
