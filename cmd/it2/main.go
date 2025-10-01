@@ -15,7 +15,6 @@ import (
 	"github.com/tmc/it2/internal/cmd/auth"
 	"github.com/tmc/it2/internal/cmd/badge"
 	"github.com/tmc/it2/internal/cmd/broadcast"
-	"github.com/tmc/it2/internal/cmd/clipboard"
 	"github.com/tmc/it2/internal/cmd/color"
 	"github.com/tmc/it2/internal/cmd/control"
 	"github.com/tmc/it2/internal/cmd/event"
@@ -291,7 +290,6 @@ func init() {
 	rootCmd.AddCommand(auth.NewCommand())
 	rootCmd.AddCommand(badge.NewCommand())
 	rootCmd.AddCommand(broadcast.NewCommand())
-	rootCmd.AddCommand(clipboard.NewCommand())
 	rootCmd.AddCommand(color.NewCommand())
 	rootCmd.AddCommand(input.NewCommand())
 	rootCmd.AddCommand(job.NewCommand())

@@ -15,7 +15,6 @@ import (
 	"github.com/tmc/it2/internal/cmd/auth"
 	"github.com/tmc/it2/internal/cmd/badge"
 	"github.com/tmc/it2/internal/cmd/broadcast"
-	"github.com/tmc/it2/internal/cmd/clipboard"
 	"github.com/tmc/it2/internal/cmd/color"
 	"github.com/tmc/it2/internal/cmd/job"
 	"github.com/tmc/it2/internal/cmd/notification"
@@ -161,10 +160,6 @@ It supports both traditional flat command syntax and intuitive hierarchical navi
 	textCmd := text.NewCommand()
 	textCmd.GroupID = "content"
 	rootCmd.AddCommand(textCmd)
-
-	clipboardCmd := clipboard.NewCommand()
-	clipboardCmd.GroupID = "content"
-	rootCmd.AddCommand(clipboardCmd)
 
 	selectionCmd := selection.NewCommand()
 	selectionCmd.GroupID = "content"
