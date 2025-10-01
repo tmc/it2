@@ -86,6 +86,8 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 				}
 			}
 		}
+		// Save metrics after enrichment
+		plugins.GetMetricsStore().Save()
 	}
 
 	// Format and output

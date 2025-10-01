@@ -135,6 +135,13 @@ func setupPluginEnv(cmd *exec.Cmd) {
 
 // EnrichSession runs the executable with the session ID and parses the output
 func (p *ExecPlugin) EnrichSession(ctx context.Context, session *client.SessionInfo) (map[string]interface{}, error) {
+	// Record execution start time
+	start := time.Now()
+	defer func() {
+		duration := time.Since(start)
+		GetMetricsStore().RecordExecution(p.name, duration)
+	}()
+
 	// Use a longer timeout for plugins to ensure they can complete
 	pluginCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -173,6 +180,12 @@ func (p *ExecPlugin) EnrichSession(ctx context.Context, session *client.SessionI
 
 // EnrichTab runs the executable with tab information and parses the output
 func (p *ExecPlugin) EnrichTab(ctx context.Context, tab *formatting.TabInfo) (map[string]interface{}, error) {
+	// Record execution metrics
+	start := time.Now()
+	defer func() {
+		GetMetricsStore().RecordExecution(p.name, time.Since(start))
+	}()
+
 	// Use a longer timeout for plugins to ensure they can complete
 	pluginCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -201,6 +214,12 @@ func (p *ExecPlugin) EnrichTab(ctx context.Context, tab *formatting.TabInfo) (ma
 
 // EnrichWindow runs the executable with window information and parses the output
 func (p *ExecPlugin) EnrichWindow(ctx context.Context, window *client.WindowInfo) (map[string]interface{}, error) {
+	// Record execution metrics
+	start := time.Now()
+	defer func() {
+		GetMetricsStore().RecordExecution(p.name, time.Since(start))
+	}()
+
 	// Use a longer timeout for plugins to ensure they can complete
 	pluginCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -229,6 +248,12 @@ func (p *ExecPlugin) EnrichWindow(ctx context.Context, window *client.WindowInfo
 
 // EnrichProcess runs the executable with process information and parses the output
 func (p *ExecPlugin) EnrichProcess(ctx context.Context, sessionID string, pid int) (map[string]interface{}, error) {
+	// Record execution metrics
+	start := time.Now()
+	defer func() {
+		GetMetricsStore().RecordExecution(p.name, time.Since(start))
+	}()
+
 	// Use a longer timeout for plugins to ensure they can complete
 	pluginCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
