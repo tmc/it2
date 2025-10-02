@@ -72,6 +72,7 @@ Shell Integration Features (requires Shell Integration):
 
   - prompt: Access command history, prompts, exit codes
   - job: Monitor running processes and jobs
+  - shell: Detect shell state (ready/busy/tui) and wait for prompts
 
 Customization:
 
@@ -100,9 +101,7 @@ Global flags available for all commands:
 	--timeout duration   Connection timeout (default 5s)
 	--url string         API URL (default "ws://localhost:1912", auto-detects Unix socket)
 
-## Environment Variables
-
-Key environment variables that affect behavior:
+Environment variables that affect behavior:
 
 	ITERM_SESSION_ID     Current session ID (automatically set by iTerm2)
 	ITERM2_COOKIE        Authentication cookie (auto-requested if not set)
@@ -175,6 +174,12 @@ Example Shell Integration workflows:
 
 	# Monitor running jobs
 	it2 job list <session-id>
+
+	# Check if shell is ready for input
+	it2 shell state
+
+	# Wait for shell to be ready before sending commands
+	it2 shell wait-for-prompt && it2 session send-text "echo ready"
 
 ## Real-time Monitoring
 
@@ -290,24 +295,6 @@ iTerm2 uses these connection methods for API communication:
 	ws://localhost:1912
 	    WebSocket endpoint for API communication (fallback only)
 	    Used only when Unix socket is unavailable
-
-## Environment Variables
-
-The following environment variables affect it2 behavior:
-
-	ITERM_SESSION_ID
-	    Current session ID (automatically set by iTerm2 with Shell Integration)
-	    Format: w0t1p12:C3D91F33-3805-47E2-A3F6-B8AED6EC2209
-
-	ITERM2_COOKIE
-	    Authentication cookie (auto-requested if not set)
-
-	ITERM2_KEY
-	    Authentication key (auto-requested if not set)
-
-	ITERM2_DEBUG
-	    Enable debug logging when set to "1"
-	    Shows WebSocket messages and connection details
 
 ## More Information
 
