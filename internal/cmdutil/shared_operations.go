@@ -170,6 +170,20 @@ func (s *SharedListOperations) ListWindows(opts SharedListOptions) error {
 		return fmt.Errorf("failed to list windows: %w", err)
 	}
 
+	// Get sessions to calculate session counts per window
+	sessions, err := s.client.ListSessions(s.ctx)
+	if err == nil {
+		// Count sessions per window
+		sessionCounts := make(map[string]int)
+		for _, session := range sessions {
+			sessionCounts[session.WindowID]++
+		}
+		// Update window session counts
+		for _, window := range windows {
+			window.SessionCount = sessionCounts[window.WindowID]
+		}
+	}
+
 	// Apply plugins to windows
 	registry := plugins.NewRegistry()
 	if err := registry.DiscoverAndRegister(); err == nil {

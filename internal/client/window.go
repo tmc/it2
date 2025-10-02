@@ -148,6 +148,7 @@ type WindowInfo struct {
 	Fullscreen   string                 `json:"fullscreen,omitempty"`
 	Miniaturized string                 `json:"miniaturized,omitempty"`
 	TabCount     int                    `json:"tab_count"`
+	SessionCount int                    `json:"session_count,omitempty"`
 	PluginData   map[string]interface{} `json:"plugin_data,omitempty"`
 }
 
