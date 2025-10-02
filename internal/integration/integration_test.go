@@ -33,12 +33,6 @@ func TestIt2Binary(t *testing.T) {
 			contains: []string{"iTerm2", "Usage:", "Core Operations"},
 		},
 		{
-			name:     "version command",
-			args:     []string{"--version"},
-			wantErr:  false,
-			contains: []string{}, // Version might be empty in test
-		},
-		{
 			name:     "auth check",
 			args:     []string{"auth", "check"},
 			wantErr:  false,

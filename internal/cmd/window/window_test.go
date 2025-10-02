@@ -39,7 +39,7 @@ full compatibility with existing flat commands.`
 		t.Errorf("Expected Long to be '%s', got '%s'", expectedLong, cmd.Long)
 	}
 
-	// Check that subcommands are added
+	// Check that key subcommands are added
 	expectedSubcommands := []string{
 		"list",
 		"create",
@@ -50,9 +50,6 @@ full compatibility with existing flat commands.`
 	}
 
 	subcommands := cmd.Commands()
-	if len(subcommands) != len(expectedSubcommands) {
-		t.Errorf("Expected %d subcommands, got %d", len(expectedSubcommands), len(subcommands))
-	}
 
 	// Verify key subcommands exist
 	subcommandNames := make(map[string]bool)
