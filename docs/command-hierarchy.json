@@ -10,21 +10,6 @@
         "path": "it2 app",
         "subcommands": [
           {
-            "name": "focus",
-            "short": "Bring iTerm2 to the foreground",
-            "path": "it2 app focus"
-          },
-          {
-            "name": "get-info",
-            "short": "Get comprehensive application information",
-            "path": "it2 app get-info"
-          },
-          {
-            "name": "get-property",
-            "short": "Get the value of an application-level property",
-            "path": "it2 app get-property"
-          },
-          {
             "name": "get-variable",
             "short": "Get the value of an application-level variable",
             "path": "it2 app get-variable"
@@ -35,34 +20,72 @@
             "path": "it2 app launch"
           },
           {
-            "name": "list-properties",
-            "short": "List all available application properties",
-            "path": "it2 app list-properties"
-          },
-          {
-            "name": "list-windows",
-            "short": "List all terminal windows with their IDs, tabs, and sessions",
-            "path": "it2 app list-windows"
-          },
-          {
-            "name": "preferences",
-            "short": "Quick access to common preference operations",
-            "path": "it2 app preferences"
-          },
-          {
             "name": "quit",
             "short": "Quit iTerm2 application",
             "path": "it2 app quit"
           },
           {
-            "name": "set-property",
-            "short": "Set the value of an application-level property",
-            "path": "it2 app set-property"
-          },
-          {
             "name": "set-variable",
             "short": "Set a user-defined application-level variable",
             "path": "it2 app set-variable"
+          },
+          {
+            "name": "settings",
+            "short": "Manage iTerm2 application settings",
+            "path": "it2 app settings",
+            "subcommands": [
+              {
+                "name": "api",
+                "short": "Manage iTerm2 API automation",
+                "path": "it2 app settings api",
+                "subcommands": [
+                  {
+                    "name": "disable",
+                    "short": "Disable iTerm2 API automation",
+                    "path": "it2 app settings api disable"
+                  },
+                  {
+                    "name": "enable",
+                    "short": "Enable iTerm2 API automation",
+                    "path": "it2 app settings api enable"
+                  },
+                  {
+                    "name": "enabled",
+                    "short": "Check if iTerm2 API automation is enabled",
+                    "path": "it2 app settings api enabled"
+                  }
+                ]
+              },
+              {
+                "name": "keybindings",
+                "short": "Manage iTerm2 key bindings",
+                "path": "it2 app settings keybindings",
+                "subcommands": [
+                  {
+                    "name": "shift-enter",
+                    "short": "Manage Shift+Enter key binding",
+                    "path": "it2 app settings keybindings shift-enter",
+                    "subcommands": [
+                      {
+                        "name": "disable",
+                        "short": "Disable Shift+Enter → newline binding",
+                        "path": "it2 app settings keybindings shift-enter disable"
+                      },
+                      {
+                        "name": "enable",
+                        "short": "Enable Shift+Enter → newline binding",
+                        "path": "it2 app settings keybindings shift-enter enable"
+                      },
+                      {
+                        "name": "status",
+                        "short": "Check if Shift+Enter is configured",
+                        "path": "it2 app settings keybindings shift-enter status"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           },
           {
             "name": "version",
@@ -180,23 +203,6 @@
         ]
       },
       {
-        "name": "clipboard",
-        "short": "Manage clipboard operations",
-        "path": "it2 clipboard",
-        "subcommands": [
-          {
-            "name": "copy",
-            "short": "Copy current selection to clipboard",
-            "path": "it2 clipboard copy"
-          },
-          {
-            "name": "paste",
-            "short": "Paste clipboard content to session",
-            "path": "it2 clipboard paste"
-          }
-        ]
-      },
-      {
         "name": "color",
         "short": "Manage iTerm2 colors and appearance",
         "path": "it2 color",
@@ -305,6 +311,11 @@
             "path": "it2 profile bulk-update"
           },
           {
+            "name": "clear-badge",
+            "short": "Clear the badge text of a profile",
+            "path": "it2 profile clear-badge"
+          },
+          {
             "name": "create",
             "short": "Guide for creating a new profile",
             "path": "it2 profile create"
@@ -328,6 +339,11 @@
             "name": "get",
             "short": "Get profile details",
             "path": "it2 profile get"
+          },
+          {
+            "name": "get-badge",
+            "short": "Get the badge text of a profile",
+            "path": "it2 profile get-badge"
           },
           {
             "name": "get-property",
@@ -365,6 +381,11 @@
             "path": "it2 profile set"
           },
           {
+            "name": "set-badge",
+            "short": "Set the badge text of a profile",
+            "path": "it2 profile set-badge"
+          },
+          {
             "name": "set-property",
             "short": "Set a single profile property",
             "path": "it2 profile set-property"
@@ -399,18 +420,6 @@
         ]
       },
       {
-        "name": "screen",
-        "short": "Screen capture utilities",
-        "path": "it2 screen",
-        "subcommands": [
-          {
-            "name": "capture",
-            "short": "Take a screenshot using macOS screencapture with absolute coordinates",
-            "path": "it2 screen capture"
-          }
-        ]
-      },
-      {
         "name": "selection",
         "short": "Text selection operations in iTerm2",
         "path": "it2 selection",
@@ -419,11 +428,6 @@
             "name": "clear",
             "short": "Clear current text selection",
             "path": "it2 selection clear"
-          },
-          {
-            "name": "copy",
-            "short": "Copy current selection to clipboard",
-            "path": "it2 selection copy"
           },
           {
             "name": "get",
@@ -463,6 +467,11 @@
             "path": "it2 session clear-title"
           },
           {
+            "name": "clear-variable",
+            "short": "Clear a session variable",
+            "path": "it2 session clear-variable"
+          },
+          {
             "name": "close",
             "short": "Close a session",
             "path": "it2 session close"
@@ -481,6 +490,16 @@
             "name": "current",
             "short": "Show the current session ID",
             "path": "it2 session current"
+          },
+          {
+            "name": "focus",
+            "short": "Focus/activate a session",
+            "path": "it2 session focus"
+          },
+          {
+            "name": "focused",
+            "short": "Get the currently focused session ID",
+            "path": "it2 session focused"
           },
           {
             "name": "get-badge",
@@ -528,6 +547,11 @@
             "path": "it2 session list"
           },
           {
+            "name": "list-variables",
+            "short": "List all variables for a session",
+            "path": "it2 session list-variables"
+          },
+          {
             "name": "monitor",
             "short": "Monitor session events in real-time",
             "path": "it2 session monitor"
@@ -541,6 +565,50 @@
             "name": "paste",
             "short": "Paste clipboard content to session",
             "path": "it2 session paste"
+          },
+          {
+            "name": "process",
+            "short": "Process inspection for sessions",
+            "path": "it2 session process",
+            "subcommands": [
+              {
+                "name": "has",
+                "short": "Check if a process exists in session's tree",
+                "path": "it2 session process has"
+              },
+              {
+                "name": "list",
+                "short": "List processes for a session",
+                "path": "it2 session process list"
+              }
+            ]
+          },
+          {
+            "name": "profile",
+            "short": "Manage session profile properties",
+            "path": "it2 session profile",
+            "subcommands": [
+              {
+                "name": "get",
+                "short": "Get a session profile property",
+                "path": "it2 session profile get"
+              },
+              {
+                "name": "list",
+                "short": "List all profile properties for a session",
+                "path": "it2 session profile list"
+              },
+              {
+                "name": "reset",
+                "short": "Reset a session profile property to profile default",
+                "path": "it2 session profile reset"
+              },
+              {
+                "name": "set",
+                "short": "Set a session profile property",
+                "path": "it2 session profile set"
+              }
+            ]
           },
           {
             "name": "restart",
@@ -591,6 +659,11 @@
             "name": "splits",
             "short": "Show split pane layout (moved to 'tab splits')",
             "path": "it2 session splits"
+          },
+          {
+            "name": "tail",
+            "short": "Continuously monitor session output (like tail -f)",
+            "path": "it2 session tail"
           },
           {
             "name": "watch",
@@ -904,21 +977,6 @@
           "path": "it2 app",
           "subcommands": [
             {
-              "name": "focus",
-              "short": "Bring iTerm2 to the foreground",
-              "path": "it2 app focus"
-            },
-            {
-              "name": "get-info",
-              "short": "Get comprehensive application information",
-              "path": "it2 app get-info"
-            },
-            {
-              "name": "get-property",
-              "short": "Get the value of an application-level property",
-              "path": "it2 app get-property"
-            },
-            {
               "name": "get-variable",
               "short": "Get the value of an application-level variable",
               "path": "it2 app get-variable"
@@ -929,34 +987,72 @@
               "path": "it2 app launch"
             },
             {
-              "name": "list-properties",
-              "short": "List all available application properties",
-              "path": "it2 app list-properties"
-            },
-            {
-              "name": "list-windows",
-              "short": "List all terminal windows with their IDs, tabs, and sessions",
-              "path": "it2 app list-windows"
-            },
-            {
-              "name": "preferences",
-              "short": "Quick access to common preference operations",
-              "path": "it2 app preferences"
-            },
-            {
               "name": "quit",
               "short": "Quit iTerm2 application",
               "path": "it2 app quit"
             },
             {
-              "name": "set-property",
-              "short": "Set the value of an application-level property",
-              "path": "it2 app set-property"
-            },
-            {
               "name": "set-variable",
               "short": "Set a user-defined application-level variable",
               "path": "it2 app set-variable"
+            },
+            {
+              "name": "settings",
+              "short": "Manage iTerm2 application settings",
+              "path": "it2 app settings",
+              "subcommands": [
+                {
+                  "name": "api",
+                  "short": "Manage iTerm2 API automation",
+                  "path": "it2 app settings api",
+                  "subcommands": [
+                    {
+                      "name": "disable",
+                      "short": "Disable iTerm2 API automation",
+                      "path": "it2 app settings api disable"
+                    },
+                    {
+                      "name": "enable",
+                      "short": "Enable iTerm2 API automation",
+                      "path": "it2 app settings api enable"
+                    },
+                    {
+                      "name": "enabled",
+                      "short": "Check if iTerm2 API automation is enabled",
+                      "path": "it2 app settings api enabled"
+                    }
+                  ]
+                },
+                {
+                  "name": "keybindings",
+                  "short": "Manage iTerm2 key bindings",
+                  "path": "it2 app settings keybindings",
+                  "subcommands": [
+                    {
+                      "name": "shift-enter",
+                      "short": "Manage Shift+Enter key binding",
+                      "path": "it2 app settings keybindings shift-enter",
+                      "subcommands": [
+                        {
+                          "name": "disable",
+                          "short": "Disable Shift+Enter → newline binding",
+                          "path": "it2 app settings keybindings shift-enter disable"
+                        },
+                        {
+                          "name": "enable",
+                          "short": "Enable Shift+Enter → newline binding",
+                          "path": "it2 app settings keybindings shift-enter enable"
+                        },
+                        {
+                          "name": "status",
+                          "short": "Check if Shift+Enter is configured",
+                          "path": "it2 app settings keybindings shift-enter status"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
               "name": "version",
@@ -991,6 +1087,11 @@
               "path": "it2 session clear-title"
             },
             {
+              "name": "clear-variable",
+              "short": "Clear a session variable",
+              "path": "it2 session clear-variable"
+            },
+            {
               "name": "close",
               "short": "Close a session",
               "path": "it2 session close"
@@ -1009,6 +1110,16 @@
               "name": "current",
               "short": "Show the current session ID",
               "path": "it2 session current"
+            },
+            {
+              "name": "focus",
+              "short": "Focus/activate a session",
+              "path": "it2 session focus"
+            },
+            {
+              "name": "focused",
+              "short": "Get the currently focused session ID",
+              "path": "it2 session focused"
             },
             {
               "name": "get-badge",
@@ -1056,6 +1167,11 @@
               "path": "it2 session list"
             },
             {
+              "name": "list-variables",
+              "short": "List all variables for a session",
+              "path": "it2 session list-variables"
+            },
+            {
               "name": "monitor",
               "short": "Monitor session events in real-time",
               "path": "it2 session monitor"
@@ -1069,6 +1185,50 @@
               "name": "paste",
               "short": "Paste clipboard content to session",
               "path": "it2 session paste"
+            },
+            {
+              "name": "process",
+              "short": "Process inspection for sessions",
+              "path": "it2 session process",
+              "subcommands": [
+                {
+                  "name": "has",
+                  "short": "Check if a process exists in session's tree",
+                  "path": "it2 session process has"
+                },
+                {
+                  "name": "list",
+                  "short": "List processes for a session",
+                  "path": "it2 session process list"
+                }
+              ]
+            },
+            {
+              "name": "profile",
+              "short": "Manage session profile properties",
+              "path": "it2 session profile",
+              "subcommands": [
+                {
+                  "name": "get",
+                  "short": "Get a session profile property",
+                  "path": "it2 session profile get"
+                },
+                {
+                  "name": "list",
+                  "short": "List all profile properties for a session",
+                  "path": "it2 session profile list"
+                },
+                {
+                  "name": "reset",
+                  "short": "Reset a session profile property to profile default",
+                  "path": "it2 session profile reset"
+                },
+                {
+                  "name": "set",
+                  "short": "Set a session profile property",
+                  "path": "it2 session profile set"
+                }
+              ]
             },
             {
               "name": "restart",
@@ -1119,6 +1279,11 @@
               "name": "splits",
               "short": "Show split pane layout (moved to 'tab splits')",
               "path": "it2 session splits"
+            },
+            {
+              "name": "tail",
+              "short": "Continuously monitor session output (like tail -f)",
+              "path": "it2 session tail"
             },
             {
               "name": "watch",
@@ -1285,35 +1450,6 @@
           ]
         },
         {
-          "name": "clipboard",
-          "short": "Manage clipboard operations",
-          "path": "it2 clipboard",
-          "subcommands": [
-            {
-              "name": "copy",
-              "short": "Copy current selection to clipboard",
-              "path": "it2 clipboard copy"
-            },
-            {
-              "name": "paste",
-              "short": "Paste clipboard content to session",
-              "path": "it2 clipboard paste"
-            }
-          ]
-        },
-        {
-          "name": "screen",
-          "short": "Screen capture utilities",
-          "path": "it2 screen",
-          "subcommands": [
-            {
-              "name": "capture",
-              "short": "Take a screenshot using macOS screencapture with absolute coordinates",
-              "path": "it2 screen capture"
-            }
-          ]
-        },
-        {
           "name": "selection",
           "short": "Text selection operations in iTerm2",
           "path": "it2 selection",
@@ -1322,11 +1458,6 @@
               "name": "clear",
               "short": "Clear current text selection",
               "path": "it2 selection clear"
-            },
-            {
-              "name": "copy",
-              "short": "Copy current selection to clipboard",
-              "path": "it2 selection copy"
             },
             {
               "name": "get",
@@ -1495,6 +1626,11 @@
               "path": "it2 profile bulk-update"
             },
             {
+              "name": "clear-badge",
+              "short": "Clear the badge text of a profile",
+              "path": "it2 profile clear-badge"
+            },
+            {
               "name": "create",
               "short": "Guide for creating a new profile",
               "path": "it2 profile create"
@@ -1518,6 +1654,11 @@
               "name": "get",
               "short": "Get profile details",
               "path": "it2 profile get"
+            },
+            {
+              "name": "get-badge",
+              "short": "Get the badge text of a profile",
+              "path": "it2 profile get-badge"
             },
             {
               "name": "get-property",
@@ -1553,6 +1694,11 @@
               "name": "set",
               "short": "Set multiple profile properties from JSON",
               "path": "it2 profile set"
+            },
+            {
+              "name": "set-badge",
+              "short": "Set the badge text of a profile",
+              "path": "it2 profile set-badge"
             },
             {
               "name": "set-property",
@@ -1812,6 +1958,6 @@
       ]
     }
   ],
-  "total_commands": 170,
-  "generated_at": "2025-10-01T02:40:31Z"
+  "total_commands": 183,
+  "generated_at": "2025-10-02T05:09:18Z"
 }
