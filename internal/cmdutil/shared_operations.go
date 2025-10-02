@@ -122,7 +122,9 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 	}
 
 	// Format and output
-	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, !opts.NoHyperlinks)
+	// Enable hyperlinks if: not explicitly disabled AND terminal supports them
+	enableHyperlinks := !opts.NoHyperlinks && formatting.SupportsOSC8()
+	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, enableHyperlinks)
 	return formatter.FormatSessions(filteredSessions)
 }
 
@@ -155,7 +157,9 @@ func (s *SharedListOperations) ListTabs(opts SharedListOptions) error {
 	}
 
 	// Format and output
-	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, !opts.NoHyperlinks)
+	// Enable hyperlinks if: not explicitly disabled AND terminal supports them
+	enableHyperlinks := !opts.NoHyperlinks && formatting.SupportsOSC8()
+	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, enableHyperlinks)
 	return formatter.FormatTabs(tabInfos)
 }
 
@@ -187,7 +191,9 @@ func (s *SharedListOperations) ListWindows(opts SharedListOptions) error {
 		}
 	}
 
-	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, !opts.NoHyperlinks)
+	// Enable hyperlinks if: not explicitly disabled AND terminal supports them
+	enableHyperlinks := !opts.NoHyperlinks && formatting.SupportsOSC8()
+	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, enableHyperlinks)
 	return formatter.FormatClientWindows(windows)
 }
 

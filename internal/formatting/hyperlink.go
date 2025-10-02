@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"golang.org/x/term"
 )
 
 // SupportsOSC8 detects if the current terminal supports OSC 8 hyperlinks.
@@ -16,10 +18,18 @@ import (
 //   - Kitty (TERM=xterm-kitty)
 //   - Terminals with VTE >= 0.50 (TERM contains "vte")
 //
-// Can be disabled via NO_HYPERLINKS environment variable.
+// Hyperlinks are automatically disabled when:
+//   - NO_HYPERLINKS environment variable is set
+//   - Output is not a TTY (piped to watch, tee, files, etc.)
 func SupportsOSC8() bool {
 	// Check if explicitly disabled
 	if os.Getenv("NO_HYPERLINKS") != "" {
+		return false
+	}
+
+	// Check if stdout is a TTY - disable hyperlinks when piped
+	// This prevents hyperlink escape codes in: watch, tee, file redirects, etc.
+	if !term.IsTerminal(int(os.Stdout.Fd())) {
 		return false
 	}
 
@@ -31,8 +41,8 @@ func SupportsOSC8() bool {
 	}
 
 	// Check TERM for other known terminals
-	term := os.Getenv("TERM")
-	if strings.Contains(term, "kitty") || strings.Contains(term, "vte") {
+	termEnv := os.Getenv("TERM")
+	if strings.Contains(termEnv, "kitty") || strings.Contains(termEnv, "vte") {
 		return true
 	}
 
@@ -44,7 +54,7 @@ func SupportsOSC8() bool {
 // The format is: ESC ]8;;URI ESC \ text ESC ]8;; ESC \
 //
 // Parameters:
-//   - url: The target URI (e.g., "it2://session/activate/ABC123")
+//   - url: The target URI (e.g., "iterm2://session/activate/ABC123")
 //   - text: The display text to show as a clickable link
 //
 // Returns the text wrapped in OSC 8 sequences, or just the text if hyperlinks are disabled.
@@ -61,26 +71,26 @@ func OSC8Hyperlink(url, text string) string {
 	return fmt.Sprintf("\x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\", url, text)
 }
 
-// SessionActivateURL generates an it2:// URL for activating a session.
-// Format: it2://session/activate/<session-id>
+// SessionActivateURL generates an iterm2:// URL for activating a session.
+// Format: iterm2://session/activate/<session-id>
 func SessionActivateURL(sessionID string) string {
-	return fmt.Sprintf("it2://session/activate/%s", sessionID)
+	return fmt.Sprintf("iterm2://session/activate/%s", sessionID)
 }
 
-// TabActivateURL generates an it2:// URL for activating a tab.
-// Format: it2://tab/activate/<tab-id>
+// TabActivateURL generates an iterm2:// URL for activating a tab.
+// Format: iterm2://tab/activate/<tab-id>
 func TabActivateURL(tabID string) string {
-	return fmt.Sprintf("it2://tab/activate/%s", tabID)
+	return fmt.Sprintf("iterm2://tab/activate/%s", tabID)
 }
 
-// WindowActivateURL generates an it2:// URL for activating a window.
-// Format: it2://window/activate/<window-id>
+// WindowActivateURL generates an iterm2:// URL for activating a window.
+// Format: iterm2://window/activate/<window-id>
 func WindowActivateURL(windowID string) string {
-	return fmt.Sprintf("it2://window/activate/%s", windowID)
+	return fmt.Sprintf("iterm2://window/activate/%s", windowID)
 }
 
 // MakeSessionIDHyperlink creates a clickable session ID hyperlink.
-// When clicked, it executes: it2 session activate <session-id>
+// When clicked in iTerm2, opens the iterm2://session/activate/<id> URL.
 func MakeSessionIDHyperlink(sessionID string, enableHyperlinks bool) string {
 	if !enableHyperlinks {
 		return sessionID
@@ -90,7 +100,7 @@ func MakeSessionIDHyperlink(sessionID string, enableHyperlinks bool) string {
 }
 
 // MakeTabIDHyperlink creates a clickable tab ID hyperlink.
-// When clicked, it executes: it2 tab activate <tab-id>
+// When clicked in iTerm2, opens the iterm2://tab/activate/<id> URL.
 func MakeTabIDHyperlink(tabID string, enableHyperlinks bool) string {
 	if !enableHyperlinks {
 		return tabID
@@ -100,7 +110,7 @@ func MakeTabIDHyperlink(tabID string, enableHyperlinks bool) string {
 }
 
 // MakeWindowIDHyperlink creates a clickable window ID hyperlink.
-// When clicked, it executes: it2 window activate <window-id>
+// When clicked in iTerm2, opens the iterm2://window/activate/<id> URL.
 func MakeWindowIDHyperlink(windowID string, enableHyperlinks bool) string {
 	if !enableHyperlinks {
 		return windowID

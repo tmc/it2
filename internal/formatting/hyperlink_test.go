@@ -4,9 +4,16 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"golang.org/x/term"
 )
 
 func TestSupportsOSC8(t *testing.T) {
+	// Skip if stdout is not a TTY - can't test terminal detection in CI
+	if !term.IsTerminal(int(os.Stdout.Fd())) {
+		t.Skip("Skipping TestSupportsOSC8: stdout is not a TTY (expected in test/CI environments)")
+	}
+
 	tests := []struct {
 		name            string
 		termProgram     string
@@ -104,9 +111,9 @@ func TestOSC8Hyperlink(t *testing.T) {
 		},
 		{
 			name: "session activate link",
-			url:  "it2://session/activate/ABC123",
+			url:  "iterm2://session/activate/ABC123",
 			text: "ABC123",
-			want: "\x1b]8;;it2://session/activate/ABC123\x1b\\ABC123\x1b]8;;\x1b\\",
+			want: "\x1b]8;;iterm2://session/activate/ABC123\x1b\\ABC123\x1b]8;;\x1b\\",
 		},
 		{
 			name: "empty text",
@@ -149,12 +156,12 @@ func TestSessionActivateURL(t *testing.T) {
 		{
 			name:      "full UUID",
 			sessionID: "7AA97682-C080-4D65-8C19-FDEF4669AA84",
-			want:      "it2://session/activate/7AA97682-C080-4D65-8C19-FDEF4669AA84",
+			want:      "iterm2://session/activate/7AA97682-C080-4D65-8C19-FDEF4669AA84",
 		},
 		{
 			name:      "short ID",
 			sessionID: "7AA97682",
-			want:      "it2://session/activate/7AA97682",
+			want:      "iterm2://session/activate/7AA97682",
 		},
 	}
 
@@ -170,7 +177,7 @@ func TestSessionActivateURL(t *testing.T) {
 
 func TestTabActivateURL(t *testing.T) {
 	tabID := "1"
-	want := "it2://tab/activate/1"
+	want := "iterm2://tab/activate/1"
 	got := TabActivateURL(tabID)
 	if got != want {
 		t.Errorf("TabActivateURL() = %q, want %q", got, want)
@@ -179,7 +186,7 @@ func TestTabActivateURL(t *testing.T) {
 
 func TestWindowActivateURL(t *testing.T) {
 	windowID := "pty-E20F6640-287B-4A1A-9E3B-25F16687D3C4"
-	want := "it2://window/activate/pty-E20F6640-287B-4A1A-9E3B-25F16687D3C4"
+	want := "iterm2://window/activate/pty-E20F6640-287B-4A1A-9E3B-25F16687D3C4"
 	got := WindowActivateURL(windowID)
 	if got != want {
 		t.Errorf("WindowActivateURL() = %q, want %q", got, want)
@@ -191,7 +198,7 @@ func TestMakeSessionIDHyperlink(t *testing.T) {
 
 	t.Run("with hyperlinks enabled", func(t *testing.T) {
 		got := MakeSessionIDHyperlink(sessionID, true)
-		if !strings.Contains(got, "it2://session/activate/") {
+		if !strings.Contains(got, "iterm2://session/activate/") {
 			t.Errorf("MakeSessionIDHyperlink() should contain URL scheme, got %q", got)
 		}
 		if !strings.Contains(got, sessionID) {
@@ -215,7 +222,7 @@ func TestMakeTabIDHyperlink(t *testing.T) {
 
 	t.Run("with hyperlinks enabled", func(t *testing.T) {
 		got := MakeTabIDHyperlink(tabID, true)
-		if !strings.Contains(got, "it2://tab/activate/") {
+		if !strings.Contains(got, "iterm2://tab/activate/") {
 			t.Errorf("MakeTabIDHyperlink() should contain URL scheme, got %q", got)
 		}
 		if !strings.Contains(got, tabID) {
@@ -236,7 +243,7 @@ func TestMakeWindowIDHyperlink(t *testing.T) {
 
 	t.Run("with hyperlinks enabled", func(t *testing.T) {
 		got := MakeWindowIDHyperlink(windowID, true)
-		if !strings.Contains(got, "it2://window/activate/") {
+		if !strings.Contains(got, "iterm2://window/activate/") {
 			t.Errorf("MakeWindowIDHyperlink() should contain URL scheme, got %q", got)
 		}
 		if !strings.Contains(got, windowID) {
