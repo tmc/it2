@@ -70,10 +70,6 @@ func NewCommand() *cobra.Command {
 	setCmd.GroupID = "property"
 	cmd.AddCommand(setCmd)
 
-	bulkUpdateCmd := newBulkUpdateCommand()
-	bulkUpdateCmd.GroupID = "property"
-	cmd.AddCommand(bulkUpdateCmd)
-
 	// Badge shortcuts
 	getBadgeCmd := newGetBadgeCommand()
 	getBadgeCmd.GroupID = "property"
@@ -96,10 +92,22 @@ func NewCommand() *cobra.Command {
 	importCmd.GroupID = "import-export"
 	cmd.AddCommand(importCmd)
 
-	// Per-session profile commands (hidden from main groups)
-	cmd.AddCommand(newSessionSetPropertyCommand())
-	cmd.AddCommand(newSessionGetPropertyCommand())
-	cmd.AddCommand(newSessionResetCommand())
+	// Hidden/deprecated commands - kept for backwards compatibility but not shown in help
+	bulkUpdateCmd := newBulkUpdateCommand()
+	bulkUpdateCmd.Hidden = true
+	cmd.AddCommand(bulkUpdateCmd)
+
+	sessionSetCmd := newSessionSetPropertyCommand()
+	sessionSetCmd.Hidden = true
+	cmd.AddCommand(sessionSetCmd)
+
+	sessionGetCmd := newSessionGetPropertyCommand()
+	sessionGetCmd.Hidden = true
+	cmd.AddCommand(sessionGetCmd)
+
+	sessionResetCmd := newSessionResetCommand()
+	sessionResetCmd.Hidden = true
+	cmd.AddCommand(sessionResetCmd)
 
 	return cmd
 }
