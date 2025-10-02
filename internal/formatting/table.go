@@ -2,10 +2,21 @@ package formatting
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 )
+
+// Regular expression to match ANSI escape codes including OSC 8 hyperlinks
+var ansiEscapeRegex = regexp.MustCompile(`\x1b\][^\x1b]*\x1b\\|\x1b\[[^m]*m`)
+
+// visibleLen returns the visible length of a string, excluding ANSI escape codes
+func visibleLen(s string) int {
+	// Strip all ANSI escape sequences including OSC 8 hyperlinks
+	stripped := ansiEscapeRegex.ReplaceAllString(s, "")
+	return len(stripped)
+}
 
 // TableData represents data to be displayed in a table format
 type TableData struct {
@@ -30,17 +41,20 @@ func (f *Formatter) FormatTable(data *TableData) error {
 		return nil
 	}
 
-	// Calculate column widths
+	// Calculate column widths (using visible length, excluding ANSI escape codes)
 	colWidths := make([]int, len(data.Headers))
 	for i, header := range data.Headers {
-		colWidths[i] = len(header)
+		colWidths[i] = visibleLen(header)
 	}
 
 	// Check each row to find maximum width per column
 	for _, row := range data.Rows {
 		for i, cell := range row {
-			if i < len(colWidths) && len(cell) > colWidths[i] {
-				colWidths[i] = len(cell)
+			if i < len(colWidths) {
+				cellWidth := visibleLen(cell)
+				if cellWidth > colWidths[i] {
+					colWidths[i] = cellWidth
+				}
 			}
 		}
 	}
@@ -65,7 +79,13 @@ func (f *Formatter) printTableRow(row []string, colWidths []int) {
 		width := colWidths[i]
 		if i < len(colWidths)-1 {
 			// Left-align all columns except the last one
-			parts = append(parts, fmt.Sprintf("%-*s", width, cell))
+			// Calculate padding based on visible length to account for escape codes
+			visLen := visibleLen(cell)
+			padding := width - visLen
+			if padding < 0 {
+				padding = 0
+			}
+			parts = append(parts, cell+strings.Repeat(" ", padding))
 		} else {
 			// Don't pad the last column
 			parts = append(parts, cell)
