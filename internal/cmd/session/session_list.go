@@ -28,7 +28,7 @@ func newListCommand() *cobra.Command {
 			$ it2 session list --columns id,name,title
 
 			# Sort sessions by name
-			$ it2 session list --sort-by name
+			$ it2 session list --sort name
 
 			# Export session list for backup
 			$ it2 session list --format json > sessions-backup.json
