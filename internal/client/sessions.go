@@ -175,8 +175,11 @@ func (c *Client) populateJobInfo(ctx context.Context, sessions []*SessionInfo) {
 			session.CurrentCommand = promptResp.GetCommand()
 			session.ExitCode = promptResp.GetExitStatus()
 			session.PromptState = promptResp.GetPromptState().String()
-			// CommandCount would need to be tracked separately, for now set to 0
-			session.CommandCount = 0
+		}
+
+		// Get command count by listing all prompts for this session
+		if listResp, err := c.ListPrompts(ctx, session.SessionID); err == nil {
+			session.CommandCount = int32(len(listResp.GetUniquePromptId()))
 		}
 
 		// Try to get shell PID from session variables
