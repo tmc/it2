@@ -2,12 +2,14 @@ package session
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -26,6 +28,49 @@ type DeliveryResult struct {
 	Message   string `json:"message"`
 	ExitCode  int    `json:"exit_code"`
 	Delivered bool   `json:"delivered"`
+}
+
+// TemplateData represents the data available in send-text templates
+type TemplateData struct {
+	Content   string // The text content to send
+	SessionID string // Full session ID
+	ShortID   string // Shortened session ID (last 8 chars)
+	Timestamp string // Current timestamp in RFC3339 format
+}
+
+// applyTemplate applies a Go text/template to the given text with session context
+func applyTemplate(templateStr, text, sessionID string) (string, error) {
+	if templateStr == "" {
+		return text, nil
+	}
+
+	// Parse the template
+	tmpl, err := template.New("send-text").Parse(templateStr)
+	if err != nil {
+		return "", fmt.Errorf("invalid template syntax: %w", err)
+	}
+
+	// Extract short ID (first 8 characters of session ID)
+	shortID := sessionID
+	if len(sessionID) > 8 {
+		shortID = sessionID[:8]
+	}
+
+	// Prepare template data
+	data := TemplateData{
+		Content:   text,
+		SessionID: sessionID,
+		ShortID:   shortID,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}
+
+	// Execute template
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return "", fmt.Errorf("template execution failed: %w", err)
+	}
+
+	return buf.String(), nil
 }
 
 // sendTextWithConfirmation sends text and verifies receipt by checking screen contents
@@ -296,6 +341,18 @@ Multiple conditions can be specified and all must pass.`,
 			# Alternative methods for exclamation mark
 			$ it2 session send-text ':q!'         # Single quotes protect
 			$ it2 session send-text ':q\!'        # Backslash escape
+
+			# Template wrapping for structured messaging
+			$ it2 session send-text --template '<msg from="{{.ShortID}}">{{.Content}}</msg>' "hello"
+
+			# JSON formatting with timestamp
+			$ it2 session send-text --template '{"text":"{{.Content}}","session":"{{.SessionID}}","ts":"{{.Timestamp}}"}' "status update"
+
+			# XML message with metadata
+			$ it2 session send-text --template '<message session="{{.ShortID}}" time="{{.Timestamp}}">{{.Content}}</message>' "deploy complete"
+
+			# Simple prefix/suffix wrapping
+			$ it2 session send-text --template '[{{.ShortID}}] {{.Content}}' "log message"
 		`),
 		Args: cobra.RangeArgs(0, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -369,6 +426,15 @@ Multiple conditions can be specified and all must pass.`,
 			sessionID, err = c.ResolveSessionID(ctx, sessionID)
 			if err != nil {
 				return fmt.Errorf("failed to resolve session ID: %w", err)
+			}
+
+			// Apply template if specified
+			templateStr, _ := cmd.Flags().GetString("template")
+			if templateStr != "" {
+				text, err = applyTemplate(templateStr, text, sessionID)
+				if err != nil {
+					return fmt.Errorf("template error: %w", err)
+				}
 			}
 
 			// Prompt for confirmation if using implicit session ID and --confirm flag is set
@@ -517,6 +583,7 @@ Multiple conditions can be specified and all must pass.`,
 	cmd.Flags().Bool("skip-newline", false, "Don't send any line terminator")
 	cmd.Flags().BoolP("send-cr", "r", true, "Send carriage return (\\r) to execute command (enabled by default)")
 	cmd.Flags().Bool("send-lf", false, "Send line feed (\\n) to move to new line")
+	cmd.Flags().String("template", "", "Go text/template to wrap the text (variables: Content, SessionID, ShortID, Timestamp)")
 
 	// Create alias for send-return -> send-cr
 	cmd.Flags().SetNormalizeFunc(func(f *pflag.FlagSet, name string) pflag.NormalizedName {
