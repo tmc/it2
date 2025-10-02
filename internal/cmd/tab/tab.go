@@ -69,6 +69,18 @@ func NewCommand() *cobra.Command {
 	clearTitleCmd.GroupID = "display"
 	cmd.AddCommand(clearTitleCmd)
 
+	getColorCmd := newGetColorCommand()
+	getColorCmd.GroupID = "display"
+	cmd.AddCommand(getColorCmd)
+
+	setColorCmd := newSetColorCommand()
+	setColorCmd.GroupID = "display"
+	cmd.AddCommand(setColorCmd)
+
+	clearColorCmd := newClearColorCommand()
+	clearColorCmd.GroupID = "display"
+	cmd.AddCommand(clearColorCmd)
+
 	// Layout Commands
 	setLayoutCmd := newSetLayoutCommand()
 	setLayoutCmd.GroupID = "layout"
