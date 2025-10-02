@@ -32,6 +32,15 @@ func newListCommand() *cobra.Command {
 
 			# Export session list for backup
 			$ it2 session list --format json > sessions-backup.json
+
+			# Output only session IDs (quiet mode)
+			$ it2 session list -q
+
+			# Use with xargs to send text to all sessions
+			$ it2 session list -q | xargs -n1 -I {} it2 session send-text {} "echo hello"
+
+			# Count total sessions
+			$ it2 session list -q | wc -l
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_, timeout, format, columns, sortBy, sortReverse := cmdcore.GetExtendedFlags(cmd)

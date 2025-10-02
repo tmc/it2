@@ -26,14 +26,20 @@ func newListCommand() *cobra.Command {
 			# Sort by window ID (descending)
 			$ it2 window list --sort id --reverse
 
+			# Output only window IDs (quiet mode)
+			$ it2 window list -q
+
+			# Use with xargs to close all windows
+			$ it2 window list -q | xargs -n1 it2 window close
+
+			# Count total windows
+			$ it2 window list -q | wc -l
+
 			# Find window by name pattern
 			$ it2 window list --format json | jq '.[] | select(.name | contains("Production"))'
 
 			# Get first window ID for scripting
 			$ FIRST_WINDOW=$(it2 window list --format json | jq -r '.[0].id')
-
-			# Count total windows
-			$ it2 window list --format json | jq length
 
 			# Export window layout for backup
 			$ it2 window list --format json > windows-backup.json

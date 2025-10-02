@@ -16,9 +16,12 @@ func newListCommand() *cobra.Command {
 		Long: `List tabs in a specific window or all windows.
 
 Examples:
-  it2 tab list           # List tabs in all windows
-  it2 tab list 1         # List tabs in window 1 (positional)
-  it2 tab list --window-id 1  # List tabs in window 1 (flag)`,
+  it2 tab list                # List tabs in all windows
+  it2 tab list 1              # List tabs in window 1 (positional)
+  it2 tab list --window-id 1  # List tabs in window 1 (flag)
+  it2 tab list -q             # Output only tab IDs (quiet mode)
+  it2 tab list -q | xargs -n1 it2 tab close  # Close all tabs (use with caution!)
+  it2 tab list -q | wc -l     # Count total tabs`,
 		Args:            cobra.MaximumNArgs(1),
 		RequiresClient:  true,
 		SupportsSorting: true,
