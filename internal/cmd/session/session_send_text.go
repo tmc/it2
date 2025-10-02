@@ -298,8 +298,12 @@ Multiple conditions can be specified and all must pass.`,
 			# Send to current session (uses $ITERM_SESSION_ID)
 			$ it2 session send-text 'hello world'
 
-			# Send to specific session
-			$ it2 session send-text w0t1p11:SESSION-ID 'hello world'
+			# Send to specific session (full UUID)
+			$ it2 session send-text 7AA97682-C080-4D65-8C19-FDEF4669AA84 'hello world'
+
+			# Send using partial session ID (4+ characters, case-insensitive)
+			$ it2 session send-text 7AA9 'hello world'
+			$ it2 session send-text 6b1a 'test message'
 
 			# Send text without any line terminator
 			$ it2 session send-text --skip-newline 'partial text'

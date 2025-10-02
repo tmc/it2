@@ -41,6 +41,11 @@ func (c *Client) ResolveSessionID(ctx context.Context, sessionID string) (string
 		return sessionID, nil
 	}
 
+	// Require at least 4 characters for prefix matching (to avoid accidents)
+	if len(sessionID) < 4 {
+		return "", fmt.Errorf("session ID prefix too short (minimum 4 characters): %s", sessionID)
+	}
+
 	// Otherwise, try to expand it as a prefix
 	sessions, err := c.ListSessions(ctx)
 	if err != nil {
@@ -48,8 +53,10 @@ func (c *Client) ResolveSessionID(ctx context.Context, sessionID string) (string
 	}
 
 	var matches []string
+	sessionIDUpper := strings.ToUpper(sessionID)
 	for _, session := range sessions {
-		if strings.HasPrefix(session.SessionID, sessionID) {
+		sessionUpper := strings.ToUpper(session.SessionID)
+		if strings.HasPrefix(sessionUpper, sessionIDUpper) {
 			matches = append(matches, session.SessionID)
 		}
 	}
@@ -60,13 +67,25 @@ func (c *Client) ResolveSessionID(ctx context.Context, sessionID string) (string
 	case 1:
 		return matches[0], nil
 	default:
-		return "", fmt.Errorf("ambiguous session ID prefix '%s' matches %d sessions: %v", sessionID, len(matches), matches)
+		// Format suggestions nicely
+		var suggestions []string
+		for _, match := range matches {
+			// Show first 8 characters (ShortID) for readability
+			shortID := match
+			if len(match) > 8 {
+				shortID = match[:8]
+			}
+			suggestions = append(suggestions, shortID)
+		}
+		return "", fmt.Errorf("ambiguous session ID prefix '%s' matches %d sessions. Try a longer prefix or use one of: %s",
+			sessionID, len(matches), strings.Join(suggestions, ", "))
 	}
 }
 
-// ResolveTabID resolves a tab ID with intelligent fallback
+// ResolveTabID resolves a tab ID with intelligent fallback and prefix matching
 // 1. If tabID is empty, finds the tab ID of the current session
-// 2. Returns the tab ID as-is if provided (tab IDs are simple numeric strings)
+// 2. Supports prefix matching for tab IDs (4+ chars minimum)
+// 3. Returns the tab ID as-is if it's a complete match
 func (c *Client) ResolveTabID(ctx context.Context, tabID string) (string, error) {
 	// If no tab ID provided, get it from current session
 	if tabID == "" {
@@ -90,13 +109,61 @@ func (c *Client) ResolveTabID(ctx context.Context, tabID string) (string, error)
 		return "", fmt.Errorf("session %s not found in session list", sessionID)
 	}
 
-	// Tab IDs are simple strings, return as-is
-	return tabID, nil
+	// Get all unique tab IDs
+	sessions, err := c.ListSessions(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to list sessions: %w", err)
+	}
+
+	tabIDsMap := make(map[string]bool)
+	for _, session := range sessions {
+		if session.TabID != "" {
+			tabIDsMap[session.TabID] = true
+		}
+	}
+
+	// Convert to slice for matching
+	var allTabIDs []string
+	for id := range tabIDsMap {
+		allTabIDs = append(allTabIDs, id)
+	}
+
+	// Check for exact match first
+	for _, id := range allTabIDs {
+		if id == tabID {
+			return tabID, nil
+		}
+	}
+
+	// Require at least 4 characters for prefix matching
+	if len(tabID) < 4 {
+		return "", fmt.Errorf("tab ID prefix too short (minimum 4 characters): %s", tabID)
+	}
+
+	// Try prefix matching (case-insensitive)
+	var matches []string
+	tabIDUpper := strings.ToUpper(tabID)
+	for _, id := range allTabIDs {
+		if strings.HasPrefix(strings.ToUpper(id), tabIDUpper) {
+			matches = append(matches, id)
+		}
+	}
+
+	switch len(matches) {
+	case 0:
+		return "", fmt.Errorf("no tab found matching ID or prefix: %s", tabID)
+	case 1:
+		return matches[0], nil
+	default:
+		return "", fmt.Errorf("ambiguous tab ID prefix '%s' matches %d tabs. Try a longer prefix or use one of: %s",
+			tabID, len(matches), strings.Join(matches, ", "))
+	}
 }
 
-// ResolveWindowID resolves a window ID with intelligent fallback
+// ResolveWindowID resolves a window ID with intelligent fallback and prefix matching
 // 1. If windowID is empty, finds the window ID of the current session
-// 2. Returns the window ID as-is if provided
+// 2. Supports prefix matching for window IDs (4+ chars minimum)
+// 3. Returns the window ID as-is if it's a complete match
 func (c *Client) ResolveWindowID(ctx context.Context, windowID string) (string, error) {
 	// If no window ID provided, get it from current session
 	if windowID == "" {
@@ -120,6 +187,57 @@ func (c *Client) ResolveWindowID(ctx context.Context, windowID string) (string, 
 		return "", fmt.Errorf("session %s not found in session list", sessionID)
 	}
 
-	// Window IDs are in format "pty-UUID", return as-is
-	return windowID, nil
+	// Get all unique window IDs
+	windows, err := c.ListWindows(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to list windows: %w", err)
+	}
+
+	var allWindowIDs []string
+	for _, window := range windows {
+		if window.WindowID != "" {
+			allWindowIDs = append(allWindowIDs, window.WindowID)
+		}
+	}
+
+	// Check for exact match first
+	for _, id := range allWindowIDs {
+		if id == windowID {
+			return windowID, nil
+		}
+	}
+
+	// Require at least 4 characters for prefix matching
+	if len(windowID) < 4 {
+		return "", fmt.Errorf("window ID prefix too short (minimum 4 characters): %s", windowID)
+	}
+
+	// Try prefix matching (case-insensitive)
+	var matches []string
+	windowIDUpper := strings.ToUpper(windowID)
+	for _, id := range allWindowIDs {
+		if strings.HasPrefix(strings.ToUpper(id), windowIDUpper) {
+			matches = append(matches, id)
+		}
+	}
+
+	switch len(matches) {
+	case 0:
+		return "", fmt.Errorf("no window found matching ID or prefix: %s", windowID)
+	case 1:
+		return matches[0], nil
+	default:
+		// Format suggestions nicely (show pty-XXXXXXXX format)
+		var suggestions []string
+		for _, match := range matches {
+			// Show first 12 characters (pty-XXXXXXXX) for readability
+			shortID := match
+			if len(match) > 12 {
+				shortID = match[:12]
+			}
+			suggestions = append(suggestions, shortID)
+		}
+		return "", fmt.Errorf("ambiguous window ID prefix '%s' matches %d windows. Try a longer prefix or use one of: %s",
+			windowID, len(matches), strings.Join(suggestions, ", "))
+	}
 }

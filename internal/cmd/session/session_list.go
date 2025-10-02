@@ -39,6 +39,9 @@ func newListCommand() *cobra.Command {
 			# Use with xargs to send text to all sessions
 			$ it2 session list -q | xargs -n1 -I {} it2 session send-text {} "echo hello"
 
+			# Use partial IDs with quiet mode
+			$ it2 session list -q | cut -c1-8 | xargs -n1 -I {} it2 session send-text {} "test"
+
 			# Count total sessions
 			$ it2 session list -q | wc -l
 		`),
