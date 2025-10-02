@@ -56,9 +56,18 @@ func MapKeyToCode(key string) string {
 		}
 	}
 
-	// Handle Ctrl+key combinations (both ctrl-x and ctrl+x formats)
+	// Handle Ctrl+key combinations (ctrl-x, ctrl+x, c-x, c+x formats)
 	if strings.HasPrefix(key, "ctrl-") || strings.HasPrefix(key, "ctrl+") {
 		keyChar := key[5:] // Remove "ctrl-" or "ctrl+"
+		if len(keyChar) == 1 && keyChar >= "a" && keyChar <= "z" {
+			// Convert to control character (Ctrl+A = 0x01, Ctrl+B = 0x02, etc.)
+			return string(rune(keyChar[0] - 'a' + 1))
+		}
+	}
+
+	// Handle shorthand C-x or c-x format (common in Emacs/terminal notation)
+	if strings.HasPrefix(key, "c-") || strings.HasPrefix(key, "c+") {
+		keyChar := key[2:] // Remove "c-" or "c+"
 		if len(keyChar) == 1 && keyChar >= "a" && keyChar <= "z" {
 			// Convert to control character (Ctrl+A = 0x01, Ctrl+B = 0x02, etc.)
 			return string(rune(keyChar[0] - 'a' + 1))
