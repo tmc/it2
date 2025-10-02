@@ -69,8 +69,13 @@ Examples:
 			}
 
 			// Check shell integration indicators
-			hasShellIntegration := targetSession.PromptState != "" &&
-				targetSession.PromptState != "UNKNOWN"
+			// Shell integration is considered active if:
+			// 1. CommandCount > 0 (commands have been tracked), OR
+			// 2. PromptState is RUNNING or FINISHED (active state transitions)
+			// Just having EDITING state isn't enough - that's the default even without shell integration
+			hasShellIntegration := targetSession.CommandCount > 0 ||
+				targetSession.PromptState == "RUNNING" ||
+				targetSession.PromptState == "FINISHED"
 
 			// Get quiet flag
 			quiet, _ := sc.GetCommand().Flags().GetBool("quiet")
