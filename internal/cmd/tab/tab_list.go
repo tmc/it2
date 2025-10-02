@@ -47,15 +47,19 @@ Examples:
 			// Get quiet flag
 			quiet, _ := sc.GetCommand().Flags().GetBool("quiet")
 
+			// Get no-hyperlinks flag
+			noHyperlinks, _ := sc.GetCommand().Flags().GetBool("no-hyperlinks")
+
 			// Use shared operations
 			sharedOps := cmdutil.NewSharedListOperations(sc.GetClient(), sc.GetContext())
 			return sharedOps.ListTabs(cmdutil.SharedListOptions{
-				WindowID:    windowID,
-				Format:      sc.GetFlags().Format,
-				Columns:     sc.GetFlags().Columns,
-				SortBy:      sc.GetFlags().SortBy,
-				SortReverse: sc.GetFlags().SortReverse,
-				Quiet:       quiet,
+				WindowID:     windowID,
+				Format:       sc.GetFlags().Format,
+				Columns:      sc.GetFlags().Columns,
+				SortBy:       sc.GetFlags().SortBy,
+				SortReverse:  sc.GetFlags().SortReverse,
+				Quiet:        quiet,
+				NoHyperlinks: noHyperlinks,
 			})
 		},
 	}
@@ -67,6 +71,9 @@ Examples:
 
 	// Add quiet flag
 	cmd.Flags().BoolP("quiet", "q", false, "Output only tab IDs")
+
+	// Add no-hyperlinks flag
+	cmd.Flags().Bool("no-hyperlinks", false, "Disable OSC 8 terminal hyperlinks in output")
 
 	// Add completion functions
 	cmd.RegisterFlagCompletionFunc("window-id", completion.WindowIDCompletion)

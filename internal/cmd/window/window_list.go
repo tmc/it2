@@ -67,14 +67,18 @@ func newListCommand() *cobra.Command {
 			// Get quiet flag
 			quiet, _ := cmd.Flags().GetBool("quiet")
 
+			// Get no-hyperlinks flag
+			noHyperlinks, _ := cmd.Flags().GetBool("no-hyperlinks")
+
 			// Use shared operations
 			sharedOps := cmdutil.NewSharedListOperations(c, ctx)
 			return sharedOps.ListWindows(cmdutil.SharedListOptions{
-				Format:      format,
-				Columns:     columns,
-				SortBy:      sortBy,
-				SortReverse: sortReverse,
-				Quiet:       quiet,
+				Format:       format,
+				Columns:      columns,
+				SortBy:       sortBy,
+				SortReverse:  sortReverse,
+				Quiet:        quiet,
+				NoHyperlinks: noHyperlinks,
 			})
 		},
 	}
@@ -86,6 +90,9 @@ func newListCommand() *cobra.Command {
 
 	// Add quiet flag
 	cmd.Flags().BoolP("quiet", "q", false, "Output only window IDs")
+
+	// Add no-hyperlinks flag
+	cmd.Flags().Bool("no-hyperlinks", false, "Disable OSC 8 terminal hyperlinks in output")
 
 	return cmd
 }
