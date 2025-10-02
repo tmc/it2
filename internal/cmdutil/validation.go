@@ -2,272 +2,110 @@ package cmdutil
 
 import (
 	"context"
-	"fmt"
-	"regexp"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/validate"
 )
 
-// Regular expressions for ID validation
-var (
-	// UUID pattern for session/window/tab IDs
-	uuidPattern = regexp.MustCompile(`^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$`)
-	// Session ID with optional prefix (e.g., w0t1p12:UUID)
-	sessionIDPattern = regexp.MustCompile(`^(?:[^:]+:)?[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$`)
-)
-
-// ValidateSessionID validates a session ID format
+// ValidateSessionID validates a session ID format.
+// Deprecated: Use validate.SessionID instead.
 func ValidateSessionID(id string) error {
-	if id == "" {
-		return NewValidationError("session_id", "cannot be empty")
-	}
-
-	// Normalize the ID first
-	normalized := NormalizeSessionID(id)
-
-	// Check if it's a valid UUID after normalization
-	if !uuidPattern.MatchString(normalized) {
-		return NewValidationError("session_id", fmt.Sprintf("invalid format: %s", id))
-	}
-
-	return nil
+	return validate.SessionID(id)
 }
 
-// ValidateWindowID validates a window ID format
-// Window IDs from iTerm2 are in the format "pty-<UUID>"
+// ValidateWindowID validates a window ID format.
+// Deprecated: Use validate.WindowID instead.
 func ValidateWindowID(id string) error {
-	if id == "" {
-		return NewValidationError("window_id", "cannot be empty")
-	}
-
-	// Window IDs start with "pty-" followed by a UUID
-	if !strings.HasPrefix(id, "pty-") {
-		return NewValidationError("window_id", fmt.Sprintf("must start with 'pty-': %s", id))
-	}
-
-	// Validate the UUID part after "pty-"
-	uuidPart := id[4:] // Skip "pty-"
-	if !uuidPattern.MatchString(uuidPart) {
-		return NewValidationError("window_id", fmt.Sprintf("invalid UUID format: %s", id))
-	}
-
-	return nil
+	return validate.WindowID(id)
 }
 
-// ValidateTabID validates a tab ID format
-// Tab IDs from iTerm2 are simple numeric strings, not UUIDs
+// ValidateTabID validates a tab ID format.
+// Deprecated: Use validate.TabID instead.
 func ValidateTabID(id string) error {
-	if id == "" {
-		return NewValidationError("tab_id", "cannot be empty")
-	}
-
-	// Tab IDs are numeric strings from iTerm2's API
-	// No strict format validation needed beyond non-empty
-	return nil
+	return validate.TabID(id)
 }
 
-// ValidateFormat validates an output format specification
+// ValidateFormat validates an output format specification.
+// Deprecated: Use validate.Format instead.
 func ValidateFormat(format string) error {
-	validFormats := []string{"table", "json", "yaml", "text"}
-
-	for _, valid := range validFormats {
-		if format == valid {
-			return nil
-		}
-	}
-
-	return NewInvalidFormatError(format, validFormats)
+	return validate.Format(format)
 }
 
-// ValidateTimeout validates a timeout duration
+// ValidateTimeout validates a timeout duration.
+// Deprecated: Use validate.Timeout instead.
 func ValidateTimeout(timeout time.Duration) error {
-	if timeout <= 0 {
-		return NewValidationError("timeout", "must be positive")
-	}
-
-	if timeout > 5*time.Minute {
-		return NewValidationError("timeout", "exceeds maximum allowed (5 minutes)")
-	}
-
-	return nil
+	return validate.Timeout(timeout)
 }
 
-// ValidateSessionExists checks if a session exists
+// ValidateSessionExists checks if a session exists.
+// Deprecated: Use validate.SessionExists instead.
 func ValidateSessionExists(ctx context.Context, client *client.Client, id string) error {
-	sessions, err := client.ListSessions(ctx)
-	if err != nil {
-		return NewOperationError("list sessions", err)
-	}
-
-	normalized := NormalizeSessionID(id)
-	for _, session := range sessions {
-		if session.SessionID == normalized {
-			return nil
-		}
-	}
-
-	return NewNotFoundError("session", id)
+	return validate.SessionExists(ctx, client, id)
 }
 
-// ValidateWindowExists checks if a window exists
+// ValidateWindowExists checks if a window exists.
+// Deprecated: Use validate.WindowExists instead.
 func ValidateWindowExists(ctx context.Context, client *client.Client, id string) error {
-	windows, err := client.ListWindows(ctx)
-	if err != nil {
-		return NewOperationError("list windows", err)
-	}
-
-	for _, window := range windows {
-		if window.WindowID == id {
-			return nil
-		}
-	}
-
-	return NewNotFoundError("window", id)
+	return validate.WindowExists(ctx, client, id)
 }
 
-// ValidateTabExists checks if a tab exists
+// ValidateTabExists checks if a tab exists.
+// Deprecated: Use validate.TabExists instead.
 func ValidateTabExists(ctx context.Context, client *client.Client, id string) error {
-	sessions, err := client.ListSessions(ctx)
-	if err != nil {
-		return NewOperationError("list sessions", err)
-	}
-
-	for _, session := range sessions {
-		if session.TabID == id {
-			return nil
-		}
-	}
-
-	return NewNotFoundError("tab", id)
+	return validate.TabExists(ctx, client, id)
 }
 
-// ParsePositiveInt parses a positive integer from a string
+// ParsePositiveInt parses a positive integer from a string.
+// Deprecated: Use validate.PositiveInt instead.
 func ParsePositiveInt(s, name string) (int32, error) {
-	val, err := strconv.ParseInt(s, 10, 32)
-	if err != nil {
-		return 0, NewValidationError(name, fmt.Sprintf("must be a valid integer: %v", err))
-	}
-
-	if val <= 0 {
-		return 0, NewValidationError(name, "must be positive")
-	}
-
-	return int32(val), nil
+	return validate.PositiveInt(s, name)
 }
 
-// ParseCoordinates parses x,y coordinates from a string
+// ParseCoordinates parses x,y coordinates from a string.
+// Deprecated: Use validate.Coordinates instead.
 func ParseCoordinates(coord string) (x, y int32, err error) {
-	parts := strings.Split(coord, ",")
-	if len(parts) != 2 {
-		return 0, 0, NewValidationError("coordinates", "must be in format 'x,y'")
-	}
-
-	x64, err := strconv.ParseInt(strings.TrimSpace(parts[0]), 10, 32)
-	if err != nil {
-		return 0, 0, NewValidationError("x coordinate", fmt.Sprintf("invalid: %v", err))
-	}
-
-	y64, err := strconv.ParseInt(strings.TrimSpace(parts[1]), 10, 32)
-	if err != nil {
-		return 0, 0, NewValidationError("y coordinate", fmt.Sprintf("invalid: %v", err))
-	}
-
-	return int32(x64), int32(y64), nil
+	return validate.Coordinates(coord)
 }
 
-// ParseKeyValue parses a key=value pair
+// ParseKeyValue parses a key=value pair.
+// Deprecated: Use validate.KeyValue instead.
 func ParseKeyValue(kv string) (key, value string, err error) {
-	parts := strings.SplitN(kv, "=", 2)
-	if len(parts) != 2 {
-		return "", "", NewValidationError("key-value pair", "must be in format 'key=value'")
-	}
-
-	key = strings.TrimSpace(parts[0])
-	value = strings.TrimSpace(parts[1])
-
-	if key == "" {
-		return "", "", NewValidationError("key", "cannot be empty")
-	}
-
-	return key, value, nil
+	return validate.KeyValue(kv)
 }
 
-// ValidateHexString validates a hexadecimal string
+// ValidateHexString validates a hexadecimal string.
+// Deprecated: Use validate.HexString instead.
 func ValidateHexString(s string) error {
-	// Remove common hex prefixes if present
-	s = strings.TrimPrefix(s, "0x")
-	s = strings.TrimPrefix(s, "0X")
-
-	if len(s)%2 != 0 {
-		return NewValidationError("hex string", "must have even number of characters")
-	}
-
-	for _, ch := range s {
-		if !((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F')) {
-			return NewValidationError("hex string", fmt.Sprintf("invalid character: %c", ch))
-		}
-	}
-
-	return nil
+	return validate.HexString(s)
 }
 
-// ValidatePort validates a port number
+// ValidatePort validates a port number.
+// Deprecated: Use validate.Port instead.
 func ValidatePort(port int) error {
-	if port < 1 || port > 65535 {
-		return NewValidationError("port", fmt.Sprintf("must be between 1 and 65535, got %d", port))
-	}
-	return nil
+	return validate.Port(port)
 }
 
-// ValidateNonEmpty validates that a string is not empty
+// ValidateNonEmpty validates that a string is not empty.
+// Deprecated: Use validate.NonEmpty instead.
 func ValidateNonEmpty(value, name string) error {
-	if strings.TrimSpace(value) == "" {
-		return NewValidationError(name, "cannot be empty")
-	}
-	return nil
+	return validate.NonEmpty(value, name)
 }
 
-// ValidateOneOf validates that a value is one of the allowed options
+// ValidateOneOf validates that a value is one of the allowed options.
+// Deprecated: Use validate.OneOf instead.
 func ValidateOneOf(value string, options []string, name string) error {
-	for _, opt := range options {
-		if value == opt {
-			return nil
-		}
-	}
-	return NewValidationError(name, fmt.Sprintf("must be one of: %s", strings.Join(options, ", ")))
+	return validate.OneOf(value, options, name)
 }
 
-// ValidateResourceArgs validates standard resource argument patterns
+// ValidateResourceArgs validates standard resource argument patterns.
+// Deprecated: Use validate.ResourceArgs instead.
 func ValidateResourceArgs(args []string, resourceType string, allowMultiple bool) error {
-	if len(args) == 0 {
-		return NewRequiredArgumentError(resourceType + "_id")
-	}
+	return validate.ResourceArgs(args, resourceType, allowMultiple)
+}
 
-	if !allowMultiple && len(args) > 1 {
-		return NewValidationError("arguments", fmt.Sprintf("expected 1 %s ID, got %d", resourceType, len(args)))
-	}
-
-	// Validate each ID based on resource type
-	for _, id := range args {
-		var err error
-		switch resourceType {
-		case "session":
-			err = ValidateSessionID(id)
-		case "window":
-			err = ValidateWindowID(id)
-		case "tab":
-			err = ValidateTabID(id)
-		default:
-			err = NewValidationError("resource_type", fmt.Sprintf("unknown type: %s", resourceType))
-		}
-
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+// ParseHexData parses hex-encoded data with common prefixes.
+// Deprecated: Use validate.HexData instead.
+func ParseHexData(s string) ([]byte, error) {
+	return validate.HexData(s)
 }

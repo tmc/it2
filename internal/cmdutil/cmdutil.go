@@ -8,143 +8,50 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/sessionid"
 )
 
 // GetFlags extracts common flags from a command, falling back to parent/root flags
+// Deprecated: Use cmdcore.GetFlags instead
 func GetFlags(cmd *cobra.Command) (wsURL string, timeout time.Duration, format string) {
-	wsURL, _ = cmd.Flags().GetString("url")
-	timeout, _ = cmd.Flags().GetDuration("timeout")
-	format, _ = cmd.Flags().GetString("format")
-
-	// Use parent command flags if not set
-	if wsURL == "" {
-		if parent := cmd.Parent(); parent != nil {
-			if root := parent.Root(); root != nil {
-				wsURL = root.PersistentFlags().Lookup("url").Value.String()
-			}
-		}
-	}
-	if timeout == 0 {
-		if parent := cmd.Parent(); parent != nil {
-			if root := parent.Root(); root != nil {
-				timeout, _ = root.PersistentFlags().GetDuration("timeout")
-			}
-		}
-	}
-	if format == "" {
-		if parent := cmd.Parent(); parent != nil {
-			if root := parent.Root(); root != nil {
-				if flag := root.PersistentFlags().Lookup("format"); flag != nil {
-					format = flag.Value.String()
-				}
-			}
-		}
-	}
-
-	// Set defaults if still empty
-	if wsURL == "" {
-		wsURL = "ws://localhost:1912"
-	}
-	if timeout == 0 {
-		timeout = 60 * time.Second
-	}
-	if format == "" {
-		format = "table"
-	}
-
-	return wsURL, timeout, format
+	return cmdcore.GetFlags(cmd)
 }
 
 // GetExtendedFlags extracts common flags plus column/sort options from a command
+// Deprecated: Use cmdcore.GetExtendedFlags instead
 func GetExtendedFlags(cmd *cobra.Command) (wsURL string, timeout time.Duration, format string, columns []string, sortBy string, sortReverse bool) {
-	wsURL, timeout, format = GetFlags(cmd)
-
-	// Get column selection flags
-	if columnsFlag := cmd.Flags().Lookup("columns"); columnsFlag != nil {
-		if columnsStr, err := cmd.Flags().GetString("columns"); err == nil && columnsStr != "" {
-			columns = strings.Split(columnsStr, ",")
-			// Trim whitespace from each column name
-			for i := range columns {
-				columns[i] = strings.TrimSpace(columns[i])
-			}
-		}
-	}
-
-	// Get sort flags
-	if sortFlag := cmd.Flags().Lookup("sort"); sortFlag != nil {
-		sortBy, _ = cmd.Flags().GetString("sort")
-	}
-	if reverseFlag := cmd.Flags().Lookup("reverse"); reverseFlag != nil {
-		sortReverse, _ = cmd.Flags().GetBool("reverse")
-	}
-
-	return wsURL, timeout, format, columns, sortBy, sortReverse
+	return cmdcore.GetExtendedFlags(cmd)
 }
 
 // ConnectClient creates and connects a client with standard timeout handling
-// Gets the URL from global flags, defaults to ws://localhost:1912
+// Deprecated: Use cmdcore.ConnectClient instead
 func ConnectClient(ctx context.Context) (*client.Client, error) {
-	wsURL := "ws://localhost:1912" // Default URL
-
-	// TODO: In the future, we could read the global --url flag here
-	// This would enable proxy support while keeping the simple API
-	// For now, we hardcode the default to maintain compatibility
-
-	c := client.New(wsURL)
-	if err := c.Connect(ctx); err != nil {
-		return nil, err
-	}
-	return c, nil
+	return cmdcore.ConnectClient(ctx)
 }
 
 // GetTimeout extracts timeout from command flags with fallback to global/default
+// Deprecated: Use cmdcore.GetTimeout instead
 func GetTimeout(cmd *cobra.Command) time.Duration {
-	timeout, _ := cmd.Flags().GetDuration("timeout")
-	if timeout == 0 {
-		if parent := cmd.Parent(); parent != nil {
-			if root := parent.Root(); root != nil {
-				timeout, _ = root.PersistentFlags().GetDuration("timeout")
-			}
-		}
-	}
-	if timeout == 0 {
-		timeout = 60 * time.Second
-	}
-	return timeout
+	return cmdcore.GetTimeout(cmd)
 }
 
 // GetFormat extracts format from command flags with fallback to global/default
+// Deprecated: Use cmdcore.GetFormat instead
 func GetFormat(cmd *cobra.Command) string {
-	format, _ := cmd.Flags().GetString("format")
-	if format == "" {
-		if parent := cmd.Parent(); parent != nil {
-			if root := parent.Root(); root != nil {
-				if flag := root.PersistentFlags().Lookup("format"); flag != nil {
-					format = flag.Value.String()
-				}
-			}
-		}
-	}
-	if format == "" {
-		format = "table"
-	}
-	return format
+	return cmdcore.GetFormat(cmd)
 }
 
 // CreateContext creates a context with the specified timeout
+// Deprecated: Use cmdcore.CreateContext instead
 func CreateContext(timeout time.Duration) (context.Context, context.CancelFunc) {
-	if timeout == 0 {
-		// No timeout - use a cancellable context
-		return context.WithCancel(context.Background())
-	}
-	return context.WithTimeout(context.Background(), timeout)
+	return cmdcore.CreateContext(timeout)
 }
 
 // CreateContextFromCommand creates a context using timeout from command flags
+// Deprecated: Use cmdcore.CreateContextFromCommand instead
 func CreateContextFromCommand(cmd *cobra.Command) (context.Context, context.CancelFunc) {
-	timeout := GetTimeout(cmd)
-	return CreateContext(timeout)
+	return cmdcore.CreateContextFromCommand(cmd)
 }
 
 // BoolPtr returns a pointer to a bool value

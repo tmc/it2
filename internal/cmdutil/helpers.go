@@ -1,7 +1,6 @@
 package cmdutil
 
 import (
-	"encoding/hex"
 	"fmt"
 	"os"
 	"strings"
@@ -127,20 +126,9 @@ func ParseResourceReference(ref string) (resourceType, id string, err error) {
 	return "", "", NewValidationError("resource_reference", "invalid format")
 }
 
-// ParseHexData parses hex-encoded data with common prefixes
-func ParseHexData(s string) ([]byte, error) {
-	// Remove common hex prefixes
-	s = strings.TrimPrefix(s, "0x")
-	s = strings.TrimPrefix(s, "0X")
-	s = strings.TrimPrefix(s, "\\x")
-
-	// Validate hex string
-	if err := ValidateHexString(s); err != nil {
-		return nil, err
-	}
-
-	return hex.DecodeString(s)
-}
+// ParseHexData is deprecated. Use validate.HexData instead.
+// This function is kept for backward compatibility.
+// Deprecated: Use validate.HexData instead.
 
 // TruncateString truncates a string to a maximum length with ellipsis
 func TruncateString(s string, maxLen int) string {

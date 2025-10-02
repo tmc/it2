@@ -1,156 +1,74 @@
 package cmdutil
 
 import (
-	"fmt"
-	"strings"
+	"github.com/tmc/it2/internal/cmderr"
 )
 
-// StandardError provides consistent error formatting across commands
-type StandardError struct {
-	Operation string
-	Cause     error
-	Details   map[string]interface{}
-}
+// StandardError is deprecated. Use cmderr.StandardError instead.
+type StandardError = cmderr.StandardError
 
-// Error implements the error interface
-func (e *StandardError) Error() string {
-	if e.Cause != nil {
-		return fmt.Sprintf("failed to %s: %v", e.Operation, e.Cause)
-	}
-	return fmt.Sprintf("failed to %s", e.Operation)
-}
-
-// Unwrap returns the underlying cause
-func (e *StandardError) Unwrap() error {
-	return e.Cause
-}
-
-// NewOperationError creates a new operation error
+// NewOperationError creates a new operation error.
+// Deprecated: Use cmderr.NewOperationError instead.
 func NewOperationError(operation string, cause error) error {
-	return &StandardError{
-		Operation: operation,
-		Cause:     cause,
-	}
+	return cmderr.NewOperationError(operation, cause)
 }
 
-// NewConnectionError creates a standardized connection error
+// NewConnectionError creates a standardized connection error.
+// Deprecated: Use cmderr.NewConnectionError instead.
 func NewConnectionError(cause error) error {
-	hint := "Ensure iTerm2 is running and the Python API is enabled in Settings → General → Magic"
-
-	// Check if this is an automation error and provide specific guidance
-	if cause != nil && (cause.Error() == "iTerm2 is not running" ||
-	   strings.Contains(cause.Error(), "Python API")) {
-		hint = cause.Error()
-	}
-
-	return &StandardError{
-		Operation: "connect to iTerm2",
-		Cause:     cause,
-		Details: map[string]interface{}{
-			"hint": hint,
-		},
-	}
+	return cmderr.NewConnectionError(cause)
 }
 
-// NewValidationError creates a standardized validation error
+// NewValidationError creates a standardized validation error.
+// Deprecated: Use cmderr.NewValidationError instead.
 func NewValidationError(field, reason string) error {
-	return &StandardError{
-		Operation: "validate " + field,
-		Details: map[string]interface{}{
-			"field":  field,
-			"reason": reason,
-		},
-	}
+	return cmderr.NewValidationError(field, reason)
 }
 
-// NewNotFoundError creates a standardized not found error
+// NewNotFoundError creates a standardized not found error.
+// Deprecated: Use cmderr.NewNotFoundError instead.
 func NewNotFoundError(resource, id string) error {
-	return &StandardError{
-		Operation: fmt.Sprintf("find %s", resource),
-		Details: map[string]interface{}{
-			"resource": resource,
-			"id":       id,
-		},
-	}
+	return cmderr.NewNotFoundError(resource, id)
 }
 
-// NewRequiredArgumentError creates an error for missing required arguments
+// NewRequiredArgumentError creates an error for missing required arguments.
+// Deprecated: Use cmderr.NewRequiredArgumentError instead.
 func NewRequiredArgumentError(argName string) error {
-	return &StandardError{
-		Operation: "parse arguments",
-		Details: map[string]interface{}{
-			"missing": argName,
-			"hint":    fmt.Sprintf("%s is required", argName),
-		},
-	}
+	return cmderr.NewRequiredArgumentError(argName)
 }
 
-// NewInvalidFormatError creates an error for invalid format specifications
+// NewInvalidFormatError creates an error for invalid format specifications.
+// Deprecated: Use cmderr.NewInvalidFormatError instead.
 func NewInvalidFormatError(format string, validFormats []string) error {
-	return &StandardError{
-		Operation: "parse format",
-		Details: map[string]interface{}{
-			"invalid": format,
-			"valid":   validFormats,
-		},
-	}
+	return cmderr.NewInvalidFormatError(format, validFormats)
 }
 
-// NewTimeoutError creates a standardized timeout error
+// NewTimeoutError creates a standardized timeout error.
+// Deprecated: Use cmderr.NewTimeoutError instead.
 func NewTimeoutError(operation string) error {
-	return &StandardError{
-		Operation: operation,
-		Details: map[string]interface{}{
-			"error": "operation timed out",
-			"hint":  "Try increasing the timeout with --timeout flag",
-		},
-	}
+	return cmderr.NewTimeoutError(operation)
 }
 
-// NewPermissionError creates a standardized permission error
+// NewPermissionError creates a standardized permission error.
+// Deprecated: Use cmderr.NewPermissionError instead.
 func NewPermissionError(resource string) error {
-	return &StandardError{
-		Operation: fmt.Sprintf("access %s", resource),
-		Details: map[string]interface{}{
-			"error": "permission denied",
-			"hint":  "Check iTerm2 permissions and API settings",
-		},
-	}
+	return cmderr.NewPermissionError(resource)
 }
 
-// IsNotFoundError checks if an error is a not found error
+// IsNotFoundError checks if an error is a not found error.
+// Deprecated: Use cmderr.IsNotFoundError instead.
 func IsNotFoundError(err error) bool {
-	if err == nil {
-		return false
-	}
-	if se, ok := err.(*StandardError); ok {
-		if details, ok := se.Details["resource"]; ok {
-			return details != nil
-		}
-	}
-	return false
+	return cmderr.IsNotFoundError(err)
 }
 
-// IsValidationError checks if an error is a validation error
+// IsValidationError checks if an error is a validation error.
+// Deprecated: Use cmderr.IsValidationError instead.
 func IsValidationError(err error) bool {
-	if err == nil {
-		return false
-	}
-	if se, ok := err.(*StandardError); ok {
-		if field, ok := se.Details["field"]; ok {
-			return field != nil
-		}
-	}
-	return false
+	return cmderr.IsValidationError(err)
 }
 
-// IsConnectionError checks if an error is a connection error
+// IsConnectionError checks if an error is a connection error.
+// Deprecated: Use cmderr.IsConnectionError instead.
 func IsConnectionError(err error) bool {
-	if err == nil {
-		return false
-	}
-	if se, ok := err.(*StandardError); ok {
-		return se.Operation == "connect to iTerm2"
-	}
-	return false
+	return cmderr.IsConnectionError(err)
 }
