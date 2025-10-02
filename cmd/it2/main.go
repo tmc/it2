@@ -30,6 +30,7 @@ import (
 	"github.com/tmc/it2/internal/cmd/prompt"
 	"github.com/tmc/it2/internal/cmd/selection"
 	"github.com/tmc/it2/internal/cmd/session"
+	"github.com/tmc/it2/internal/cmd/shell"
 	"github.com/tmc/it2/internal/cmd/snippet"
 	"github.com/tmc/it2/internal/cmd/statusbar"
 	"github.com/tmc/it2/internal/cmd/tab"
@@ -296,6 +297,7 @@ func init() {
 	rootCmd.AddCommand(prompt.NewCommand())
 	rootCmd.AddCommand(selection.NewCommand())
 	rootCmd.AddCommand(session.NewCommand())
+	rootCmd.AddCommand(shell.NewCommand())
 	rootCmd.AddCommand(statusbar.NewCommand())
 	rootCmd.AddCommand(tab.NewCommand())
 	rootCmd.AddCommand(text.NewCommand())
