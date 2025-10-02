@@ -643,13 +643,14 @@ type WindowInfo struct {
 
 // TabInfo represents tab information for formatting
 type TabInfo struct {
-	TabID      string                 `json:"tab_id"`
-	WindowID   string                 `json:"window_id"`
-	Title      string                 `json:"title,omitempty"`
-	Active     bool                   `json:"active"`
-	Position   int                    `json:"position"`
-	Sessions   []*client.SessionInfo  `json:"sessions,omitempty"`
-	PluginData map[string]interface{} `json:"plugin_data,omitempty"`
+	TabID        string                 `json:"tab_id"`
+	WindowID     string                 `json:"window_id"`
+	WindowNumber int                    `json:"window_number"`
+	Title        string                 `json:"title,omitempty"`
+	Active       bool                   `json:"active"`
+	Position     int                    `json:"position"`
+	Sessions     []*client.SessionInfo  `json:"sessions,omitempty"`
+	PluginData   map[string]interface{} `json:"plugin_data,omitempty"`
 }
 
 func (f *Formatter) FormatWindows(windows []*WindowInfo) error {
@@ -970,7 +971,7 @@ func (f *Formatter) formatTabsTable(tabs []*TabInfo) error {
 	}
 
 	// Create table with headers (base headers + plugin columns)
-	headers := []string{"Window ID", "Tab ID", "Position", "Active", "Title", "Sessions"}
+	headers := []string{"Win", "Window ID", "Tab", "Title", "Sess"}
 	for pluginName := range pluginColumns {
 		headers = append(headers, pluginName)
 	}
@@ -978,14 +979,13 @@ func (f *Formatter) formatTabsTable(tabs []*TabInfo) error {
 
 	// Add rows for each tab
 	for _, tab := range tabs {
-		activeIndicator := ""
-		if tab.Active {
-			activeIndicator = "✓"
-		}
-
 		title := tab.Title
 		if title == "" {
 			title = "-"
+		}
+		// Truncate long titles
+		if len(title) > 80 {
+			title = title[:77] + "..."
 		}
 
 		sessionsCount := fmt.Sprintf("%d", len(tab.Sessions))
@@ -993,17 +993,12 @@ func (f *Formatter) formatTabsTable(tabs []*TabInfo) error {
 			sessionsCount = "-"
 		}
 
-		// Truncate and apply hyperlinks to window ID
+		// Show full window ID with hyperlink
 		windowID := tab.WindowID
-		displayWindowID := windowID
-		if len(displayWindowID) > 12 {
-			displayWindowID = displayWindowID[:9] + "..."
-		}
 		if f.hyperlinks {
 			url := WindowActivateURL(tab.WindowID)
-			displayWindowID = OSC8Hyperlink(url, displayWindowID)
+			windowID = OSC8Hyperlink(url, windowID)
 		}
-		windowID = displayWindowID
 
 		// Apply hyperlinks to tab ID if enabled
 		tabID := tab.TabID
@@ -1013,10 +1008,9 @@ func (f *Formatter) formatTabsTable(tabs []*TabInfo) error {
 		}
 
 		row := []string{
+			fmt.Sprintf("%d", tab.WindowNumber),
 			windowID,
 			tabID,
-			fmt.Sprintf("%d", tab.Position),
-			activeIndicator,
 			title,
 			sessionsCount,
 		}

@@ -216,12 +216,13 @@ func (s *SharedListOperations) buildTabInfoFromSessions(sessions []*client.Sessi
 				title = session.SessionName
 			}
 			tabMap[key] = &formatting.TabInfo{
-				WindowID: session.WindowID,
-				TabID:    session.TabID,
-				Title:    title,
-				Position: 0, // Position needs to be determined differently
-				Active:   false, // Will be determined by checking session focus
-				Sessions: []*client.SessionInfo{session},
+				WindowID:     session.WindowID,
+				WindowNumber: int(session.WindowNumber),
+				TabID:        session.TabID,
+				Title:        title,
+				Position:     0,      // Position needs to be determined differently
+				Active:       false,  // Will be determined by checking session focus
+				Sessions:     []*client.SessionInfo{session},
 			}
 		} else {
 			// Add session to existing tab
