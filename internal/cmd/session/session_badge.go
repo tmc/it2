@@ -19,16 +19,17 @@ func NewBadgeCommand() *cobra.Command {
 
 Session badges appear in the top-right corner of the terminal window
 and can display custom text, useful for showing environment, server names,
-or other contextual information.
+or other contextual information.`,
+		Example: `  # Query Badge
 
-Examples:
-  # Get badge from current session
   it2 session badge get
 
-  # Set badge for a specific session
+  # Set Badge
+
   it2 session badge set sess_123 "PROD"
 
-  # Clear badge
+  # Clear Badge
+
   it2 session badge clear sess_123`,
 	}
 

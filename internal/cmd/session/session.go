@@ -10,25 +10,26 @@ func NewCommand() *cobra.Command {
 		Use:     "session",
 		Short:   "Manage iTerm2 sessions",
 		Long:    "Commands for creating, listing, and managing iTerm2 sessions",
-		Example: `  # List all sessions
-  it2 session list
+		Example: `  # Basic Session Information
 
-  # Get current session ID
+  it2 session list
   it2 session current
 
-  # Set a badge for the current session
-  it2 session badge set "PROD"
+  # Display & Appearance
 
-  # Set a title for a specific session
+  it2 session badge set "PROD"
   it2 session title set sess_abc123 "My Server"
 
-  # Get a session variable
+  # Variables & Properties
+
   it2 session variable get $ITERM_SESSION_ID user.environment
 
-  # Send text to a session
+  # Interaction
+
   it2 session send-text sess_abc123 "echo hello"
 
-  # Monitor session output in real-time
+  # Monitoring
+
   it2 session tail -f`,
 		GroupID: "core",
 	}

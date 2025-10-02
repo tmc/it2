@@ -24,13 +24,16 @@ Selection modes:
   --mode line       - Select by whole lines
   --mode smart      - Smart selection
   --mode box        - Box/rectangular selection`,
-		Example: `  # Select text from column 5 to 15 on line 10
+		Example: `  # Basic Selection
+
   it2 session select session123 5 10 15 10
 
-  # Select multiple lines (from line 5 col 0 to line 8 col 20)
+  # Multi-line Selection
+
   it2 session select session123 0 5 20 8
 
-  # Select and copy workflow:
+  # Workflow Example
+
   it2 session select session123 10 5 20 5  # Select text
   it2 session copy session123              # Copy to clipboard`,
 		Args: cobra.ExactArgs(5),

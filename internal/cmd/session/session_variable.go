@@ -28,6 +28,15 @@ Common session variables:
   - session.path: Current working directory
   - profileName: Profile name
   - user.*: Custom user-defined variables`,
+		Example: `  # Query Variables
+
+  it2 session variable get $SESSION user.environment
+  it2 session variable list $SESSION
+
+  # Modify Variables
+
+  it2 session variable set $SESSION user.environment "production"
+  it2 session variable clear $SESSION user.environment`,
 	}
 
 	cmd.AddCommand(newVariableGetCommand())

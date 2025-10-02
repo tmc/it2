@@ -14,16 +14,17 @@ func newPasteCommand() *cobra.Command {
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 By default, paste operates silently without changing session focus.`,
-		Example: `  # Paste to current session (silent)
-  it2 session paste
+		Example: `  # Basic Usage
 
-  # Paste to specific session (silent)
+  it2 session paste
   it2 session paste session123
 
-  # Paste with visual feedback and focus restoration
+  # With Options
+
   it2 session paste session123 --restore-focus
 
-  # Copy and paste workflow:
+  # Workflow Example
+
   it2 session copy session123                    # Copy from one session
   it2 session paste session456                   # Paste to another session`,
 		Args: cobra.RangeArgs(0, 1),

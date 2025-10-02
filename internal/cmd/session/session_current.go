@@ -14,10 +14,12 @@ func newCurrentCommand() *cobra.Command {
 		Use:   "current",
 		Short: "Show the current session ID",
 		Long:  "Display the ID of the current iTerm2 session from ITERM_SESSION_ID environment variable",
-		Example: `  # Get current session ID
+		Example: `  # Basic Usage
+
   it2 session current
 
-  # Use in scripts
+  # Scripting Example
+
   SESSION=$(it2 session current)
   it2 session title set "$SESSION" "My Title"`,
 		Args: cobra.NoArgs,

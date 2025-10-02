@@ -27,13 +27,13 @@ func newGetInfoCommand() *cobra.Command {
   - Process information
 
 This command combines multiple API calls to provide a complete view of the session.`,
-		Example: `  # Get info for current session
-  it2 session get-info
+		Example: `  # Basic Usage
 
-  # Get info for specific session
+  it2 session get-info
   it2 session get-info sess_abc123
 
-  # Get info in JSON format for scripting
+  # Output Formats
+
   it2 session get-info --format json`,
 		Args: cobra.RangeArgs(0, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {

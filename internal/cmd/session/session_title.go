@@ -18,16 +18,17 @@ func NewTitleCommand() *cobra.Command {
 		Long: `Get, set, and clear session titles.
 
 Session titles appear in the tab or window header and can be customized
-to help identify different sessions.
+to help identify different sessions.`,
+		Example: `  # Query Title
 
-Examples:
-  # Get title from current session
   it2 session title get
 
-  # Set title for a specific session
+  # Set Title
+
   it2 session title set sess_123 "Production Server"
 
-  # Clear custom title
+  # Clear Title
+
   it2 session title clear sess_123`,
 	}
 

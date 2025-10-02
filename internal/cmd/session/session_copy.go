@@ -14,13 +14,13 @@ func newCopyCommand() *cobra.Command {
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 The session must have an active text selection for this to work.`,
-		Example: `  # Copy selection from current session
-  it2 session copy
+		Example: `  # Basic Usage
 
-  # Copy selection from specific session
+  it2 session copy
   it2 session copy session123
 
-  # Select and copy in one workflow:
+  # Workflow Example
+
   it2 session select session123 10 5 20 5  # Select text
   it2 session copy session123              # Copy to clipboard`,
 		Args: cobra.RangeArgs(0, 1),
