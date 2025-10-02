@@ -15,18 +15,20 @@ func NewCommand() *cobra.Command {
   it2 session list
   it2 session current
 
+  # Creating & Managing Sessions
+
+  it2 session split --horizontal
+  it2 session close sess_abc123
+
   # Display & Appearance
 
   it2 session badge set "PROD"
-  it2 session title set sess_abc123 "My Server"
-
-  # Variables & Properties
-
-  it2 session variable get $ITERM_SESSION_ID user.environment
+  it2 session title set "My Server"
 
   # Interaction
 
   it2 session send-text sess_abc123 "echo hello"
+  it2 session send-key sess_abc123 enter
 
   # Monitoring
 

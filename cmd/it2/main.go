@@ -67,9 +67,7 @@ var rootCmd = &cobra.Command{
 			os.Setenv("IT2_PLUGIN_DEADLINE", pluginDeadline.String())
 		}
 	},
-	Long: `it2 - iTerm2 API Command-Line Interface
-
-A powerful command-line tool for controlling iTerm2. Provides comprehensive access to terminal automation,
+	Long: `A powerful command-line tool for controlling iTerm2. Provides comprehensive access to terminal automation,
 session management, and advanced iTerm2 features.
 
 FEATURES:
@@ -84,41 +82,6 @@ FEATURES:
   • tmux Integration: Control tmux sessions through iTerm2
   • Broadcast Domains: Manage input broadcasting to multiple sessions
 
-EXAMPLES:
-  # List all sessions
-  it2 session list
-
-  # Send text to current session (uses $ITERM_SESSION_ID)
-  it2 session send-text "echo Hello, iTerm2!"
-
-  # Show command history with Shell Integration
-  it2 prompt list
-
-  # Create a new tab
-  it2 tab create "Default"
-
-  # Split current pane vertically
-  it2 session split --vertical
-
-  # Monitor keystroke events in real-time
-  it2 notification monitor --type keystroke
-
-  # Get terminal buffer contents
-  it2 text get-buffer <session-id>
-
-  # Search command history
-  it2 prompt search "git commit"
-
-GLOBAL FLAGS:
-  --format string      Output format: table, text, json, yaml (default "table")
-  --timeout duration   Connection timeout (default 5s)
-
-ENVIRONMENT VARIABLES:
-  ITERM_SESSION_ID     Current session ID (set by iTerm2)
-  ITERM2_COOKIE        Authentication cookie (auto-requested)
-  ITERM2_KEY           Authentication key (auto-requested)
-  ITERM2_DEBUG         Enable debug output (set to "1")
-
 AUTHENTICATION:
   The tool automatically requests authentication from iTerm2 on first use.
   iTerm2 will prompt to allow API access. No manual setup required.
@@ -126,9 +89,27 @@ AUTHENTICATION:
 REQUIREMENTS:
   • iTerm2 version 3.3.0 or later
   • Python API enabled in iTerm2 preferences
-  • macOS (iTerm2 is macOS-only)
+  • macOS (iTerm2 is macOS-only)`,
+	Example: `  # Session Management
 
-Use "it2 [command] --help" for more information about a command.`,
+  it2 session list
+  it2 session current
+  it2 session split --horizontal
+
+  # Interaction
+
+  it2 session send-text sess_abc123 "echo hello"
+  it2 session send-key sess_abc123 enter
+
+  # Tab & Window Control
+
+  it2 tab create "Default"
+  it2 window list
+
+  # Shell Integration
+
+  it2 prompt list
+  it2 prompt search "git commit"`,
 }
 
 // newCompletionCommand creates the completion command
@@ -267,7 +248,11 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&format, "format", defaultFormat, "Output format (table, text, json, yaml)")
 	rootCmd.PersistentFlags().StringSliceVar(&pluginPaths, "plugin-path", nil, "Additional plugin search paths (higher priority than embedded plugins)")
 	rootCmd.PersistentFlags().DurationVar(&pluginDeadline, "plugin-deadline", 0, "Plugin execution deadline (hidden flag, default 5s)")
+
+	// Hide advanced flags
 	rootCmd.PersistentFlags().MarkHidden("plugin-deadline")
+	rootCmd.PersistentFlags().MarkHidden("url")
+	rootCmd.PersistentFlags().MarkHidden("plugin-path")
 
 	// Add flag completion
 	rootCmd.RegisterFlagCompletionFunc("format", completion.FormatCompletion)
