@@ -9,8 +9,8 @@ import (
 func newActivateCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
 		Use:   "activate <session-id>",
-		Short: "Activate a session",
-		Long:  "Activate the specified iTerm2 session, optionally selecting it in its tab",
+		Short: "Activate a session (deprecated: use 'focus')",
+		Long:  "Activate the specified iTerm2 session, optionally selecting it in its tab.\n\nDEPRECATED: This command is an alias for 'focus'. Use 'it2 session focus' instead.",
 		Example: cmdutil.Doc(`
 			# Activate a specific session (brings it to front and selects it)
 			$ it2 session activate abc123
@@ -68,6 +68,7 @@ func newActivateCommand() *cobra.Command {
 
 	cmd := cmdutil.NewCommandFromTemplate(template)
 	cmd.Flags().Bool("select-session", true, "Select the session in its tab")
+	cmd.Deprecated = "use 'it2 session focus' instead"
 
 	return cmd
 }

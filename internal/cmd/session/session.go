@@ -48,13 +48,14 @@ func NewCommand() *cobra.Command {
 	closeCmd.GroupID = "management"
 	cmd.AddCommand(closeCmd)
 
-	activateCmd := newActivateCommand()
-	activateCmd.GroupID = "management"
-	cmd.AddCommand(activateCmd)
-
 	focusCmd := newFocusCommand()
 	focusCmd.GroupID = "management"
 	cmd.AddCommand(focusCmd)
+
+	// Keep activate as hidden alias for backwards compatibility
+	activateCmd := newActivateCommand()
+	activateCmd.Hidden = true
+	cmd.AddCommand(activateCmd)
 
 	restartCmd := newRestartCommand()
 	restartCmd.GroupID = "management"

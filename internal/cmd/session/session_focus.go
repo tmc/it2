@@ -10,7 +10,7 @@ func newFocusCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
 		Use:   "focus [<session-id>]",
 		Short: "Focus/activate a session",
-		Long:  "Activate and focus the specified iTerm2 session, bringing it to front. Alias for 'activate'.",
+		Long:  "Activate and focus the specified iTerm2 session, bringing it to front.",
 		Example: cmdutil.Doc(`
 			# Focus a specific session (brings it to front and selects it)
 			$ it2 session focus abc123
