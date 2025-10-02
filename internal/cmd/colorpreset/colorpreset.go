@@ -34,13 +34,13 @@ func newListCommand() *cobra.Command {
 		Short: "List available color presets",
 		Example: cmdutil.Doc(`
 			# List all color presets
-			$ it2 color-preset list
+			$ it2 color preset list
 
 			# List with JSON output
-			$ it2 color-preset list --format json
+			$ it2 color preset list --format json
 
 			# List and count
-			$ it2 color-preset list | wc -l
+			$ it2 color preset list | wc -l
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_, timeout, format := cmdcore.GetFlags(cmd)
@@ -83,16 +83,16 @@ func newApplyCommand() *cobra.Command {
 		Long:  "Apply the specified color preset to a profile. If no profile is specified, applies to the current session's profile.",
 		Example: cmdutil.Doc(`
 			# Apply preset to current profile
-			$ it2 color-preset apply "Solarized Dark"
+			$ it2 color preset apply "Solarized Dark"
 
 			# Apply preset to specific profile
-			$ it2 color-preset apply "Monokai" "Development"
+			$ it2 color preset apply "Monokai" "Development"
 
 			# Apply dark theme
-			$ it2 color-preset apply "Dracula"
+			$ it2 color preset apply "Dracula"
 
 			# Apply light theme
-			$ it2 color-preset apply "Solarized Light" "Work"
+			$ it2 color preset apply "Solarized Light" "Work"
 		`),
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -154,14 +154,14 @@ func newImportCommand() *cobra.Command {
 		Long:  "Import a color preset from an .itermcolors file and save it with the specified name.",
 		Example: cmdutil.Doc(`
 			# Import color scheme
-			$ it2 color-preset import "Custom" ~/Downloads/theme.itermcolors
+			$ it2 color preset import "Custom" ~/Downloads/theme.itermcolors
 
 			# Import from URL (download first)
 			$ curl -o nord.itermcolors https://example.com/nord.itermcolors
-			$ it2 color-preset import "Nord" nord.itermcolors
+			$ it2 color preset import "Nord" nord.itermcolors
 
 			# Import company theme
-			$ it2 color-preset import "Company" ~/themes/company.itermcolors
+			$ it2 color preset import "Company" ~/themes/company.itermcolors
 		`),
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -198,13 +198,13 @@ func newExportCommand() *cobra.Command {
 		Long:  "Export the specified color preset to an .itermcolors file.",
 		Example: cmdutil.Doc(`
 			# Export color preset
-			$ it2 color-preset export "Solarized Dark" solarized
+			$ it2 color preset export "Solarized Dark" solarized
 
 			# Export to specific path
-			$ it2 color-preset export "Custom" ~/backups/custom.itermcolors
+			$ it2 color preset export "Custom" ~/backups/custom.itermcolors
 
 			# Export and share
-			$ it2 color-preset export "My Theme" my-theme.itermcolors
+			$ it2 color preset export "My Theme" my-theme.itermcolors
 		`),
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
