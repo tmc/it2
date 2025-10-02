@@ -188,9 +188,9 @@ func NewCommand() *cobra.Command {
 	watchCmd.GroupID = "monitoring"
 	cmd.AddCommand(watchCmd)
 
-	shellIntegrationCmd := newSessionShellIntegrationCmd()
-	shellIntegrationCmd.GroupID = "monitoring"
-	cmd.AddCommand(shellIntegrationCmd)
+	hasShellIntegrationCmd := newHasShellIntegrationCmd()
+	hasShellIntegrationCmd.GroupID = "monitoring"
+	cmd.AddCommand(hasShellIntegrationCmd)
 
 	promptCmd := newPromptCommand()
 	promptCmd.GroupID = "monitoring"

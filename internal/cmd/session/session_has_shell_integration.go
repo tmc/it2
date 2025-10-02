@@ -9,9 +9,9 @@ import (
 	"github.com/tmc/it2/internal/completion"
 )
 
-func newSessionShellIntegrationCmd() *cobra.Command {
+func newHasShellIntegrationCmd() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "shell-integration [session-id]",
+		Use:   "has-shell-integration [session-id]",
 		Short: "Check if shell integration is enabled for a session",
 		Long: `Check if shell integration is enabled for a session.
 
@@ -25,13 +25,13 @@ Without shell integration, sessions will show IDLE state.
 
 Examples:
   # Check current session
-  $ it2 session shell-integration
+  $ it2 session has-shell-integration
 
   # Check specific session
-  $ it2 session shell-integration ABC12345
+  $ it2 session has-shell-integration ABC12345
 
   # Quiet output (just 'enabled' or 'disabled')
-  $ it2 session shell-integration -q
+  $ it2 session has-shell-integration -q
 `,
 		Args:           cobra.MaximumNArgs(1),
 		RequiresClient: true,
