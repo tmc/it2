@@ -6,6 +6,89 @@ import (
 	"testing"
 )
 
+func TestSupportsOSC8(t *testing.T) {
+	tests := []struct {
+		name            string
+		termProgram     string
+		term            string
+		noHyperlinks    string
+		expectedSupport bool
+	}{
+		{
+			name:            "iTerm2",
+			termProgram:     "iTerm.app",
+			term:            "xterm-256color",
+			expectedSupport: true,
+		},
+		{
+			name:            "WezTerm",
+			termProgram:     "WezTerm",
+			term:            "wezterm",
+			expectedSupport: true,
+		},
+		{
+			name:            "VSCode",
+			termProgram:     "vscode",
+			term:            "xterm-256color",
+			expectedSupport: true,
+		},
+		{
+			name:            "Kitty",
+			termProgram:     "",
+			term:            "xterm-kitty",
+			expectedSupport: true,
+		},
+		{
+			name:            "VTE terminal",
+			termProgram:     "",
+			term:            "xterm-vte-256color",
+			expectedSupport: true,
+		},
+		{
+			name:            "Unknown terminal",
+			termProgram:     "",
+			term:            "xterm",
+			expectedSupport: false,
+		},
+		{
+			name:            "NO_HYPERLINKS set on iTerm2",
+			termProgram:     "iTerm.app",
+			term:            "xterm-256color",
+			noHyperlinks:    "1",
+			expectedSupport: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Save and restore original environment
+			origTermProgram := os.Getenv("TERM_PROGRAM")
+			origTerm := os.Getenv("TERM")
+			origNoHyperlinks := os.Getenv("NO_HYPERLINKS")
+			defer func() {
+				os.Setenv("TERM_PROGRAM", origTermProgram)
+				os.Setenv("TERM", origTerm)
+				os.Setenv("NO_HYPERLINKS", origNoHyperlinks)
+			}()
+
+			// Set test environment
+			os.Setenv("TERM_PROGRAM", tt.termProgram)
+			os.Setenv("TERM", tt.term)
+			if tt.noHyperlinks != "" {
+				os.Setenv("NO_HYPERLINKS", tt.noHyperlinks)
+			} else {
+				os.Unsetenv("NO_HYPERLINKS")
+			}
+
+			got := SupportsOSC8()
+			if got != tt.expectedSupport {
+				t.Errorf("SupportsOSC8() = %v, want %v (TERM_PROGRAM=%s, TERM=%s, NO_HYPERLINKS=%s)",
+					got, tt.expectedSupport, tt.termProgram, tt.term, tt.noHyperlinks)
+			}
+		})
+	}
+}
+
 func TestOSC8Hyperlink(t *testing.T) {
 	tests := []struct {
 		name string
