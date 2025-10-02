@@ -56,4 +56,5 @@ dist: clean
 
 # Generate documentation
 gen-docs:
+	rm ./docs/it2_*.md || true
 	go run cmd/gen-docs/main.go --website --hierarchy --doc-path ./docs

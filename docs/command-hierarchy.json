@@ -306,11 +306,6 @@
         "path": "it2 profile",
         "subcommands": [
           {
-            "name": "bulk-update",
-            "short": "Update properties across multiple profiles",
-            "path": "it2 profile bulk-update"
-          },
-          {
             "name": "clear-badge",
             "short": "Clear the badge text of a profile",
             "path": "it2 profile clear-badge"
@@ -346,11 +341,6 @@
             "path": "it2 profile get-badge"
           },
           {
-            "name": "get-property",
-            "short": "Get a specific profile property",
-            "path": "it2 profile get-property"
-          },
-          {
             "name": "import",
             "short": "Import profile settings",
             "path": "it2 profile import"
@@ -361,24 +351,26 @@
             "path": "it2 profile list"
           },
           {
-            "name": "session-get-property",
-            "short": "Get a profile property value from a specific session",
-            "path": "it2 profile session-get-property"
-          },
-          {
-            "name": "session-reset",
-            "short": "Reset session-specific profile customizations",
-            "path": "it2 profile session-reset"
-          },
-          {
-            "name": "session-set-property",
-            "short": "Set a profile property for a specific session only",
-            "path": "it2 profile session-set-property"
-          },
-          {
-            "name": "set",
-            "short": "Set multiple profile properties from JSON",
-            "path": "it2 profile set"
+            "name": "property",
+            "short": "Manage profile properties",
+            "path": "it2 profile property",
+            "subcommands": [
+              {
+                "name": "get",
+                "short": "Get a specific profile property",
+                "path": "it2 profile property get"
+              },
+              {
+                "name": "list",
+                "short": "List all properties for a profile",
+                "path": "it2 profile property list"
+              },
+              {
+                "name": "set",
+                "short": "Set a profile property",
+                "path": "it2 profile property set"
+              }
+            ]
           },
           {
             "name": "set-badge",
@@ -386,9 +378,26 @@
             "path": "it2 profile set-badge"
           },
           {
-            "name": "set-property",
-            "short": "Set a single profile property",
-            "path": "it2 profile set-property"
+            "name": "shell-integration",
+            "short": "Manage automatic shell integration for profiles",
+            "path": "it2 profile shell-integration",
+            "subcommands": [
+              {
+                "name": "disable",
+                "short": "Disable automatic shell integration for a profile",
+                "path": "it2 profile shell-integration disable"
+              },
+              {
+                "name": "enable",
+                "short": "Enable automatic shell integration for a profile",
+                "path": "it2 profile shell-integration enable"
+              },
+              {
+                "name": "status",
+                "short": "Check if shell integration is enabled for a profile",
+                "path": "it2 profile shell-integration status"
+              }
+            ]
           }
         ]
       },
@@ -447,11 +456,6 @@
         "path": "it2 session",
         "subcommands": [
           {
-            "name": "activate",
-            "short": "Activate a session",
-            "path": "it2 session activate"
-          },
-          {
             "name": "autorespond",
             "short": "Monitor and automatically respond to session prompts",
             "path": "it2 session autorespond"
@@ -465,11 +469,6 @@
             "name": "clear-title",
             "short": "Clear the title of a session",
             "path": "it2 session clear-title"
-          },
-          {
-            "name": "clear-variable",
-            "short": "Clear a session variable",
-            "path": "it2 session clear-variable"
           },
           {
             "name": "close",
@@ -522,11 +521,6 @@
             "path": "it2 session get-pid"
           },
           {
-            "name": "get-property",
-            "short": "Get a session property value",
-            "path": "it2 session get-property"
-          },
-          {
             "name": "get-screen",
             "short": "Get current screen contents of a session",
             "path": "it2 session get-screen"
@@ -537,19 +531,14 @@
             "path": "it2 session get-title"
           },
           {
-            "name": "get-variable",
-            "short": "Get a session variable value",
-            "path": "it2 session get-variable"
+            "name": "has-shell-integration",
+            "short": "Check if shell integration is enabled for a session",
+            "path": "it2 session has-shell-integration"
           },
           {
             "name": "list",
             "short": "List all iTerm2 sessions",
             "path": "it2 session list"
-          },
-          {
-            "name": "list-variables",
-            "short": "List all variables for a session",
-            "path": "it2 session list-variables"
           },
           {
             "name": "monitor",
@@ -611,6 +600,11 @@
             ]
           },
           {
+            "name": "prompt",
+            "short": "Get shell prompt metadata for a session",
+            "path": "it2 session prompt"
+          },
+          {
             "name": "restart",
             "short": "Restart a session",
             "path": "it2 session restart"
@@ -636,19 +630,9 @@
             "path": "it2 session set-badge"
           },
           {
-            "name": "set-property",
-            "short": "Set a session property value",
-            "path": "it2 session set-property"
-          },
-          {
             "name": "set-title",
             "short": "Set the title of a session",
             "path": "it2 session set-title"
-          },
-          {
-            "name": "set-variable",
-            "short": "Set a session variable value",
-            "path": "it2 session set-variable"
           },
           {
             "name": "split",
@@ -664,6 +648,33 @@
             "name": "tail",
             "short": "Continuously monitor session output (like tail -f)",
             "path": "it2 session tail"
+          },
+          {
+            "name": "variable",
+            "short": "Manage session variables",
+            "path": "it2 session variable",
+            "subcommands": [
+              {
+                "name": "clear",
+                "short": "Clear a session variable",
+                "path": "it2 session variable clear"
+              },
+              {
+                "name": "get",
+                "short": "Get a session variable value",
+                "path": "it2 session variable get"
+              },
+              {
+                "name": "list",
+                "short": "List all variables for a session",
+                "path": "it2 session variable list"
+              },
+              {
+                "name": "set",
+                "short": "Set a session variable value",
+                "path": "it2 session variable set"
+              }
+            ]
           },
           {
             "name": "watch",
@@ -1082,11 +1093,6 @@
           "path": "it2 session",
           "subcommands": [
             {
-              "name": "activate",
-              "short": "Activate a session",
-              "path": "it2 session activate"
-            },
-            {
               "name": "autorespond",
               "short": "Monitor and automatically respond to session prompts",
               "path": "it2 session autorespond"
@@ -1100,11 +1106,6 @@
               "name": "clear-title",
               "short": "Clear the title of a session",
               "path": "it2 session clear-title"
-            },
-            {
-              "name": "clear-variable",
-              "short": "Clear a session variable",
-              "path": "it2 session clear-variable"
             },
             {
               "name": "close",
@@ -1157,11 +1158,6 @@
               "path": "it2 session get-pid"
             },
             {
-              "name": "get-property",
-              "short": "Get a session property value",
-              "path": "it2 session get-property"
-            },
-            {
               "name": "get-screen",
               "short": "Get current screen contents of a session",
               "path": "it2 session get-screen"
@@ -1172,19 +1168,14 @@
               "path": "it2 session get-title"
             },
             {
-              "name": "get-variable",
-              "short": "Get a session variable value",
-              "path": "it2 session get-variable"
+              "name": "has-shell-integration",
+              "short": "Check if shell integration is enabled for a session",
+              "path": "it2 session has-shell-integration"
             },
             {
               "name": "list",
               "short": "List all iTerm2 sessions",
               "path": "it2 session list"
-            },
-            {
-              "name": "list-variables",
-              "short": "List all variables for a session",
-              "path": "it2 session list-variables"
             },
             {
               "name": "monitor",
@@ -1246,6 +1237,11 @@
               ]
             },
             {
+              "name": "prompt",
+              "short": "Get shell prompt metadata for a session",
+              "path": "it2 session prompt"
+            },
+            {
               "name": "restart",
               "short": "Restart a session",
               "path": "it2 session restart"
@@ -1271,19 +1267,9 @@
               "path": "it2 session set-badge"
             },
             {
-              "name": "set-property",
-              "short": "Set a session property value",
-              "path": "it2 session set-property"
-            },
-            {
               "name": "set-title",
               "short": "Set the title of a session",
               "path": "it2 session set-title"
-            },
-            {
-              "name": "set-variable",
-              "short": "Set a session variable value",
-              "path": "it2 session set-variable"
             },
             {
               "name": "split",
@@ -1299,6 +1285,33 @@
               "name": "tail",
               "short": "Continuously monitor session output (like tail -f)",
               "path": "it2 session tail"
+            },
+            {
+              "name": "variable",
+              "short": "Manage session variables",
+              "path": "it2 session variable",
+              "subcommands": [
+                {
+                  "name": "clear",
+                  "short": "Clear a session variable",
+                  "path": "it2 session variable clear"
+                },
+                {
+                  "name": "get",
+                  "short": "Get a session variable value",
+                  "path": "it2 session variable get"
+                },
+                {
+                  "name": "list",
+                  "short": "List all variables for a session",
+                  "path": "it2 session variable list"
+                },
+                {
+                  "name": "set",
+                  "short": "Set a session variable value",
+                  "path": "it2 session variable set"
+                }
+              ]
             },
             {
               "name": "watch",
@@ -1651,11 +1664,6 @@
           "path": "it2 profile",
           "subcommands": [
             {
-              "name": "bulk-update",
-              "short": "Update properties across multiple profiles",
-              "path": "it2 profile bulk-update"
-            },
-            {
               "name": "clear-badge",
               "short": "Clear the badge text of a profile",
               "path": "it2 profile clear-badge"
@@ -1691,11 +1699,6 @@
               "path": "it2 profile get-badge"
             },
             {
-              "name": "get-property",
-              "short": "Get a specific profile property",
-              "path": "it2 profile get-property"
-            },
-            {
               "name": "import",
               "short": "Import profile settings",
               "path": "it2 profile import"
@@ -1706,24 +1709,26 @@
               "path": "it2 profile list"
             },
             {
-              "name": "session-get-property",
-              "short": "Get a profile property value from a specific session",
-              "path": "it2 profile session-get-property"
-            },
-            {
-              "name": "session-reset",
-              "short": "Reset session-specific profile customizations",
-              "path": "it2 profile session-reset"
-            },
-            {
-              "name": "session-set-property",
-              "short": "Set a profile property for a specific session only",
-              "path": "it2 profile session-set-property"
-            },
-            {
-              "name": "set",
-              "short": "Set multiple profile properties from JSON",
-              "path": "it2 profile set"
+              "name": "property",
+              "short": "Manage profile properties",
+              "path": "it2 profile property",
+              "subcommands": [
+                {
+                  "name": "get",
+                  "short": "Get a specific profile property",
+                  "path": "it2 profile property get"
+                },
+                {
+                  "name": "list",
+                  "short": "List all properties for a profile",
+                  "path": "it2 profile property list"
+                },
+                {
+                  "name": "set",
+                  "short": "Set a profile property",
+                  "path": "it2 profile property set"
+                }
+              ]
             },
             {
               "name": "set-badge",
@@ -1731,9 +1736,26 @@
               "path": "it2 profile set-badge"
             },
             {
-              "name": "set-property",
-              "short": "Set a single profile property",
-              "path": "it2 profile set-property"
+              "name": "shell-integration",
+              "short": "Manage automatic shell integration for profiles",
+              "path": "it2 profile shell-integration",
+              "subcommands": [
+                {
+                  "name": "disable",
+                  "short": "Disable automatic shell integration for a profile",
+                  "path": "it2 profile shell-integration disable"
+                },
+                {
+                  "name": "enable",
+                  "short": "Enable automatic shell integration for a profile",
+                  "path": "it2 profile shell-integration enable"
+                },
+                {
+                  "name": "status",
+                  "short": "Check if shell integration is enabled for a profile",
+                  "path": "it2 profile shell-integration status"
+                }
+              ]
             }
           ]
         },
@@ -1988,6 +2010,6 @@
       ]
     }
   ],
-  "total_commands": 186,
-  "generated_at": "2025-10-02T05:53:02Z"
+  "total_commands": 187,
+  "generated_at": "2025-10-02T07:20:49Z"
 }
