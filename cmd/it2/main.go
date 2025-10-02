@@ -93,6 +93,7 @@ REQUIREMENTS:
 	Example: `  # Session Management
 
   it2 session list
+  it2 session list --scope=tab
   it2 session current
   it2 session split --horizontal
 
