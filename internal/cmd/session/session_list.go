@@ -67,17 +67,21 @@ func newListCommand() *cobra.Command {
 			windowID, _ := cmd.Flags().GetString("window-id")
 			tabID, _ := cmd.Flags().GetString("tab-id")
 
+			// Get no-hyperlinks flag
+			noHyperlinks, _ := cmd.Flags().GetBool("no-hyperlinks")
+
 			// Use shared operations
 			sharedOps := cmdutil.NewSharedListOperations(c, ctx)
 			return sharedOps.ListSessions(cmdutil.SharedListOptions{
-				WindowID:    windowID,
-				TabID:       tabID,
-				ScopeFlag:   scopeFlag,
-				Format:      format,
-				Columns:     columns,
-				SortBy:      sortBy,
-				SortReverse: sortReverse,
-				Quiet:       quiet,
+				WindowID:     windowID,
+				TabID:        tabID,
+				ScopeFlag:    scopeFlag,
+				Format:       format,
+				Columns:      columns,
+				SortBy:       sortBy,
+				SortReverse:  sortReverse,
+				Quiet:        quiet,
+				NoHyperlinks: noHyperlinks,
 			})
 		},
 	}
@@ -96,6 +100,9 @@ func newListCommand() *cobra.Command {
 
 	// Add quiet flag
 	cmd.Flags().BoolP("quiet", "q", false, "Output only session IDs")
+
+	// Add no-hyperlinks flag
+	cmd.Flags().Bool("no-hyperlinks", false, "Disable OSC 8 terminal hyperlinks in output")
 
 	// Add completion functions
 	cmd.RegisterFlagCompletionFunc("window-id", completion.WindowIDCompletion)

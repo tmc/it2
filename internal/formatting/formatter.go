@@ -20,6 +20,7 @@ type Formatter struct {
 	sortBy      string
 	sortReverse bool
 	quiet       bool
+	hyperlinks  bool // Enable OSC 8 terminal hyperlinks
 }
 
 func New(format string) *Formatter {
@@ -28,12 +29,18 @@ func New(format string) *Formatter {
 
 // NewWithOptions creates a new formatter with column and sort options
 func NewWithOptions(format string, columns []string, sortBy string, sortReverse bool, quiet bool) *Formatter {
+	return NewWithHyperlinks(format, columns, sortBy, sortReverse, quiet, true)
+}
+
+// NewWithHyperlinks creates a new formatter with full options including hyperlinks
+func NewWithHyperlinks(format string, columns []string, sortBy string, sortReverse bool, quiet bool, hyperlinks bool) *Formatter {
 	return &Formatter{
 		format:      format,
 		columns:     columns,
 		sortBy:      sortBy,
 		sortReverse: sortReverse,
 		quiet:       quiet,
+		hyperlinks:  hyperlinks,
 	}
 }
 
@@ -539,8 +546,15 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			command = command[:77] + "..."
 		}
 
+		// Apply hyperlinks to ShortID if enabled (display ShortID, link to full ID)
+		shortID := session.ShortID
+		if f.hyperlinks {
+			url := SessionActivateURL(session.SessionID)
+			shortID = OSC8Hyperlink(url, session.ShortID)
+		}
+
 		row := []string{
-			session.ShortID,
+			shortID,
 			parentDisplay,
 			pidDisplay,
 			state,
@@ -742,6 +756,12 @@ func (f *Formatter) formatWindowsTable(windows []*WindowInfo) error {
 			shortID = shortID[:9] + "..."
 		}
 
+		// Apply hyperlinks to window ID if enabled
+		if f.hyperlinks {
+			url := WindowActivateURL(window.WindowID)
+			shortID = OSC8Hyperlink(url, shortID)
+		}
+
 		// Truncate long titles
 		title := window.Title
 		if len(title) > 30 {
@@ -790,6 +810,12 @@ func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error
 		shortID := window.WindowID
 		if len(shortID) > 12 {
 			shortID = shortID[:9] + "..."
+		}
+
+		// Apply hyperlinks to window ID if enabled
+		if f.hyperlinks {
+			url := WindowActivateURL(window.WindowID)
+			shortID = OSC8Hyperlink(url, shortID)
 		}
 
 		// Truncate long titles
@@ -965,9 +991,16 @@ func (f *Formatter) formatTabsTable(tabs []*TabInfo) error {
 			sessionsCount = "-"
 		}
 
+		// Apply hyperlinks to tab ID if enabled
+		tabID := tab.TabID
+		if f.hyperlinks {
+			url := TabActivateURL(tab.TabID)
+			tabID = OSC8Hyperlink(url, tab.TabID)
+		}
+
 		row := []string{
 			tab.WindowID,
-			tab.TabID,
+			tabID,
 			fmt.Sprintf("%d", tab.Position),
 			activeIndicator,
 			title,

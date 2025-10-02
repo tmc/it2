@@ -15,15 +15,16 @@ import (
 
 // SharedListOptions contains common options for list operations
 type SharedListOptions struct {
-	WindowID    string
-	TabID       string
-	SessionID   string
-	ScopeFlag   string
-	Format      string
-	Columns     []string
-	SortBy      string
-	SortReverse bool
-	Quiet       bool
+	WindowID     string
+	TabID        string
+	SessionID    string
+	ScopeFlag    string
+	Format       string
+	Columns      []string
+	SortBy       string
+	SortReverse  bool
+	Quiet        bool
+	NoHyperlinks bool
 }
 
 // SharedListOperations provides shared listing functionality for both flat and hierarchical commands
@@ -121,7 +122,7 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 	}
 
 	// Format and output
-	formatter := formatting.NewWithOptions(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet)
+	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, !opts.NoHyperlinks)
 	return formatter.FormatSessions(filteredSessions)
 }
 
@@ -154,7 +155,7 @@ func (s *SharedListOperations) ListTabs(opts SharedListOptions) error {
 	}
 
 	// Format and output
-	formatter := formatting.NewWithOptions(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet)
+	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, !opts.NoHyperlinks)
 	return formatter.FormatTabs(tabInfos)
 }
 
@@ -186,7 +187,7 @@ func (s *SharedListOperations) ListWindows(opts SharedListOptions) error {
 		}
 	}
 
-	formatter := formatting.NewWithOptions(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet)
+	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, !opts.NoHyperlinks)
 	return formatter.FormatClientWindows(windows)
 }
 
