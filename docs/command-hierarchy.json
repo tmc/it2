@@ -695,6 +695,11 @@
             "path": "it2 tab activate"
           },
           {
+            "name": "clear-color",
+            "short": "Clear the color of a tab",
+            "path": "it2 tab clear-color"
+          },
+          {
             "name": "clear-title",
             "short": "Clear the title of a tab",
             "path": "it2 tab clear-title"
@@ -715,6 +720,11 @@
             "path": "it2 tab current"
           },
           {
+            "name": "get-color",
+            "short": "Get the current color of a tab",
+            "path": "it2 tab get-color"
+          },
+          {
             "name": "get-info",
             "short": "Get detailed information about a tab",
             "path": "it2 tab get-info"
@@ -733,6 +743,11 @@
             "name": "reorder",
             "short": "Reorder tabs within a window",
             "path": "it2 tab reorder"
+          },
+          {
+            "name": "set-color",
+            "short": "Set the color of a tab",
+            "path": "it2 tab set-color"
           },
           {
             "name": "set-layout",
@@ -1303,6 +1318,11 @@
               "path": "it2 tab activate"
             },
             {
+              "name": "clear-color",
+              "short": "Clear the color of a tab",
+              "path": "it2 tab clear-color"
+            },
+            {
               "name": "clear-title",
               "short": "Clear the title of a tab",
               "path": "it2 tab clear-title"
@@ -1323,6 +1343,11 @@
               "path": "it2 tab current"
             },
             {
+              "name": "get-color",
+              "short": "Get the current color of a tab",
+              "path": "it2 tab get-color"
+            },
+            {
               "name": "get-info",
               "short": "Get detailed information about a tab",
               "path": "it2 tab get-info"
@@ -1341,6 +1366,11 @@
               "name": "reorder",
               "short": "Reorder tabs within a window",
               "path": "it2 tab reorder"
+            },
+            {
+              "name": "set-color",
+              "short": "Set the color of a tab",
+              "path": "it2 tab set-color"
             },
             {
               "name": "set-layout",
@@ -1958,6 +1988,6 @@
       ]
     }
   ],
-  "total_commands": 183,
-  "generated_at": "2025-10-02T05:09:18Z"
+  "total_commands": 186,
+  "generated_at": "2025-10-02T05:53:02Z"
 }

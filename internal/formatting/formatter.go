@@ -809,31 +809,28 @@ func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error
 		return nil
 	}
 
-	headers := []string{"Window", "ID", "Tabs", "Fullscreen"}
+	headers := []string{"Win", "Window ID", "Tabs", "Full"}
 	table := NewTableData(headers)
 
 	for _, window := range windows {
-		// Format window ID - keep first 16 chars for readability (pty-E20F6640-287...)
-		shortID := window.WindowID
-		if len(shortID) > 24 {
-			shortID = shortID[:21] + "..."
-		}
+		// Show full window ID without truncation
+		windowID := window.WindowID
 
 		// Apply hyperlinks to window ID if enabled
 		if f.hyperlinks {
 			url := WindowActivateURL(window.WindowID)
-			shortID = OSC8Hyperlink(url, shortID)
+			windowID = OSC8Hyperlink(url, windowID)
 		}
 
 		// Format boolean fields
-		fullscreen := "No"
+		fullscreen := "N"
 		if window.Fullscreen == "true" {
-			fullscreen = "Yes"
+			fullscreen = "Y"
 		}
 
 		row := []string{
 			fmt.Sprintf("%d", window.WindowNumber),
-			shortID,
+			windowID,
 			fmt.Sprintf("%d", window.TabCount),
 			fullscreen,
 		}
