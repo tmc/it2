@@ -20,10 +20,15 @@ func newSendKeyCommand() *cobra.Command {
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 
-Supported special keys: enter, tab, escape, backspace, delete, space, paste,
-up/down/left/right arrows, home, end, pageup/pagedown, ctrl-a thru ctrl-z,
-cmd+a thru cmd+z. Also supports caret notation (^C, ^D, etc.) for Ctrl keys.
-Supports complex modifier combinations like cmd+ctrl+shift+a.`,
+Supported special keys:
+  - Basic: enter, tab, escape, backspace, delete, space
+  - Arrow keys: up, down, left, right
+  - Navigation: home, end, pageup, pagedown
+  - Function keys: f1-f12
+  - Control keys: ctrl-a thru ctrl-z (also C-x, c-x, ^X formats)
+  - Meta/Alt keys: M-x, alt-x, meta-x (sends ESC+key)
+  - Shift combos: shift+tab, shift+up/down/left/right, shift+letter
+  - Complex modifiers: cmd+ctrl+shift+a, etc.`,
 		Example: cmdutil.Doc(`
 			# Send Enter to current session
 			$ it2 session send-key enter
@@ -39,20 +44,24 @@ Supports complex modifier combinations like cmd+ctrl+shift+a.`,
 
 			# Send Ctrl+C (all formats work)
 			$ it2 session send-key ctrl-c
-			$ it2 session send-key ctrl+c
+			$ it2 session send-key C-c
 			$ it2 session send-key ^C
 
-			# Send Ctrl+T (transpose characters)
-			$ it2 session send-key ctrl-t
-			$ it2 session send-key ^T
+			# Send function keys
+			$ it2 session send-key f5
+			$ it2 session send-key f12
 
-			# Send Cmd+V (paste)
-			$ it2 session send-key cmd+v
+			# Send Meta/Alt combinations (Emacs-style)
+			$ it2 session send-key M-x
+			$ it2 session send-key alt-w
+
+			# Send shifted arrow keys
+			$ it2 session send-key shift+up
+			$ it2 session send-key shift+tab
 
 			# Send complex modifier combinations
-			$ it2 session send-key cmd+shift+z     # Cmd+Shift+Z (redo)
-			$ it2 session send-key ctrl+opt+a      # Ctrl+Option+A
-			$ it2 session send-key cmd+ctrl+shift+v # All modifiers
+			$ it2 session send-key cmd+shift+z
+			$ it2 session send-key ctrl+alt+a
 		`),
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
