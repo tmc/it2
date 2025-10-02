@@ -192,6 +192,10 @@ func NewCommand() *cobra.Command {
 	shellIntegrationCmd.GroupID = "monitoring"
 	cmd.AddCommand(shellIntegrationCmd)
 
+	promptCmd := newPromptCommand()
+	promptCmd.GroupID = "monitoring"
+	cmd.AddCommand(promptCmd)
+
 	// Hidden/Advanced commands (no group)
 	cmd.AddCommand(newSplitsCommand())
 	cmd.AddCommand(newSplitsAliasCommand())
