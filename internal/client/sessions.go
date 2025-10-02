@@ -22,12 +22,13 @@ type SessionInfo struct {
 	GridSize        *pb.Size               // Grid size if available
 
 	// Command information from shell integration
-	CurrentCommand string // Current command from GetPrompt
-	ExitCode       uint32 // Last command exit status
-	PromptState    string // Shell prompt state (AT_COMMAND_LINE, IN_COMMAND, etc.)
-	CommandCount   int32  // Number of commands executed
-	ShellPID       int32  // Process ID of the shell
-	JobPID         int32  // Process ID of current job
+	CurrentCommand   string // Current command from GetPrompt
+	ExitCode         uint32 // Last command exit status
+	PromptState      string // Shell prompt state (AT_COMMAND_LINE, IN_COMMAND, etc.)
+	CommandCount     int32  // Number of commands executed
+	ShellPID         int32  // Process ID of the shell
+	JobPID           int32  // Process ID of current job
+	WorkingDirectory string // Current working directory from session.path
 }
 
 func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
@@ -198,6 +199,11 @@ func (c *Client) populateJobInfo(ctx context.Context, sessions []*SessionInfo) {
 			if n, parseErr := fmt.Sscanf(pidStr, "%d", &pid); parseErr == nil && n == 1 {
 				session.JobPID = pid
 			}
+		}
+
+		// Try to get working directory from session.path variable
+		if path, err := c.GetVariableWithScope(ctx, "session", session.SessionID, "path"); err == nil && path != "" {
+			session.WorkingDirectory = path
 		}
 	}
 }

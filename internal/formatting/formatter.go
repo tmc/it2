@@ -453,6 +453,9 @@ func (f *Formatter) formatText(sessions []*client.SessionInfo) error {
 		if session.TabID != "" {
 			fmt.Printf("  Tab ID: %s\n", session.TabID)
 		}
+		if session.WorkingDirectory != "" {
+			fmt.Printf("  Working Directory: %s\n", session.WorkingDirectory)
+		}
 		if session.SessionName != "" {
 			fmt.Printf("  Title: %s\n", session.SessionName)
 		}
@@ -475,7 +478,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	}
 
 	// Determine columns to include - put long fields at end as requested
-	headers := []string{"ID", "Parent", "PID", "State", "Window", "Tab", "Title", "Command"}
+	headers := []string{"ID", "Parent", "PID", "State", "Window", "Tab", "Path", "Title", "Command"}
 
 	// Check if any sessions have plugin data to determine additional columns
 	pluginColumns := make(map[string]bool)
@@ -566,6 +569,12 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			command = command[:77] + "..."
 		}
 
+		// Truncate working directory - show last 40 chars for readability
+		workingDir := session.WorkingDirectory
+		if len(workingDir) > 40 {
+			workingDir = "..." + workingDir[len(workingDir)-37:]
+		}
+
 		// Apply hyperlinks to ShortID if enabled (display ShortID, link to full ID)
 		shortID := session.ShortID
 		if f.hyperlinks {
@@ -580,6 +589,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			state,
 			fmt.Sprintf("%d", session.WindowNumber),
 			session.TabID,
+			workingDir,
 			title,
 			command,
 		}
