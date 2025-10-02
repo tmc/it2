@@ -516,23 +516,29 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 		case "FILE_TRANSFER":
 			state = "+ XFER"
 		case "UNKNOWN":
-			state = "- IDLE"
+			state = "IDLE"
 		default:
 			if session.ExitCode != 0 {
 				state = "✗ ERROR"
 			} else {
-				state = "- IDLE"
+				state = "IDLE"
 			}
 		}
 
-		// Format parent ID - use short form (last 8 chars)
+		// Format parent ID - use short form (first 8 chars) with hyperlink
 		parentDisplay := ""
 		if session.ParentSessionID != "" {
-			// Extract last 8 characters for short ID
-			if len(session.ParentSessionID) >= 8 {
-				parentDisplay = session.ParentSessionID[len(session.ParentSessionID)-8:]
+			// Extract first 8 characters for short ID (consistent with session ShortID)
+			shortParentID := session.ParentSessionID
+			if len(shortParentID) > 8 {
+				shortParentID = shortParentID[:8]
+			}
+			// Apply hyperlink if enabled
+			if f.hyperlinks {
+				url := SessionActivateURL(session.ParentSessionID)
+				parentDisplay = OSC8Hyperlink(url, shortParentID)
 			} else {
-				parentDisplay = session.ParentSessionID
+				parentDisplay = shortParentID
 			}
 		}
 
