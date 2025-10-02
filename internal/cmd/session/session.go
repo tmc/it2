@@ -52,6 +52,10 @@ func NewCommand() *cobra.Command {
 	activateCmd.GroupID = "management"
 	cmd.AddCommand(activateCmd)
 
+	focusCmd := newFocusCommand()
+	focusCmd.GroupID = "management"
+	cmd.AddCommand(focusCmd)
+
 	restartCmd := newRestartCommand()
 	restartCmd.GroupID = "management"
 	cmd.AddCommand(restartCmd)
