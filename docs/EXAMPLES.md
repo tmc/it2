@@ -27,11 +27,17 @@ it2 session current
 # Send text to current session
 it2 session send-text "echo 'Hello from it2!'"
 
-# Send text to specific session
+# Send text to specific session (supports partial IDs)
+it2 session send-text 85F9 "ls -la"
+
+# Send text with full UUID (still works)
 it2 session send-text "85F9DD0D-1A75-4793-861D-8F5C62166AB7" "ls -la"
 
 # Send complex commands with quotes
 it2 session send-text 'find . -name "*.go" | head -5'
+
+# Send with template wrapping for structured messages
+it2 session send-text --template '<msg from="{{.ShortID}}">{{.Content}}</msg>' "status update"
 ```
 
 ## Tab and Window Management
@@ -206,13 +212,19 @@ it2 prompt search "git commit"
 it2 prompt get
 ```
 
-### Job monitoring
+### Job monitoring and shell state
 ```bash
 # List running jobs in session
 it2 job list
 
 # Monitor job changes
 it2 job monitor
+
+# Check if shell is ready for commands
+it2 shell state
+
+# Wait for shell to be ready before automation
+it2 shell wait-for-prompt && it2 session send-text "make deploy"
 ```
 
 ## Real-time Monitoring
@@ -462,7 +474,14 @@ export ITERM2_URL="ws://localhost:1912"
 
 ### Session cleanup
 ```bash
-# Find and close idle sessions
+# Find and close idle sessions (using quiet mode)
+it2 session list -q | \
+  while read session_id; do
+    # Use partial ID matching for convenience
+    it2 session close "$session_id"
+  done
+
+# Or with JSON filtering
 it2 session list --format json | \
   jq -r '.[] | select(.name | contains("idle")) | .id' | \
   while read session_id; do

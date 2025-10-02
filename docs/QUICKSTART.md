@@ -24,11 +24,17 @@ it2 auth request
 # See all your terminal sessions
 it2 session list
 
+# List only session IDs (quiet mode for scripting)
+it2 session list -q
+
 # Get your current session ID
 it2 session current
 
 # Send a command to current session
 it2 session send-text "echo 'Hello from it2!'"
+
+# Send to specific session using partial ID (4+ chars)
+it2 session send-text 7AA9 "echo 'Using short ID!'"
 ```
 
 ## Essential Commands
@@ -134,7 +140,7 @@ LOG_PANE=$(it2 session list --format json | jq -r '.[-1].id')
 it2 session send-text "$LOG_PANE" "tail -f /var/log/app.log"
 ```
 
-### 4. Command History Analysis
+### 4. Command History and Shell State Analysis
 ```bash
 # Show recent commands with exit codes (requires Shell Integration)
 it2 prompt list
@@ -144,6 +150,12 @@ it2 prompt search "git"
 
 # Find failed commands
 it2 prompt list | grep "Exit: [^0]"
+
+# Check if shell is ready for input (requires Shell Integration)
+it2 shell state
+
+# Wait for shell to be ready before sending commands
+it2 shell wait-for-prompt && it2 session send-text "make build"
 ```
 
 ## Output Formats
@@ -174,8 +186,14 @@ CURRENT=$(it2 session current)
 # Last created session
 LAST=$(it2 session list --format json | jq -r '.[-1].id')
 
-# All session IDs
+# All session IDs (using quiet mode)
+SESSIONS=($(it2 session list -q))
+
+# Or using JSON format
 SESSIONS=($(it2 session list --format json | jq -r '.[].id'))
+
+# Use partial IDs (4+ chars) instead of full UUIDs
+it2 session send-text 7AA9 "echo 'Much easier!'"
 ```
 
 ### Conditional operations
@@ -199,9 +217,11 @@ fi
 ### Shell Integration Features
 Requires iTerm2 Shell Integration to be installed:
 ```bash
-it2 prompt list      # Command history
-it2 job list         # Running processes
-it2 variable get     # iTerm2 variables
+it2 prompt list              # Command history
+it2 job list                 # Running processes
+it2 shell state              # Check if shell is ready/busy/tui
+it2 shell wait-for-prompt    # Wait until shell is ready
+it2 variable get             # iTerm2 variables
 ```
 
 ### Real-time Monitoring
