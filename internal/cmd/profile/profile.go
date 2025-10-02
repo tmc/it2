@@ -75,9 +75,9 @@ func NewCommand() *cobra.Command {
 	clearBadgeCmd.GroupID = "property"
 	cmd.AddCommand(clearBadgeCmd)
 
-	enableShellIntegrationCmd := newEnableShellIntegrationCommand()
-	enableShellIntegrationCmd.GroupID = "property"
-	cmd.AddCommand(enableShellIntegrationCmd)
+	shellIntegrationCmd := newShellIntegrationCommand()
+	shellIntegrationCmd.GroupID = "property"
+	cmd.AddCommand(shellIntegrationCmd)
 
 	// Import/Export Commands
 	exportCmd := newExportCommand()
