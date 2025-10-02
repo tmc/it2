@@ -90,27 +90,31 @@ REQUIREMENTS:
   • iTerm2 version 3.3.0 or later
   • Python API enabled in iTerm2 preferences
   • macOS (iTerm2 is macOS-only)`,
-	Example: `  # Session Management
+	Example: `  # Core Operations
 
   it2 session list
   it2 session list --scope=tab
-  it2 session current
   it2 session split --horizontal
-
-  # Interaction
-
-  it2 session send-text sess_abc123 "echo hello"
-  it2 session send-key sess_abc123 enter
-
-  # Tab & Window Control
-
   it2 tab create "Default"
   it2 window list
 
-  # Shell Integration
+  # Content & Text
+
+  it2 text get-buffer sess_abc123
+  it2 badge set "PROD"
+  it2 selection copy
+
+  # Configuration
+
+  it2 profile list
+  it2 variable get session sess_abc123 user.environment
+  it2 color list
+
+  # Monitoring
 
   it2 prompt list
-  it2 prompt search "git commit"`,
+  it2 prompt search "git commit"
+  it2 notification monitor --type keystroke`,
 }
 
 // newCompletionCommand creates the completion command
