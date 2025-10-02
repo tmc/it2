@@ -23,6 +23,17 @@ that parent session ID.
 
 If no session ID is provided, uses the current session from ITERM_SESSION_ID.
 If the session has no parent (e.g., it's the original session in a tab), no output is returned.`,
+		Example: `  # Get parent of current session
+  it2 session parent
+
+  # Get parent of specific session
+  it2 session parent sess_abc123
+
+  # Use in scripts to navigate session hierarchy
+  PARENT=$(it2 session parent -q)
+  if [ -n "$PARENT" ]; then
+    it2 session focus "$PARENT"
+  fi`,
 		Args: cobra.RangeArgs(0, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID string

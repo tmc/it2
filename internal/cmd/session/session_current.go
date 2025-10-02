@@ -14,7 +14,13 @@ func newCurrentCommand() *cobra.Command {
 		Use:   "current",
 		Short: "Show the current session ID",
 		Long:  "Display the ID of the current iTerm2 session from ITERM_SESSION_ID environment variable",
-		Args:  cobra.NoArgs,
+		Example: `  # Get current session ID
+  it2 session current
+
+  # Use in scripts
+  SESSION=$(it2 session current)
+  it2 session title set "$SESSION" "My Title"`,
+		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionID := os.Getenv("ITERM_SESSION_ID")
 			if sessionID == "" {

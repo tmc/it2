@@ -18,8 +18,13 @@ func newSelectCommand() *cobra.Command {
 Coordinates are 0-based with (0,0) at the top-left corner of the terminal.
 You can then use 'it2 session copy' to copy the selected text.
 
-Examples:
-  # Select text from column 5 to 15 on line 10
+Selection modes:
+  --mode character  - Select by character (default)
+  --mode word       - Select by word boundaries
+  --mode line       - Select by whole lines
+  --mode smart      - Smart selection
+  --mode box        - Box/rectangular selection`,
+		Example: `  # Select text from column 5 to 15 on line 10
   it2 session select session123 5 10 15 10
 
   # Select multiple lines (from line 5 col 0 to line 8 col 20)
@@ -27,15 +32,8 @@ Examples:
 
   # Select and copy workflow:
   it2 session select session123 10 5 20 5  # Select text
-  it2 session copy session123              # Copy to clipboard
-
-Selection modes:
-  --mode character  - Select by character (default)
-  --mode word       - Select by word boundaries
-  --mode line       - Select by whole lines
-  --mode smart      - Smart selection
-  --mode box        - Box/rectangular selection`,
-		Args:            cobra.ExactArgs(5),
+  it2 session copy session123              # Copy to clipboard`,
+		Args: cobra.ExactArgs(5),
 		RequiresClient:  true,
 		RequiresSession: true,
 		SupportsFormat:  true,
