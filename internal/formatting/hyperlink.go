@@ -71,22 +71,22 @@ func OSC8Hyperlink(url, text string) string {
 	return fmt.Sprintf("\x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\", url, text)
 }
 
-// SessionActivateURL generates an iterm2:// URL for activating a session.
-// Format: iterm2://session/activate/<session-id>
+// SessionActivateURL generates an it2:// URL for activating a session.
+// Format: it2://session/activate/<session-id>
 func SessionActivateURL(sessionID string) string {
-	return fmt.Sprintf("iterm2://session/activate/%s", sessionID)
+	return fmt.Sprintf("it2://session/activate/%s", sessionID)
 }
 
-// TabActivateURL generates an iterm2:// URL for activating a tab.
-// Format: iterm2://tab/activate/<tab-id>
+// TabActivateURL generates an it2:// URL for activating a tab.
+// Format: it2://tab/activate/<tab-id>
 func TabActivateURL(tabID string) string {
-	return fmt.Sprintf("iterm2://tab/activate/%s", tabID)
+	return fmt.Sprintf("it2://tab/activate/%s", tabID)
 }
 
-// WindowActivateURL generates an iterm2:// URL for activating a window.
-// Format: iterm2://window/activate/<window-id>
+// WindowActivateURL generates an it2:// URL for activating a window.
+// Format: it2://window/activate/<window-id>
 func WindowActivateURL(windowID string) string {
-	return fmt.Sprintf("iterm2://window/activate/%s", windowID)
+	return fmt.Sprintf("it2://window/activate/%s", windowID)
 }
 
 // MakeSessionIDHyperlink creates a clickable session ID hyperlink.

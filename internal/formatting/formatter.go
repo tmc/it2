@@ -29,8 +29,8 @@ func New(format string) *Formatter {
 
 // NewWithOptions creates a new formatter with column and sort options
 func NewWithOptions(format string, columns []string, sortBy string, sortReverse bool, quiet bool) *Formatter {
-	// Auto-detect OSC 8 support by default
-	return NewWithHyperlinks(format, columns, sortBy, sortReverse, quiet, SupportsOSC8())
+	// Disable hyperlinks by default to avoid conflicts with user's Semantic History
+	return NewWithHyperlinks(format, columns, sortBy, sortReverse, quiet, false)
 }
 
 // NewWithHyperlinks creates a new formatter with full options including hyperlinks
