@@ -57,18 +57,10 @@ func NewCommand() *cobra.Command {
 	deleteCmd.GroupID = "lifecycle"
 	cmd.AddCommand(deleteCmd)
 
-	// Property Commands
-	getPropertyCmd := newGetPropertyCommand()
-	getPropertyCmd.GroupID = "property"
-	cmd.AddCommand(getPropertyCmd)
-
-	setPropertyCmd := newSetPropertyCommand()
-	setPropertyCmd.GroupID = "property"
-	cmd.AddCommand(setPropertyCmd)
-
-	setCmd := newSetCommand()
-	setCmd.GroupID = "property"
-	cmd.AddCommand(setCmd)
+	// Property Commands - new grouped structure
+	propertyCmd := newPropertyCommand()
+	propertyCmd.GroupID = "property"
+	cmd.AddCommand(propertyCmd)
 
 	// Badge shortcuts
 	getBadgeCmd := newGetBadgeCommand()
@@ -93,6 +85,18 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(importCmd)
 
 	// Hidden/deprecated commands - kept for backwards compatibility but not shown in help
+	getPropertyCmd := newGetPropertyCommand()
+	getPropertyCmd.Hidden = true
+	cmd.AddCommand(getPropertyCmd)
+
+	setPropertyCmd := newSetPropertyCommand()
+	setPropertyCmd.Hidden = true
+	cmd.AddCommand(setPropertyCmd)
+
+	setCmd := newSetCommand()
+	setCmd.Hidden = true
+	cmd.AddCommand(setCmd)
+
 	bulkUpdateCmd := newBulkUpdateCommand()
 	bulkUpdateCmd.Hidden = true
 	cmd.AddCommand(bulkUpdateCmd)
