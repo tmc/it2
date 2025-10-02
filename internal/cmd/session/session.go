@@ -78,28 +78,37 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(parentCmd)
 
 	// Display & Appearance Commands
+	titleCmd := NewTitleCommand()
+	titleCmd.GroupID = "display"
+	cmd.AddCommand(titleCmd)
+
+	badgeCmd := NewBadgeCommand()
+	badgeCmd.GroupID = "display"
+	cmd.AddCommand(badgeCmd)
+
+	// Keep old flat commands hidden for backwards compatibility
 	getTitleCmd := newGetTitleCommand()
-	getTitleCmd.GroupID = "display"
+	getTitleCmd.Hidden = true
 	cmd.AddCommand(getTitleCmd)
 
 	setTitleCmd := newSetTitleCommand()
-	setTitleCmd.GroupID = "display"
+	setTitleCmd.Hidden = true
 	cmd.AddCommand(setTitleCmd)
 
 	clearTitleCmd := newClearTitleCommand()
-	clearTitleCmd.GroupID = "display"
+	clearTitleCmd.Hidden = true
 	cmd.AddCommand(clearTitleCmd)
 
 	getBadgeCmd := newGetBadgeCommand()
-	getBadgeCmd.GroupID = "display"
+	getBadgeCmd.Hidden = true
 	cmd.AddCommand(getBadgeCmd)
 
 	setBadgeCmd := newSetBadgeCommand()
-	setBadgeCmd.GroupID = "display"
+	setBadgeCmd.Hidden = true
 	cmd.AddCommand(setBadgeCmd)
 
 	clearBadgeCmd := newClearBadgeCommand()
-	clearBadgeCmd.GroupID = "display"
+	clearBadgeCmd.Hidden = true
 	cmd.AddCommand(clearBadgeCmd)
 
 	// Interaction Commands
