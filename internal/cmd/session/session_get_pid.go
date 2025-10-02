@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
 )
@@ -32,7 +32,7 @@ This command attempts to extract the PID from shell integration or by running co
 			if timeout == 0 {
 				timeout = 5 * time.Second
 			}
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)

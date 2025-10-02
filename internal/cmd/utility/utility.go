@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
@@ -57,12 +58,12 @@ func newCursorGuideShowCommand() *cobra.Command {
 				sessionID = args[0]
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -99,12 +100,12 @@ func newCursorGuideHideCommand() *cobra.Command {
 				sessionID = args[0]
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -141,12 +142,12 @@ func newCursorGuideToggleCommand() *cobra.Command {
 				sessionID = args[0]
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -197,12 +198,12 @@ func newTimestampShowCommand() *cobra.Command {
 				sessionID = args[0]
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -251,12 +252,12 @@ func newTimestampHideCommand() *cobra.Command {
 				sessionID = args[0]
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -305,12 +306,12 @@ func newTimestampToggleCommand() *cobra.Command {
 				sessionID = args[0]
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -727,12 +728,12 @@ func newPasswordManagerGetCommand() *cobra.Command {
 			account := args[0]
 			service, _ := cmd.Flags().GetString("service")
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -781,12 +782,12 @@ func newPasswordManagerSetCommand() *cobra.Command {
 			password := args[1]
 			service, _ := cmd.Flags().GetString("service")
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -852,12 +853,12 @@ func newSSHConnectCommand() *cobra.Command {
 				sessionID = "active"
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -918,12 +919,12 @@ func newSSHKeyListCommand() *cobra.Command {
 				sessionID = "active"
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -957,12 +958,12 @@ func newSSHKeyAddCommand() *cobra.Command {
 				sessionID = "active"
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -1010,12 +1011,12 @@ func newBadgeSetCommand() *cobra.Command {
 				sessionID = args[1]
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -1064,12 +1065,12 @@ func newBadgeClearCommand() *cobra.Command {
 				sessionID = args[0]
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -1129,12 +1130,12 @@ func newTouchBarSetCommand() *cobra.Command {
 			label := args[0]
 			command := args[1]
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -1172,12 +1173,12 @@ func newTouchBarClearCommand() *cobra.Command {
 		Use:   "clear",
 		Short: "Clear TouchBar customizations",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

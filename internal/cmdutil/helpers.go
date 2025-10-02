@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/tmc/it2/internal/auth"
+	"github.com/tmc/it2/internal/cmderr"
 )
 
 // ParseColumnList parses a comma-separated list of columns
@@ -117,13 +118,13 @@ func ParseResourceReference(ref string) (resourceType, id string, err error) {
 		}
 
 		if !valid {
-			return "", "", NewValidationError("resource_type", fmt.Sprintf("invalid type: %s", resourceType))
+			return "", "", cmderr.NewValidationError("resource_type", fmt.Sprintf("invalid type: %s", resourceType))
 		}
 
 		return resourceType, id, nil
 	}
 
-	return "", "", NewValidationError("resource_reference", "invalid format")
+	return "", "", cmderr.NewValidationError("resource_reference", "invalid format")
 }
 
 // ParseHexData is deprecated. Use validate.HexData instead.

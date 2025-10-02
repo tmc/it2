@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/formatting"
 )
 
@@ -37,11 +37,11 @@ func newRegisterRPCCommand() *cobra.Command {
 }
 
 func runRegisterRPCCommand(cmd *cobra.Command, args []string) error {
-	_, timeout, format := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, format := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -73,11 +73,11 @@ func newUnregisterRPCCommand() *cobra.Command {
 }
 
 func runUnregisterRPCCommand(cmd *cobra.Command, args []string) error {
-	_, timeout, format := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, format := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -109,11 +109,11 @@ func newMonitorCommand() *cobra.Command {
 }
 
 func runMonitorCommand(cmd *cobra.Command, args []string) error {
-	_, timeout, format := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, format := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/formatting"
 )
 
@@ -43,12 +43,12 @@ func newExportCommand() *cobra.Command {
 			_, _ = cmd.Flags().GetString("format") // Unused but kept for future use
 			pretty, _ := cmd.Flags().GetBool("pretty")
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -135,12 +135,12 @@ func newImportCommand() *cobra.Command {
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
 			backup, _ := cmd.Flags().GetBool("backup")
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -216,12 +216,12 @@ func newResetCommand() *cobra.Command {
 				return fmt.Errorf("must specify preference keys to reset, use --all to reset everything, or --force to bypass confirmation")
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -403,12 +403,12 @@ func newGetCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			key := args[0]
 
-			_, timeout, format := cmdutil.GetFlags(cmd)
+			_, timeout, format := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -452,12 +452,12 @@ func newSetCommand() *cobra.Command {
 			key := args[0]
 			value := args[1]
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

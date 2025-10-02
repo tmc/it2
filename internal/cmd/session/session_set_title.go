@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newSetTitleCommand() *cobra.Command {
@@ -21,7 +22,7 @@ func newSetTitleCommand() *cobra.Command {
 			if len(args) == 2 {
 				titleIdx = 1
 			}
-			if err := cmdutil.ValidateNonEmpty(args[titleIdx], "title"); err != nil {
+			if err := validate.NonEmpty(args[titleIdx], "title"); err != nil {
 				return err
 			}
 			return nil

@@ -2,6 +2,7 @@ package text
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
@@ -34,10 +35,10 @@ func newGetContentsCommand() *cobra.Command {
 
 			// Validate parameters
 			if firstLine < 0 {
-				return cmdutil.NewValidationError("first-line", "must be >= 0")
+				return cmderr.NewValidationError("first-line", "must be >= 0")
 			}
 			if numLines <= 0 {
-				return cmdutil.NewValidationError("num-lines", "must be > 0")
+				return cmderr.NewValidationError("num-lines", "must be > 0")
 			}
 
 			// Get contents from the specified range

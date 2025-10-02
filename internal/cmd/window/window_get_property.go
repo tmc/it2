@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
 )
@@ -21,8 +21,8 @@ func newGetPropertyCommand() *cobra.Command {
 			windowID := args[0]
 			property := args[1]
 
-			_, timeout, format := cmdutil.GetFlags(cmd)
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			_, timeout, format := cmdcore.GetFlags(cmd)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)

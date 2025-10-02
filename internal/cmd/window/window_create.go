@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
@@ -36,8 +37,8 @@ func newCreateCommand() *cobra.Command {
 				profile = args[0]
 			}
 
-			_, timeout, format := cmdutil.GetFlags(cmd)
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			_, timeout, format := cmdcore.GetFlags(cmd)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)

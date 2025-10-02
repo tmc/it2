@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 )
@@ -43,7 +44,7 @@ Selection modes:
 			// Validate coordinates
 			for i := 1; i < 5; i++ {
 				if _, err := strconv.ParseInt(args[i], 10, 32); err != nil {
-					return cmdutil.NewValidationError([]string{"start-x", "start-y", "end-x", "end-y"}[i-1], "must be a valid integer")
+					return cmderr.NewValidationError([]string{"start-x", "start-y", "end-x", "end-y"}[i-1], "must be a valid integer")
 				}
 			}
 			return nil
@@ -65,7 +66,7 @@ Selection modes:
 
 			// Validate coordinates are non-negative
 			if startX < 0 || startY < 0 || endX < 0 || endY < 0 {
-				return cmdutil.NewValidationError("coordinates", "must be non-negative")
+				return cmderr.NewValidationError("coordinates", "must be non-negative")
 			}
 
 			// Get selection mode

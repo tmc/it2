@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
@@ -159,7 +160,7 @@ Examples:
 			}
 
 			if !found {
-				return cmdutil.NewNotFoundError("annotation", annotationID)
+				return cmderr.NewNotFoundError("annotation", annotationID)
 			}
 
 			// Save back to session

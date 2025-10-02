@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newCloseCommand() *cobra.Command {
@@ -32,14 +33,14 @@ func newCloseCommand() *cobra.Command {
 			    [[ "$tid" != "$(it2 tab current)" ]] && it2 tab close --force $tid
 			  done
 		`),
-		Args: cobra.MinimumNArgs(1),
+		Args:           cobra.MinimumNArgs(1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.TabIDCompletion,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			// Validate all tab IDs
 			for _, tabID := range args {
-				if err := cmdutil.ValidateTabID(tabID); err != nil {
+				if err := validate.TabID(tabID); err != nil {
 					return err
 				}
 			}

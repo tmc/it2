@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
@@ -56,11 +57,11 @@ The exit code can be used in scripts for conditional execution.`,
 				sessionID = args[0]
 			}
 
-			_, timeout, format := cmdutil.GetFlags(cmd)
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			_, timeout, format := cmdcore.GetFlags(cmd)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -94,10 +95,10 @@ The exit code can be used in scripts for conditional execution.`,
 			// Output based on format
 			if format == "json" {
 				return formatting.PrintJSON(map[string]interface{}{
-					"state":                  state,
-					"has_shell_integration":  hasShellIntegration,
-					"session_id":             sessionID,
-					"exit_code":              exitCode,
+					"state":                 state,
+					"has_shell_integration": hasShellIntegration,
+					"session_id":            sessionID,
+					"exit_code":             exitCode,
 				})
 			}
 

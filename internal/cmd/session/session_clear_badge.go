@@ -18,10 +18,10 @@ By default, clears the badge to empty string. Use --use-profile to copy the prof
 
 Note: Due to an iTerm2 API limitation, this creates a session override rather than removing it.
 To truly remove the override (requires iTerm2 fix), the validation order needs to be corrected.`,
-		Args:          cobra.RangeArgs(0, 1),
+		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,
 		SupportsFormat: true,
-		ValidArgsFunc: completion.SessionIDCompletion,
+		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			sessionID := ""
 			if len(args) > 0 {

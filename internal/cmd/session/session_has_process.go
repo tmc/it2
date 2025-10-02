@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/cmdcore"
 )
 
 func newHasProcessCommand() *cobra.Command {
@@ -46,10 +46,10 @@ Examples:
 			verbose, _ := cmd.Flags().GetBool("verbose")
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

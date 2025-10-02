@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/plugins"
@@ -355,10 +356,10 @@ Multiple conditions can be specified and all must pass.`,
 				timeout = 60 * time.Second
 			}
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -425,7 +426,7 @@ Multiple conditions can be specified and all must pass.`,
 				}
 
 				// Create a context with the specified timeout
-				ctx, cancel := cmdutil.CreateContext(requireTimeout)
+				ctx, cancel := cmdcore.CreateContext(requireTimeout)
 				defer cancel()
 
 				// Wait for the condition to be met

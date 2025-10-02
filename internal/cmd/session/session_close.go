@@ -27,7 +27,7 @@ func newCloseCommand() *cobra.Command {
 			# Close all sessions in window
 			$ IT2_SCOPE=window it2 session close $(it2 session list --format id)
 		`),
-		Args: cobra.ExactArgs(1),
+		Args:            cobra.ExactArgs(1),
 		RequiresClient:  true,
 		RequiresSession: true,
 		SupportsFormat:  true,

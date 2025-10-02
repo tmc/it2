@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/formatting"
 )
 
@@ -48,11 +48,11 @@ func runGetCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	getText, _ := cmd.Flags().GetBool("text")
-	_, timeout, format := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, format := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -185,11 +185,11 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("must specify coordinates using --range, --start/--end, or individual coordinate flags")
 	}
 
-	_, timeout, _ := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, _ := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -219,11 +219,11 @@ func runClearCommand(cmd *cobra.Command, args []string) error {
 		sessionID = client.NormalizeSessionID(args[0])
 	}
 
-	_, timeout, _ := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, _ := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

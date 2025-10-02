@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newInjectCommand() *cobra.Command {
@@ -30,7 +31,7 @@ func newInjectCommand() *cobra.Command {
 			# Inject with JSON output
 			$ it2 text inject --format json abc123 "test"
 		`),
-		Args: cobra.ExactArgs(2),
+		Args:            cobra.ExactArgs(2),
 		RequiresClient:  true,
 		RequiresSession: true,
 		SupportsFormat:  true,
@@ -46,7 +47,7 @@ func newInjectCommand() *cobra.Command {
 
 			if isHex {
 				// Decode hex string to bytes
-				data, err = cmdutil.ParseHexData(dataStr)
+				data, err = validate.HexData(dataStr)
 				if err != nil {
 					return err
 				}

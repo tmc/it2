@@ -13,7 +13,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
 )
@@ -82,7 +82,7 @@ func runMonitorCommand(cmd *cobra.Command, args []string) error {
 		cancel()
 	}()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

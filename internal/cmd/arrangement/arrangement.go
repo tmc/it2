@@ -6,6 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
@@ -64,11 +65,11 @@ func runSaveCommand(cmd *cobra.Command, args []string) error {
 	name := args[0]
 	windowID, _ := cmd.Flags().GetString("window")
 
-	_, timeout, _ := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, _ := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -122,11 +123,11 @@ func newRestoreCommand() *cobra.Command {
 func runRestoreCommand(cmd *cobra.Command, args []string) error {
 	name := args[0]
 
-	_, timeout, _ := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, _ := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -162,11 +163,11 @@ func newListCommand() *cobra.Command {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) error {
-	_, timeout, format := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, format := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -241,11 +242,11 @@ func runExportCommand(cmd *cobra.Command, args []string) error {
 	name := args[0]
 	filename := args[1]
 
-	_, timeout, _ := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, _ := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

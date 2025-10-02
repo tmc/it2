@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	pb "github.com/tmc/it2/proto"
 )
@@ -54,7 +55,7 @@ Use this command to ensure reliable command sequencing in automation scripts.`,
 				sessionID = args[0]
 			}
 
-			_, cmdTimeout, _ := cmdutil.GetFlags(cmd)
+			_, cmdTimeout, _ := cmdcore.GetFlags(cmd)
 			waitTimeout, _ := cmd.Flags().GetDuration("timeout")
 			quiet, _ := cmd.Flags().GetBool("quiet")
 
@@ -68,8 +69,8 @@ Use this command to ensure reliable command sequencing in automation scripts.`,
 			defer cancel()
 
 			// Use shorter timeout for connection
-			connectCtx, connectCancel := cmdutil.CreateContext(cmdTimeout)
-			c, err := cmdutil.ConnectClient(connectCtx)
+			connectCtx, connectCancel := cmdcore.CreateContext(cmdTimeout)
+			c, err := cmdcore.ConnectClient(connectCtx)
 			connectCancel()
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)

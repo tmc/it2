@@ -7,6 +7,7 @@ import (
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/validate"
 	pb "github.com/tmc/it2/proto"
 )
 
@@ -78,7 +79,7 @@ When a session-id is provided, splits that session to create a new session.`,
 func createSessionByNewTab(sc *cmdutil.StandardCommand, profile, windowID, command string) error {
 	// Validate window exists if provided
 	if windowID != "" {
-		if err := cmdutil.ValidateWindowExists(sc.GetContext(), sc.GetClient(), windowID); err != nil {
+		if err := validate.WindowExists(sc.GetContext(), sc.GetClient(), windowID); err != nil {
 			return err
 		}
 	}
@@ -102,7 +103,7 @@ func createSessionByNewTab(sc *cmdutil.StandardCommand, profile, windowID, comma
 
 func createSessionBySplit(sc *cmdutil.StandardCommand, sessionID, profile, splitDirection string) error {
 	// Validate session exists
-	if err := cmdutil.ValidateSessionExists(sc.GetContext(), sc.GetClient(), sessionID); err != nil {
+	if err := validate.SessionExists(sc.GetContext(), sc.GetClient(), sessionID); err != nil {
 		return err
 	}
 

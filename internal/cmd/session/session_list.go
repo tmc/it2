@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 )
@@ -33,11 +34,11 @@ func newListCommand() *cobra.Command {
 			$ it2 session list --format json > sessions-backup.json
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, timeout, format, columns, sortBy, sortReverse := cmdutil.GetExtendedFlags(cmd)
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			_, timeout, format, columns, sortBy, sortReverse := cmdcore.GetExtendedFlags(cmd)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

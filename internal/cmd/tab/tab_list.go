@@ -6,6 +6,7 @@ import (
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newListCommand() *cobra.Command {
@@ -30,7 +31,7 @@ Examples:
 			if len(args) > 0 {
 				windowID = args[0]
 				// Validate window exists if specified
-				if err := cmdutil.ValidateWindowID(windowID); err != nil {
+				if err := validate.WindowID(windowID); err != nil {
 					return err
 				}
 			}

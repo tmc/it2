@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdcore"
 )
 
 func TestGetFlags_Defaults(t *testing.T) {
@@ -14,7 +15,7 @@ func TestGetFlags_Defaults(t *testing.T) {
 	cmd.Flags().Duration("timeout", 0, "")
 	cmd.Flags().String("format", "", "")
 
-	wsURL, timeout, format := GetFlags(cmd)
+	wsURL, timeout, format := cmdcore.GetFlags(cmd)
 
 	if wsURL != "ws://localhost:1912" {
 		t.Errorf("Expected default wsURL to be 'ws://localhost:1912', got '%s'", wsURL)
@@ -33,7 +34,7 @@ func TestGetFlags_CustomValues(t *testing.T) {
 	cmd.Flags().Duration("timeout", 10*time.Second, "")
 	cmd.Flags().String("format", "json", "")
 
-	wsURL, timeout, format := GetFlags(cmd)
+	wsURL, timeout, format := cmdcore.GetFlags(cmd)
 
 	if wsURL != "ws://example.com:1234" {
 		t.Errorf("Expected wsURL to be 'ws://example.com:1234', got '%s'", wsURL)
@@ -55,7 +56,7 @@ func TestGetExtendedFlags_WithColumns(t *testing.T) {
 	cmd.Flags().String("sort", "Session ID", "")
 	cmd.Flags().Bool("reverse", true, "")
 
-	wsURL, timeout, format, columns, sortBy, sortReverse := GetExtendedFlags(cmd)
+	wsURL, timeout, format, columns, sortBy, sortReverse := cmdcore.GetExtendedFlags(cmd)
 
 	expectedColumns := []string{"session id", "window id", "name"}
 	if !reflect.DeepEqual(columns, expectedColumns) {
@@ -86,7 +87,7 @@ func TestGetExtendedFlags_WithSpacedColumns(t *testing.T) {
 	cmd.Flags().String("format", "", "")
 	cmd.Flags().String("columns", " session id , window id , name ", "")
 
-	_, _, _, columns, _, _ := GetExtendedFlags(cmd)
+	_, _, _, columns, _, _ := cmdcore.GetExtendedFlags(cmd)
 
 	expectedColumns := []string{"session id", "window id", "name"}
 	if !reflect.DeepEqual(columns, expectedColumns) {

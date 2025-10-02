@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/cmdcore"
 	pb "github.com/tmc/it2/proto"
 )
 
@@ -95,7 +95,7 @@ Examples:
 		RunE: func(cmd *cobra.Command, args []string) error {
 			eventType := args[0]
 			sessionID, _ := cmd.Flags().GetString("session")
-			_, _, format := cmdutil.GetFlags(cmd)
+			_, _, format := cmdcore.GetFlags(cmd)
 
 			// Validate event type
 			var eventID int32 = -1
@@ -120,7 +120,7 @@ Examples:
 				cancel()
 			}()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -182,7 +182,7 @@ Examples:
   # List with JSON output
   it2 event list --format json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, _, format := cmdutil.GetFlags(cmd)
+			_, _, format := cmdcore.GetFlags(cmd)
 
 			// Format output
 			switch format {
@@ -227,7 +227,7 @@ Examples:
   # Show last 20 events
   it2 event log --limit 20`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, _, format := cmdutil.GetFlags(cmd)
+			_, _, format := cmdcore.GetFlags(cmd)
 			limit, _ := cmd.Flags().GetInt("limit")
 
 			// This is a placeholder - in a real implementation you would

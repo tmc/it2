@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/cmdcore"
 	pb "github.com/tmc/it2/proto"
 )
 
@@ -59,7 +59,7 @@ Examples:
   # Monitor with JSON output
   it2 focus monitor --format json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, _, format := cmdutil.GetFlags(cmd)
+			_, _, format := cmdcore.GetFlags(cmd)
 
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -72,7 +72,7 @@ Examples:
 				cancel()
 			}()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -141,12 +141,12 @@ Examples:
   # Get with JSON output
   it2 focus get --format json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, timeout, format := cmdutil.GetFlags(cmd)
+			_, timeout, format := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -230,12 +230,12 @@ Examples:
 				return fmt.Errorf("can only specify one of --window, --tab, or --session")
 			}
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -293,7 +293,7 @@ Examples:
   # Show last 10 events
   it2 focus history --limit 10`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, _, format := cmdutil.GetFlags(cmd)
+			_, _, format := cmdcore.GetFlags(cmd)
 			limit, _ := cmd.Flags().GetInt("limit")
 
 			if len(focusHistory) == 0 {

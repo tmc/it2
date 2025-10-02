@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 )
@@ -288,11 +289,11 @@ func handleTabSplit(cmd *cobra.Command, windowID, tabID string, splitArgs []stri
 
 // executeListTabs executes tab listing for a specific window
 func executeListTabs(cmd *cobra.Command, windowID string) error {
-	_, timeout, format := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, format := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -314,11 +315,11 @@ func executeListTabs(cmd *cobra.Command, windowID string) error {
 
 // executeListSessions executes session listing with optional window/tab filtering
 func executeListSessions(cmd *cobra.Command, windowID, tabID string) error {
-	_, timeout, format := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, format := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -341,11 +342,11 @@ func executeListSessions(cmd *cobra.Command, windowID, tabID string) error {
 
 // executeSessionFocus focuses a specific session
 func executeSessionFocus(cmd *cobra.Command, sessionID string) error {
-	_, timeout, _ := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, _ := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -362,11 +363,11 @@ func executeSessionFocus(cmd *cobra.Command, sessionID string) error {
 
 // executeSessionClose closes a specific session
 func executeSessionClose(cmd *cobra.Command, sessionID string) error {
-	_, timeout, _ := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, _ := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -383,11 +384,11 @@ func executeSessionClose(cmd *cobra.Command, sessionID string) error {
 
 // executeSessionSendText sends text to a specific session
 func executeSessionSendText(cmd *cobra.Command, sessionID, text string) error {
-	_, timeout, _ := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, _ := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
@@ -409,11 +410,11 @@ func executeSessionSendText(cmd *cobra.Command, sessionID, text string) error {
 
 // executeSessionSplit splits a specific session
 func executeSessionSplit(cmd *cobra.Command, sessionID string, args []string) error {
-	_, timeout, _ := cmdutil.GetFlags(cmd)
-	ctx, cancel := cmdutil.CreateContext(timeout)
+	_, timeout, _ := cmdcore.GetFlags(cmd)
+	ctx, cancel := cmdcore.CreateContext(timeout)
 	defer cancel()
 
-	c, err := cmdutil.ConnectClient(ctx)
+	c, err := cmdcore.ConnectClient(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to connect: %w", err)
 	}

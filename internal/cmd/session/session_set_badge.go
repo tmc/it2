@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newSetBadgeCommand() *cobra.Command {
@@ -21,7 +22,7 @@ func newSetBadgeCommand() *cobra.Command {
 			if len(args) == 2 {
 				badgeIdx = 1
 			}
-			if err := cmdutil.ValidateNonEmpty(args[badgeIdx], "badge"); err != nil {
+			if err := validate.NonEmpty(args[badgeIdx], "badge"); err != nil {
 				return err
 			}
 			return nil

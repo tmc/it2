@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/connect"
 )
 
@@ -23,8 +23,8 @@ Note: Not all properties are settable. Use get-property to see current values.`,
 			property := args[1]
 			value := args[2]
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)

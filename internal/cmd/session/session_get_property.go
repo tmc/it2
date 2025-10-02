@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
@@ -65,7 +66,7 @@ Use --list to see detailed property information.`,
 			if timeout == 0 {
 				timeout = 5 * time.Second
 			}
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
 			c, err := connect.ConnectClient(ctx)

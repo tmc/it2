@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 )
@@ -31,7 +32,7 @@ Coordinates are 0-based with (0,0) at the top-left corner.`,
 			# Move to bottom-left (column 0, row 50)
 			$ it2 text set-cursor abc123 0 50
 		`),
-		Args: cobra.ExactArgs(3),
+		Args:            cobra.ExactArgs(3),
 		RequiresClient:  true,
 		RequiresSession: true,
 		SupportsFormat:  true,
@@ -39,10 +40,10 @@ Coordinates are 0-based with (0,0) at the top-left corner.`,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			// Validate coordinates
 			if _, err := strconv.ParseInt(args[1], 10, 32); err != nil {
-				return cmdutil.NewValidationError("x coordinate", "must be a valid integer")
+				return cmderr.NewValidationError("x coordinate", "must be a valid integer")
 			}
 			if _, err := strconv.ParseInt(args[2], 10, 32); err != nil {
-				return cmdutil.NewValidationError("y coordinate", "must be a valid integer")
+				return cmderr.NewValidationError("y coordinate", "must be a valid integer")
 			}
 			return nil
 		},
@@ -58,10 +59,10 @@ Coordinates are 0-based with (0,0) at the top-left corner.`,
 
 			// Validate coordinates are non-negative
 			if x < 0 {
-				return cmdutil.NewValidationError("x coordinate", "must be non-negative")
+				return cmderr.NewValidationError("x coordinate", "must be non-negative")
 			}
 			if y < 0 {
-				return cmdutil.NewValidationError("y coordinate", "must be non-negative")
+				return cmderr.NewValidationError("y coordinate", "must be non-negative")
 			}
 
 			// Set cursor position

@@ -2,6 +2,7 @@ package text
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
@@ -49,7 +50,7 @@ Examples:
 
 			// Need pattern for highlighting
 			if len(args) < 2 {
-				return cmdutil.NewRequiredArgumentError("pattern")
+				return cmderr.NewRequiredArgumentError("pattern")
 			}
 			pattern := args[1]
 
@@ -63,15 +64,15 @@ Examples:
 
 			// Validate duration
 			if duration < 0 {
-				return cmdutil.NewValidationError("duration", "must be >= 0")
+				return cmderr.NewValidationError("duration", "must be >= 0")
 			}
 
 			// Validate color values
 			if !isValidColor(color) {
-				return cmdutil.NewValidationError("color", "must be one of: yellow, red, green, blue, cyan, magenta")
+				return cmderr.NewValidationError("color", "must be one of: yellow, red, green, blue, cyan, magenta")
 			}
 			if background != "" && !isValidColor(background) {
-				return cmdutil.NewValidationError("background", "must be one of: yellow, red, green, blue, cyan, magenta")
+				return cmderr.NewValidationError("background", "must be one of: yellow, red, green, blue, cyan, magenta")
 			}
 
 			// Highlight text in the buffer

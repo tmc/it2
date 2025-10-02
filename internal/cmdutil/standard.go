@@ -9,6 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmdcore"
+	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/formatting"
 )
 
@@ -50,13 +52,13 @@ func NewStandardCommand(use, short string) *StandardCommand {
 // ExecuteWithClient runs a command with standard connection handling
 func (sc *StandardCommand) ExecuteWithClient(fn func(*client.Client, context.Context) error) error {
 	// Setup context with timeout
-	sc.ctx, sc.cancel = CreateContext(sc.flags.Timeout)
+	sc.ctx, sc.cancel = cmdcore.CreateContext(sc.flags.Timeout)
 	defer sc.cancel()
 
 	// Connect client
-	c, err := ConnectClient(sc.ctx)
+	c, err := cmdcore.ConnectClient(sc.ctx)
 	if err != nil {
-		return NewConnectionError(err)
+		return cmderr.NewConnectionError(err)
 	}
 	sc.client = c
 	defer c.Close()
@@ -84,7 +86,7 @@ func (sc *StandardCommand) AddExtendedFlags() {
 func (sc *StandardCommand) ParseFlags() error {
 	// If flags weren't set via StandardFlags, try to get them from command
 	if sc.flags.WsURL == "" {
-		sc.flags.WsURL, sc.flags.Timeout, sc.flags.Format = GetFlags(sc.cmd)
+		sc.flags.WsURL, sc.flags.Timeout, sc.flags.Format = cmdcore.GetFlags(sc.cmd)
 	}
 
 	// Extract extended flags if they exist
@@ -145,7 +147,7 @@ func (sc *StandardCommand) ReportSuccess(format string, args ...interface{}) {
 
 // ReportError reports an error with standard formatting
 func (sc *StandardCommand) ReportError(operation string, err error) error {
-	return NewOperationError(operation, err)
+	return cmderr.NewOperationError(operation, err)
 }
 
 // splitAndTrim splits a string and trims whitespace from each element

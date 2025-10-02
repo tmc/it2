@@ -2,6 +2,7 @@ package text
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
@@ -34,7 +35,7 @@ Examples:
 
 			// Validate max-results
 			if maxResults <= 0 {
-				return cmdutil.NewValidationError("max-results", "must be > 0")
+				return cmderr.NewValidationError("max-results", "must be > 0")
 			}
 
 			// Find text in the buffer

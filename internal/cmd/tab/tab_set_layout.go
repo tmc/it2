@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newSetLayoutCommand() *cobra.Command {
@@ -40,12 +41,12 @@ Supported layout types: single, split, grid (all currently return helpful error 
 		ValidArgsFunc:  completion.TabIDCompletion,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			// Validate tab ID
-			if err := cmdutil.ValidateTabID(args[0]); err != nil {
+			if err := validate.TabID(args[0]); err != nil {
 				return err
 			}
 			// Validate layout type
 			validLayouts := []string{"single", "split", "grid"}
-			if err := cmdutil.ValidateOneOf(args[1], validLayouts, "layout"); err != nil {
+			if err := validate.OneOf(args[1], validLayouts, "layout"); err != nil {
 				return err
 			}
 			return nil
@@ -56,7 +57,7 @@ Supported layout types: single, split, grid (all currently return helpful error 
 			// horizontal, _ := sc.GetCommand().Flags().GetBool("horizontal") // Not used in current implementation
 
 			// Validate tab exists
-			if err := cmdutil.ValidateTabExists(sc.GetContext(), sc.GetClient(), tabID); err != nil {
+			if err := validate.TabExists(sc.GetContext(), sc.GetClient(), tabID); err != nil {
 				return err
 			}
 

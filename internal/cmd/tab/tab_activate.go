@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newActivateCommand() *cobra.Command {
@@ -30,12 +31,12 @@ func newActivateCommand() *cobra.Command {
 			# Activate last tab
 			$ it2 tab activate $(it2 tab list --format id | tail -1)
 		`),
-		Args: cobra.ExactArgs(1),
+		Args:           cobra.ExactArgs(1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.TabIDCompletion,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return cmdutil.ValidateTabID(args[0])
+			return validate.TabID(args[0])
 		},
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			tabID := args[0]

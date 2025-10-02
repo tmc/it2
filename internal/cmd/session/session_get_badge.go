@@ -17,7 +17,7 @@ func newGetBadgeCommand() *cobra.Command {
 Note: This returns the session-specific override only. If the session badge has been cleared (set to null),
 this will return empty, and the session will use the profile's badge instead. Use 'it2 profile get-badge'
 to see the profile's default badge.`,
-		Args: cobra.RangeArgs(0, 1),
+		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.SessionIDCompletion,

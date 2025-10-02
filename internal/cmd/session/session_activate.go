@@ -27,7 +27,7 @@ func newActivateCommand() *cobra.Command {
 			# Activate most recently created session
 			$ it2 session activate $(it2 session list --format id | head -1)
 		`),
-		Args: cobra.ExactArgs(1),
+		Args:            cobra.ExactArgs(1),
 		RequiresClient:  true,
 		RequiresSession: true,
 		SupportsFormat:  true,

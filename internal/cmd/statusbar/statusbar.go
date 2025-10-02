@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	pb "github.com/tmc/it2/proto"
 )
@@ -33,17 +34,17 @@ func newOpenPopoverCommand() *cobra.Command {
 			sessionID := cmdutil.NormalizeSessionID(args[1])
 			html := args[2]
 
-			_, timeout, _ := cmdutil.GetFlags(cmd)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
 			widthFloat, _ := cmd.Flags().GetFloat32("width")
 			heightFloat, _ := cmd.Flags().GetFloat32("height")
 
 			width := int32(widthFloat)
 			height := int32(heightFloat)
 
-			ctx, cancel := cmdutil.CreateContext(timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := cmdutil.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

@@ -5,9 +5,11 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newReorderCommand() *cobra.Command {
@@ -34,23 +36,23 @@ func newReorderCommand() *cobra.Command {
 			# Swap two tabs by moving them
 			$ it2 tab reorder tab-123 1 && it2 tab reorder tab-456 0
 		`),
-		Args: cobra.ExactArgs(2),
+		Args:           cobra.ExactArgs(2),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.TabIDCompletion,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			// Validate tab ID
-			if err := cmdutil.ValidateTabID(args[0]); err != nil {
+			if err := validate.TabID(args[0]); err != nil {
 				return err
 			}
 
 			// Validate index
 			newIndex, err := strconv.Atoi(args[1])
 			if err != nil {
-				return cmdutil.NewValidationError("index", "must be a valid integer")
+				return cmderr.NewValidationError("index", "must be a valid integer")
 			}
 			if newIndex < 0 {
-				return cmdutil.NewValidationError("index", "must be non-negative")
+				return cmderr.NewValidationError("index", "must be non-negative")
 			}
 
 			return nil
@@ -67,7 +69,7 @@ func newReorderCommand() *cobra.Command {
 
 			windowID := findWindowForTab(sessions, tabID)
 			if windowID == "" {
-				return cmdutil.NewNotFoundError("tab", tabID)
+				return cmderr.NewNotFoundError("tab", tabID)
 			}
 
 			// Build ordered list of tabs in the window

@@ -5,9 +5,11 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newGetInfoCommand() *cobra.Command {
@@ -20,7 +22,7 @@ func newGetInfoCommand() *cobra.Command {
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.TabIDCompletion,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return cmdutil.ValidateTabID(args[0])
+			return validate.TabID(args[0])
 		},
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			tabID := args[0]
@@ -34,7 +36,7 @@ func newGetInfoCommand() *cobra.Command {
 			// Find sessions belonging to this tab
 			tabInfo := extractTabInfo(sc.GetClient(), sc.GetContext(), sessions, tabID)
 			if tabInfo == nil {
-				return cmdutil.NewNotFoundError("tab", tabID)
+				return cmderr.NewNotFoundError("tab", tabID)
 			}
 
 			// Format and display the information

@@ -5,6 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/cmderr"
+	"github.com/tmc/it2/internal/validate"
 )
 
 // CommandTemplate provides a standard command structure
@@ -75,7 +77,7 @@ func NewCommandFromTemplate(template CommandTemplate) *cobra.Command {
 
 		// Validate format if supported
 		if template.SupportsFormat {
-			if err := ValidateFormat(sc.flags.Format); err != nil {
+			if err := validate.Format(sc.flags.Format); err != nil {
 				return err
 			}
 		}
@@ -143,7 +145,7 @@ func GetCommandTemplate(resourceType string, getFunc func(*StandardCommand, stri
 		RequiresClient: true,
 		SupportsFormat: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return ValidateResourceArgs(args, resourceType, false)
+			return validate.ResourceArgs(args, resourceType, false)
 		},
 		RunE: func(sc *StandardCommand, args []string) error {
 			return getFunc(sc, args[0])
@@ -174,7 +176,7 @@ func DeleteCommandTemplate(resourceType string, deleteFunc func(*StandardCommand
 		Args:           cobra.ExactArgs(1),
 		RequiresClient: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return ValidateResourceArgs(args, resourceType, false)
+			return validate.ResourceArgs(args, resourceType, false)
 		},
 		RunE: func(sc *StandardCommand, args []string) error {
 			return deleteFunc(sc, args[0])
@@ -192,7 +194,7 @@ func UpdateCommandTemplate(resourceType string, updateFunc func(*StandardCommand
 		RequiresClient: true,
 		SupportsFormat: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return ValidateResourceArgs([]string{args[0]}, resourceType, false)
+			return validate.ResourceArgs([]string{args[0]}, resourceType, false)
 		},
 		RunE: func(sc *StandardCommand, args []string) error {
 			return updateFunc(sc, args[0], args[1:])
@@ -209,7 +211,7 @@ func ActionCommandTemplate(action, resourceType string, actionFunc func(*Standar
 		Args:           cobra.ExactArgs(1),
 		RequiresClient: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return ValidateResourceArgs(args, resourceType, false)
+			return validate.ResourceArgs(args, resourceType, false)
 		},
 		RunE: func(sc *StandardCommand, args []string) error {
 			if err := actionFunc(sc, args[0]); err != nil {
@@ -231,7 +233,7 @@ func SessionCommandTemplate(use, short string, sessionFunc func(*StandardCommand
 		SupportsFormat:  true,
 		RunE: func(sc *StandardCommand, args []string) error {
 			if len(args) == 0 {
-				return NewRequiredArgumentError("session_id")
+				return cmderr.NewRequiredArgumentError("session_id")
 			}
 			return sessionFunc(sc, args[0], args[1:])
 		},

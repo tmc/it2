@@ -122,11 +122,11 @@ as it appears. Useful for monitoring long-running commands or watching session o
 
 			// Start tailing with filters
 			opts := tailOptions{
-				interval:      interval,
-				colorized:     colorized,
-				grepPattern:   grepRE,
-				grepInvert:    grepInvertRE,
-				outputOnly:    outputOnly,
+				interval:    interval,
+				colorized:   colorized,
+				grepPattern: grepRE,
+				grepInvert:  grepInvertRE,
+				outputOnly:  outputOnly,
 			}
 			return tailSession(ctx, sc, sessionID, opts)
 		},

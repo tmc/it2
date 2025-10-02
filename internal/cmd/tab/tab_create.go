@@ -5,6 +5,7 @@ import (
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newCreateCommand() *cobra.Command {
@@ -61,7 +62,7 @@ func newCreateCommand() *cobra.Command {
 			if len(args) > 1 {
 				windowID = args[1]
 				// Validate window exists
-				if err := cmdutil.ValidateWindowExists(sc.GetContext(), sc.GetClient(), windowID); err != nil {
+				if err := validate.WindowExists(sc.GetContext(), sc.GetClient(), windowID); err != nil {
 					return err
 				}
 			}

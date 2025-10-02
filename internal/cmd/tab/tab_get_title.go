@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/validate"
 )
 
 func newGetTitleCommand() *cobra.Command {
@@ -20,7 +21,7 @@ func newGetTitleCommand() *cobra.Command {
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			// If tab ID provided, validate it
 			if len(args) == 1 {
-				if err := cmdutil.ValidateTabID(args[0]); err != nil {
+				if err := validate.TabID(args[0]); err != nil {
 					return err
 				}
 			}

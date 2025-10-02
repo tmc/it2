@@ -2,6 +2,7 @@ package text
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
@@ -34,7 +35,7 @@ Use with caution as it modifies the actual terminal content.`,
 			# Replace without confirmation
 			$ it2 text replace --confirm=false abc123 "old" "new"
 		`),
-		Args: cobra.ExactArgs(3),
+		Args:           cobra.ExactArgs(3),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.SessionIDCompletion,
@@ -52,7 +53,7 @@ Use with caution as it modifies the actual terminal content.`,
 
 			// Validate max-replacements
 			if maxReplacements <= 0 {
-				return cmdutil.NewValidationError("max-replacements", "must be > 0")
+				return cmderr.NewValidationError("max-replacements", "must be > 0")
 			}
 
 			// Replace text in the buffer
