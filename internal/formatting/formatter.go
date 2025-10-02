@@ -507,6 +507,18 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 		// Shorten prompt state with state indicators
 		state := session.PromptState
 		switch state {
+		// New shell integration states (State enum)
+		case "EDITING":
+			state = "IDLE"  // Default state when shell integration not enabled
+		case "RUNNING":
+			state = "+ EXEC"
+		case "FINISHED":
+			if session.ExitCode != 0 {
+				state = "✗ ERROR"
+			} else {
+				state = "✓ DONE"
+			}
+		// Legacy prompt states (PromptState enum)
 		case "AT_COMMAND_LINE":
 			state = "✓ READY"
 		case "IN_COMMAND":
@@ -518,10 +530,11 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 		case "UNKNOWN":
 			state = "IDLE"
 		default:
+			// Unknown state - show raw value with prefix
 			if session.ExitCode != 0 {
 				state = "✗ ERROR"
 			} else {
-				state = "IDLE"
+				state = "? " + state
 			}
 		}
 
