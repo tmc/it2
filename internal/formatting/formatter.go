@@ -809,14 +809,14 @@ func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error
 		return nil
 	}
 
-	headers := []string{"ID", "Window", "Title", "Tabs", "Fullscreen", "Miniaturized"}
+	headers := []string{"Window", "ID", "Tabs", "Fullscreen"}
 	table := NewTableData(headers)
 
 	for _, window := range windows {
-		// Truncate long window IDs
+		// Format window ID - keep first 16 chars for readability (pty-E20F6640-287...)
 		shortID := window.WindowID
-		if len(shortID) > 12 {
-			shortID = shortID[:9] + "..."
+		if len(shortID) > 24 {
+			shortID = shortID[:21] + "..."
 		}
 
 		// Apply hyperlinks to window ID if enabled
@@ -825,19 +825,17 @@ func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error
 			shortID = OSC8Hyperlink(url, shortID)
 		}
 
-		// Truncate long titles
-		title := window.Title
-		if len(title) > 40 {
-			title = title[:37] + "..."
+		// Format boolean fields
+		fullscreen := "No"
+		if window.Fullscreen == "true" {
+			fullscreen = "Yes"
 		}
 
 		row := []string{
-			shortID,
 			fmt.Sprintf("%d", window.WindowNumber),
-			title,
+			shortID,
 			fmt.Sprintf("%d", window.TabCount),
-			window.Fullscreen,
-			window.Miniaturized,
+			fullscreen,
 		}
 
 		table.AddRow(row)
