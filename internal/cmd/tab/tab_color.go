@@ -26,7 +26,10 @@ The color can be specified using either:
 
 If no tab ID is provided, the current tab is used.
 
-The color persists across sessions and is stored in the profile.`,
+The color persists across sessions and is stored in the profile.
+
+Note: The profile must have "Use custom tab color" enabled in iTerm2's profile
+preferences (Prefs > Profiles > Colors > Tab Color) for the color to be visible.`,
 		Args:           cobra.MaximumNArgs(1),
 		RequiresClient: true,
 		SupportsFormat: true,
