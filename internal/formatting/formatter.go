@@ -991,6 +991,18 @@ func (f *Formatter) formatTabsTable(tabs []*TabInfo) error {
 			sessionsCount = "-"
 		}
 
+		// Truncate and apply hyperlinks to window ID
+		windowID := tab.WindowID
+		displayWindowID := windowID
+		if len(displayWindowID) > 12 {
+			displayWindowID = displayWindowID[:9] + "..."
+		}
+		if f.hyperlinks {
+			url := WindowActivateURL(tab.WindowID)
+			displayWindowID = OSC8Hyperlink(url, displayWindowID)
+		}
+		windowID = displayWindowID
+
 		// Apply hyperlinks to tab ID if enabled
 		tabID := tab.TabID
 		if f.hyperlinks {
@@ -999,7 +1011,7 @@ func (f *Formatter) formatTabsTable(tabs []*TabInfo) error {
 		}
 
 		row := []string{
-			tab.WindowID,
+			windowID,
 			tabID,
 			fmt.Sprintf("%d", tab.Position),
 			activeIndicator,
