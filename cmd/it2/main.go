@@ -70,17 +70,22 @@ var rootCmd = &cobra.Command{
 	Long: `A powerful command-line tool for controlling iTerm2. Provides comprehensive access to terminal automation,
 session management, and advanced iTerm2 features.
 
-FEATURES:
-  • Session Management: Create, list, close, split, activate, restart sessions
-  • Tab & Window Control: Manage tabs and windows with full lifecycle support
-  • Text Operations: Send text, manipulate buffers, control cursor, search content
-  • Shell Integration: Access command history, prompts, job monitoring (requires Shell Integration)
-  • Variable Management: Get/set variables with session, tab, window, and app scopes
-  • Profile Management: List profiles, get/set properties, apply to sessions
-  • Color Management: Import/export color presets, modify appearance
-  • Real-time Monitoring: Subscribe to notifications and monitor iTerm2 events
-  • tmux Integration: Control tmux sessions through iTerm2
-  • Broadcast Domains: Manage input broadcasting to multiple sessions
+COMMAND GROUPS:
+
+Core Operations
+  app, session, tab, window - Control application and core UI elements
+
+Content & Text
+  badge, selection, text - Manage content, buffers, and text operations
+
+Configuration
+  auth, color, plugins, profile, statusbar, variable - Manage settings and appearance
+
+Monitoring
+  job, notification, prompt, shell - Monitor state and events
+
+Advanced
+  arrangement, broadcast, tmux - Advanced features and integrations
 
 AUTHENTICATION:
   The tool automatically requests authentication from iTerm2 on first use.
