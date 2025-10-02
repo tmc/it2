@@ -49,33 +49,26 @@ Examples:
 				return sc.ReportError("resolve session ID", err)
 			}
 
-			// Get session info
-			sessions, err := sc.GetClient().ListSessions(sc.GetContext())
-			if err != nil {
-				return sc.ReportError("list sessions", err)
-			}
+			// Check shell integration by calling GetPrompt
+			// This is the most reliable way - if shell integration is enabled,
+			// GetPrompt will return OK status. If not, it returns PROMPT_UNAVAILABLE.
+			promptResp, err := sc.GetClient().GetPrompt(sc.GetContext(), sessionID)
+			hasShellIntegration := err == nil && promptResp != nil &&
+				promptResp.GetStatus().String() != "PROMPT_UNAVAILABLE"
 
-			// Find the specific session
+			// Also get session info for detailed output
 			var targetSession *client.SessionInfo
-			for _, session := range sessions {
-				if session.SessionID == sessionID {
-					targetSession = session
-					break
+			if hasShellIntegration {
+				sessions, err := sc.GetClient().ListSessions(sc.GetContext())
+				if err == nil {
+					for _, session := range sessions {
+						if session.SessionID == sessionID {
+							targetSession = session
+							break
+						}
+					}
 				}
 			}
-
-			if targetSession == nil {
-				return fmt.Errorf("session not found: %s", sessionID)
-			}
-
-			// Check shell integration indicators
-			// Shell integration is considered active if:
-			// 1. CommandCount > 0 (commands have been tracked), OR
-			// 2. PromptState is RUNNING or FINISHED (active state transitions)
-			// Just having EDITING state isn't enough - that's the default even without shell integration
-			hasShellIntegration := targetSession.CommandCount > 0 ||
-				targetSession.PromptState == "RUNNING" ||
-				targetSession.PromptState == "FINISHED"
 
 			// Get quiet flag
 			quiet, _ := sc.GetCommand().Flags().GetBool("quiet")
@@ -90,7 +83,13 @@ Examples:
 			}
 
 			// Detailed output
-			fmt.Printf("Session: %s\n", targetSession.ShortID)
+			// Get short ID for display
+			shortID := sessionID
+			if len(sessionID) > 8 {
+				shortID = sessionID[:8]
+			}
+
+			fmt.Printf("Session: %s\n", shortID)
 			fmt.Printf("Shell Integration: ")
 			if hasShellIntegration {
 				fmt.Println("✓ Enabled")
@@ -99,16 +98,29 @@ Examples:
 			}
 			fmt.Println()
 
-			if hasShellIntegration {
+			if hasShellIntegration && promptResp != nil {
 				fmt.Println("Shell Integration Details:")
-				fmt.Printf("  Prompt State:   %s\n", targetSession.PromptState)
-				fmt.Printf("  Command Count:  %d\n", targetSession.CommandCount)
-				fmt.Printf("  Shell PID:      %d\n", targetSession.ShellPID)
-				if targetSession.JobPID > 0 {
-					fmt.Printf("  Job PID:        %d\n", targetSession.JobPID)
+				promptState := promptResp.GetPromptState().String()
+				if promptState != "" {
+					fmt.Printf("  Prompt State:   %s\n", promptState)
 				}
-				if targetSession.CurrentCommand != "" {
-					fmt.Printf("  Current Cmd:    %s\n", targetSession.CurrentCommand)
+				if promptResp.GetWorkingDirectory() != "" {
+					fmt.Printf("  Working Dir:    %s\n", promptResp.GetWorkingDirectory())
+				}
+				if promptResp.GetCommand() != "" {
+					fmt.Printf("  Command:        %s\n", promptResp.GetCommand())
+				}
+				if promptState == "FINISHED" && promptResp.GetExitStatus() != 0 {
+					fmt.Printf("  Exit Status:    %d\n", promptResp.GetExitStatus())
+				}
+
+				// Also show session info if available
+				if targetSession != nil {
+					fmt.Printf("  Command Count:  %d\n", targetSession.CommandCount)
+					fmt.Printf("  Shell PID:      %d\n", targetSession.ShellPID)
+					if targetSession.JobPID > 0 {
+						fmt.Printf("  Job PID:        %d\n", targetSession.JobPID)
+					}
 				}
 			} else {
 				fmt.Println("\nTo enable shell integration:")
