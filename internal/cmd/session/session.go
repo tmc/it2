@@ -136,33 +136,38 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(tailCmd)
 
 	// Properties & Variables Commands
-	getPropertyCmd := newGetPropertyCommand()
-	getPropertyCmd.GroupID = "properties"
-	cmd.AddCommand(getPropertyCmd)
-
-	setPropertyCmd := newSetPropertyCommand()
-	setPropertyCmd.GroupID = "properties"
-	cmd.AddCommand(setPropertyCmd)
-
-	getVariableCmd := newGetVariableCommand()
-	getVariableCmd.GroupID = "properties"
-	cmd.AddCommand(getVariableCmd)
-
-	setVariableCmd := newSetVariableCommand()
-	setVariableCmd.GroupID = "properties"
-	cmd.AddCommand(setVariableCmd)
-
-	listVariablesCmd := newListVariablesCommand()
-	listVariablesCmd.GroupID = "properties"
-	cmd.AddCommand(listVariablesCmd)
-
-	clearVariableCmd := newClearVariableCommand()
-	clearVariableCmd.GroupID = "properties"
-	cmd.AddCommand(clearVariableCmd)
+	variableCmd := NewVariableCommand()
+	variableCmd.GroupID = "properties"
+	cmd.AddCommand(variableCmd)
 
 	profileCmd := NewProfileCommand()
 	profileCmd.GroupID = "properties"
 	cmd.AddCommand(profileCmd)
+
+	// Keep old flat commands hidden for backwards compatibility
+	getPropertyCmd := newGetPropertyCommand()
+	getPropertyCmd.Hidden = true
+	cmd.AddCommand(getPropertyCmd)
+
+	setPropertyCmd := newSetPropertyCommand()
+	setPropertyCmd.Hidden = true
+	cmd.AddCommand(setPropertyCmd)
+
+	getVariableCmd := newGetVariableCommand()
+	getVariableCmd.Hidden = true
+	cmd.AddCommand(getVariableCmd)
+
+	setVariableCmd := newSetVariableCommand()
+	setVariableCmd.Hidden = true
+	cmd.AddCommand(setVariableCmd)
+
+	listVariablesCmd := newListVariablesCommand()
+	listVariablesCmd.Hidden = true
+	cmd.AddCommand(listVariablesCmd)
+
+	clearVariableCmd := newClearVariableCommand()
+	clearVariableCmd.Hidden = true
+	cmd.AddCommand(clearVariableCmd)
 
 	// Monitoring & Information Commands
 	getPIDCmd := newGetPIDCommand()
