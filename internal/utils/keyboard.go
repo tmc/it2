@@ -45,6 +45,30 @@ func MapKeyToCode(key string) string {
 		return "\x1b[5~"
 	case "pagedown":
 		return "\x1b[6~"
+	case "f1":
+		return "\x1bOP"
+	case "f2":
+		return "\x1bOQ"
+	case "f3":
+		return "\x1bOR"
+	case "f4":
+		return "\x1bOS"
+	case "f5":
+		return "\x1b[15~"
+	case "f6":
+		return "\x1b[17~"
+	case "f7":
+		return "\x1b[18~"
+	case "f8":
+		return "\x1b[19~"
+	case "f9":
+		return "\x1b[20~"
+	case "f10":
+		return "\x1b[21~"
+	case "f11":
+		return "\x1b[23~"
+	case "f12":
+		return "\x1b[24~"
 	}
 
 	// Handle caret notation (^C, ^c, etc.) for Ctrl key combinations
@@ -74,6 +98,29 @@ func MapKeyToCode(key string) string {
 		}
 	}
 
+	// Handle Meta/Alt key combinations (M-x, m-x, meta-x, alt-x formats)
+	if strings.HasPrefix(key, "m-") || strings.HasPrefix(key, "m+") {
+		keyChar := key[2:] // Remove "m-" or "m+"
+		if len(keyChar) == 1 && keyChar >= "a" && keyChar <= "z" {
+			// Meta/Alt sends ESC followed by the key
+			return "\x1b" + keyChar
+		}
+	}
+	if strings.HasPrefix(key, "meta-") || strings.HasPrefix(key, "meta+") {
+		keyChar := key[5:] // Remove "meta-" or "meta+"
+		if len(keyChar) == 1 && keyChar >= "a" && keyChar <= "z" {
+			// Meta/Alt sends ESC followed by the key
+			return "\x1b" + keyChar
+		}
+	}
+	if strings.HasPrefix(key, "alt-") || strings.HasPrefix(key, "alt+") {
+		keyChar := key[4:] // Remove "alt-" or "alt+"
+		if len(keyChar) == 1 && keyChar >= "a" && keyChar <= "z" {
+			// Alt sends ESC followed by the key
+			return "\x1b" + keyChar
+		}
+	}
+
 	// Handle Cmd+key combinations (map to Ctrl equivalents for cross-platform compatibility)
 	if strings.HasPrefix(key, "cmd-") || strings.HasPrefix(key, "cmd+") {
 		keyChar := key[4:] // Remove "cmd-" or "cmd+"
@@ -90,6 +137,22 @@ func MapKeyToCode(key string) string {
 
 	// Not a special key, return empty string to indicate it should be used as-is
 	return ""
+}
+
+// getShiftedArrowKey returns the escape sequence for shifted arrow keys
+func getShiftedArrowKey(direction string) string {
+	switch strings.ToLower(direction) {
+	case "up":
+		return "\x1b[1;2A"
+	case "down":
+		return "\x1b[1;2B"
+	case "right":
+		return "\x1b[1;2C"
+	case "left":
+		return "\x1b[1;2D"
+	default:
+		return ""
+	}
 }
 
 // parseComplexKey handles complex modifier combinations like cmd+shift+z, ctrl+opt+a, etc.
@@ -154,6 +217,11 @@ func parseComplexKey(key string) string {
 		if hasShift {
 			return "\x1b[Z" // Shift+Tab
 		}
+	case "up", "down", "left", "right":
+		if hasShift && !hasCtrl && !hasAlt {
+			return getShiftedArrowKey(baseKey)
+		}
+		// For arrow keys with other modifiers, could extend here
 	case "c":
 		if hasCtrl {
 			return "\x03" // Ctrl+C
@@ -169,6 +237,9 @@ func parseComplexKey(key string) string {
 	case "a":
 		if hasCtrl {
 			return "\x01" // Ctrl+A (beginning of line)
+		}
+		if hasAlt {
+			return "\x1ba" // Alt+A
 		}
 	case "e":
 		if hasCtrl {
@@ -198,6 +269,16 @@ func parseComplexKey(key string) string {
 		if hasCtrl {
 			return "\x0f" // Ctrl+O
 		}
+	}
+
+	// Handle simple shift+letter (just uppercase the letter)
+	if hasShift && !hasCtrl && !hasAlt && !hasCmd && len(baseKey) == 1 && baseKey >= "a" && baseKey <= "z" {
+		return strings.ToUpper(baseKey)
+	}
+
+	// Handle Alt+letter combinations (not handled above)
+	if hasAlt && !hasCtrl && !hasShift && len(baseKey) == 1 && baseKey >= "a" && baseKey <= "z" {
+		return "\x1b" + baseKey
 	}
 
 	// If we can't map it to a specific sequence, return empty string
