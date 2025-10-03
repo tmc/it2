@@ -1683,10 +1683,26 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 	fmt.Println("Session Hierarchy:")
 	fmt.Println()
 
-	// Print each window
+	// Build sets of window IDs and tab IDs that contain our filtered sessions
+	windowIDs := make(map[string]bool)
+	tabKeys := make(map[string]bool) // key is "windowID:tabID"
+	for _, session := range sessions {
+		windowIDs[session.WindowID] = true
+		tabKeys[session.WindowID+":"+session.TabID] = true
+	}
+
+	// Print each window (only those containing filtered sessions)
 	windows := listResp.GetWindows()
-	for windowIndex, window := range windows {
-		isLastWindow := windowIndex == len(windows)-1
+	var filteredWindows []*pb.ListSessionsResponse_Window
+	for _, window := range windows {
+		windowID := window.GetWindowId()
+		if windowIDs[windowID] {
+			filteredWindows = append(filteredWindows, window)
+		}
+	}
+
+	for windowIndex, window := range filteredWindows {
+		isLastWindow := windowIndex == len(filteredWindows)-1
 		windowConnector := "├─"
 		if isLastWindow {
 			windowConnector = "└─"
@@ -1713,10 +1729,19 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 			fmt.Printf("%s Window %d\n", windowConnector, windowNum)
 		}
 
-		// Print tabs within this window
+		// Print tabs within this window (only those containing filtered sessions)
+		windowID := window.GetWindowId()
 		tabs := window.GetTabs()
-		for tabIndex, tab := range tabs {
-			isLastTab := tabIndex == len(tabs)-1
+		var filteredTabs []*pb.ListSessionsResponse_Tab
+		for _, tab := range tabs {
+			tabKey := windowID + ":" + tab.GetTabId()
+			if tabKeys[tabKey] {
+				filteredTabs = append(filteredTabs, tab)
+			}
+		}
+
+		for tabIndex, tab := range filteredTabs {
+			isLastTab := tabIndex == len(filteredTabs)-1
 
 			tabPrefix := "│ "
 			if isLastWindow {
