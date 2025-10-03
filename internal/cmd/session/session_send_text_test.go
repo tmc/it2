@@ -83,8 +83,8 @@ func TestApplyTemplate(t *testing.T) {
 			wantErr:     true,
 		},
 		{
-			name:        "complex multiline template",
-			template:    `<message>
+			name: "complex multiline template",
+			template: `<message>
   <from>{{.ShortID}}</from>
   <text>{{.Content}}</text>
   <timestamp>{{.Timestamp}}</timestamp>

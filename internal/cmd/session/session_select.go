@@ -36,7 +36,7 @@ Selection modes:
 
   it2 session select session123 10 5 20 5  # Select text
   it2 session copy session123              # Copy to clipboard`,
-		Args: cobra.ExactArgs(5),
+		Args:            cobra.ExactArgs(5),
 		RequiresClient:  true,
 		RequiresSession: true,
 		SupportsFormat:  true,

@@ -6,9 +6,9 @@
 //   - Client connection management
 //
 // These are the most fundamental building blocks that commands depend on to:
-//   1. Extract configuration from command flags
-//   2. Create properly configured contexts
-//   3. Establish connections to iTerm2
+//  1. Extract configuration from command flags
+//  2. Create properly configured contexts
+//  3. Establish connections to iTerm2
 //
 // This package is intentionally minimal and focused on core command infrastructure.
 // Higher-level abstractions like command templates and validation live in separate packages.

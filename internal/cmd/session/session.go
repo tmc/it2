@@ -7,9 +7,9 @@ import (
 // NewCommand creates the session command with all subcommands.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "session",
-		Short:   "Manage iTerm2 sessions",
-		Long:    "Commands for creating, listing, and managing iTerm2 sessions",
+		Use:   "session",
+		Short: "Manage iTerm2 sessions",
+		Long:  "Commands for creating, listing, and managing iTerm2 sessions",
 		Example: `  # Basic Session Information
 
   it2 session list

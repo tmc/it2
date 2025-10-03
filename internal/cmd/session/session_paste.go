@@ -27,7 +27,7 @@ By default, paste operates silently without changing session focus.`,
 
   it2 session copy session123                    # Copy from one session
   it2 session paste session456                   # Paste to another session`,
-		Args: cobra.RangeArgs(0, 1),
+		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.SessionIDCompletion,

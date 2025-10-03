@@ -512,7 +512,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 		switch state {
 		// New shell integration states (State enum)
 		case "EDITING":
-			state = "IDLE"  // Default state when shell integration not enabled
+			state = "IDLE" // Default state when shell integration not enabled
 		case "RUNNING":
 			state = "+ EXEC"
 		case "FINISHED":

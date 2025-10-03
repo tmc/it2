@@ -11,11 +11,11 @@ import (
 
 // PluginMetrics tracks execution statistics for a single plugin
 type PluginMetrics struct {
-	Name          string        `json:"name"`
-	ExecutionCount int          `json:"execution_count"`
-	TotalDuration time.Duration `json:"total_duration"`
-	Durations     []int64       `json:"durations"` // Microseconds for compact storage
-	LastExecuted  time.Time     `json:"last_executed"`
+	Name           string        `json:"name"`
+	ExecutionCount int           `json:"execution_count"`
+	TotalDuration  time.Duration `json:"total_duration"`
+	Durations      []int64       `json:"durations"` // Microseconds for compact storage
+	LastExecuted   time.Time     `json:"last_executed"`
 }
 
 // MetricsStore manages plugin execution metrics

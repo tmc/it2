@@ -198,7 +198,7 @@ func (c *Client) formatConnectionError(err error) error {
 
 	// Already well-formatted errors
 	if strings.Contains(errMsg, "API automation") ||
-	   strings.Contains(errMsg, "authentication required") {
+		strings.Contains(errMsg, "authentication required") {
 		return err
 	}
 

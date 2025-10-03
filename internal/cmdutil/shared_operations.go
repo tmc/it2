@@ -234,8 +234,8 @@ func (s *SharedListOperations) buildTabInfoFromSessions(sessions []*client.Sessi
 				WindowNumber: int(session.WindowNumber),
 				TabID:        session.TabID,
 				Title:        title,
-				Position:     0,      // Position needs to be determined differently
-				Active:       false,  // Will be determined by checking session focus
+				Position:     0,     // Position needs to be determined differently
+				Active:       false, // Will be determined by checking session focus
 				Sessions:     []*client.SessionInfo{session},
 			}
 		} else {

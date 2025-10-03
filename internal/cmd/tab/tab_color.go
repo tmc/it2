@@ -16,8 +16,8 @@ func newSetColorCommand() *cobra.Command {
 	var hex string
 
 	template := cmdutil.CommandTemplate{
-		Use:            "set-color [<tab-id>]",
-		Short:          "Set the color of a tab",
+		Use:   "set-color [<tab-id>]",
+		Short: "Set the color of a tab",
 		Long: `Set the color of a tab using RGB or hex color formats.
 
 The color can be specified using either:
@@ -102,8 +102,8 @@ preferences (Prefs > Profiles > Colors > Tab Color) for the color to be visible.
 // newGetColorCommand creates the get-color subcommand
 func newGetColorCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "get-color [<tab-id>]",
-		Short:          "Get the current color of a tab",
+		Use:   "get-color [<tab-id>]",
+		Short: "Get the current color of a tab",
 		Long: `Get the current color of a tab.
 
 Returns the RGB color components (0.0-1.0) and whether tab color is enabled.
@@ -165,8 +165,8 @@ If no tab ID is provided, the current tab is used.`,
 // newClearColorCommand creates the clear-color subcommand
 func newClearColorCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "clear-color [<tab-id>]",
-		Short:          "Clear the color of a tab",
+		Use:   "clear-color [<tab-id>]",
+		Short: "Clear the color of a tab",
 		Long: `Clear the color of a tab, reverting to the default color.
 
 This disables the custom tab color and allows the tab to use the default color

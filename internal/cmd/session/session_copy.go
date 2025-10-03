@@ -23,7 +23,7 @@ The session must have an active text selection for this to work.`,
 
   it2 session select session123 10 5 20 5  # Select text
   it2 session copy session123              # Copy to clipboard`,
-		Args: cobra.RangeArgs(0, 1),
+		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.SessionIDCompletion,
