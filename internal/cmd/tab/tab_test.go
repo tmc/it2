@@ -97,9 +97,12 @@ func TestListCommand_Structure(t *testing.T) {
 	expectedLong := `List tabs in a specific window or all windows.
 
 Examples:
-  it2 tab list           # List tabs in all windows
-  it2 tab list 1         # List tabs in window 1 (positional)
-  it2 tab list --window-id 1  # List tabs in window 1 (flag)`
+  it2 tab list                # List tabs in all windows
+  it2 tab list 1              # List tabs in window 1 (positional)
+  it2 tab list --window-id 1  # List tabs in window 1 (flag)
+  it2 tab list -q             # Output only tab IDs (quiet mode)
+  it2 tab list -q | xargs -n1 it2 tab close  # Close all tabs (use with caution!)
+  it2 tab list -q | wc -l     # Count total tabs`
 	if cmd.Long != expectedLong {
 		t.Errorf("Expected correct Long description, got '%s'", cmd.Long)
 	}

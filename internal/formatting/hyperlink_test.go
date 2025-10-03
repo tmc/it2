@@ -156,12 +156,12 @@ func TestSessionActivateURL(t *testing.T) {
 		{
 			name:      "full UUID",
 			sessionID: "7AA97682-C080-4D65-8C19-FDEF4669AA84",
-			want:      "iterm2://session/activate/7AA97682-C080-4D65-8C19-FDEF4669AA84",
+			want:      "it2://session/activate/7AA97682-C080-4D65-8C19-FDEF4669AA84",
 		},
 		{
 			name:      "short ID",
 			sessionID: "7AA97682",
-			want:      "iterm2://session/activate/7AA97682",
+			want:      "it2://session/activate/7AA97682",
 		},
 	}
 
@@ -177,7 +177,7 @@ func TestSessionActivateURL(t *testing.T) {
 
 func TestTabActivateURL(t *testing.T) {
 	tabID := "1"
-	want := "iterm2://tab/activate/1"
+	want := "it2://tab/activate/1"
 	got := TabActivateURL(tabID)
 	if got != want {
 		t.Errorf("TabActivateURL() = %q, want %q", got, want)
@@ -186,7 +186,7 @@ func TestTabActivateURL(t *testing.T) {
 
 func TestWindowActivateURL(t *testing.T) {
 	windowID := "pty-E20F6640-287B-4A1A-9E3B-25F16687D3C4"
-	want := "iterm2://window/activate/pty-E20F6640-287B-4A1A-9E3B-25F16687D3C4"
+	want := "it2://window/activate/pty-E20F6640-287B-4A1A-9E3B-25F16687D3C4"
 	got := WindowActivateURL(windowID)
 	if got != want {
 		t.Errorf("WindowActivateURL() = %q, want %q", got, want)
@@ -198,7 +198,7 @@ func TestMakeSessionIDHyperlink(t *testing.T) {
 
 	t.Run("with hyperlinks enabled", func(t *testing.T) {
 		got := MakeSessionIDHyperlink(sessionID, true)
-		if !strings.Contains(got, "iterm2://session/activate/") {
+		if !strings.Contains(got, "it2://session/activate/") {
 			t.Errorf("MakeSessionIDHyperlink() should contain URL scheme, got %q", got)
 		}
 		if !strings.Contains(got, sessionID) {
@@ -222,7 +222,7 @@ func TestMakeTabIDHyperlink(t *testing.T) {
 
 	t.Run("with hyperlinks enabled", func(t *testing.T) {
 		got := MakeTabIDHyperlink(tabID, true)
-		if !strings.Contains(got, "iterm2://tab/activate/") {
+		if !strings.Contains(got, "it2://tab/activate/") {
 			t.Errorf("MakeTabIDHyperlink() should contain URL scheme, got %q", got)
 		}
 		if !strings.Contains(got, tabID) {
@@ -243,7 +243,7 @@ func TestMakeWindowIDHyperlink(t *testing.T) {
 
 	t.Run("with hyperlinks enabled", func(t *testing.T) {
 		got := MakeWindowIDHyperlink(windowID, true)
-		if !strings.Contains(got, "iterm2://window/activate/") {
+		if !strings.Contains(got, "it2://window/activate/") {
 			t.Errorf("MakeWindowIDHyperlink() should contain URL scheme, got %q", got)
 		}
 		if !strings.Contains(got, windowID) {
