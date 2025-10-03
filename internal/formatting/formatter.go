@@ -1765,82 +1765,38 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 	return nil
 }
 
-// printFormattedTreeLine prints a tree line with session details
+// printFormattedTreeLine prints a tree line with session details (compact format)
 func printFormattedTreeLine(prefix, title, sessionID, pidDisplay, state, command string, pluginCols []string, pluginData map[string]interface{}) {
-	// Build output with fixed column widths for proper alignment
 	var output strings.Builder
 
-	// Column 1: prefix + session ID (fixed width including tree chars)
+	// Prefix + session ID
 	output.WriteString(prefix)
-	if sessionID != "" {
-		output.WriteString(fmt.Sprintf("[%s]", sessionID))
-	} else {
-		output.WriteString(strings.Repeat(" ", 10))
-	}
-	output.WriteString("    ") // 4 spaces separator
+	output.WriteString(fmt.Sprintf("[%s]", sessionID))
 
-	// Column 2: PID (right-aligned, fixed width)
-	if pidDisplay != "" {
-		output.WriteString(fmt.Sprintf("%13s", pidDisplay)) // 13 chars for pid/pid format
-	} else {
-		output.WriteString(strings.Repeat(" ", 13))
-	}
-	output.WriteString("    ") // 4 spaces separator
-
-	// Column 3: Title + state + command (variable width, but calculate for alignment)
-	var titleSection strings.Builder
-	if title != "" {
-		// Truncate title to reasonable length
-		if len(title) > 60 {
-			title = title[:57] + "..."
-		}
-		titleSection.WriteString(title)
-	}
-
+	// State indicator
 	if state != "" {
-		if titleSection.Len() > 0 {
-			titleSection.WriteString(" ")
-		}
-		titleSection.WriteString(state)
+		output.WriteString(" ")
+		output.WriteString(state)
 	}
 
-	if command != "" && command != "-" {
-		// Truncate very long commands
-		if len(command) > 80 {
-			command = command[:77] + "..."
+	// Title (compact - max 35 chars)
+	if title != "" {
+		output.WriteString(" ")
+		if len(title) > 35 {
+			title = title[:32] + "..."
 		}
-		if titleSection.Len() > 0 {
-			titleSection.WriteString(" ")
-		}
-		titleSection.WriteString(fmt.Sprintf("— %s", command))
+		output.WriteString(title)
 	}
 
-	titleStr := titleSection.String()
-	output.WriteString(titleStr)
-
-	// Add plugin data aligned to fixed column position
-	var pluginParts []string
-	for _, col := range pluginCols {
-		if pluginData != nil {
+	// Plugin data (compact)
+	if len(pluginCols) > 0 && pluginData != nil {
+		for _, col := range pluginCols {
 			if value, exists := pluginData[col]; exists {
 				if v := fmt.Sprintf("%v", value); v != "" && v != "-" {
-					pluginParts = append(pluginParts, fmt.Sprintf("%s:%v", col, value))
+					output.WriteString(fmt.Sprintf(" [%s:%v]", col, value))
 				}
 			}
 		}
-	}
-
-	if len(pluginParts) > 0 {
-		// Calculate total visible width so far (prefix + ID + PID + title)
-		currentWidth := visibleLen(prefix) + 10 + 4 + 13 + 4 + visibleLen(titleStr)
-		// Align plugin data to absolute column position
-		targetCol := 120
-		if currentWidth < targetCol {
-			output.WriteString(strings.Repeat(" ", targetCol-currentWidth))
-		} else {
-			output.WriteString("    ") // minimum spacing if content is too long
-		}
-		output.WriteString(strings.Join(pluginParts, " "))
 	}
 
 	fmt.Println(output.String())
