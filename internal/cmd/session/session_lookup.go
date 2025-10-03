@@ -26,9 +26,16 @@ parent-child relationships, split trees, and container lookups.`,
   it2 session lookup window`,
 	}
 
-	// Add subcommands
+	// Add hierarchy/lineage subcommands
 	cmd.AddCommand(newLookupParentCommand())
+	cmd.AddCommand(newLookupChildrenCommand())
+	cmd.AddCommand(newLookupSiblingsCommand())
+	cmd.AddCommand(newLookupAncestorsCommand())
+	cmd.AddCommand(newLookupDescendantsCommand())
+	cmd.AddCommand(newLookupLineageCommand())
 	cmd.AddCommand(newLookupSplitRootCommand())
+
+	// Add container lookup subcommands
 	cmd.AddCommand(newLookupTabCommand())
 	cmd.AddCommand(newLookupWindowCommand())
 
