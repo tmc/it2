@@ -92,6 +92,10 @@ func NewCommand() *cobra.Command {
 	splitCmd.GroupID = "management"
 	cmd.AddCommand(splitCmd)
 
+	moveCmd := newMoveCommand()
+	moveCmd.GroupID = "management"
+	cmd.AddCommand(moveCmd)
+
 	currentCmd := newCurrentCommand()
 	currentCmd.GroupID = "management"
 	cmd.AddCommand(currentCmd)

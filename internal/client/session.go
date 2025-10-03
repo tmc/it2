@@ -782,3 +782,45 @@ func (c *Client) ListSessionProfileProperties(ctx context.Context, sessionID str
 
 	return result, nil
 }
+
+// MoveSession moves a session to be a split pane next to another session
+// using iTerm2's built-in iterm2.move_session function.
+//
+// Parameters:
+//   - sourceSessionID: The session to move
+//   - destSessionID: The destination session to split
+//   - vertical: If true, split destination vertically; if false, horizontally
+//   - before: If true, place source before/above destination; if false, after/below
+//
+// The function will fail if:
+//   - Either session ID is invalid
+//   - Sessions are not compatible (e.g., tmux vs non-tmux)
+//   - Either session has no tab
+//   - Either session is locked
+//   - Panes are maximized (will auto-unmaximize)
+func (c *Client) MoveSession(ctx context.Context, sourceSessionID, destSessionID string, vertical, before bool) error {
+	// Construct the invocation string for iterm2.move_session
+	// Format: iterm2.move_session(session: "id1", destination: "id2", vertical: true, before: false)
+	invocation := fmt.Sprintf(
+		"iterm2.move_session(session: %s, destination: %s, vertical: %t, before: %t)",
+		jsonQuote(sourceSessionID),
+		jsonQuote(destSessionID),
+		vertical,
+		before,
+	)
+
+	// Invoke the function with session context (using source session)
+	_, err := c.InvokeFunction(ctx, invocation, &sourceSessionID, nil, nil, -1)
+	if err != nil {
+		return fmt.Errorf("failed to move session: %w", err)
+	}
+
+	return nil
+}
+
+// jsonQuote wraps a string in JSON double quotes, escaping any special characters
+func jsonQuote(s string) string {
+	// Use json.Marshal to properly escape the string
+	b, _ := json.Marshal(s)
+	return string(b)
+}

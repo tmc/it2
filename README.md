@@ -224,6 +224,10 @@ Development workflow automation:
 	it2 session split --horizontal
 	it2 session send-text "git status"
 
+	# Reorganize sessions by moving them
+	# Move a session to be next to another session
+	it2 session move sess_abc123 sess_def456 --vertical
+
 Remote server management:
 
 	# Connect to multiple servers
