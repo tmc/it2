@@ -10,8 +10,18 @@ import (
 	"time"
 
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/sessionid"
 	pb "github.com/tmc/it2/proto"
+	"golang.org/x/term"
 	"gopkg.in/yaml.v3"
+)
+
+const (
+	colorReset      = "\033[0m"
+	colorBold       = "\033[1m"
+	colorBrightCyan = "\033[1;36m" // Bright cyan for path
+	colorGreen      = "\033[1;32m" // Bright green for current session
+	colorCyan       = "\033[36m"   // Regular cyan for ancestors
 )
 
 type Formatter struct {
@@ -1559,6 +1569,76 @@ func FormatNotification(notification *pb.Notification, notificationType string) 
 	return fmt.Sprintf("Unknown notification type: %T", notification)
 }
 
+// shouldEnableColors determines if ANSI color codes should be used
+func shouldEnableColors() bool {
+	if os.Getenv("NO_COLOR") != "" {
+		return false
+	}
+	if os.Getenv("FORCE_COLOR") != "" || os.Getenv("CLICOLOR_FORCE") != "" {
+		return true
+	}
+	if term.IsTerminal(int(os.Stdout.Fd())) {
+		return true
+	}
+	if term.IsTerminal(int(os.Stderr.Fd())) {
+		return true
+	}
+	return false
+}
+
+// buildAncestorSet builds a set of ancestor session IDs for the given session
+func buildAncestorSet(targetSessionID string, sessions []*client.SessionInfo) map[string]bool {
+	ancestorSet := make(map[string]bool)
+	if targetSessionID == "" {
+		return ancestorSet
+	}
+
+	// Find ancestors by following parent links
+	currentID := targetSessionID
+	for {
+		found := false
+		for _, session := range sessions {
+			if session.SessionID == currentID {
+				if session.ParentSessionID != "" {
+					ancestorSet[session.ParentSessionID] = true
+					currentID = session.ParentSessionID
+					found = true
+				}
+				break
+			}
+		}
+		if !found {
+			break
+		}
+	}
+
+	return ancestorSet
+}
+
+// tabContainsSession checks if a split tree node contains the target session or any ancestors
+func tabContainsSession(node *pb.SplitTreeNode, targetSessionID string, ancestorSet map[string]bool) bool {
+	if node == nil || targetSessionID == "" {
+		return false
+	}
+	links := node.GetLinks()
+	for _, link := range links {
+		switch child := link.GetChild().(type) {
+		case *pb.SplitTreeNode_SplitTreeLink_Session:
+			if child.Session != nil {
+				sessionID := child.Session.GetUniqueIdentifier()
+				if sessionID == targetSessionID || ancestorSet[sessionID] {
+					return true
+				}
+			}
+		case *pb.SplitTreeNode_SplitTreeLink_Node:
+			if tabContainsSession(child.Node, targetSessionID, ancestorSet) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // formatSessionsTreeFromRaw formats sessions as a tree using raw split tree structure
 func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse, sessions []*client.SessionInfo) error {
 	if listResp == nil || len(listResp.GetWindows()) == 0 {
@@ -1588,6 +1668,17 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 	}
 	sort.Strings(pluginCols)
 
+	// Determine if highlighting should be enabled and get current session
+	shouldHighlight := shouldEnableColors()
+	currentSessionID := ""
+	var ancestorSet map[string]bool
+	if shouldHighlight {
+		if envSessionID := os.Getenv("ITERM_SESSION_ID"); envSessionID != "" {
+			currentSessionID = sessionid.Normalize(envSessionID)
+			ancestorSet = buildAncestorSet(currentSessionID, sessions)
+		}
+	}
+
 	// Print header
 	fmt.Println("Session Hierarchy:")
 	fmt.Println()
@@ -1602,7 +1693,25 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 		}
 
 		windowNum := window.GetNumber()
-		fmt.Printf("%s Window %d\n", windowConnector, windowNum)
+
+		// Check if this window contains the current session
+		windowContainsCurrent := false
+		if currentSessionID != "" {
+			tabs := window.GetTabs()
+			for _, tab := range tabs {
+				if tabContainsSession(tab.GetRoot(), currentSessionID, ancestorSet) {
+					windowContainsCurrent = true
+					break
+				}
+			}
+		}
+
+		// Highlight window if it contains the current session
+		if windowContainsCurrent {
+			fmt.Printf("%s%s%s Window %d\n", colorBrightCyan, windowConnector, colorReset, windowNum)
+		} else {
+			fmt.Printf("%s Window %d\n", windowConnector, windowNum)
+		}
 
 		// Print tabs within this window
 		tabs := window.GetTabs()
@@ -1620,7 +1729,20 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 			}
 
 			tabID := tab.GetTabId()
-			fmt.Printf("%s%s Tab %s\n", tabPrefix, tabConnector, tabID)
+
+			// Check if this tab contains the current session or ancestors
+			root := tab.GetRoot()
+			inHighlightedPath := false
+			if root != nil {
+				inHighlightedPath = tabContainsSession(root, currentSessionID, ancestorSet)
+			}
+
+			// Highlight tab if it contains the current session
+			if inHighlightedPath {
+				fmt.Printf("%s%s%s%s Tab %s\n", colorBrightCyan, tabPrefix, tabConnector, colorReset, tabID)
+			} else {
+				fmt.Printf("%s%s Tab %s\n", tabPrefix, tabConnector, tabID)
+			}
 
 			// Print the split tree for this tab
 			sessionPrefix := tabPrefix
@@ -1630,9 +1752,8 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 				sessionPrefix += "│ "
 			}
 
-			root := tab.GetRoot()
 			if root != nil {
-				printSplitTreeNode(root, sessionPrefix, true, sessionInfoMap, pluginCols)
+				printSplitTreeNode(root, sessionPrefix, true, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, inHighlightedPath)
 			}
 		}
 	}
@@ -2023,7 +2144,7 @@ func sortTreeNodes(nodes []*TreeNode) {
 }
 
 // printSplitTreeNode recursively prints a split tree node (either a split container or a session)
-func printSplitTreeNode(node *pb.SplitTreeNode, prefix string, isLast bool, sessionInfoMap map[string]*client.SessionInfo, pluginCols []string) {
+func printSplitTreeNode(node *pb.SplitTreeNode, prefix string, isLast bool, sessionInfoMap map[string]*client.SessionInfo, pluginCols []string, currentSessionID string, ancestorSet map[string]bool, inHighlightedPath bool) {
 	if node == nil {
 		return
 	}
@@ -2049,7 +2170,12 @@ func printSplitTreeNode(node *pb.SplitTreeNode, prefix string, isLast bool, sess
 			dirIndicator = "⫴"
 		}
 
-		fmt.Printf("%s%s %s [%s]\n", prefix, connector, dirIndicator, splitType)
+		// Apply bright cyan highlighting if this split is in the path to current session
+		if inHighlightedPath {
+			fmt.Printf("%s%s%s%s %s [%s]\n", colorBrightCyan, prefix, connector, colorReset, dirIndicator, splitType)
+		} else {
+			fmt.Printf("%s%s %s [%s]\n", prefix, connector, dirIndicator, splitType)
+		}
 
 		// Print children with appropriate prefix
 		newPrefix := prefix
@@ -2061,16 +2187,38 @@ func printSplitTreeNode(node *pb.SplitTreeNode, prefix string, isLast bool, sess
 
 		for i, link := range links {
 			childIsLast := i == len(links)-1
-			printSplitTreeLink(link, newPrefix, childIsLast, sessionInfoMap, pluginCols)
+			// Check if this child link contains the current session or ancestors
+			var childInPath bool
+			switch child := link.GetChild().(type) {
+			case *pb.SplitTreeNode_SplitTreeLink_Session:
+				if child.Session != nil {
+					sessionID := child.Session.GetUniqueIdentifier()
+					childInPath = sessionID == currentSessionID || ancestorSet[sessionID]
+				}
+			case *pb.SplitTreeNode_SplitTreeLink_Node:
+				childInPath = tabContainsSession(child.Node, currentSessionID, ancestorSet)
+			}
+			printSplitTreeLink(link, newPrefix, childIsLast, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, childInPath)
 		}
 	} else {
 		// Single link - just print it directly
-		printSplitTreeLink(links[0], prefix, isLast, sessionInfoMap, pluginCols)
+		// Check if this link is in the highlighted path
+		var linkInPath bool
+		switch child := links[0].GetChild().(type) {
+		case *pb.SplitTreeNode_SplitTreeLink_Session:
+			if child.Session != nil {
+				sessionID := child.Session.GetUniqueIdentifier()
+				linkInPath = sessionID == currentSessionID || ancestorSet[sessionID]
+			}
+		case *pb.SplitTreeNode_SplitTreeLink_Node:
+			linkInPath = tabContainsSession(child.Node, currentSessionID, ancestorSet)
+		}
+		printSplitTreeLink(links[0], prefix, isLast, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, linkInPath)
 	}
 }
 
 // printSplitTreeLink prints a link in the split tree (can be a session or another split node)
-func printSplitTreeLink(link *pb.SplitTreeNode_SplitTreeLink, prefix string, isLast bool, sessionInfoMap map[string]*client.SessionInfo, pluginCols []string) {
+func printSplitTreeLink(link *pb.SplitTreeNode_SplitTreeLink, prefix string, isLast bool, sessionInfoMap map[string]*client.SessionInfo, pluginCols []string, currentSessionID string, ancestorSet map[string]bool, inHighlightedPath bool) {
 	if link == nil {
 		return
 	}
@@ -2129,12 +2277,31 @@ func printSplitTreeLink(link *pb.SplitTreeNode_SplitTreeLink, prefix string, isL
 			pluginData = sessionInfo.PluginData
 		}
 
+		// Determine highlighting: current session vs ancestor vs normal
+		isCurrent := currentSessionID != "" && sessionID == currentSessionID
+		isAncestor := ancestorSet[sessionID]
+
+		// Build the line prefix with appropriate highlighting
+		var linePrefix string
+		if isCurrent {
+			// Current session: cyan connector with green indicator
+			linePrefix = prefix + colorBrightCyan + connector + colorReset + " " + colorGreen + "● " + colorReset
+		} else if isAncestor {
+			// Ancestor in path: bright cyan connector
+			linePrefix = prefix + colorBrightCyan + connector + colorReset + " "
+		} else {
+			// No highlighting - normal display
+			linePrefix = prefix + connector + " "
+		}
+
 		// Print the session using the formatted tree line
-		printFormattedTreeLine(prefix+connector+" ", title, shortID, pidDisplay, state, command, pluginCols, pluginData)
+		printFormattedTreeLine(linePrefix, title, shortID, pidDisplay, state, command, pluginCols, pluginData)
 
 	case *pb.SplitTreeNode_SplitTreeLink_Node:
+		// Check if this child node contains the current session or ancestors
+		childInPath := tabContainsSession(child.Node, currentSessionID, ancestorSet)
 		// Recursively print child split tree node
-		printSplitTreeNode(child.Node, prefix, isLast, sessionInfoMap, pluginCols)
+		printSplitTreeNode(child.Node, prefix, isLast, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, childInPath)
 	}
 }
 
