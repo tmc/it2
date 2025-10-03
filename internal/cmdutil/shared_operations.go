@@ -11,6 +11,7 @@ import (
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/formatting"
 	"github.com/tmc/it2/internal/plugins"
+	pb "github.com/tmc/it2/proto"
 )
 
 // SharedListOptions contains common options for list operations
@@ -43,6 +44,16 @@ func NewSharedListOperations(client *client.Client, ctx context.Context) *Shared
 
 // ListSessions lists sessions with optional filtering by window and tab
 func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
+	// Get raw response for tree format (need the full split tree structure)
+	var rawResp interface{}
+	if opts.Format == "tree" {
+		resp, err := s.client.ListSessionsRaw(s.ctx)
+		if err != nil {
+			return fmt.Errorf("failed to list sessions: %w", err)
+		}
+		rawResp = resp
+	}
+
 	sessions, err := s.client.ListSessions(s.ctx)
 	if err != nil {
 		return fmt.Errorf("failed to list sessions: %w", err)
@@ -125,6 +136,14 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 	// Disable hyperlinks by default
 	enableHyperlinks := false
 	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, enableHyperlinks)
+
+	// Use raw tree structure for tree format
+	if opts.Format == "tree" && rawResp != nil {
+		if pbResp, ok := rawResp.(*pb.ListSessionsResponse); ok {
+			return formatter.FormatSessionsWithRawTree(pbResp, filteredSessions)
+		}
+	}
+
 	return formatter.FormatSessions(filteredSessions)
 }
 

@@ -64,11 +64,21 @@ func (f *Formatter) FormatSessions(sessions []*client.SessionInfo) error {
 	case "text":
 		return f.formatText(sessions)
 	case "tree":
+		// Tree format uses flattened sessions for backward compatibility
 		return f.formatSessionsTree(sessions)
 	default:
 		// Default to table format for better readability
 		return f.formatSessionsTable(sessions)
 	}
+}
+
+// FormatSessionsWithRawTree formats sessions using the raw split tree structure from iTerm2
+func (f *Formatter) FormatSessionsWithRawTree(listResp *pb.ListSessionsResponse, sessions []*client.SessionInfo) error {
+	if f.format == "tree" {
+		return f.formatSessionsTreeFromRaw(listResp, sessions)
+	}
+	// For other formats, use the regular formatter
+	return f.FormatSessions(sessions)
 }
 
 func (f *Formatter) FormatTabResponse(resp *pb.CreateTabResponse) error {
@@ -1549,6 +1559,87 @@ func FormatNotification(notification *pb.Notification, notificationType string) 
 	return fmt.Sprintf("Unknown notification type: %T", notification)
 }
 
+// formatSessionsTreeFromRaw formats sessions as a tree using raw split tree structure
+func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse, sessions []*client.SessionInfo) error {
+	if listResp == nil || len(listResp.GetWindows()) == 0 {
+		fmt.Println("✗ No sessions found")
+		fmt.Println("  Run 'it2 session create' to create a new session")
+		return nil
+	}
+
+	// Build session info lookup map
+	sessionInfoMap := make(map[string]*client.SessionInfo)
+	for _, session := range sessions {
+		sessionInfoMap[session.SessionID] = session
+	}
+
+	// Check if any sessions have plugin data to determine additional columns
+	pluginColumns := make(map[string]bool)
+	for _, session := range sessions {
+		for key := range session.PluginData {
+			pluginColumns[key] = true
+		}
+	}
+
+	// Add plugin columns to headers in sorted order for stability
+	var pluginCols []string
+	for col := range pluginColumns {
+		pluginCols = append(pluginCols, col)
+	}
+	sort.Strings(pluginCols)
+
+	// Print header
+	fmt.Println("Session Hierarchy:")
+	fmt.Println()
+
+	// Print each window
+	windows := listResp.GetWindows()
+	for windowIndex, window := range windows {
+		isLastWindow := windowIndex == len(windows)-1
+		windowConnector := "├─"
+		if isLastWindow {
+			windowConnector = "└─"
+		}
+
+		windowNum := window.GetNumber()
+		fmt.Printf("%s Window %d\n", windowConnector, windowNum)
+
+		// Print tabs within this window
+		tabs := window.GetTabs()
+		for tabIndex, tab := range tabs {
+			isLastTab := tabIndex == len(tabs)-1
+
+			tabPrefix := "│ "
+			if isLastWindow {
+				tabPrefix = "  "
+			}
+
+			tabConnector := "├─"
+			if isLastTab {
+				tabConnector = "└─"
+			}
+
+			tabID := tab.GetTabId()
+			fmt.Printf("%s%s Tab %s\n", tabPrefix, tabConnector, tabID)
+
+			// Print the split tree for this tab
+			sessionPrefix := tabPrefix
+			if isLastTab {
+				sessionPrefix += "  "
+			} else {
+				sessionPrefix += "│ "
+			}
+
+			root := tab.GetRoot()
+			if root != nil {
+				printSplitTreeNode(root, sessionPrefix, true, sessionInfoMap, pluginCols)
+			}
+		}
+	}
+
+	return nil
+}
+
 // formatSessionsTree formats sessions as a tree showing hierarchy ordered by window -> tab -> splits -> sessions
 func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 	// Note: To show proper panel hierarchy, we need access to the raw protobuf data
@@ -1928,6 +2019,122 @@ func sortTreeNodes(nodes []*TreeNode) {
 				nodes[i], nodes[j] = nodes[j], nodes[i]
 			}
 		}
+	}
+}
+
+// printSplitTreeNode recursively prints a split tree node (either a split container or a session)
+func printSplitTreeNode(node *pb.SplitTreeNode, prefix string, isLast bool, sessionInfoMap map[string]*client.SessionInfo, pluginCols []string) {
+	if node == nil {
+		return
+	}
+
+	links := node.GetLinks()
+	if len(links) == 0 {
+		return
+	}
+
+	// If this node has multiple links, it's a split container
+	if len(links) > 1 {
+		// Print split container
+		connector := "├─"
+		if isLast {
+			connector = "└─"
+		}
+
+		// Add split direction indicator
+		splitType := "Horizontal Split"
+		dirIndicator := "⫻"
+		if node.GetVertical() {
+			splitType = "Vertical Split"
+			dirIndicator = "⫴"
+		}
+
+		fmt.Printf("%s%s %s [%s]\n", prefix, connector, dirIndicator, splitType)
+
+		// Print children with appropriate prefix
+		newPrefix := prefix
+		if isLast {
+			newPrefix += "  "
+		} else {
+			newPrefix += "│ "
+		}
+
+		for i, link := range links {
+			childIsLast := i == len(links)-1
+			printSplitTreeLink(link, newPrefix, childIsLast, sessionInfoMap, pluginCols)
+		}
+	} else {
+		// Single link - just print it directly
+		printSplitTreeLink(links[0], prefix, isLast, sessionInfoMap, pluginCols)
+	}
+}
+
+// printSplitTreeLink prints a link in the split tree (can be a session or another split node)
+func printSplitTreeLink(link *pb.SplitTreeNode_SplitTreeLink, prefix string, isLast bool, sessionInfoMap map[string]*client.SessionInfo, pluginCols []string) {
+	if link == nil {
+		return
+	}
+
+	switch child := link.GetChild().(type) {
+	case *pb.SplitTreeNode_SplitTreeLink_Session:
+		// Print session
+		session := child.Session
+		if session == nil {
+			return
+		}
+
+		connector := "├─"
+		if isLast {
+			connector = "└─"
+		}
+
+		sessionID := session.GetUniqueIdentifier()
+		shortID := sessionID
+		if len(sessionID) > 8 {
+			shortID = sessionID[:8]
+		}
+
+		// Get enriched session info if available
+		sessionInfo := sessionInfoMap[sessionID]
+
+		// Format session information
+		pidDisplay := ""
+		state := ""
+		command := ""
+		title := session.GetTitle()
+		var pluginData map[string]interface{}
+
+		if sessionInfo != nil {
+			if sessionInfo.ShellPID != 0 && sessionInfo.JobPID != 0 && sessionInfo.ShellPID != sessionInfo.JobPID {
+				pidDisplay = fmt.Sprintf("%d/%d", sessionInfo.ShellPID, sessionInfo.JobPID)
+			} else if sessionInfo.JobPID != 0 {
+				pidDisplay = fmt.Sprintf("%d", sessionInfo.JobPID)
+			} else if sessionInfo.ShellPID != 0 {
+				pidDisplay = fmt.Sprintf("%d", sessionInfo.ShellPID)
+			}
+
+			// Format state
+			switch sessionInfo.PromptState {
+			case "AT_COMMAND_LINE", "PROMPT_STATE_AT_COMMAND_LINE":
+				state = "✳"
+			case "IN_COMMAND", "PROMPT_STATE_IN_COMMAND":
+				state = "🚧"
+			case "AT_PASSWORD_PROMPT", "PROMPT_STATE_AT_PASSWORD_PROMPT":
+				state = "🔒"
+			case "FILE_TRANSFER", "PROMPT_STATE_FILE_TRANSFER":
+				state = "📁"
+			}
+
+			command = sessionInfo.CurrentCommand
+			pluginData = sessionInfo.PluginData
+		}
+
+		// Print the session using the formatted tree line
+		printFormattedTreeLine(prefix+connector+" ", title, shortID, pidDisplay, state, command, pluginCols, pluginData)
+
+	case *pb.SplitTreeNode_SplitTreeLink_Node:
+		// Recursively print child split tree node
+		printSplitTreeNode(child.Node, prefix, isLast, sessionInfoMap, pluginCols)
 	}
 }
 
