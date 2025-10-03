@@ -801,12 +801,16 @@ func (c *Client) ListSessionProfileProperties(ctx context.Context, sessionID str
 func (c *Client) MoveSession(ctx context.Context, sourceSessionID, destSessionID string, vertical, before bool) error {
 	// Construct the invocation string for iterm2.move_session
 	// Format: iterm2.move_session(session: "id1", destination: "id2", vertical: true, before: false)
+	// Note: iTerm2's "before" parameter is inverted from intuitive expectation:
+	//   before=false → northHalf/eastHalf (places source BEFORE/ABOVE destination)
+	//   before=true → southHalf/westHalf (places source AFTER/BELOW destination)
+	// So we invert the user's "before" flag to match expected behavior
 	invocation := fmt.Sprintf(
 		"iterm2.move_session(session: %s, destination: %s, vertical: %t, before: %t)",
 		jsonQuote(sourceSessionID),
 		jsonQuote(destSessionID),
 		vertical,
-		before,
+		!before, // Invert to match intuitive expectation
 	)
 
 	// Invoke the function with session context (using source session)
