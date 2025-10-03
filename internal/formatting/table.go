@@ -6,6 +6,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/mattn/go-runewidth"
 )
 
 // Regular expression to match ANSI escape codes including OSC 8 hyperlinks
@@ -15,7 +17,8 @@ var ansiEscapeRegex = regexp.MustCompile(`\x1b\][^\x1b]*\x1b\\|\x1b\[[^m]*m`)
 func visibleLen(s string) int {
 	// Strip all ANSI escape sequences including OSC 8 hyperlinks
 	stripped := ansiEscapeRegex.ReplaceAllString(s, "")
-	return len(stripped)
+	// Use runewidth to get proper display width (handles emoji and wide characters)
+	return runewidth.StringWidth(stripped)
 }
 
 // TableData represents data to be displayed in a table format
@@ -91,7 +94,7 @@ func (f *Formatter) printTableRow(row []string, colWidths []int) {
 			parts = append(parts, cell)
 		}
 	}
-	fmt.Println(strings.Join(parts, "  "))
+	fmt.Println(strings.Join(parts, "    "))
 }
 
 func (f *Formatter) printTableSeparator(colWidths []int) {
@@ -100,7 +103,7 @@ func (f *Formatter) printTableSeparator(colWidths []int) {
 		separator := strings.Repeat("-", width)
 		parts = append(parts, separator)
 	}
-	fmt.Println(strings.Join(parts, "  "))
+	fmt.Println(strings.Join(parts, "    "))
 }
 
 // NewTableData creates a new TableData with headers

@@ -1673,40 +1673,41 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 
 // printFormattedTreeLine prints a tree line with session details
 func printFormattedTreeLine(prefix, title, sessionID, pidDisplay, state, command string, pluginCols []string, pluginData map[string]interface{}) {
-	// Build a clean, readable output line with aligned PIDs
-	var parts []string
+	// Build output with fixed column widths for proper alignment
+	var output strings.Builder
 
-	// Start with prefix and session ID
-	idPart := prefix
+	// Column 1: prefix + session ID (fixed width including tree chars)
+	output.WriteString(prefix)
 	if sessionID != "" {
-		idPart += fmt.Sprintf("[%s]\t", sessionID)
+		output.WriteString(fmt.Sprintf("[%s]", sessionID))
 	} else {
-		// Pad if no session ID to maintain alignment
-		idPart += strings.Repeat(" ", 10) + "\t"
+		output.WriteString(strings.Repeat(" ", 10))
 	}
+	output.WriteString("    ") // 4 spaces separator
 
-	// Add PID with fixed width for alignment (6 digits should cover most PIDs)
+	// Column 2: PID (right-aligned, fixed width)
 	if pidDisplay != "" {
-		idPart += fmt.Sprintf("%6s", pidDisplay)
+		output.WriteString(fmt.Sprintf("%13s", pidDisplay)) // 13 chars for pid/pid format
 	} else {
-		idPart += "      " // 6 spaces for PID
+		output.WriteString(strings.Repeat(" ", 13))
 	}
+	output.WriteString("    ") // 4 spaces separator
 
-	parts = append(parts, idPart)
-
-	// Build title section (title + state + command)
-	var titleParts []string
-
-	// Truncate title to reasonable length
-	if len(title) > 60 {
-		title = title[:57] + "..."
-	}
+	// Column 3: Title + state + command (variable width, but calculate for alignment)
+	var titleSection strings.Builder
 	if title != "" {
-		titleParts = append(titleParts, title)
+		// Truncate title to reasonable length
+		if len(title) > 60 {
+			title = title[:57] + "..."
+		}
+		titleSection.WriteString(title)
 	}
 
 	if state != "" {
-		titleParts = append(titleParts, state)
+		if titleSection.Len() > 0 {
+			titleSection.WriteString(" ")
+		}
+		titleSection.WriteString(state)
 	}
 
 	if command != "" && command != "-" {
@@ -1714,12 +1715,16 @@ func printFormattedTreeLine(prefix, title, sessionID, pidDisplay, state, command
 		if len(command) > 80 {
 			command = command[:77] + "..."
 		}
-		titleParts = append(titleParts, fmt.Sprintf("— %s", command))
+		if titleSection.Len() > 0 {
+			titleSection.WriteString(" ")
+		}
+		titleSection.WriteString(fmt.Sprintf("— %s", command))
 	}
 
-	parts = append(parts, strings.Join(titleParts, " "))
+	titleStr := titleSection.String()
+	output.WriteString(titleStr)
 
-	// Add plugin data as separate tab-delimited column
+	// Add plugin data aligned to fixed column position
 	var pluginParts []string
 	for _, col := range pluginCols {
 		if pluginData != nil {
@@ -1732,10 +1737,19 @@ func printFormattedTreeLine(prefix, title, sessionID, pidDisplay, state, command
 	}
 
 	if len(pluginParts) > 0 {
-		parts = append(parts, strings.Join(pluginParts, " "))
+		// Calculate total visible width so far (prefix + ID + PID + title)
+		currentWidth := visibleLen(prefix) + 10 + 4 + 13 + 4 + visibleLen(titleStr)
+		// Align plugin data to absolute column position
+		targetCol := 120
+		if currentWidth < targetCol {
+			output.WriteString(strings.Repeat(" ", targetCol-currentWidth))
+		} else {
+			output.WriteString("    ") // minimum spacing if content is too long
+		}
+		output.WriteString(strings.Join(pluginParts, " "))
 	}
 
-	fmt.Println(strings.Join(parts, "\t"))
+	fmt.Println(output.String())
 }
 
 // buildSessionHierarchy builds parent-child relationships within a list of sessions

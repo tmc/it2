@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	pb "github.com/tmc/it2/proto"
@@ -203,7 +204,13 @@ func (c *Client) populateJobInfo(ctx context.Context, sessions []*SessionInfo) {
 
 		// Try to get working directory from session.path variable
 		if path, err := c.GetVariableWithScope(ctx, "session", session.SessionID, "path"); err == nil && path != "" {
-			session.WorkingDirectory = path
+			// Unescape JSON string (iTerm2 returns path as JSON-encoded string)
+			var unescaped string
+			if err := json.Unmarshal([]byte(path), &unescaped); err == nil {
+				session.WorkingDirectory = unescaped
+			} else {
+				session.WorkingDirectory = path
+			}
 		}
 	}
 }
