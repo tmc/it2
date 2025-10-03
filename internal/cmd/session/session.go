@@ -104,8 +104,14 @@ func NewCommand() *cobra.Command {
 	focusedCmd.GroupID = "management"
 	cmd.AddCommand(focusedCmd)
 
+	// Lookup commands for session relationships and hierarchy
+	lookupCmd := NewLookupCommand()
+	lookupCmd.GroupID = "management"
+	cmd.AddCommand(lookupCmd)
+
+	// Keep old 'parent' command as hidden alias for compatibility
 	parentCmd := newParentCommand()
-	parentCmd.GroupID = "management"
+	parentCmd.Hidden = true
 	cmd.AddCommand(parentCmd)
 
 	// Display & Appearance Commands
