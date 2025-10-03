@@ -12,6 +12,7 @@ type SessionInfo struct {
 	SessionID       string
 	ShortID         string // First 8 characters of SessionID for easier reference
 	ParentSessionID string // Parent session ID if this is a split pane
+	SplitVertical   *bool  // Direction of split from parent (nil if no parent, true=vertical, false=horizontal)
 	WindowID        string
 	WindowNumber    int32 // iTerm2 window index
 	TabID           string
@@ -91,6 +92,13 @@ func extractSessionsFromNode(node *pb.SplitTreeNode, windowID string, windowNumb
 	var sessions []*SessionInfo
 	links := node.GetLinks()
 
+	// Get split direction for this node
+	var splitVertical *bool
+	if node.Vertical != nil {
+		v := node.GetVertical()
+		splitVertical = &v
+	}
+
 	// If this node has multiple children (it's a split), establish parent-child relationships
 	if len(links) > 1 {
 		var directSessions []*SessionInfo
@@ -111,6 +119,7 @@ func extractSessionsFromNode(node *pb.SplitTreeNode, windowID string, windowNumb
 						SessionID:       sessionID,
 						ShortID:         shortID,
 						ParentSessionID: parentSessionID,
+						SplitVertical:   splitVertical,
 						WindowID:        windowID,
 						WindowNumber:    windowNumber,
 						TabID:           tabID,
@@ -132,9 +141,10 @@ func extractSessionsFromNode(node *pb.SplitTreeNode, windowID string, windowNumb
 			parentSession := directSessions[0]
 			sessions = append(sessions, parentSession)
 
-			// Remaining sessions become children of the first
+			// Remaining sessions become children of the first, with split direction
 			for i := 1; i < len(directSessions); i++ {
 				directSessions[i].ParentSessionID = parentSession.SessionID
+				directSessions[i].SplitVertical = splitVertical
 				sessions = append(sessions, directSessions[i])
 			}
 		} else {
@@ -160,6 +170,7 @@ func extractSessionsFromNode(node *pb.SplitTreeNode, windowID string, windowNumb
 						SessionID:       sessionID,
 						ShortID:         shortID,
 						ParentSessionID: parentSessionID,
+						SplitVertical:   splitVertical,
 						WindowID:        windowID,
 						WindowNumber:    windowNumber,
 						TabID:           tabID,

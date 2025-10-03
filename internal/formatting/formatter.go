@@ -1551,6 +1551,9 @@ func FormatNotification(notification *pb.Notification, notificationType string) 
 
 // formatSessionsTree formats sessions as a tree showing hierarchy ordered by window -> tab -> splits -> sessions
 func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
+	// Note: To show proper panel hierarchy, we need access to the raw protobuf data
+	// For now, fall back to the parent-child hierarchy from sessions
+	// TODO: Refactor to pass raw ListSessionsResponse to show actual split tree
 	if len(sessions) == 0 {
 		fmt.Println("✗ No sessions found")
 		fmt.Println("  Run 'it2 session create' to create a new session")
@@ -1653,7 +1656,7 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 
 			fmt.Printf("%s%s %s\n", tabPrefix, tabConnector, tabTitle)
 
-			// Build session hierarchy within this tab
+			// Build session hierarchy within this tab (with panel structure)
 			sessionHierarchy := buildSessionHierarchy(sessionList)
 
 			// Print sessions within this tab
@@ -1763,6 +1766,7 @@ func buildSessionHierarchy(sessions []*client.SessionInfo) map[string]*TreeNode 
 			ShortID:        session.ShortID,
 			Name:           session.SessionName,
 			ParentID:       session.ParentSessionID,
+			SplitVertical:  session.SplitVertical,
 			Children:       []*TreeNode{},
 			CurrentCommand: session.CurrentCommand,
 			ShellPID:       session.ShellPID,
@@ -1818,10 +1822,19 @@ func printSessionHierarchy(nodeMap map[string]*TreeNode, prefix string, pluginCo
 
 // printSessionNode prints a session node with its children
 func printSessionNode(node *TreeNode, prefix string, isLast bool, pluginCols []string) {
-	// Determine the connector
+	// Determine the connector with split direction indicator
 	connector := "├─"
 	if isLast {
 		connector = "└─"
+	}
+
+	// Add split direction indicator if this is a split
+	if node.SplitVertical != nil {
+		if *node.SplitVertical {
+			connector += "⫴" // Vertical split indicator
+		} else {
+			connector += "⫻" // Horizontal split indicator
+		}
 	}
 
 	// Format session information
@@ -1882,12 +1895,28 @@ type TreeNode struct {
 	ShortID        string
 	Name           string
 	ParentID       string
+	SplitVertical  *bool // Direction of split from parent (nil if no parent, true=vertical, false=horizontal)
 	Children       []*TreeNode
 	CurrentCommand string
 	ShellPID       int32
 	JobPID         int32
 	PromptState    string
 	PluginData     map[string]interface{}
+}
+
+// SplitTreeNode represents a node in the panel hierarchy (can be a session or a split container)
+type SplitTreeNode struct {
+	IsSession      bool                 // True if this is a session, false if it's a split container
+	IsVertical     bool                 // Direction of split (only relevant if IsSession=false)
+	SessionID      string               // Only set if IsSession=true
+	ShortID        string               // Only set if IsSession=true
+	Name           string               // Only set if IsSession=true
+	CurrentCommand string               // Only set if IsSession=true
+	ShellPID       int32                // Only set if IsSession=true
+	JobPID         int32                // Only set if IsSession=true
+	PromptState    string               // Only set if IsSession=true
+	PluginData     map[string]interface{} // Only set if IsSession=true
+	Children       []*SplitTreeNode     // Child nodes (either sessions or more splits)
 }
 
 // sortTreeNodes sorts tree nodes by name for consistent output
