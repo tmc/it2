@@ -27,3 +27,6 @@ tmp/
 
 # Session collaboration and research artifacts
 tmp/
+
+# Compiled binaries
+it2-extensions/*/it2-session-*
