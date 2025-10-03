@@ -122,8 +122,8 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 	}
 
 	// Format and output
-	// Enable hyperlinks if: not explicitly disabled AND terminal supports them
-	enableHyperlinks := !opts.NoHyperlinks && formatting.SupportsOSC8()
+	// Disable hyperlinks by default
+	enableHyperlinks := false
 	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, enableHyperlinks)
 	return formatter.FormatSessions(filteredSessions)
 }
@@ -157,8 +157,8 @@ func (s *SharedListOperations) ListTabs(opts SharedListOptions) error {
 	}
 
 	// Format and output
-	// Enable hyperlinks if: not explicitly disabled AND terminal supports them
-	enableHyperlinks := !opts.NoHyperlinks && formatting.SupportsOSC8()
+	// Disable hyperlinks by default
+	enableHyperlinks := false
 	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, enableHyperlinks)
 	return formatter.FormatTabs(tabInfos)
 }
@@ -205,8 +205,8 @@ func (s *SharedListOperations) ListWindows(opts SharedListOptions) error {
 		}
 	}
 
-	// Enable hyperlinks if: not explicitly disabled AND terminal supports them
-	enableHyperlinks := !opts.NoHyperlinks && formatting.SupportsOSC8()
+	// Disable hyperlinks by default
+	enableHyperlinks := false
 	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, enableHyperlinks)
 	return formatter.FormatClientWindows(windows)
 }

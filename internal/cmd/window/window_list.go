@@ -91,8 +91,9 @@ func newListCommand() *cobra.Command {
 	// Add quiet flag
 	cmd.Flags().BoolP("quiet", "q", false, "Output only window IDs")
 
-	// Add no-hyperlinks flag
+	// Add no-hyperlinks flag (hidden)
 	cmd.Flags().Bool("no-hyperlinks", false, "Disable OSC 8 terminal hyperlinks in output")
+	cmd.Flags().MarkHidden("no-hyperlinks")
 
 	return cmd
 }

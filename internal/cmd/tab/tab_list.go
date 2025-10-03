@@ -72,8 +72,9 @@ Examples:
 	// Add quiet flag
 	cmd.Flags().BoolP("quiet", "q", false, "Output only tab IDs")
 
-	// Add no-hyperlinks flag
+	// Add no-hyperlinks flag (hidden)
 	cmd.Flags().Bool("no-hyperlinks", false, "Disable OSC 8 terminal hyperlinks in output")
+	cmd.Flags().MarkHidden("no-hyperlinks")
 
 	// Add completion functions
 	cmd.RegisterFlagCompletionFunc("window-id", completion.WindowIDCompletion)
