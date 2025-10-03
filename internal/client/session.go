@@ -136,16 +136,54 @@ func (c *Client) CloseSessions(ctx context.Context, sessionIDs []string, force b
 	return nil, fmt.Errorf("unexpected response type")
 }
 
-// ActivateSession activates and optionally selects a session
+// TabContainsSession recursively checks if a tab tree contains the given session ID
+func (c *Client) TabContainsSession(node *pb.SplitTreeNode, sessionID string) bool {
+	if node == nil {
+		return false
+	}
+
+	// Check all links
+	for _, link := range node.GetLinks() {
+		// Check if link contains a session
+		if session := link.GetSession(); session != nil {
+			if session.GetUniqueIdentifier() == sessionID {
+				return true
+			}
+		}
+		// Check if link contains a node
+		if childNode := link.GetNode(); childNode != nil {
+			if c.TabContainsSession(childNode, sessionID) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// ActivateSession activates and optionally selects a session with default options
 func (c *Client) ActivateSession(ctx context.Context, sessionID string, selectSession bool) (*pb.ActivateResponse, error) {
+	return c.ActivateSessionWithOptions(ctx, sessionID, selectSession, true, true)
+}
+
+// ActivateSessionWithOptions activates a session with full control over activation behavior
+func (c *Client) ActivateSessionWithOptions(ctx context.Context, sessionID string, selectSession, orderWindowFront, selectTab bool) (*pb.ActivateResponse, error) {
 	normalizedID := NormalizeSessionID(sessionID)
+	raiseAllWindows := false
+	ignoringOtherApps := true
 	msg := &pb.ClientOriginatedMessage{
 		Submessage: &pb.ClientOriginatedMessage_ActivateRequest{
 			ActivateRequest: &pb.ActivateRequest{
 				Identifier: &pb.ActivateRequest_SessionId{
 					SessionId: normalizedID,
 				},
-				SelectSession: &selectSession,
+				OrderWindowFront: &orderWindowFront,
+				SelectTab:        &selectTab,
+				SelectSession:    &selectSession,
+				ActivateApp: &pb.ActivateRequest_App{
+					RaiseAllWindows:    &raiseAllWindows,
+					IgnoringOtherApps: &ignoringOtherApps,
+				},
 			},
 		},
 	}

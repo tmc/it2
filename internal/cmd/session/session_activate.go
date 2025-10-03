@@ -42,11 +42,13 @@ func newActivateCommand() *cobra.Command {
 				return sc.ReportError("resolve session ID", err)
 			}
 
-			// Get the select-session flag
+			// Get flags
 			selectSession, _ := sc.GetCommand().Flags().GetBool("select-session")
+			orderWindowFront, _ := sc.GetCommand().Flags().GetBool("order-window-front")
+			selectTab, _ := sc.GetCommand().Flags().GetBool("select-tab")
 
 			// Execute the activation
-			_, err = sc.GetClient().ActivateSession(sc.GetContext(), sessionID, selectSession)
+			_, err = sc.GetClient().ActivateSessionWithOptions(sc.GetContext(), sessionID, selectSession, orderWindowFront, selectTab)
 			if err != nil {
 				return sc.ReportError("activate session", err)
 			}
@@ -68,6 +70,8 @@ func newActivateCommand() *cobra.Command {
 
 	cmd := cmdutil.NewCommandFromTemplate(template)
 	cmd.Flags().Bool("select-session", true, "Select the session in its tab")
+	cmd.Flags().Bool("order-window-front", true, "Bring the window containing the session to front")
+	cmd.Flags().Bool("select-tab", true, "Select the tab containing the session")
 	cmd.Deprecated = "use 'it2 session focus' instead"
 
 	return cmd

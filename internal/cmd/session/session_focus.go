@@ -53,11 +53,50 @@ func newFocusCommand() *cobra.Command {
 				return sc.ReportError("resolve session ID", err)
 			}
 
-			// Get the select-session flag
-			selectSession, _ := sc.GetCommand().Flags().GetBool("select-session")
+			// Get flags
+			focusTab, _ := sc.GetCommand().Flags().GetBool("focus-tab")
+			focusWindow, _ := sc.GetCommand().Flags().GetBool("focus-window")
 
-			// Execute the activation (same as activate command)
-			_, err = sc.GetClient().ActivateSession(sc.GetContext(), sessionID, selectSession)
+			// If focus-tab or focus-window is requested, find which window and tab contain this session
+			if focusTab || focusWindow {
+				sessions, err := sc.GetClient().ListSessionsRaw(ctx)
+				if err != nil {
+					return sc.ReportError("list sessions", err)
+				}
+
+				var windowID, tabID string
+				for _, window := range sessions.GetWindows() {
+					for _, tab := range window.GetTabs() {
+						if sc.GetClient().TabContainsSession(tab.GetRoot(), sessionID) {
+							windowID = window.GetWindowId()
+							tabID = tab.GetTabId()
+							break
+						}
+					}
+					if windowID != "" {
+						break
+					}
+				}
+
+				// Activate the window if focus-window is set
+				if windowID != "" && focusWindow {
+					_, err = sc.GetClient().ActivateWindow(ctx, windowID, true)
+					if err != nil {
+						return sc.ReportError("activate window", err)
+					}
+				}
+
+				// Activate the tab if focus-tab is set
+				if tabID != "" && focusTab {
+					_, err = sc.GetClient().ActivateTab(ctx, tabID, true)
+					if err != nil {
+						return sc.ReportError("activate tab", err)
+					}
+				}
+			}
+
+			// Then activate the session (with defaults for internal API flags)
+			_, err = sc.GetClient().ActivateSessionWithOptions(sc.GetContext(), sessionID, true, focusWindow, focusTab)
 			if err != nil {
 				return sc.ReportError("focus session", err)
 			}
@@ -65,9 +104,10 @@ func newFocusCommand() *cobra.Command {
 			// Report success with JSON output support
 			if sc.GetFlags().Format == "json" {
 				result := map[string]interface{}{
-					"session_id": sessionID,
-					"focused":    true,
-					"selected":   selectSession,
+					"session_id":   sessionID,
+					"focused":      true,
+					"focus_window": focusWindow,
+					"focus_tab":    focusTab,
 				}
 				return sc.FormatOutput(result)
 			}
@@ -78,7 +118,8 @@ func newFocusCommand() *cobra.Command {
 	}
 
 	cmd := cmdutil.NewCommandFromTemplate(template)
-	cmd.Flags().Bool("select-session", true, "Select the session in its tab")
+	cmd.Flags().Bool("focus-window", false, "Bring the window containing the session to front")
+	cmd.Flags().Bool("focus-tab", false, "Switch to the tab containing the session")
 
 	return cmd
 }

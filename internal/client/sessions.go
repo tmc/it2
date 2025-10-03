@@ -32,7 +32,8 @@ type SessionInfo struct {
 	WorkingDirectory string // Current working directory from session.path
 }
 
-func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
+// ListSessionsRaw returns the raw protobuf response with full window/tab tree
+func (c *Client) ListSessionsRaw(ctx context.Context) (*pb.ListSessionsResponse, error) {
 	msg := &pb.ClientOriginatedMessage{
 		Submessage: &pb.ClientOriginatedMessage_ListSessionsRequest{
 			ListSessionsRequest: &pb.ListSessionsRequest{},
@@ -47,6 +48,15 @@ func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
 	listResp := response.GetListSessionsResponse()
 	if listResp == nil {
 		return nil, fmt.Errorf("unexpected response type")
+	}
+
+	return listResp, nil
+}
+
+func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
+	listResp, err := c.ListSessionsRaw(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	var sessions []*SessionInfo
