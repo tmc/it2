@@ -65,6 +65,14 @@ func newCreateCommand() *cobra.Command {
 				if err := validate.WindowExists(sc.GetContext(), sc.GetClient(), windowID); err != nil {
 					return err
 				}
+			} else {
+				// If no window ID provided, use the current window
+				currentWindowID, err := sc.GetCurrentWindowID()
+				if err == nil && currentWindowID != "" {
+					windowID = currentWindowID
+				}
+				// If we can't get the current window, windowID remains empty
+				// and iTerm2 will create a new window (existing behavior)
 			}
 
 			// Get additional flags

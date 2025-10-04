@@ -4,6 +4,7 @@ package cmdutil
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -126,6 +127,36 @@ func (sc *StandardCommand) GetContext() context.Context {
 // GetFlags returns the standard flags
 func (sc *StandardCommand) GetFlags() *StandardFlags {
 	return sc.flags
+}
+
+// GetCurrentWindowID returns the window ID of the current session
+func (sc *StandardCommand) GetCurrentWindowID() (string, error) {
+	sessionID := os.Getenv("ITERM_SESSION_ID")
+	if sessionID == "" {
+		return "", fmt.Errorf("ITERM_SESSION_ID not set")
+	}
+
+	if sc.client == nil {
+		return "", fmt.Errorf("client not initialized")
+	}
+
+	// Get all sessions
+	sessions, err := sc.client.ListSessions(sc.ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to list sessions: %w", err)
+	}
+
+	// Normalize the session ID for comparison
+	sessionID = NormalizeSessionID(sessionID)
+
+	// Find the current session and return its window ID
+	for _, session := range sessions {
+		if session.SessionID == sessionID {
+			return session.WindowID, nil
+		}
+	}
+
+	return "", fmt.Errorf("current session not found: %s", sessionID)
 }
 
 // FormatOutput formats and outputs data based on standard flags
