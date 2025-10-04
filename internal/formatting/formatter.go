@@ -797,7 +797,7 @@ func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error
 		return nil
 	}
 
-	headers := []string{"Win", "Window ID", "Tabs", "Sessions", "Full"}
+	headers := []string{"Win", "Window ID", "Tabs", "Sessions", "Full", "Title"}
 	table := NewTableData(headers)
 
 	for _, window := range windows {
@@ -822,6 +822,7 @@ func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error
 			fmt.Sprintf("%d", window.TabCount),
 			fmt.Sprintf("%d", window.SessionCount),
 			fullscreen,
+			window.Title,
 		}
 
 		table.AddRow(row)
