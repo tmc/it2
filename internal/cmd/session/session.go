@@ -119,6 +119,10 @@ func NewCommand() *cobra.Command {
 	badgeCmd.GroupID = "display"
 	cmd.AddCommand(badgeCmd)
 
+	resizeCmd := newResizeCommand()
+	resizeCmd.GroupID = "display"
+	cmd.AddCommand(resizeCmd)
+
 	// Keep old flat commands hidden for backwards compatibility
 	getTitleCmd := newGetTitleCommand()
 	getTitleCmd.Hidden = true
