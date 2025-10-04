@@ -640,22 +640,6 @@ type TabInfo struct {
 	PluginData   map[string]interface{} `json:"plugin_data,omitempty"`
 }
 
-func (f *Formatter) FormatWindows(windows []*WindowInfo) error {
-	switch f.format {
-	case "json":
-		return f.formatJSON(windows)
-	case "yaml":
-		return f.formatYAML(windows)
-	case "table":
-		return f.formatWindowsTable(windows)
-	case "text":
-		return f.formatWindowsText(windows)
-	default:
-		// Default to table format
-		return f.formatWindowsTable(windows)
-	}
-}
-
 // FormatClientWindows formats client.WindowInfo from the client package
 func (f *Formatter) FormatClientWindows(windows []*client.WindowInfo) error {
 	if f.quiet {
@@ -701,96 +685,6 @@ func (f *Formatter) formatClientWindowsText(windows []*client.WindowInfo) error 
 	return nil
 }
 
-func (f *Formatter) FormatWindowInfo(window *WindowInfo) error {
-	switch f.format {
-	case "json":
-		return f.formatJSON(window)
-	case "yaml":
-		return f.formatYAML(window)
-	default:
-		return f.formatWindowInfoText(window)
-	}
-}
-
-func (f *Formatter) formatWindowsText(windows []*WindowInfo) error {
-	if len(windows) == 0 {
-		fmt.Println("No windows found")
-		return nil
-	}
-
-	for _, window := range windows {
-		fmt.Printf("Window ID: %s\n", window.WindowID)
-		if window.Title != "" {
-			fmt.Printf("  Title: %s\n", window.Title)
-		}
-		fmt.Printf("  Tab Count: %d\n", window.TabCount)
-		if window.Fullscreen != "" {
-			fmt.Printf("  Fullscreen: %s\n", window.Fullscreen)
-		}
-		if window.Miniaturized != "" {
-			fmt.Printf("  Miniaturized: %s\n", window.Miniaturized)
-		}
-		fmt.Println(strings.Repeat("-", 40))
-	}
-	return nil
-}
-
-func (f *Formatter) formatWindowsTable(windows []*WindowInfo) error {
-	if len(windows) == 0 {
-		fmt.Println("No windows found")
-		return nil
-	}
-
-	headers := []string{"ID", "Title", "Name", "Tabs", "Frame", "Fullscreen", "Miniaturized"}
-	table := NewTableData(headers)
-
-	for _, window := range windows {
-		// Truncate long window IDs
-		shortID := window.WindowID
-		if len(shortID) > 12 {
-			shortID = shortID[:9] + "..."
-		}
-
-		// Apply hyperlinks to window ID if enabled
-		if f.hyperlinks {
-			url := WindowActivateURL(window.WindowID)
-			shortID = OSC8Hyperlink(url, shortID)
-		}
-
-		// Truncate long titles
-		title := window.Title
-		if len(title) > 30 {
-			title = title[:27] + "..."
-		}
-
-		// Truncate long names
-		name := window.Name
-		if len(name) > 20 {
-			name = name[:17] + "..."
-		}
-
-		// Truncate frame if too long
-		frame := window.Frame
-		if len(frame) > 20 {
-			frame = frame[:17] + "..."
-		}
-
-		row := []string{
-			shortID,
-			title,
-			name,
-			fmt.Sprintf("%d", window.TabCount),
-			frame,
-			window.Fullscreen,
-			window.Miniaturized,
-		}
-
-		table.AddRow(row)
-	}
-
-	return f.FormatTable(table)
-}
-
 func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error {
 	if len(windows) == 0 {
 		fmt.Println("No windows found")
@@ -829,24 +723,6 @@ func (f *Formatter) formatClientWindowsTable(windows []*client.WindowInfo) error
 	}
 
 	return f.FormatTable(table)
-}
-
-func (f *Formatter) formatWindowInfoText(window *WindowInfo) error {
-	fmt.Printf("Window ID: %s\n", window.WindowID)
-	if window.Title != "" {
-		fmt.Printf("Title: %s\n", window.Title)
-	}
-	fmt.Printf("Tab Count: %d\n", window.TabCount)
-	if window.Frame != "" {
-		fmt.Printf("Frame: %s\n", window.Frame)
-	}
-	if window.Fullscreen != "" {
-		fmt.Printf("Fullscreen: %s\n", window.Fullscreen)
-	}
-	if window.Miniaturized != "" {
-		fmt.Printf("Miniaturized: %s\n", window.Miniaturized)
-	}
-	return nil
 }
 
 // FormatTabs formats tab information
@@ -1388,16 +1264,6 @@ func (f *Formatter) FormatFilePanelResponse(response interface{}) error {
 // FormatLifecycleResponse formats lifecycle responses (placeholder)
 func (f *Formatter) FormatLifecycleResponse(response interface{}) error {
 	return fmt.Errorf("Lifecycle functionality not implemented - this is a placeholder")
-}
-
-// FormatStatusBarResponse formats status bar responses (placeholder)
-func (f *Formatter) FormatStatusBarResponse(response interface{}) error {
-	return fmt.Errorf("Status bar popover functionality not implemented - this is a placeholder")
-}
-
-// FormatUtilityResponse formats utility responses (placeholder)
-func (f *Formatter) FormatUtilityResponse(response interface{}) error {
-	return fmt.Errorf("Utility functionality not implemented - this is a placeholder")
 }
 
 // FormatNotification formats a notification for display

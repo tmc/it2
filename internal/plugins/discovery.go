@@ -112,86 +112,6 @@ func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, []Pr
 	return sessionPlugins, tabPlugins, windowPlugins, processPlugins, nil
 }
 
-// DiscoverEventMonitors finds all it2-* executables that support event monitoring
-// Search order (highest to lowest priority):
-//  1. Directories from PATH environment variable (highest priority)
-//  2. Directories from IT2_PLUGIN_PATHS (--plugin-path flag, middle priority)
-//  3. Embedded plugins directory (lowest priority, fallback)
-func DiscoverEventMonitors() ([]EventMonitor, error) {
-	var eventMonitors []EventMonitor
-	seen := make(map[string]bool) // Track seen plugin names to avoid duplicates
-
-	var paths []string
-
-	// Priority 1: User's PATH directories (highest priority)
-	pathEnv := os.Getenv("PATH")
-	if pathEnv != "" {
-		paths = append(paths, strings.Split(pathEnv, string(os.PathListSeparator))...)
-	}
-
-	// Priority 2: Additional plugin paths from --plugin-path flag (middle priority)
-	pluginPathsEnv := os.Getenv("IT2_PLUGIN_PATHS")
-	if pluginPathsEnv != "" {
-		paths = append(paths, strings.Split(pluginPathsEnv, string(os.PathListSeparator))...)
-	}
-
-	// Priority 3: Embedded plugins directory (lowest priority, fallback)
-	pluginsDir, err := embedded.ExtractPlugins()
-	if err == nil {
-		paths = append(paths, pluginsDir)
-	}
-
-	if len(paths) == 0 {
-		return eventMonitors, nil
-	}
-
-	// Look for executables starting with "it2-"
-	for _, dir := range paths {
-		entries, err := os.ReadDir(dir)
-		if err != nil {
-			// Skip directories we can't read
-			continue
-		}
-
-		for _, entry := range entries {
-			if entry.IsDir() {
-				continue
-			}
-
-			name := entry.Name()
-			if !strings.HasPrefix(name, "it2-") {
-				continue
-			}
-
-			fullPath := filepath.Join(dir, name)
-
-			// Check if it's executable
-			info, err := os.Stat(fullPath)
-			if err != nil {
-				continue
-			}
-
-			// Check if file is executable (Unix-like systems)
-			if info.Mode()&0111 != 0 {
-				// Skip if we've already seen this plugin name
-				if seen[name] {
-					continue
-				}
-				seen[name] = true
-
-				plugin := NewExecPlugin(fullPath)
-
-				// All session plugins can potentially be event monitors
-				if plugin.pluginType == "session" || plugin.pluginType == "generic" {
-					eventMonitors = append(eventMonitors, plugin)
-				}
-			}
-		}
-	}
-
-	return eventMonitors, nil
-}
-
 // Registry holds discovered plugins
 type Registry struct {
 	sessionEnrichers []SessionEnricher
@@ -228,11 +148,6 @@ func (r *Registry) GetEnrichers() []SessionEnricher {
 	return r.sessionEnrichers
 }
 
-// GetSessionEnrichers returns all registered session enrichers
-func (r *Registry) GetSessionEnrichers() []SessionEnricher {
-	return r.sessionEnrichers
-}
-
 // GetTabEnrichers returns all registered tab enrichers
 func (r *Registry) GetTabEnrichers() []TabEnricher {
 	return r.tabEnrichers
@@ -243,29 +158,9 @@ func (r *Registry) GetWindowEnrichers() []WindowEnricher {
 	return r.windowEnrichers
 }
 
-// AddSessionEnricher manually adds a session enricher to the registry
-func (r *Registry) AddSessionEnricher(enricher SessionEnricher) {
-	r.sessionEnrichers = append(r.sessionEnrichers, enricher)
-}
-
-// AddTabEnricher manually adds a tab enricher to the registry
-func (r *Registry) AddTabEnricher(enricher TabEnricher) {
-	r.tabEnrichers = append(r.tabEnrichers, enricher)
-}
-
-// AddWindowEnricher manually adds a window enricher to the registry
-func (r *Registry) AddWindowEnricher(enricher WindowEnricher) {
-	r.windowEnrichers = append(r.windowEnrichers, enricher)
-}
-
 // GetProcessEnrichers returns all registered process enrichers
 func (r *Registry) GetProcessEnrichers() []ProcessEnricher {
 	return r.processEnrichers
-}
-
-// AddProcessEnricher manually adds a process enricher to the registry
-func (r *Registry) AddProcessEnricher(enricher ProcessEnricher) {
-	r.processEnrichers = append(r.processEnrichers, enricher)
 }
 
 // DiscoverPluginMetadata returns detailed metadata about all discovered plugins

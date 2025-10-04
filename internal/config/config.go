@@ -158,15 +158,6 @@ func getConfigPath() string {
 	return filepath.Join(homeDir, ".it2", "config.yaml")
 }
 
-// GetConfigDir returns the configuration directory path
-func GetConfigDir() string {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return ".it2"
-	}
-	return filepath.Join(homeDir, ".it2")
-}
-
 // GetConfigPath returns the configuration file path
 func GetConfigPath() string {
 	return getConfigPath()

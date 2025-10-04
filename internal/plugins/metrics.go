@@ -78,23 +78,6 @@ func (s *MetricsStore) RecordExecution(pluginName string, duration time.Duration
 	}
 }
 
-// GetMetrics returns a copy of metrics for a plugin
-func (s *MetricsStore) GetMetrics(pluginName string) *PluginMetrics {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	m, exists := s.metrics[pluginName]
-	if !exists {
-		return nil
-	}
-
-	// Return a copy
-	copy := *m
-	copy.Durations = make([]int64, len(m.Durations))
-	copySlice(copy.Durations, m.Durations)
-	return &copy
-}
-
 // GetAllMetrics returns metrics for all plugins
 func (s *MetricsStore) GetAllMetrics() map[string]*PluginMetrics {
 	s.mu.RLock()

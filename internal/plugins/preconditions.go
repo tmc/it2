@@ -260,42 +260,6 @@ func (m *PreConditionManager) WaitForCondition(ctx context.Context, conditionNam
 	}
 }
 
-// CheckCondition checks a condition once without waiting
-func (m *PreConditionManager) CheckCondition(ctx context.Context, conditionName string, args []string) (PreConditionResult, error) {
-	checker, exists := m.checkers[conditionName]
-	if !exists {
-		// Try to find it as an executable
-		executable := m.findExecutable(conditionName)
-		if executable != "" {
-			if err := m.RegisterExecutable(executable); err != nil {
-				return PreConditionResult{
-					Success: false,
-					Message: fmt.Sprintf("Failed to load pre-condition plugin '%s': %v", conditionName, err),
-					Error:   err,
-				}, err
-			}
-			checker = m.checkers[conditionName]
-		} else {
-			return PreConditionResult{
-				Success: false,
-				Message: fmt.Sprintf("Pre-condition '%s' not found", conditionName),
-				Error:   fmt.Errorf("unknown pre-condition: %s", conditionName),
-			}, fmt.Errorf("unknown pre-condition: %s", conditionName)
-		}
-	}
-
-	return checker.Check(ctx, args)
-}
-
-// ListConditions returns a list of all registered conditions
-func (m *PreConditionManager) ListConditions() []string {
-	conditions := make([]string, 0, len(m.checkers))
-	for name := range m.checkers {
-		conditions = append(conditions, name)
-	}
-	return conditions
-}
-
 // findExecutable tries to find an executable for a condition name
 func (m *PreConditionManager) findExecutable(conditionName string) string {
 	// Try different naming patterns
@@ -345,17 +309,7 @@ func (m *PreConditionManager) findExecutable(conditionName string) string {
 // Global pre-condition manager instance
 var globalManager = NewPreConditionManager()
 
-// GetGlobalManager returns the global pre-condition manager
-func GetGlobalManager() *PreConditionManager {
-	return globalManager
-}
-
 // WaitForCondition is a convenience function using the global manager
 func WaitForCondition(ctx context.Context, conditionName string, args []string, timeout time.Duration) (PreConditionResult, error) {
 	return globalManager.WaitForCondition(ctx, conditionName, args, timeout, 500*time.Millisecond)
-}
-
-// CheckCondition is a convenience function using the global manager
-func CheckCondition(ctx context.Context, conditionName string, args []string) (PreConditionResult, error) {
-	return globalManager.CheckCondition(ctx, conditionName, args)
 }

@@ -95,25 +95,3 @@ func NewInvalidFormatError(format string, validFormats []string) error {
 		},
 	}
 }
-
-// NewTimeoutError creates a standardized timeout error.
-func NewTimeoutError(operation string) error {
-	return &StandardError{
-		Operation: operation,
-		Details: map[string]interface{}{
-			"error": "operation timed out",
-			"hint":  "Try increasing the timeout with --timeout flag",
-		},
-	}
-}
-
-// NewPermissionError creates a standardized permission error.
-func NewPermissionError(resource string) error {
-	return &StandardError{
-		Operation: fmt.Sprintf("access %s", resource),
-		Details: map[string]interface{}{
-			"error": "permission denied",
-			"hint":  "Check iTerm2 permissions and API settings",
-		},
-	}
-}

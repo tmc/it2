@@ -19,23 +19,6 @@ var (
 	sessionIDPattern = regexp.MustCompile(`^(?:[^:]+:)?[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$`)
 )
 
-// SessionID validates a session ID format.
-func SessionID(id string) error {
-	if id == "" {
-		return cmderr.NewValidationError("session_id", "cannot be empty")
-	}
-
-	// Normalize the ID first
-	normalized := sessionid.Normalize(id)
-
-	// Check if it's a valid UUID after normalization
-	if !uuidPattern.MatchString(normalized) {
-		return cmderr.NewValidationError("session_id", fmt.Sprintf("invalid format: %s", id))
-	}
-
-	return nil
-}
-
 // WindowID validates a window ID format.
 // Window IDs from iTerm2 are in the format "pty-<UUID>"
 func WindowID(id string) error {
@@ -116,36 +99,4 @@ func TabExists(ctx context.Context, client *client.Client, id string) error {
 	}
 
 	return cmderr.NewNotFoundError("tab", id)
-}
-
-// ResourceArgs validates standard resource argument patterns.
-func ResourceArgs(args []string, resourceType string, allowMultiple bool) error {
-	if len(args) == 0 {
-		return cmderr.NewRequiredArgumentError(resourceType + "_id")
-	}
-
-	if !allowMultiple && len(args) > 1 {
-		return cmderr.NewValidationError("arguments", fmt.Sprintf("expected 1 %s ID, got %d", resourceType, len(args)))
-	}
-
-	// Validate each ID based on resource type
-	for _, id := range args {
-		var err error
-		switch resourceType {
-		case "session":
-			err = SessionID(id)
-		case "window":
-			err = WindowID(id)
-		case "tab":
-			err = TabID(id)
-		default:
-			err = cmderr.NewValidationError("resource_type", fmt.Sprintf("unknown type: %s", resourceType))
-		}
-
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

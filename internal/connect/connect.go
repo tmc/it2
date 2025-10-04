@@ -49,12 +49,3 @@ func isConnectionRefused(err error) bool {
 		strings.Contains(errStr, "dial tcp") ||
 		strings.Contains(errStr, "connect:")
 }
-
-// ConnectClientWithURL creates and connects a client to a specific URL
-func ConnectClientWithURL(ctx context.Context, wsURL string) (*client.Client, error) {
-	c := client.New(wsURL)
-	if err := c.Connect(ctx); err != nil {
-		return nil, err
-	}
-	return c, nil
-}

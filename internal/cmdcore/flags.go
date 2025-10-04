@@ -79,37 +79,3 @@ func GetExtendedFlags(cmd *cobra.Command) (wsURL string, timeout time.Duration, 
 
 	return wsURL, timeout, format, columns, sortBy, sortReverse
 }
-
-// GetTimeout extracts timeout from command flags with fallback to global/default.
-func GetTimeout(cmd *cobra.Command) time.Duration {
-	timeout, _ := cmd.Flags().GetDuration("timeout")
-	if timeout == 0 {
-		if parent := cmd.Parent(); parent != nil {
-			if root := parent.Root(); root != nil {
-				timeout, _ = root.PersistentFlags().GetDuration("timeout")
-			}
-		}
-	}
-	if timeout == 0 {
-		timeout = 60 * time.Second
-	}
-	return timeout
-}
-
-// GetFormat extracts format from command flags with fallback to global/default.
-func GetFormat(cmd *cobra.Command) string {
-	format, _ := cmd.Flags().GetString("format")
-	if format == "" {
-		if parent := cmd.Parent(); parent != nil {
-			if root := parent.Root(); root != nil {
-				if flag := root.PersistentFlags().Lookup("format"); flag != nil {
-					format = flag.Value.String()
-				}
-			}
-		}
-	}
-	if format == "" {
-		format = "table"
-	}
-	return format
-}
