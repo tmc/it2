@@ -864,3 +864,61 @@ func (c *Client) SetPreferences(ctx context.Context, prefs map[string]interface{
 
 	return nil
 }
+
+// SendRPCResult sends the result of a server-originated RPC call back to iTerm2.
+// This is used when responding to ServerOriginatedRPCNotification messages.
+// Either jsonValue (for success) or jsonException (for errors) should be provided, not both.
+func (c *Client) SendRPCResult(ctx context.Context, requestID string, jsonValue interface{}, jsonException error) error {
+	rpcReq := &pb.ServerOriginatedRPCResultRequest{
+		RequestId: &requestID,
+	}
+
+	if jsonException != nil {
+		// Format exception as JSON
+		exceptionData := map[string]string{
+			"reason": jsonException.Error(),
+		}
+		exceptionJSON, err := json.Marshal(exceptionData)
+		if err != nil {
+			return fmt.Errorf("failed to marshal exception: %w", err)
+		}
+		exceptionStr := string(exceptionJSON)
+		rpcReq.Result = &pb.ServerOriginatedRPCResultRequest_JsonException{
+			JsonException: exceptionStr,
+		}
+	} else if jsonValue != nil {
+		// Marshal value to JSON string
+		valueJSON, err := json.Marshal(jsonValue)
+		if err != nil {
+			return fmt.Errorf("failed to marshal result value: %w", err)
+		}
+		valueStr := string(valueJSON)
+		rpcReq.Result = &pb.ServerOriginatedRPCResultRequest_JsonValue{
+			JsonValue: valueStr,
+		}
+	} else {
+		// No result provided - send null
+		nullStr := "null"
+		rpcReq.Result = &pb.ServerOriginatedRPCResultRequest_JsonValue{
+			JsonValue: nullStr,
+		}
+	}
+
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_ServerOriginatedRpcResultRequest{
+			ServerOriginatedRpcResultRequest: rpcReq,
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return fmt.Errorf("failed to send RPC result: %w", err)
+	}
+
+	// Check for acknowledgment
+	if response.GetServerOriginatedRpcResultResponse() != nil {
+		return nil
+	}
+
+	return fmt.Errorf("unexpected response type")
+}

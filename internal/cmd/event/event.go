@@ -353,6 +353,7 @@ func processNotification(notification *pb.Notification, eventType string) EventL
 
 	case "rpc":
 		if rpc := notification.GetServerOriginatedRpcNotification(); rpc != nil {
+			event.Data["request_id"] = rpc.GetRequestId()
 			if rpcData := rpc.GetRpc(); rpcData != nil {
 				event.Data["name"] = rpcData.GetName()
 				event.Data["arguments"] = formatRPCArguments(rpcData.GetArguments())
@@ -426,6 +427,12 @@ func formatEventDescription(event EventLog) string {
 				return fmt.Sprintf("Profile %s property %s changed", guid, property)
 			}
 			return fmt.Sprintf("Profile %s changed", guid)
+		}
+
+	case "rpc":
+		if name, ok := event.Data["name"].(string); ok {
+			requestID := event.Data["request_id"].(string)
+			return fmt.Sprintf("RPC call: %s (request_id: %s)", name, requestID)
 		}
 	}
 
