@@ -37,6 +37,8 @@ func newCreateCommand() *cobra.Command {
 				profile = args[0]
 			}
 
+			focus, _ := cmd.Flags().GetBool("focus")
+
 			_, timeout, format := cmdcore.GetFlags(cmd)
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
@@ -52,11 +54,19 @@ func newCreateCommand() *cobra.Command {
 				return fmt.Errorf("failed to create window: %w", err)
 			}
 
+			// Focus the window if requested
+			if focus && response.WindowId != nil {
+				if _, err := c.ActivateWindow(ctx, *response.WindowId, true); err != nil {
+					return fmt.Errorf("failed to focus window: %w", err)
+				}
+			}
+
 			formatter := formatting.New(format)
 			return formatter.FormatTabResponse(response)
 		},
 	}
 
 	cmd.Flags().String("profile", "Default", "Profile to use for the new window")
+	cmd.Flags().Bool("focus", false, "Focus the new window after creation")
 	return cmd
 }
