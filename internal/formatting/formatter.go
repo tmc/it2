@@ -2143,17 +2143,17 @@ type TreeNode struct {
 
 // SplitTreeNode represents a node in the panel hierarchy (can be a session or a split container)
 type SplitTreeNode struct {
-	IsSession      bool                 // True if this is a session, false if it's a split container
-	IsVertical     bool                 // Direction of split (only relevant if IsSession=false)
-	SessionID      string               // Only set if IsSession=true
-	ShortID        string               // Only set if IsSession=true
-	Name           string               // Only set if IsSession=true
-	CurrentCommand string               // Only set if IsSession=true
-	ShellPID       int32                // Only set if IsSession=true
-	JobPID         int32                // Only set if IsSession=true
-	PromptState    string               // Only set if IsSession=true
+	IsSession      bool                   // True if this is a session, false if it's a split container
+	IsVertical     bool                   // Direction of split (only relevant if IsSession=false)
+	SessionID      string                 // Only set if IsSession=true
+	ShortID        string                 // Only set if IsSession=true
+	Name           string                 // Only set if IsSession=true
+	CurrentCommand string                 // Only set if IsSession=true
+	ShellPID       int32                  // Only set if IsSession=true
+	JobPID         int32                  // Only set if IsSession=true
+	PromptState    string                 // Only set if IsSession=true
 	PluginData     map[string]interface{} // Only set if IsSession=true
-	Children       []*SplitTreeNode     // Child nodes (either sessions or more splits)
+	Children       []*SplitTreeNode       // Child nodes (either sessions or more splits)
 }
 
 // sortTreeNodes sorts tree nodes by name for consistent output
