@@ -143,8 +143,6 @@ If no tab ID is provided, uses the current tab.`,
 			default:
 				return fmt.Errorf("unsupported format: %s (use 'tree' or 'json')", format)
 			}
-
-			return nil
 		},
 	}
 

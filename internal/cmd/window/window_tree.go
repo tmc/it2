@@ -139,8 +139,6 @@ If no window ID is provided, uses the current window.`,
 			default:
 				return fmt.Errorf("unsupported format: %s (use 'tree' or 'json')", format)
 			}
-
-			return nil
 		},
 	}
 

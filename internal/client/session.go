@@ -181,7 +181,7 @@ func (c *Client) ActivateSessionWithOptions(ctx context.Context, sessionID strin
 				SelectTab:        &selectTab,
 				SelectSession:    &selectSession,
 				ActivateApp: &pb.ActivateRequest_App{
-					RaiseAllWindows:    &raiseAllWindows,
+					RaiseAllWindows:   &raiseAllWindows,
 					IgnoringOtherApps: &ignoringOtherApps,
 				},
 			},

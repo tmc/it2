@@ -51,7 +51,6 @@ var (
 	format         string
 	pluginPaths    []string
 	pluginDeadline time.Duration
-	configCmd      *cobra.Command
 )
 
 var rootCmd = &cobra.Command{
