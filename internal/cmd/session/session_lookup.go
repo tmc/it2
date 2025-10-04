@@ -39,5 +39,8 @@ parent-child relationships, split trees, and container lookups.`,
 	cmd.AddCommand(newLookupTabCommand())
 	cmd.AddCommand(newLookupWindowCommand())
 
+	// Add spatial lookup subcommands
+	cmd.AddCommand(newLookupAboveCommand())
+
 	return cmd
 }
