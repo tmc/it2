@@ -88,7 +88,7 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 			colLower := strings.ToLower(col)
 			// Check if this looks like a plugin column (not a standard column)
 			standardCols := map[string]bool{
-				"id": true, "parent": true, "pid": true, "exit": true, "state": true,
+				"id": true, "split from": true, "pid": true, "exit": true, "state": true,
 				"window": true, "tab": true, "title": true, "command": true,
 			}
 			if !standardCols[colLower] {
