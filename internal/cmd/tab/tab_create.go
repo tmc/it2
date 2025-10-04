@@ -79,6 +79,7 @@ func newCreateCommand() *cobra.Command {
 			index, _ := sc.GetCommand().Flags().GetUint32("index")
 			initialCommand, _ := sc.GetCommand().Flags().GetString("command")
 			badge, _ := sc.GetCommand().Flags().GetString("badge")
+			focus, _ := sc.GetCommand().Flags().GetBool("focus")
 
 			// TODO: Implement badge setting after tab creation
 			_ = badge // Suppress unused variable warning for now
@@ -95,6 +96,13 @@ func newCreateCommand() *cobra.Command {
 				return sc.ReportError("create tab", err)
 			}
 
+			// Focus the tab if requested (via its session)
+			if focus && response.SessionId != nil && *response.SessionId != "" {
+				if _, err := sc.GetClient().ActivateSession(sc.GetContext(), *response.SessionId, true); err != nil {
+					return sc.ReportError("focus tab", err)
+				}
+			}
+
 			// Format the response
 			formatter := formatting.New(sc.GetFlags().Format)
 			return formatter.FormatTabResponse(response)
@@ -105,6 +113,7 @@ func newCreateCommand() *cobra.Command {
 	cmd.Flags().Uint32("index", 0, "Tab index position (0-based, appends to end if not specified)")
 	cmd.Flags().String("command", "", "Initial command to run in the new tab")
 	cmd.Flags().String("badge", "", "Set badge text on new tab's first session")
+	cmd.Flags().Bool("focus", false, "Focus the new tab after creation")
 
 	return cmd
 }
