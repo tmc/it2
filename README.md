@@ -1,315 +1,350 @@
 # it2
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/tmc/it2.svg)](https://pkg.go.dev/github.com/tmc/it2)
-[![Go Report Card](https://goreportcard.com/badge/github.com/tmc/it2)](https://goreportcard.com/report/github.com/tmc/it2)
 
-Command it2 provides comprehensive control over iTerm2 through its WebSocket API.
-
-The it2 command is a powerful CLI tool that enables terminal automation, session management, and access to advanced iTerm2 features. It's designed for both interactive use and scripting workflows.
-## Go Package
-
-For library usage, see: [https://pkg.go.dev/github.com/tmc/it2](https://pkg.go.dev/github.com/tmc/it2)
-
-	go get github.com/tmc/it2
-
-## Usage
-
-	it2 [global-flags] <command> [command-flags] [arguments]
-
-## Global Flags
-
-	--format string      Output format: text, json, yaml (default "text")
-	--timeout duration   Connection timeout (default 5s)
-	--url string         API URL (default "ws://localhost:1912", auto-detects Unix socket)
+A powerful command-line tool for controlling iTerm2 through its API. Automate terminal sessions, manage tabs and windows, monitor events, and integrate iTerm2 into your workflows.
 
 ## Installation
 
-Install the latest version:
+### Requirements
 
-	go install github.com/tmc/it2/cmd/it2@latest
+- **iTerm2** (macOS only, for now)
+- **Go** 1.21+
 
-Or download pre-built binaries from GitHub releases.
+### Install with Go
+
+```bash
+go install github.com/tmc/it2/cmd/it2@latest
+```
+
+Make sure `~/go/bin` is in your PATH:
+
+```bash
+export PATH="$HOME/go/bin:$PATH"
+```
+
+### Install from GitHub Releases
+
+Download pre-built binaries from [GitHub Releases](https://github.com/tmc/it2/releases).
+
+### Verify Installation
+
+```bash
+it2 auth check
+```
+
+The first time you run `it2`, iTerm2 will prompt you to allow API access. Click "Allow" to continue.
 
 ## Quick Start
 
-Basic session management:
+Try these commands to get started:
 
-	# List all terminal sessions
-	it2 session list
+```bash
+# List all terminal sessions
+it2 session list
 
-	# Send text to current session
-	it2 session send-text "echo Hello!"
+# Send text to the current session
+it2 session send-text "echo Hello, iTerm2!"
 
-	# Create a new tab
-	it2 tab create "Default"
+# Create a new tab
+it2 tab create "Default"
 
-	# Split current pane
-	it2 session split --vertical
+# Split current pane vertically
+it2 session split --vertical
 
-## Command Categories
+# Split current pane horizontally
+it2 session split --horizontal
+```
 
-Application Control:
+### Your First Automation Script
 
-  - app: Control iTerm2 application (focus, variables, properties)
-  - auth: Manage API authentication and connection
-  - arrangement: Save and restore window arrangements
+Create a development environment with one command:
 
-Session & Tab Management:
-
-  - session: Create, list, close, split, activate, restart sessions
-  - tab: Create, list, close, move, activate tabs
-  - window: Create, list, close, focus windows
-
-Text & Content Operations:
-
-  - text: Buffer operations, cursor control, search, selection
-  - selection: Control and retrieve text selection
-  - badge: Display informational badges on sessions
-  - clipboard: Manage clipboard operations
-  - screen: Screen capture utilities
-
-Shell Integration Features (requires Shell Integration):
-
-  - prompt: Access command history, prompts, exit codes
-  - job: Monitor running processes and jobs
-  - shell: Detect shell state (ready/busy/tui) and wait for prompts
-
-Customization:
-
-  - profile: Manage terminal profiles and their properties
-  - color: Import/export color presets and themes
-  - variable: Get/set iTerm2 variables with scope control
-
-Monitoring & Events:
-
-  - notification: Subscribe to real-time iTerm2 events
-  - broadcast: Manage broadcast input domains
-  - statusbar: Configure status bar components
-
-Advanced Features:
-
-  - tmux: Control tmux integration
-  - completion: Generate completion scripts for various shells
-  - config: Manage it2 configuration
-  - help: Get help about any command
-
-## Configuration
-
-Global flags available for all commands:
-
-	--format string      Output format: text, json, yaml (default "text")
-	--timeout duration   Connection timeout (default 5s)
-	--url string         API URL (default "ws://localhost:1912", auto-detects Unix socket)
-
-Environment variables that affect behavior:
-
-	ITERM_SESSION_ID     Current session ID (automatically set by iTerm2)
-	ITERM2_COOKIE        Authentication cookie (auto-requested if not set)
-	ITERM2_KEY           Authentication key (auto-requested if not set)
-	ITERM2_DEBUG         Enable debug logging (set to "1")
-
-## Authentication
-
-The it2 command automatically handles authentication with iTerm2:
-
- 1. On first connection, it requests credentials from iTerm2 via AppleScript
- 2. iTerm2 prompts the user to allow API access
- 3. Credentials are cached for the session duration
- 4. No manual authentication setup is required
-
-Authentication can be bypassed entirely for trusted environments by creating:
-
-	~/Library/Application Support/iTerm2/disable-automation-auth
-
-(This file must be owned by root and contain specific content)
-
-Check authentication status:
-
-	it2 auth check
-
-Force re-authentication:
-
-	it2 auth request
-
-## Session Identification
-
-Many commands work with session IDs in two formats:
-
-  - Full format: w0t1p12:C3D91F33-3805-47E2-A3F6-B8AED6EC2209
-  - UUID only: C3D91F33-3805-47E2-A3F6-B8AED6EC2209
-
-Commands automatically normalize session IDs and fall back to $ITERM\_SESSION\_ID when appropriate, making current session operations seamless.
-
-## Output Formats
-
-Most commands support multiple output formats:
-
-	# Human-readable text (default)
-	it2 session list
-
-	# JSON for scripting
-	it2 session list --format json
-
-	# YAML for configuration
-	it2 profile get "Default" --format yaml
-
-## Shell Integration
-
-Advanced features require iTerm2's Shell Integration:
-
-  - Command history access (prompt commands)
-  - Exit code tracking
-  - Job monitoring
-  - Directory tracking
-
-Enable in iTerm2: Menu → iTerm2 → Install Shell Integration
-
-Example Shell Integration workflows:
-
-	# Show command history with exit codes
-	it2 prompt list
-
-	# Search for failed commands
-	it2 prompt search "git" | grep "Exit: [^0]"
-
-	# Monitor running jobs
-	it2 job list <session-id>
-
-	# Check if shell is ready for input
-	it2 shell state
-
-	# Wait for shell to be ready before sending commands
-	it2 shell wait-for-prompt && it2 session send-text "echo ready"
-
-## Real-time Monitoring
-
-Subscribe to live iTerm2 events:
-
-	# Monitor keystrokes
-	it2 notification monitor --type keystroke
-
-	# Watch for new sessions
-	it2 notification monitor --type session
-
-	# Monitor variable changes
-	it2 variable monitor session user.myvar
-
-## Scripting Examples
-
-Useful patterns for automation:
-
-	# Create development environment
-	TAB1=$(it2 tab create "Default" --format json | jq -r '.tab_id')
-	it2 session send-text "cd ~/project && vim"
-	it2 session split --horizontal
-	it2 session send-text "npm run dev"
-
-	# Broadcast command to all sessions
-	for session in $(it2 session list --format json | jq -r '.[].id'); do
-	    it2 session send-text "$session" "git pull"
-	done
-
-	# Save terminal state
-	it2 arrangement save "development-setup"
+```bash
+# Create a new tab and split it into three panes
+it2 tab create "Default"
+it2 session send-text "cd ~/project && vim"
+it2 session split --horizontal
+it2 session send-text "npm run dev"
+it2 session split --vertical
+it2 session send-text "git status && git log --oneline -5"
+```
 
 ## Common Use Cases
 
-Development workflow automation:
+### Development Workflow
 
-	# Setup development environment
-	it2 tab create "Default"
-	it2 session send-text "cd ~/project"
-	it2 session split --vertical
-	it2 session send-text "npm run dev"
-	it2 session split --horizontal
-	it2 session send-text "git status"
+Setup a complete development environment:
 
-	# Reorganize sessions by moving them
-	# Move a session to be next to another session
-	it2 session move sess_abc123 sess_def456 --vertical
+```bash
+# Create a new tab with editor, dev server, and git status
+it2 tab create "Default"
+it2 session send-text "cd ~/project && vim"
+it2 session split --vertical
+it2 session send-text "npm run dev"
+it2 session split --horizontal
+it2 session send-text "git status"
+```
 
-Remote server management:
+### Multi-Server Management
 
-	# Connect to multiple servers
-	for server in web1 web2 db1; do
-	    it2 tab create "Default" --badge "$server"
-	    it2 session send-text "ssh $server"
-	done
+Connect to multiple servers at once:
 
-Monitoring and logging:
+```bash
+for server in web1 web2 db1; do
+    it2 tab create "Default"
+    it2 session send-text "ssh $server"
+done
+```
 
-	# Watch logs in real-time
-	it2 session send-text "tail -f /var/log/app.log"
-	it2 notification monitor --type screen | grep "ERROR"
+### Broadcast Commands
 
-Session backup and restore:
+Run the same command in all sessions:
 
-	# Save current arrangement
-	it2 arrangement save "$(date +%Y%m%d_%H%M%S)"
+```bash
+for session in $(it2 session list --format json | jq -r '.[].id'); do
+    it2 session send-text "$session" "git pull && git status"
+done
+```
 
-	# List saved arrangements
-	it2 arrangement list
+### Save and Restore Layouts
 
-	# Restore arrangement
-	it2 arrangement restore "20240101_120000"
+Save your current window arrangement:
+
+```bash
+it2 arrangement save "my-dev-setup"
+
+# Later, restore it
+it2 arrangement list
+it2 arrangement restore "my-dev-setup"
+```
+
+## Command Reference
+
+### Essential Commands
+
+**Sessions & Tabs:**
+- `it2 session list` - List all terminal sessions
+- `it2 session split [--vertical|--horizontal]` - Split current pane
+- `it2 session send-text <text>` - Send text to session
+- `it2 tab create <profile>` - Create new tab
+- `it2 window create` - Create new window
+
+**Text & Content:**
+- `it2 text get-buffer` - Get session buffer content
+- `it2 clipboard paste` - Paste from clipboard
+- `it2 badge set <text>` - Set session badge
+
+**Monitoring:**
+- `it2 notification monitor --type <type>` - Monitor events
+- `it2 variable monitor <scope> <name>` - Watch variable changes
+
+### All Command Categories
+
+<details>
+<summary>Click to expand full command list</summary>
+
+**Application Control:**
+- `app` - Control iTerm2 application (focus, variables, properties)
+- `auth` - Manage API authentication and connection
+- `arrangement` - Save and restore window arrangements
+
+**Session & Tab Management:**
+- `session` - Create, list, close, split, activate, restart sessions
+- `tab` - Create, list, close, move, activate tabs
+- `window` - Create, list, close, focus windows
+
+**Text & Content Operations:**
+- `text` - Buffer operations, cursor control, search, selection
+- `selection` - Control and retrieve text selection
+- `badge` - Display informational badges on sessions
+- `clipboard` - Manage clipboard operations
+- `screen` - Screen capture utilities
+
+**Shell Integration Features** (requires Shell Integration):
+- `prompt` - Access command history, prompts, exit codes
+- `job` - Monitor running processes and jobs
+- `shell` - Detect shell state (ready/busy/tui) and wait for prompts
+
+**Customization:**
+- `profile` - Manage terminal profiles and their properties
+- `color` - Import/export color presets and themes
+- `variable` - Get/set iTerm2 variables with scope control
+
+**Monitoring & Events:**
+- `notification` - Subscribe to real-time iTerm2 events
+- `broadcast` - Manage broadcast input domains
+- `statusbar` - Configure status bar components
+
+**Advanced:**
+- `tmux` - Control tmux integration
+- `completion` - Generate shell completion scripts
+- `config` - Manage it2 configuration
+
+</details>
+
+## Configuration
+
+### Global Flags
+
+All commands support these flags:
+
+```bash
+--format string      # Output format: text, json, yaml (default "text")
+--timeout duration   # Connection timeout (default 5s)
+--url string         # API URL (auto-detects Unix socket)
+```
+
+### Environment Variables
+
+```bash
+ITERM_SESSION_ID     # Current session ID (auto-set by iTerm2)
+ITERM2_COOKIE        # Auth cookie (auto-requested if not set)
+ITERM2_KEY           # Auth key (auto-requested if not set)
+ITERM2_DEBUG=1       # Enable debug logging
+```
+
+### Output Formats
+
+Get data in different formats:
+
+```bash
+it2 session list                    # Human-readable text
+it2 session list --format json      # JSON for scripting
+it2 profile get "Default" --format yaml  # YAML for config
+```
+
+## Advanced Features
+
+### Shell Integration
+
+Enable advanced features by installing iTerm2 Shell Integration:
+
+**Menu → iTerm2 → Install Shell Integration**
+
+This unlocks:
+- Command history access
+- Exit code tracking
+- Job monitoring
+- Shell state detection
+
+```bash
+# Show command history with exit codes
+it2 prompt list
+
+# Search for failed commands
+it2 prompt search "git" | grep "Exit: [^0]"
+
+# Wait for shell to be ready
+it2 shell wait-for-prompt && it2 session send-text "echo ready"
+```
+
+### Real-time Event Monitoring
+
+Subscribe to live iTerm2 events:
+
+```bash
+# Monitor keystrokes
+it2 notification monitor --type keystroke
+
+# Watch for new sessions
+it2 notification monitor --type session
+
+# Monitor variable changes
+it2 variable monitor session user.myvar
+```
+
+### Authentication
+
+Authentication is automatic:
+1. First connection requests credentials via AppleScript
+2. iTerm2 prompts you to allow API access
+3. Credentials cached for session duration
+
+```bash
+# Check auth status
+it2 auth check
+
+# Force re-authentication
+it2 auth request
+```
+
+## Usage Tips
+
+### Session Identification
+
+Sessions can be referenced by:
+- Full format: `w0t1p12:C3D91F33-3805-47E2-A3F6-B8AED6EC2209`
+- UUID only: `C3D91F33-3805-47E2-A3F6-B8AED6EC2209`
+- When omitted, uses `$ITERM_SESSION_ID` (current session)
+
+### Scripting Best Practices
+
+```bash
+# Use JSON output for parsing
+SESSIONS=$(it2 session list --format json)
+echo "$SESSIONS" | jq -r '.[].id'
+
+# Always quote variables
+it2 session send-text "$SESSION_ID" "$COMMAND"
+
+# Chain commands carefully
+it2 session send-text "cd /path && pwd && ls"
+```
 
 ## Troubleshooting
 
-Common issues and solutions:
+### Connection Problems
 
-Connection problems:
+```bash
+# Check if iTerm2 API is enabled
+it2 auth check
 
-	# Check if iTerm2 API is enabled
-	it2 auth check
+# Enable debug output
+ITERM2_DEBUG=1 it2 session list
 
-	# Enable debug output
-	ITERM2_DEBUG=1 it2 session list
+# Verify API is enabled in iTerm2
+# Preferences → General → Magic → Enable Python API
+```
 
-Shell Integration not working:
+### Shell Integration Not Working
 
-	# Verify Shell Integration is installed
-	echo $ITERM_SESSION_ID  # Should show session ID
+```bash
+# Verify Shell Integration is installed
+echo $ITERM_SESSION_ID  # Should show session ID
 
-	# Reinstall if needed
-	curl -L https://iterm2.com/shell_integration/install_shell_integration_and_utilities.sh | bash
+# Reinstall if needed
+curl -L https://iterm2.com/shell_integration/install_shell_integration_and_utilities.sh | bash
+```
 
-## Requirements
+### Session ID Not Found
 
-  - iTerm2 version 3.3.0 or later
-  - Python API enabled: Preferences → General → Magic → Enable Python API
-  - macOS (iTerm2 is macOS-only)
-  - Shell Integration (for prompt/job commands)
+```bash
+# List all sessions to find the correct ID
+it2 session list
 
-## Exit Codes
+# Use UUID format or full format
+it2 session send-text C3D91F33-3805-47E2-A3F6-B8AED6EC2209 "echo test"
+```
 
-The it2 command uses standard exit codes:
+## Go Package
 
-	0    Success
-	1    General error (authentication, connection, invalid arguments)
-	2    Command usage error (wrong number of arguments, invalid flags)
+For using it2 as a Go library in your own projects:
 
-## Files
+```bash
+go get github.com/tmc/it2
+```
 
-iTerm2 uses these connection methods for API communication:
+See documentation at [pkg.go.dev/github.com/tmc/it2](https://pkg.go.dev/github.com/tmc/it2)
 
-	~/Library/Application Support/iTerm2/private/socket
-	    Unix domain socket for local API communication (preferred, faster)
-	    Automatically detected and used when available
+## Resources
 
-	ws://localhost:1912
-	    WebSocket endpoint for API communication (fallback only)
-	    Used only when Unix socket is unavailable
-
-## More Information
-
-Documentation and examples:
-
-  - Project repository: [https://github.com/tmc/it2](https://github.com/tmc/it2)
-  - iTerm2 API documentation: [https://iterm2.com/documentation-api.html](https://iterm2.com/documentation-api.html)
-  - Shell Integration guide: [https://iterm2.com/documentation-shell-integration.html](https://iterm2.com/documentation-shell-integration.html)
+- **Project Repository**: [github.com/tmc/it2](https://github.com/tmc/it2)
+- **iTerm2 API Docs**: [iterm2.com/documentation-api.html](https://iterm2.com/documentation-api.html)
+- **Shell Integration Guide**: [iterm2.com/documentation-shell-integration.html](https://iterm2.com/documentation-shell-integration.html)
 
 Get help for any command:
-
-	it2 help [command]
-	it2 [command] --help
-	it2 [command] [subcommand] --help
+```bash
+it2 help [command]
+it2 [command] --help
+```
