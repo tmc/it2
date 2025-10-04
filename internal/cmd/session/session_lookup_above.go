@@ -134,15 +134,26 @@ func findSessionAboveInNode(node *pb.SplitTreeNode, targetSessionID string, path
 	// Add current node to path
 	currentPath := append(path, node)
 
-	// Check if this is a vertical split
+	// Check split direction
+	// Note: iTerm2's vertical flag means:
+	//   vertical=true  → panes arranged horizontally (left-to-right)
+	//   vertical=false → panes arranged vertically (top-to-bottom)
 	isVertical := node.GetVertical()
 
 	links := node.GetLinks()
 	for i, link := range links {
-		// Check if this link contains our target session
-		if containsSession(link, targetSessionID) {
-			// If this is a vertical split and not the first link, look in previous link
-			if isVertical && i > 0 {
+		// Recurse into children FIRST to handle nested splits
+		switch child := link.GetChild().(type) {
+		case *pb.SplitTreeNode_SplitTreeLink_Node:
+			if sessionID := findSessionAboveInNode(child.Node, targetSessionID, currentPath); sessionID != "" {
+				return sessionID
+			}
+		}
+
+		// Check if this link contains our target session (directly, not in children)
+		if containsSessionDirectly(link, targetSessionID) {
+			// If panes are stacked vertically (vertical=false) and not the first link, look in previous link
+			if !isVertical && i > 0 {
 				// Get the previous link (which is above)
 				prevLink := links[i-1]
 				// Find the bottommost session in the previous link
@@ -151,17 +162,25 @@ func findSessionAboveInNode(node *pb.SplitTreeNode, targetSessionID string, path
 			// If we're at the top of a vertical split, need to go up the tree
 			return ""
 		}
-
-		// Recurse into children
-		switch child := link.GetChild().(type) {
-		case *pb.SplitTreeNode_SplitTreeLink_Node:
-			if sessionID := findSessionAboveInNode(child.Node, targetSessionID, currentPath); sessionID != "" {
-				return sessionID
-			}
-		}
 	}
 
 	return ""
+}
+
+// containsSessionDirectly checks if a link directly IS the target session (not in children).
+func containsSessionDirectly(link *pb.SplitTreeNode_SplitTreeLink, targetSessionID string) bool {
+	if link == nil {
+		return false
+	}
+
+	switch child := link.GetChild().(type) {
+	case *pb.SplitTreeNode_SplitTreeLink_Session:
+		if child.Session != nil {
+			return child.Session.GetUniqueIdentifier() == targetSessionID
+		}
+	}
+
+	return false
 }
 
 // containsSession checks if a link contains the target session (directly or in children).
@@ -226,11 +245,7 @@ func getBottommostSessionInNode(node *pb.SplitTreeNode) string {
 		return ""
 	}
 
-	// If vertical split, use last link (bottom)
-	if node.GetVertical() {
-		return getBottommostSession(links[len(links)-1])
-	}
-
-	// If horizontal split, check rightmost link
+	// If panes are stacked vertically (vertical=false), use last link (bottom)
+	// If panes are arranged horizontally (vertical=true), also use last link (rightmost)
 	return getBottommostSession(links[len(links)-1])
 }

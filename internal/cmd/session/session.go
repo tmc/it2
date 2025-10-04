@@ -75,10 +75,6 @@ func NewCommand() *cobra.Command {
 	focusCmd.GroupID = "management"
 	cmd.AddCommand(focusCmd)
 
-	focusHierarchyCmd := newFocusHierarchyCommand()
-	focusHierarchyCmd.GroupID = "monitoring"
-	cmd.AddCommand(focusHierarchyCmd)
-
 	// Keep activate as hidden alias for backwards compatibility
 	activateCmd := newActivateCommand()
 	activateCmd.Hidden = true
