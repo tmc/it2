@@ -1,8 +1,8 @@
-// Package it2 provides a Go client library and CLI for the iTerm2 API.
+// Package it2 provides a powerful CLI tool and Go client library for the iTerm2 API.
 //
-// The it2 package enables comprehensive programmatic control of iTerm2 on macOS,
-// providing both a library interface for Go programs and a powerful command-line tool.
-// It supports all major iTerm2 automation features through Unix socket and WebSocket APIs.
+// The it2 command-line tool enables comprehensive programmatic control of iTerm2 on macOS.
+// For library usage, see the github.com/tmc/it2/internal/client package.
+// All major iTerm2 automation features are supported through Unix socket and WebSocket APIs.
 //
 // # Features
 //
@@ -23,17 +23,17 @@
 //
 // # Installation
 //
-// Install the library:
-//
-//	go get github.com/tmc/it2
-//
 // Install the CLI tool:
 //
 //	go install github.com/tmc/it2/cmd/it2@latest
 //
+// For library usage:
+//
+//	import "github.com/tmc/it2/internal/client"
+//
 // # Library Usage
 //
-// Basic connection and session management:
+// Use the internal/client package for programmatic access:
 //
 //	package main
 //
@@ -42,51 +42,37 @@
 //		"fmt"
 //		"log"
 //
-//		"github.com/tmc/it2"
+//		"github.com/tmc/it2/internal/client"
 //	)
 //
 //	func main() {
 //		// Create and connect to iTerm2
-//		client := it2.New()
+//		c := client.New("ws://localhost:1912")
 //		ctx := context.Background()
-//		if err := client.Connect(ctx); err != nil {
+//		if err := c.Connect(ctx); err != nil {
 //			log.Fatal(err)
 //		}
-//		defer client.Close()
+//		defer c.Close()
 //
 //		// List all sessions
-//		sessions, err := client.ListSessions(ctx)
+//		sessions, err := c.ListSessions(ctx)
 //		if err != nil {
 //			log.Fatal(err)
 //		}
 //
 //		for _, session := range sessions {
 //			fmt.Printf("Session: %s (Window: %s)\n",
-//				session.ID, session.WindowID)
+//				session.SessionID, session.WindowID)
 //		}
 //
 //		// Send text to first session
 //		if len(sessions) > 0 {
-//			err = client.SendText(ctx, sessions[0].ID, "echo Hello!\n")
+//			err = c.SendText(ctx, sessions[0].SessionID, "echo Hello!\n")
 //			if err != nil {
 //				log.Fatal(err)
 //			}
 //		}
 //	}
-//
-// # Quick Connect
-//
-// For simple operations, use the QuickConnect convenience methods:
-//
-//	// Quick connect and send text
-//	client, err := it2.QuickConnect(context.Background())
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	defer client.Close()
-//
-//	// Send to current session (uses $ITERM_SESSION_ID)
-//	err = it2.QuickSendText("echo Quick message\n")
 //
 // # Connection
 //
