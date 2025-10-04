@@ -44,9 +44,9 @@ func NewSharedListOperations(client *client.Client, ctx context.Context) *Shared
 
 // ListSessions lists sessions with optional filtering by window and tab
 func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
-	// Get raw response for tree formats (need the full split tree structure)
+	// Get raw response for tree format (need the full split tree structure)
 	var rawResp interface{}
-	if opts.Format == "tree" || opts.Format == "raw-tree" || opts.Format == "tree-json" {
+	if opts.Format == "tree" {
 		resp, err := s.client.ListSessionsRaw(s.ctx)
 		if err != nil {
 			return fmt.Errorf("failed to list sessions: %w", err)
@@ -137,8 +137,8 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 	enableHyperlinks := false
 	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, enableHyperlinks)
 
-	// Use raw tree structure for tree formats
-	if (opts.Format == "tree" || opts.Format == "raw-tree" || opts.Format == "tree-json") && rawResp != nil {
+	// Use raw tree structure for tree format
+	if opts.Format == "tree" && rawResp != nil {
 		if pbResp, ok := rawResp.(*pb.ListSessionsResponse); ok {
 			return formatter.FormatSessionsWithRawTree(pbResp, filteredSessions)
 		}

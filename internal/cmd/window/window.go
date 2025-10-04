@@ -82,6 +82,10 @@ full compatibility with existing flat commands.`,
 		ID:    "properties",
 		Title: "Property Commands:",
 	})
+	cmd.AddGroup(&cobra.Group{
+		ID:    "layout",
+		Title: "Layout Commands:",
+	})
 
 	// Window Management Commands
 	listCmd := newListCommand()
@@ -125,6 +129,11 @@ full compatibility with existing flat commands.`,
 	setPropCmd := newSetPropertyCommand()
 	setPropCmd.GroupID = "properties"
 	cmd.AddCommand(setPropCmd)
+
+	// Layout Commands
+	treeCmd := newTreeCommand()
+	treeCmd.GroupID = "layout"
+	cmd.AddCommand(treeCmd)
 
 	// Add hierarchical completion
 	cmd.ValidArgsFunction = completion.HierarchicalWindowCompletion

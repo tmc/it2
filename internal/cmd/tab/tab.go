@@ -90,5 +90,9 @@ func NewCommand() *cobra.Command {
 	splitsCmd.GroupID = "layout"
 	cmd.AddCommand(splitsCmd)
 
+	treeCmd := newTreeCommand()
+	treeCmd.GroupID = "layout"
+	cmd.AddCommand(treeCmd)
+
 	return cmd
 }
