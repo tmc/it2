@@ -13,6 +13,7 @@ import (
 	"github.com/tmc/it2/internal/sessionid"
 	pb "github.com/tmc/it2/proto"
 	"golang.org/x/term"
+	"google.golang.org/protobuf/encoding/protojson"
 	"gopkg.in/yaml.v3"
 )
 
@@ -86,6 +87,9 @@ func (f *Formatter) FormatSessions(sessions []*client.SessionInfo) error {
 func (f *Formatter) FormatSessionsWithRawTree(listResp *pb.ListSessionsResponse, sessions []*client.SessionInfo) error {
 	if f.format == "tree" {
 		return f.formatSessionsTreeFromRaw(listResp, sessions)
+	}
+	if f.format == "raw-tree" || f.format == "tree-json" {
+		return f.formatRawTreeJSON(listResp)
 	}
 	// For other formats, use the regular formatter
 	return f.FormatSessions(sessions)
@@ -1637,6 +1641,28 @@ func tabContainsSession(node *pb.SplitTreeNode, targetSessionID string, ancestor
 		}
 	}
 	return false
+}
+
+// formatRawTreeJSON outputs the raw split tree structure as JSON
+func (f *Formatter) formatRawTreeJSON(listResp *pb.ListSessionsResponse) error {
+	if listResp == nil {
+		return fmt.Errorf("no split tree data available")
+	}
+
+	// Use protojson to properly marshal the protobuf to JSON
+	marshaler := &protojson.MarshalOptions{
+		Indent:          "  ",
+		EmitUnpopulated: false,
+		UseProtoNames:   true,
+	}
+
+	jsonBytes, err := marshaler.Marshal(listResp)
+	if err != nil {
+		return fmt.Errorf("failed to marshal split tree to JSON: %w", err)
+	}
+
+	fmt.Println(string(jsonBytes))
+	return nil
 }
 
 // formatSessionsTreeFromRaw formats sessions as a tree using raw split tree structure
