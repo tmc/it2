@@ -157,42 +157,6 @@ func (c *Client) SetVariable(ctx context.Context, sessionID, name, value string)
 	return c.SetVariableWithScope(ctx, "app", "", name, value)
 }
 
-// GetTabVariable gets a variable in tab scope
-// Deprecated: Use GetVariableWithScope instead
-func (c *Client) GetTabVariable(ctx context.Context, tabID, name string) (string, error) {
-	return c.GetVariableWithScope(ctx, "tab", tabID, name)
-}
-
-// SetTabVariable sets a variable in tab scope
-// Deprecated: Use SetVariableWithScope instead
-func (c *Client) SetTabVariable(ctx context.Context, tabID, name, value string) error {
-	return c.SetVariableWithScope(ctx, "tab", tabID, name, value)
-}
-
-// GetWindowVariable gets a variable in window scope
-// Deprecated: Use GetVariableWithScope instead
-func (c *Client) GetWindowVariable(ctx context.Context, windowID, name string) (string, error) {
-	return c.GetVariableWithScope(ctx, "window", windowID, name)
-}
-
-// SetWindowVariable sets a variable in window scope
-// Deprecated: Use SetVariableWithScope instead
-func (c *Client) SetWindowVariable(ctx context.Context, windowID, name, value string) error {
-	return c.SetVariableWithScope(ctx, "window", windowID, name, value)
-}
-
-// GetAppVariable gets a variable in app scope
-// Deprecated: Use GetVariableWithScope instead
-func (c *Client) GetAppVariable(ctx context.Context, name string) (string, error) {
-	return c.GetVariableWithScope(ctx, "app", "", name)
-}
-
-// SetAppVariable sets a variable in app scope
-// Deprecated: Use SetVariableWithScope instead
-func (c *Client) SetAppVariable(ctx context.Context, name, value string) error {
-	return c.SetVariableWithScope(ctx, "app", "", name, value)
-}
-
 // ListVariablesWithScope lists all variables in a specific scope
 func (c *Client) ListVariablesWithScope(ctx context.Context, scope string, id string) ([]string, error) {
 	req := &pb.VariableRequest{

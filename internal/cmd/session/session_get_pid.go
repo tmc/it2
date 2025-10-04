@@ -1,10 +1,7 @@
 package session
 
 import (
-	"context"
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -85,77 +82,4 @@ This command attempts to extract the PID from shell integration or by running co
 
 	cmd.Flags().Bool("json", false, "Output result as JSON")
 	return cmd
-}
-
-// getShellPID attempts to get the shell PID using shell commands
-func getShellPID(ctx context.Context, c *client.Client, sessionID string) (int, error) {
-	// Send command to get shell PID
-	echoCmd := "echo $$\n"
-	if err := c.SendText(ctx, sessionID, echoCmd); err != nil {
-		return 0, fmt.Errorf("failed to send PID command: %w", err)
-	}
-
-	// Wait a moment for command to execute
-	time.Sleep(150 * time.Millisecond)
-
-	// Get the buffer to see the output
-	bufferResp, err := c.GetBuffer(ctx, sessionID, 10) // Get last 10 lines
-	if err != nil {
-		return 0, fmt.Errorf("failed to get buffer: %w", err)
-	}
-
-	// Parse the output to find the PID
-	for _, lineContent := range bufferResp.GetContents() {
-		line := strings.TrimSpace(lineContent.GetText())
-		if line == "" {
-			continue
-		}
-
-		// Look for numeric PID output
-		if pid, err := strconv.Atoi(line); err == nil && pid > 0 {
-			return pid, nil
-		}
-	}
-
-	return 0, fmt.Errorf("could not extract PID from shell output")
-}
-
-// getPIDFromSessionInfo attempts to extract PID from session information
-func getPIDFromSessionInfo(ctx context.Context, c *client.Client, sessionID string) (int, error) {
-	// Get session list to find our session
-	sessions, err := c.ListSessions(ctx)
-	if err != nil {
-		return 0, fmt.Errorf("failed to list sessions: %w", err)
-	}
-
-	var targetSession *client.SessionInfo
-	for _, session := range sessions {
-		if session.SessionID == sessionID {
-			targetSession = session
-			break
-		}
-	}
-
-	if targetSession == nil {
-		return 0, fmt.Errorf("session not found: %s", sessionID)
-	}
-
-	// Try to extract PID from session name/title
-	// Look for patterns like "(bash: 12345)" or similar
-	title := targetSession.SessionName
-	if title == "" {
-		return 0, fmt.Errorf("no session title available to extract PID from")
-	}
-
-	// Look for patterns containing numbers that might be PIDs
-	parts := strings.Fields(title)
-	for _, part := range parts {
-		// Remove common non-numeric characters
-		cleanPart := strings.Trim(part, "()[]{}:")
-		if pid, err := strconv.Atoi(cleanPart); err == nil && pid > 100 {
-			return pid, nil
-		}
-	}
-
-	return 0, fmt.Errorf("could not extract PID from session title: %s", title)
 }

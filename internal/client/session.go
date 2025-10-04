@@ -245,88 +245,6 @@ func (c *Client) GetPrompt(ctx context.Context, sessionID string) (*pb.GetPrompt
 	return nil, fmt.Errorf("unexpected response type")
 }
 
-// GetSessionProfile gets the profile name for a session
-func (c *Client) GetSessionProfile(ctx context.Context, sessionID string) (string, error) {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_GetProfilePropertyRequest{
-			GetProfilePropertyRequest: &pb.GetProfilePropertyRequest{
-				Session: &sessionID,
-				Keys:    []string{"Name"},
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return "", fmt.Errorf("failed to get session profile: %w", err)
-	}
-
-	if resp := response.GetGetProfilePropertyResponse(); resp != nil {
-		if resp.GetStatus() != pb.GetProfilePropertyResponse_OK {
-			return "", fmt.Errorf("failed to get session profile: %v", resp.GetStatus())
-		}
-		if len(resp.GetProperties()) > 0 {
-			return resp.GetProperties()[0].GetJsonValue(), nil
-		}
-	}
-
-	return "", fmt.Errorf("unexpected response type")
-}
-
-// SetSessionProfile sets the profile for a session
-func (c *Client) SetSessionProfile(ctx context.Context, sessionID, profileName string) error {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_SetProfilePropertyRequest{
-			SetProfilePropertyRequest: &pb.SetProfilePropertyRequest{
-				Target: &pb.SetProfilePropertyRequest_Session{
-					Session: sessionID,
-				},
-				Key:       stringPtr("Name"),
-				JsonValue: stringPtr(fmt.Sprintf("\"%s\"", profileName)),
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return fmt.Errorf("failed to set session profile: %w", err)
-	}
-
-	if resp := response.GetSetProfilePropertyResponse(); resp != nil {
-		if resp.GetStatus() != pb.SetProfilePropertyResponse_OK {
-			return fmt.Errorf("failed to set session profile: %v", resp.GetStatus())
-		}
-	}
-
-	return nil
-}
-
-// StartCoprocess starts a coprocess in a session using iTerm2's method API
-func (c *Client) StartCoprocess(ctx context.Context, sessionID, command string) error {
-	invocation := fmt.Sprintf("run_coprocess(commandLine: %q)", command)
-	return c.InvokeMethod(ctx, invocation, sessionID, -1)
-}
-
-// StopCoprocess stops a coprocess in a session using iTerm2's method API
-func (c *Client) StopCoprocess(ctx context.Context, sessionID string) error {
-	invocation := "stop_coprocess()"
-	return c.InvokeMethod(ctx, invocation, sessionID, -1)
-}
-
-// GetCoprocess returns the command line of the currently running coprocess, if any
-func (c *Client) GetCoprocess(ctx context.Context, sessionID string) (string, error) {
-	invocation := "iterm2.get_coprocess()"
-	result, err := c.InvokeFunction(ctx, invocation, &sessionID, nil, nil, -1)
-	if err != nil {
-		return "", err
-	}
-	// Parse JSON result to get the command string
-	if result != nil {
-		return result.(string), nil
-	}
-	return "", nil
-}
-
 // MonitorSession starts monitoring a session for prompt events
 func (c *Client) MonitorSession(ctx context.Context, sessionID string, events []string) (<-chan *pb.PromptNotification, error) {
 	ch := make(chan *pb.PromptNotification, 100)
@@ -580,44 +498,6 @@ func (c *Client) SetSessionProfileProperty(ctx context.Context, sessionID, key, 
 	return nil
 }
 
-// DeleteSessionProfileProperty removes a session-specific profile property override by omitting json_value
-// This causes iTerm2 to delete the override and fall back to the profile's default value
-func (c *Client) DeleteSessionProfileProperty(ctx context.Context, sessionID, key string) error {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_SetProfilePropertyRequest{
-			SetProfilePropertyRequest: &pb.SetProfilePropertyRequest{
-				Target: &pb.SetProfilePropertyRequest_Session{
-					Session: sessionID,
-				},
-				Assignments: []*pb.SetProfilePropertyRequest_Assignment{
-					{
-						Key: &key,
-						// Omit JsonValue entirely - this sends nil instead of NSNull,
-						// which triggers deletion in PTYSession.m:386-388
-						JsonValue: nil,
-					},
-				},
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return fmt.Errorf("failed to delete session profile property: %w", err)
-	}
-
-	resp := response.GetSetProfilePropertyResponse()
-	if resp == nil {
-		return fmt.Errorf("no set profile property response received")
-	}
-
-	if resp.GetStatus() != pb.SetProfilePropertyResponse_OK {
-		return fmt.Errorf("failed to delete session profile property: %v", resp.GetStatus())
-	}
-
-	return nil
-}
-
 // GetSessionProfileProperty gets a profile property from a specific sessions copy of the profile
 func (c *Client) GetSessionProfileProperty(ctx context.Context, sessionID, key string) (interface{}, error) {
 	msg := &pb.ClientOriginatedMessage{
@@ -730,57 +610,6 @@ func (c *Client) ResetSessionBadgeToProfile(ctx context.Context, sessionID strin
 
 	// Now re-encode it for SetSessionProfileProperty (which expects JSON)
 	return c.SetSessionBadge(ctx, sessionID, badge)
-}
-
-// ListSessionProfileProperties gets multiple profile properties from a session's profile copy
-func (c *Client) ListSessionProfileProperties(ctx context.Context, sessionID string, keys []string) (map[string]interface{}, error) {
-	// If no keys specified, try common profile properties
-	if len(keys) == 0 {
-		keys = []string{
-			"Badge Text", "Name", "Background Color", "Foreground Color",
-			"Transparency", "Blur", "Blend", "Use Transparency Initially",
-		}
-	}
-
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_GetProfilePropertyRequest{
-			GetProfilePropertyRequest: &pb.GetProfilePropertyRequest{
-				Session: &sessionID,
-				Keys:    keys,
-			},
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get session profile properties: %w", err)
-	}
-
-	resp := response.GetGetProfilePropertyResponse()
-	if resp == nil {
-		return nil, fmt.Errorf("no get profile property response received")
-	}
-
-	if resp.GetStatus() != pb.GetProfilePropertyResponse_OK {
-		return nil, fmt.Errorf("failed to get session profile properties: %v", resp.GetStatus())
-	}
-
-	result := make(map[string]interface{})
-	for _, prop := range resp.Properties {
-		if prop.Key != nil && prop.JsonValue != nil {
-			key := *prop.Key
-			value := *prop.JsonValue
-
-			// Remove quotes from JSON string if present
-			if len(value) >= 2 && value[0] == '"' && value[len(value)-1] == '"' {
-				value = value[1 : len(value)-1]
-			}
-
-			result[key] = value
-		}
-	}
-
-	return result, nil
 }
 
 // MoveSession moves a session to be a split pane next to another session

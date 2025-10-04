@@ -2,10 +2,8 @@ package tab
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
-	"github.com/tmc/it2/internal/formatting"
 	"github.com/tmc/it2/internal/validate"
 )
 
@@ -81,37 +79,4 @@ Examples:
 	cmd.ValidArgsFunction = completion.WindowIDCompletion // For positional window-id arg
 
 	return cmd
-}
-
-// buildTabInfoFromSessions builds tab information from session data
-func buildTabInfoFromSessions(sessions []*client.SessionInfo, windowID string) []*formatting.TabInfo {
-	tabMap := make(map[string]*formatting.TabInfo)
-
-	for _, session := range sessions {
-		// Filter by window if specified
-		if windowID != "" && session.WindowID != windowID {
-			continue
-		}
-
-		// Create or update tab info
-		key := session.WindowID + ":" + session.TabID
-		if _, exists := tabMap[key]; exists {
-			// Tab already exists, skip (we're just counting unique tabs)
-		} else {
-			tabMap[key] = &formatting.TabInfo{
-				WindowID: session.WindowID,
-				TabID:    session.TabID,
-				Title:    session.TabTitle,
-				Position: 0, // Position needs to be determined differently
-			}
-		}
-	}
-
-	// Convert map to slice
-	var result []*formatting.TabInfo
-	for _, tabInfo := range tabMap {
-		result = append(result, tabInfo)
-	}
-
-	return result
 }

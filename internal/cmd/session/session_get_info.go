@@ -419,30 +419,6 @@ func printSessionInfo(info map[string]interface{}) error {
 	return nil
 }
 
-// getShellPIDQuiet attempts to get PID without output or errors
-func getShellPIDQuiet(ctx context.Context, c *client.Client, sessionID string) (int, error) {
-	// This is a simplified version that doesn't send commands to the terminal
-	// to avoid interfering with the user's session
-	sessions, err := c.ListSessions(ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	for _, session := range sessions {
-		if session.SessionID == sessionID {
-			// Try to extract PID from session name if available
-			if session.SessionName != "" {
-				// This is a basic implementation - in practice you might want
-				// to use more sophisticated PID extraction methods
-				return 0, fmt.Errorf("PID not available from session title")
-			}
-			break
-		}
-	}
-
-	return 0, fmt.Errorf("unable to determine PID")
-}
-
 // extractProperty extracts a specific property value from session info
 func extractProperty(info map[string]interface{}, path string) (string, error) {
 	// Handle special case for frame.coords (commonly needed for screencapture)

@@ -401,62 +401,6 @@ func escapeString(s string) string {
 	return output.String()
 }
 
-func (f *Formatter) FormatJobs(jobs []*client.JobInfo) error {
-	switch f.format {
-	case "json":
-		return f.formatJSON(jobs)
-	case "yaml":
-		return f.formatYAML(jobs)
-	case "table":
-		return f.formatJobsTable(jobs)
-	case "text":
-		return f.formatJobsText(jobs)
-	default:
-		// Default to table format
-		return f.formatJobsTable(jobs)
-	}
-}
-
-func (f *Formatter) formatJobsText(jobs []*client.JobInfo) error {
-	if len(jobs) == 0 {
-		fmt.Println("No running jobs found")
-		return nil
-	}
-
-	for _, job := range jobs {
-		fmt.Printf("Job %s: %s - %s\n", job.JobID, job.Status, job.Command)
-	}
-	return nil
-}
-
-func (f *Formatter) formatJobsTable(jobs []*client.JobInfo) error {
-	if len(jobs) == 0 {
-		fmt.Println("No running jobs found")
-		return nil
-	}
-
-	headers := []string{"Job ID", "Status", "Command"}
-	table := NewTableData(headers)
-
-	for _, job := range jobs {
-		// Truncate long commands
-		command := job.Command
-		if len(command) > 60 {
-			command = command[:57] + "..."
-		}
-
-		row := []string{
-			job.JobID,
-			job.Status,
-			command,
-		}
-
-		table.AddRow(row)
-	}
-
-	return f.FormatTable(table)
-}
-
 func (f *Formatter) formatText(sessions []*client.SessionInfo) error {
 	if len(sessions) == 0 {
 		fmt.Println("✗ No sessions found")

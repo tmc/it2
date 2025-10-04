@@ -583,12 +583,6 @@ func (c *Client) CopySelection(ctx context.Context, sessionID string) error {
 	return nil
 }
 
-// PasteFromClipboard pastes clipboard content to the session
-// Non-disruptive: directly sends clipboard content without changing session focus
-func (c *Client) PasteFromClipboard(ctx context.Context, sessionID string) error {
-	return c.PasteFromClipboardWithOptions(ctx, sessionID, false)
-}
-
 // PasteFromClipboardWithOptions pastes clipboard content with optional focus restoration
 func (c *Client) PasteFromClipboardWithOptions(ctx context.Context, sessionID string, restoreFocus bool) error {
 	// Get clipboard content directly and send as text (more reliable than paste commands)

@@ -425,49 +425,6 @@ func (c *Client) InvokeFunction(ctx context.Context, invocation string, sessionI
 }
 
 // InvokeMethod invokes a method on an iTerm2 object (convenience wrapper around InvokeFunction)
-func (c *Client) InvokeMethod(ctx context.Context, invocation, receiver string, timeout float64) error {
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_InvokeFunctionRequest{
-			InvokeFunctionRequest: &pb.InvokeFunctionRequest{
-				Invocation: &invocation,
-				Timeout:    &timeout,
-			},
-		},
-	}
-
-	// Set method context with receiver
-	msg.GetInvokeFunctionRequest().Context = &pb.InvokeFunctionRequest_Method_{
-		Method: &pb.InvokeFunctionRequest_Method{
-			Receiver: &receiver,
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return fmt.Errorf("failed to invoke method: %w", err)
-	}
-
-	if resp := response.GetInvokeFunctionResponse(); resp != nil {
-		switch disposition := resp.GetDisposition().(type) {
-		case *pb.InvokeFunctionResponse_Error_:
-			statusName := "UNKNOWN"
-			if statusPtr := disposition.Error.Status; statusPtr != nil {
-				statusName = pb.InvokeFunctionResponse_Status_name[int32(*statusPtr)]
-			}
-			return fmt.Errorf("method invocation error: %s: %s",
-				statusName,
-				disposition.Error.GetErrorReason())
-		case *pb.InvokeFunctionResponse_Success_:
-			// Method succeeded
-			return nil
-		default:
-			return fmt.Errorf("unexpected response disposition")
-		}
-	}
-
-	return fmt.Errorf("unexpected response type")
-}
-
 // SubscribeToNotification subscribes to a specific notification type
 func (c *Client) SubscribeToNotification(ctx context.Context, notificationType pb.NotificationType) error {
 	subscribe := true
@@ -868,57 +825,3 @@ func (c *Client) SetPreferences(ctx context.Context, prefs map[string]interface{
 // SendRPCResult sends the result of a server-originated RPC call back to iTerm2.
 // This is used when responding to ServerOriginatedRPCNotification messages.
 // Either jsonValue (for success) or jsonException (for errors) should be provided, not both.
-func (c *Client) SendRPCResult(ctx context.Context, requestID string, jsonValue interface{}, jsonException error) error {
-	rpcReq := &pb.ServerOriginatedRPCResultRequest{
-		RequestId: &requestID,
-	}
-
-	if jsonException != nil {
-		// Format exception as JSON
-		exceptionData := map[string]string{
-			"reason": jsonException.Error(),
-		}
-		exceptionJSON, err := json.Marshal(exceptionData)
-		if err != nil {
-			return fmt.Errorf("failed to marshal exception: %w", err)
-		}
-		exceptionStr := string(exceptionJSON)
-		rpcReq.Result = &pb.ServerOriginatedRPCResultRequest_JsonException{
-			JsonException: exceptionStr,
-		}
-	} else if jsonValue != nil {
-		// Marshal value to JSON string
-		valueJSON, err := json.Marshal(jsonValue)
-		if err != nil {
-			return fmt.Errorf("failed to marshal result value: %w", err)
-		}
-		valueStr := string(valueJSON)
-		rpcReq.Result = &pb.ServerOriginatedRPCResultRequest_JsonValue{
-			JsonValue: valueStr,
-		}
-	} else {
-		// No result provided - send null
-		nullStr := "null"
-		rpcReq.Result = &pb.ServerOriginatedRPCResultRequest_JsonValue{
-			JsonValue: nullStr,
-		}
-	}
-
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_ServerOriginatedRpcResultRequest{
-			ServerOriginatedRpcResultRequest: rpcReq,
-		},
-	}
-
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return fmt.Errorf("failed to send RPC result: %w", err)
-	}
-
-	// Check for acknowledgment
-	if response.GetServerOriginatedRpcResultResponse() != nil {
-		return nil
-	}
-
-	return fmt.Errorf("unexpected response type")
-}

@@ -280,21 +280,3 @@ func buildTreeInfo(node *pb.SplitTreeNode, windowID string) map[string]interface
 	result["children"] = children
 	return result
 }
-
-// Helper function to format coordinates for display
-func formatCoords(frame *pb.Frame) string {
-	if frame == nil {
-		return "no frame"
-	}
-
-	origin := frame.GetOrigin()
-	size := frame.GetSize()
-
-	if origin == nil || size == nil {
-		return "incomplete frame"
-	}
-
-	return fmt.Sprintf("(%d,%d) %dx%d",
-		origin.GetX(), origin.GetY(),
-		size.GetWidth(), size.GetHeight())
-}

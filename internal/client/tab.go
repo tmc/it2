@@ -8,11 +8,6 @@ import (
 	pb "github.com/tmc/it2/proto"
 )
 
-// CreateTab creates a new tab in an existing window
-func (c *Client) CreateTab(ctx context.Context, profileName, windowID string) (*pb.CreateTabResponse, error) {
-	return c.CreateTabWithOptions(ctx, profileName, windowID, 0, "")
-}
-
 // CreateTabWithOptions creates a new tab with advanced options
 func (c *Client) CreateTabWithOptions(ctx context.Context, profileName, windowID string, tabIndex uint32, command string) (*pb.CreateTabResponse, error) {
 	req := &pb.CreateTabRequest{

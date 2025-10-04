@@ -71,7 +71,7 @@ func extractTabInfo(c *client.Client, ctx context.Context, sessions []*client.Se
 	}
 
 	// Try to get tab title from variables (ignore errors)
-	if title, err := c.GetTabVariable(ctx, tabID, "title"); err == nil && title != "" {
+	if title, err := c.GetVariableWithScope(ctx, "tab", tabID, "title"); err == nil && title != "" {
 		tabTitle = title
 	}
 

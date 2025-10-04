@@ -2,16 +2,10 @@ package client
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	pb "github.com/tmc/it2/proto"
 )
-
-// GetBuffer retrieves the buffer contents of a session
-func (c *Client) GetBuffer(ctx context.Context, sessionID string, lines int32) (*pb.GetBufferResponse, error) {
-	return c.GetBufferWithStyles(ctx, sessionID, lines, false)
-}
 
 // GetBufferWithStyles retrieves the buffer contents of a session with optional style information
 func (c *Client) GetBufferWithStyles(ctx context.Context, sessionID string, lines int32, includeStyles bool) (*pb.GetBufferResponse, error) {
@@ -213,26 +207,4 @@ func (c *Client) SetGridSize(ctx context.Context, sessionID string, width, heigh
 	}
 
 	return nil
-}
-
-// GetSessionGridSize gets the current grid size for a session
-func (c *Client) GetSessionGridSize(ctx context.Context, sessionID string) (*pb.Size, error) {
-	jsonValue, err := c.GetSessionProperty(ctx, sessionID, "grid_size")
-	if err != nil {
-		return nil, fmt.Errorf("failed to get grid size: %w", err)
-	}
-
-	// Parse JSON response: {"width": 80, "height": 25}
-	var size struct {
-		Width  int32 `json:"width"`
-		Height int32 `json:"height"`
-	}
-	if err := json.Unmarshal([]byte(jsonValue), &size); err != nil {
-		return nil, fmt.Errorf("failed to parse grid size: %w", err)
-	}
-
-	return &pb.Size{
-		Width:  &size.Width,
-		Height: &size.Height,
-	}, nil
 }

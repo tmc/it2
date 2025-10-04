@@ -183,39 +183,6 @@ func containsSessionDirectly(link *pb.SplitTreeNode_SplitTreeLink, targetSession
 	return false
 }
 
-// containsSession checks if a link contains the target session (directly or in children).
-func containsSession(link *pb.SplitTreeNode_SplitTreeLink, targetSessionID string) bool {
-	if link == nil {
-		return false
-	}
-
-	switch child := link.GetChild().(type) {
-	case *pb.SplitTreeNode_SplitTreeLink_Session:
-		if child.Session != nil {
-			return child.Session.GetUniqueIdentifier() == targetSessionID
-		}
-	case *pb.SplitTreeNode_SplitTreeLink_Node:
-		return containsSessionInNode(child.Node, targetSessionID)
-	}
-
-	return false
-}
-
-// containsSessionInNode recursively checks if a node contains the target session.
-func containsSessionInNode(node *pb.SplitTreeNode, targetSessionID string) bool {
-	if node == nil {
-		return false
-	}
-
-	for _, link := range node.GetLinks() {
-		if containsSession(link, targetSessionID) {
-			return true
-		}
-	}
-
-	return false
-}
-
 // getBottommostSession returns the bottommost session in a link's subtree.
 func getBottommostSession(link *pb.SplitTreeNode_SplitTreeLink) string {
 	if link == nil {
