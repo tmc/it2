@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 // newCurrentCommand creates the tab current command.
@@ -43,7 +43,7 @@ func newCurrentCommand() *cobra.Command {
 			}
 
 			// Normalize the session ID for comparison
-			sessionID = cmdutil.NormalizeSessionID(sessionID)
+			sessionID = sessionid.Normalize(sessionID)
 
 			// Find the current session and get its tab ID
 			for _, session := range sessions {

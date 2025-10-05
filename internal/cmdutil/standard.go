@@ -13,6 +13,7 @@ import (
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 // StandardCommand provides the foundation for all commands with common setup
@@ -147,7 +148,7 @@ func (sc *StandardCommand) GetCurrentWindowID() (string, error) {
 	}
 
 	// Normalize the session ID for comparison
-	sessionID = NormalizeSessionID(sessionID)
+	sessionID = sessionid.Normalize(sessionID)
 
 	// Find the current session and return its window ID
 	for _, session := range sessions {

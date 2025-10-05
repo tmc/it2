@@ -149,29 +149,8 @@ func TestInt32Ptr(t *testing.T) {
 	}
 }
 
-func TestNormalizeSessionID(t *testing.T) {
-	testCases := []struct {
-		input    string
-		expected string
-	}{
-		{"w0t1p12:ABC123-DEF456-GHI789", "ABC123-DEF456-GHI789"},
-		{"ABC123-DEF456-GHI789", "ABC123-DEF456-GHI789"},
-		{"simple", "simple"},
-		{"", ""},
-		{"w0t1p12:", ""},
-		{"a:b:c:d", "d"},
-		{"prefix:suffix", "suffix"},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.input, func(t *testing.T) {
-			result := NormalizeSessionID(tc.input)
-			if result != tc.expected {
-				t.Errorf("Expected '%s', got '%s'", tc.expected, result)
-			}
-		})
-	}
-}
+// TestNormalizeSessionID has been removed - the function was deprecated and deleted.
+// Tests for sessionid.Normalize are in internal/sessionid/sessionid_test.go
 
 func TestIsSessionCommand(t *testing.T) {
 	testCases := []struct {

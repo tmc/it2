@@ -7,6 +7,7 @@ import (
 	"github.com/tmc/it2/internal/cmderr"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 func newSetCursorCommand() *cobra.Command {
@@ -49,7 +50,7 @@ Coordinates are 0-based with (0,0) at the top-left corner.`,
 		},
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			// Always normalize session ID (strip prefix if present)
-			sessionID := cmdutil.NormalizeSessionID(args[0])
+			sessionID := sessionid.Normalize(args[0])
 
 			// Parse coordinates
 			x64, _ := strconv.ParseInt(args[1], 10, 32)

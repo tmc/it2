@@ -14,6 +14,7 @@ import (
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
 	"github.com/tmc/it2/internal/plugins"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 // NewCommand creates the broadcast command with all subcommands.
@@ -107,7 +108,7 @@ func newSetCommand() *cobra.Command {
 			// Normalize session IDs
 			normalizedIDs := make([]string, len(sessionIDs))
 			for i, id := range sessionIDs {
-				normalizedIDs[i] = cmdutil.NormalizeSessionID(id)
+				normalizedIDs[i] = sessionid.Normalize(id)
 			}
 
 			// Create a single broadcast domain with all sessions
@@ -240,7 +241,7 @@ This ensures all sessions are ready before broadcasting.`,
 			var allSessions []string
 			for _, domain := range domains {
 				for _, sessionID := range domain.SessionIds {
-					allSessions = append(allSessions, cmdutil.NormalizeSessionID(sessionID))
+					allSessions = append(allSessions, sessionid.Normalize(sessionID))
 				}
 			}
 

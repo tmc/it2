@@ -9,6 +9,7 @@ import (
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 // isWindowUUID checks if a string looks like a window UUID (starts with "pty-")
@@ -361,7 +362,7 @@ func executeSessionFocus(cmd *cobra.Command, sessionID string) error {
 	}
 	defer c.Close()
 
-	sessionID = cmdutil.NormalizeSessionID(sessionID)
+	sessionID = sessionid.Normalize(sessionID)
 	if _, err := c.ActivateSession(ctx, sessionID, true); err != nil {
 		return fmt.Errorf("failed to focus session %s: %w", sessionID, err)
 	}
@@ -382,7 +383,7 @@ func executeSessionClose(cmd *cobra.Command, sessionID string) error {
 	}
 	defer c.Close()
 
-	sessionID = cmdutil.NormalizeSessionID(sessionID)
+	sessionID = sessionid.Normalize(sessionID)
 	if _, err := c.CloseSessions(ctx, []string{sessionID}, false); err != nil {
 		return fmt.Errorf("failed to close session %s: %w", sessionID, err)
 	}
@@ -403,7 +404,7 @@ func executeSessionSendText(cmd *cobra.Command, sessionID, text string) error {
 	}
 	defer c.Close()
 
-	sessionID = cmdutil.NormalizeSessionID(sessionID)
+	sessionID = sessionid.Normalize(sessionID)
 	// Add newline for better UX
 	if !strings.HasSuffix(text, "\n") {
 		text += "\n"
@@ -429,7 +430,7 @@ func executeSessionSplit(cmd *cobra.Command, sessionID string, args []string) er
 	}
 	defer c.Close()
 
-	sessionID = cmdutil.NormalizeSessionID(sessionID)
+	sessionID = sessionid.Normalize(sessionID)
 
 	// Parse split direction (default horizontal)
 	vertical := false

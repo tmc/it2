@@ -6,6 +6,7 @@ import (
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 func newFindCommand() *cobra.Command {
@@ -23,7 +24,7 @@ Examples:
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
-			sessionID := cmdutil.NormalizeSessionID(args[0])
+			sessionID := sessionid.Normalize(args[0])
 			pattern := args[1]
 
 			// Get command flags

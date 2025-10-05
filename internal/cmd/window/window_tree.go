@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"
-	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/sessionid"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -64,7 +64,7 @@ If no window ID is provided, uses the current window.`,
 				}
 
 				// Normalize session ID
-				sessionID = cmdutil.NormalizeSessionID(sessionID)
+				sessionID = sessionid.Normalize(sessionID)
 
 				// Get all sessions to find the current one
 				sessions, err := c.ListSessions(ctx)

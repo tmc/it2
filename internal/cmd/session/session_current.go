@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 // newCurrentCommand creates the session current command.
@@ -29,7 +29,7 @@ func newCurrentCommand() *cobra.Command {
 				return fmt.Errorf("ITERM_SESSION_ID environment variable not set - are you running this inside iTerm2?")
 			}
 
-			sessionID = cmdutil.NormalizeSessionID(sessionID)
+			sessionID = sessionid.Normalize(sessionID)
 			// Output just the session ID for easy scripting
 			fmt.Println(sessionID)
 			return nil
