@@ -2,11 +2,13 @@ package session
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/sessionid"
 	"github.com/tmc/it2/internal/validate"
 	pb "github.com/tmc/it2/proto"
 )
@@ -17,10 +19,11 @@ func newCreateCommand() *cobra.Command {
 		Short: "Create a new session",
 		Long: `Create a new iTerm2 session by either:
   1. Creating a new tab (default)
-  2. Splitting an existing session (if session-id provided)
+  2. Splitting an existing session (if session-id provided or --split flag used)
 
 When no session-id is provided, creates a new tab with the specified profile.
-When a session-id is provided, splits that session to create a new session.`,
+When a session-id is provided, splits that session to create a new session.
+When --split flag is used without session-id, splits the current session.`,
 		Example: cmdutil.Doc(`
 			# Create new session in a new tab with Default profile
 			$ it2 session create
@@ -31,11 +34,14 @@ When a session-id is provided, splits that session to create a new session.`,
 			# Create new session in specific window
 			$ it2 session create --window window-id
 
-			# Split existing session vertically to create new session
-			$ it2 session create session-id --split vertical
+			# Split current session vertically (no session-id needed)
+			$ it2 session create --split vertical
 
-			# Split existing session horizontally with specific profile
-			$ it2 session create session-id --split horizontal --profile "SSH"
+			# Split current session horizontally with specific profile
+			$ it2 session create --split horizontal --profile "SSH"
+
+			# Split existing session by ID
+			$ it2 session create session-id --split vertical
 
 			# Create session and get details
 			$ it2 session create --format json
@@ -53,7 +59,20 @@ When a session-id is provided, splits that session to create a new session.`,
 			splitDirection, _ := sc.GetCommand().Flags().GetString("split")
 			command, _ := sc.GetCommand().Flags().GetString("command")
 
+			// Check if split flag was explicitly set
+			splitFlagChanged := sc.GetCommand().Flags().Changed("split")
+
 			if len(args) == 0 {
+				// If --split flag was explicitly provided, use current session
+				if splitFlagChanged {
+					// Get current session ID from environment
+					currentSessionID := os.Getenv("ITERM_SESSION_ID")
+					if currentSessionID == "" {
+						return fmt.Errorf("--split requires either a session-id argument or ITERM_SESSION_ID environment variable (are you running inside iTerm2?)")
+					}
+					currentSessionID = sessionid.Normalize(currentSessionID)
+					return createSessionBySplit(sc, currentSessionID, profile, splitDirection)
+				}
 				// Create new tab (which creates a new session)
 				return createSessionByNewTab(sc, profile, windowID, command)
 			} else {
