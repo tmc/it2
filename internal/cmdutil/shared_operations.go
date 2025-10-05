@@ -3,14 +3,13 @@ package cmdutil
 import (
 	"context"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/formatting"
 	"github.com/tmc/it2/internal/plugins"
+	"github.com/tmc/it2/internal/scope"
 	pb "github.com/tmc/it2/proto"
 )
 
@@ -60,7 +59,7 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 	}
 
 	// Apply scope filtering first
-	scopedSessions := s.applyScopeFilter(sessions, opts.ScopeFlag)
+	scopedSessions := scope.Filter(sessions, opts.ScopeFlag)
 
 	// Filter sessions based on options
 	var filteredSessions []*client.SessionInfo
@@ -81,51 +80,14 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 	}
 
 	// Apply plugin enrichment - only if plugin columns are requested or no columns specified
-	shouldRunPlugins := len(opts.Columns) == 0 // Run all plugins if no columns specified
-	if !shouldRunPlugins {
-		// Check if any plugin column is requested
-		for _, col := range opts.Columns {
-			colLower := strings.ToLower(col)
-			// Check if this looks like a plugin column (not a standard column)
-			standardCols := map[string]bool{
-				"id": true, "split from": true, "pid": true, "exit": true, "state": true,
-				"window": true, "tab": true, "title": true, "command": true,
-			}
-			if !standardCols[colLower] {
-				shouldRunPlugins = true
-				break
-			}
-		}
-	}
-
-	if shouldRunPlugins {
+	if plugins.ShouldRunPlugins(opts.Columns) {
 		registry := plugins.NewRegistry()
 		if err := registry.DiscoverAndRegister(); err == nil {
 			enrichers := registry.GetEnrichers()
-
-			// Build set of requested plugin names if columns are specified
-			requestedPlugins := make(map[string]bool)
-			if len(opts.Columns) > 0 {
-				for _, col := range opts.Columns {
-					colLower := strings.ToLower(col)
-					requestedPlugins[colLower] = true
-				}
-			}
-
-			// Filter enrichers based on requested plugins
-			var activeEnrichers []plugins.SessionEnricher
-			for _, enricher := range enrichers {
-				if len(requestedPlugins) > 0 {
-					pluginName := strings.ToLower(enricher.Name())
-					if !requestedPlugins[pluginName] {
-						continue
-					}
-				}
-				activeEnrichers = append(activeEnrichers, enricher)
-			}
+			activeEnrichers := plugins.FilterEnrichers(enrichers, opts.Columns)
 
 			// Parallelize plugin execution across all sessions
-			s.enrichSessionsParallel(filteredSessions, activeEnrichers)
+			plugins.EnrichSessionsParallel(s.ctx, filteredSessions, activeEnrichers)
 
 			// Save metrics after enrichment
 			plugins.GetMetricsStore().Save()
@@ -162,17 +124,7 @@ func (s *SharedListOperations) ListTabs(opts SharedListOptions) error {
 	registry := plugins.NewRegistry()
 	if err := registry.DiscoverAndRegister(); err == nil {
 		enrichers := registry.GetTabEnrichers()
-		for _, tabInfo := range tabInfos {
-			if tabInfo.PluginData == nil {
-				tabInfo.PluginData = make(map[string]interface{})
-			}
-			for _, enricher := range enrichers {
-				pluginData, _ := enricher.EnrichTab(s.ctx, tabInfo)
-				for k, v := range pluginData {
-					tabInfo.PluginData[k] = v
-				}
-			}
-		}
+		plugins.EnrichTabs(s.ctx, tabInfos, enrichers)
 	}
 
 	// Format and output
@@ -207,21 +159,7 @@ func (s *SharedListOperations) ListWindows(opts SharedListOptions) error {
 	registry := plugins.NewRegistry()
 	if err := registry.DiscoverAndRegister(); err == nil {
 		windowEnrichers := registry.GetWindowEnrichers()
-		for _, window := range windows {
-			// Initialize plugin data map if needed
-			if window.PluginData == nil {
-				window.PluginData = make(map[string]interface{})
-			}
-			// Apply each window enricher
-			for _, enricher := range windowEnrichers {
-				data, err := enricher.EnrichWindow(s.ctx, window)
-				if err == nil && len(data) > 0 {
-					for k, v := range data {
-						window.PluginData[k] = v
-					}
-				}
-			}
-		}
+		plugins.EnrichWindows(s.ctx, windows, windowEnrichers)
 	}
 
 	// Disable hyperlinks by default
@@ -314,129 +252,4 @@ func (s *SharedListOperations) ResolveWindowID(windowIDOrIndex string) (string, 
 
 	// Index not found, return original (might be valid in some contexts)
 	return windowIDOrIndex, nil
-}
-
-// applyScopeFilter filters sessions based on scope settings
-func (s *SharedListOperations) applyScopeFilter(sessions []*client.SessionInfo, scopeFlag string) []*client.SessionInfo {
-	// Determine effective scope (flag overrides environment variable)
-	effectiveScope := scopeFlag
-	if effectiveScope == "" {
-		effectiveScope = os.Getenv("IT2_SCOPE")
-	}
-
-	// If no scope set or scope is "none", return all sessions
-	if effectiveScope == "" || effectiveScope == "none" {
-		return sessions
-	}
-
-	// Get current session ID from environment
-	currentSessionID := os.Getenv("ITERM_SESSION_ID")
-	if currentSessionID != "" {
-		currentSessionID = NormalizeSessionID(currentSessionID)
-	}
-	if currentSessionID == "" {
-		// No current session, return all sessions
-		return sessions
-	}
-
-	// Find the current session in the list
-	var currentSession *client.SessionInfo
-	for _, session := range sessions {
-		if session.SessionID == currentSessionID {
-			currentSession = session
-			break
-		}
-	}
-
-	if currentSession == nil {
-		// Current session not found, return all sessions
-		return sessions
-	}
-
-	// Apply scope filtering based on the effective scope
-	var filteredSessions []*client.SessionInfo
-	switch effectiveScope {
-	case "window":
-		// Filter to sessions in the same window
-		for _, session := range sessions {
-			if session.WindowID == currentSession.WindowID {
-				filteredSessions = append(filteredSessions, session)
-			}
-		}
-	case "tab":
-		// Filter to sessions in the same tab
-		for _, session := range sessions {
-			if session.WindowID == currentSession.WindowID && session.TabID == currentSession.TabID {
-				filteredSessions = append(filteredSessions, session)
-			}
-		}
-	case "siblings":
-		// Filter to sessions that share the same parent session
-		for _, session := range sessions {
-			if session.ParentSessionID == currentSession.ParentSessionID && session.ParentSessionID != "" {
-				filteredSessions = append(filteredSessions, session)
-			}
-		}
-	default:
-		// Unknown scope, return all sessions
-		return sessions
-	}
-
-	return filteredSessions
-}
-
-// enrichSessionsParallel runs plugins concurrently for each session and collects results
-func (s *SharedListOperations) enrichSessionsParallel(sessions []*client.SessionInfo, enrichers []plugins.SessionEnricher) {
-	if len(enrichers) == 0 {
-		return
-	}
-
-	// Create a semaphore to limit concurrency (e.g., max 20 concurrent plugin executions)
-	semaphore := make(chan struct{}, 20)
-
-	// Use a WaitGroup to wait for all goroutines
-	var wg sync.WaitGroup
-
-	// Create a mutex per session for safe concurrent writes
-	type sessionMutex struct {
-		session *client.SessionInfo
-		mu      sync.Mutex
-	}
-
-	sessionMutexes := make([]*sessionMutex, len(sessions))
-	for i, session := range sessions {
-		// Initialize plugin data map if needed
-		if session.PluginData == nil {
-			session.PluginData = make(map[string]interface{})
-		}
-		sessionMutexes[i] = &sessionMutex{session: session}
-	}
-
-	// Process each session with parallel enrichers
-	for _, sm := range sessionMutexes {
-		for _, enricher := range enrichers {
-			wg.Add(1)
-			go func(sm *sessionMutex, enr plugins.SessionEnricher) {
-				defer wg.Done()
-
-				// Acquire semaphore to limit concurrency
-				semaphore <- struct{}{}
-				defer func() { <-semaphore }()
-
-				// Execute the enricher
-				data, err := enr.EnrichSession(s.ctx, sm.session)
-				if err == nil && len(data) > 0 {
-					// Lock this session's mutex for safe writes
-					sm.mu.Lock()
-					for k, v := range data {
-						sm.session.PluginData[k] = v
-					}
-					sm.mu.Unlock()
-				}
-			}(sm, enricher)
-		}
-	}
-
-	// Wait for all enrichers to complete
-	wg.Wait()
 }
