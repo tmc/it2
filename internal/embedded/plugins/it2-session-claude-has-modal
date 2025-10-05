@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+#
+# it2-session-claude-has-modal
+#
+# Plugin to detect if a Claude session is showing a modal dialog
+# that requires user intervention (approval prompts, confirmations, etc.)
+#
+# Usage:
+#   it2-session-claude-has-modal <session-id>
+#
+# Returns:
+#   - "approval" for "Do you want to proceed?" type modals
+#   - "confirmation" for yes/no confirmations
+#   - "choice" for numbered option selections
+#   - "input" for text input prompts
+#   - "none" if no modal detected
+#   - Exit code 0 if modal found, 1 if no modal
+
+set -euo pipefail
+
+SESSION_ID="${1:-}"
+if [[ -z "$SESSION_ID" ]]; then
+    echo "Error: Session ID required" >&2
+    exit 1
+fi
+
+# Find it2 binary
+IT2_BIN=""
+if [[ -x "./it2" ]]; then
+    IT2_BIN="./it2"
+elif [[ -x "$HOME/go/bin/it2" ]]; then
+    IT2_BIN="$HOME/go/bin/it2"
+elif command -v it2 &> /dev/null; then
+    IT2_BIN="$(command -v it2)"
+fi
+
+if [[ -z "$IT2_BIN" ]]; then
+    echo "Error: it2 binary not found" >&2
+    exit 1
+fi
+
+SCREEN_CONTENT=$($IT2_BIN text get-screen "$SESSION_ID" 2>/dev/null || echo "")
+
+if [[ -z "$SCREEN_CONTENT" ]]; then
+    echo "none"
+    exit 1
+fi
+
+# Look for Claude modal patterns in the screen content
+# Remove ANSI escape sequences for clean pattern matching
+CLEAN_CONTENT=$(echo "$SCREEN_CONTENT" | sed 's/\x1b\[[0-9;]*m//g')
+
+# Pattern 1: Approval prompts (Do you want to proceed?)
+if echo "$CLEAN_CONTENT" | grep -q "Do you want to proceed?"; then
+    echo "approval"
+    exit 0
+fi
+
+# Pattern 2: Numbered choice dialogs with ❯ selector
+if echo "$CLEAN_CONTENT" | grep -q "❯.*[0-9]\." && \
+   echo "$CLEAN_CONTENT" | grep -qE "[0-9]\.\s+(Yes|No|Cancel)"; then
+    echo "choice"
+    exit 0
+fi
+
+# Pattern 3: Simple yes/no confirmations
+if echo "$CLEAN_CONTENT" | grep -qE "(Y/n|y/N|\[y/n\]|\(y/n\))"; then
+    echo "confirmation"
+    exit 0
+fi
+
+# Pattern 4: Input prompts (asking for text input)
+if echo "$CLEAN_CONTENT" | grep -qE "Enter.*:|Please enter|Input.*:"; then
+    echo "input"
+    exit 0
+fi
+
+# Pattern 5: Command confirmation boxes (╭─╮ style)
+if echo "$CLEAN_CONTENT" | grep -q "╭─" && \
+   echo "$CLEAN_CONTENT" | grep -q "╰─" && \
+   echo "$CLEAN_CONTENT" | grep -qE "[0-9]\.\s+(Yes|No)"; then
+    echo "choice"
+    exit 0
+fi
+
+# Pattern 6: Claude edit acceptance prompts
+if echo "$CLEAN_CONTENT" | grep -q "⏵⏵ accept edits" || \
+   echo "$CLEAN_CONTENT" | grep -q "shift+tab to cycle"; then
+    echo "approval"
+    exit 0
+fi
+
+# No modal detected
+echo "none"
+exit 0

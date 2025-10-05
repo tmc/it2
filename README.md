@@ -35,6 +35,30 @@ it2 auth check
 
 The first time you run `it2`, iTerm2 will prompt you to allow API access. Click "Allow" to continue.
 
+### Plugin Scripts
+
+Plugin scripts provide additional functionality for Claude Code integration and session management. They are automatically embedded in the `it2` binary and extracted on first use to `~/.it2/plugins/{version}/`.
+
+The plugin discovery system searches for plugins in this priority order:
+1. Executables in your `PATH` (highest priority)
+2. Directories from `IT2_PLUGIN_PATHS` environment variable
+3. Embedded plugins extracted from the binary (fallback)
+
+List available plugins:
+```bash
+it2 plugins list
+```
+
+Available plugin scripts (embedded):
+- `it2-session-has-no-queued-claude-messages` - Detect if Claude is idle
+- `it2-session-claude-suggest-action` - Suggest interventions for stuck Claude sessions
+- `it2-session-is-at-prompt` - Check if session is at a shell prompt
+- `it2-session-claude-has-modal` - Check if Claude has a modal dialog
+- `it2-session-claude-auto-approve` - Auto-approve safe operations
+- And other session management utilities
+
+To override embedded plugins, place your own version in your `PATH`.
+
 ## Quick Start
 
 Try these commands to get started:
