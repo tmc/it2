@@ -12,6 +12,7 @@ import (
 	"github.com/tmc/it2/internal/cmd/annotation"
 	"github.com/tmc/it2/internal/cmd/app"
 	"github.com/tmc/it2/internal/cmd/arrangement"
+	"github.com/tmc/it2/internal/cmd/attention"
 	"github.com/tmc/it2/internal/cmd/auth"
 	"github.com/tmc/it2/internal/cmd/badge"
 	"github.com/tmc/it2/internal/cmd/broadcast"
@@ -280,6 +281,7 @@ func init() {
 	// Add organized command groups
 	rootCmd.AddCommand(app.NewCommand())
 	rootCmd.AddCommand(arrangement.NewCommand())
+	rootCmd.AddCommand(attention.NewCommand())
 	rootCmd.AddCommand(auth.NewCommand())
 	rootCmd.AddCommand(badge.NewCommand())
 	rootCmd.AddCommand(broadcast.NewCommand())
