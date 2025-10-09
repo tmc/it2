@@ -37,6 +37,15 @@
           "path": "/TROUBLESHOOTING"
         }
       ]
+    },
+    {
+      "title": "Claude Code Integration",
+      "items": [
+        {
+          "title": "Overview",
+          "path": "/CLAUDE_CODE_INTEGRATION"
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "name": "it2-claude-agent-development",
+  "description": "Tools and agents for developing, testing, and improving Claude Code agents",
+  "version": "1.0.0",
+  "author": {
+    "name": "it2 Development Team",
+    "email": "[email protected]"
+  },
+  "homepage": "https://github.com/tmc/it2",
+  "repository": "https://github.com/tmc/it2",
+  "license": "MIT",
+  "keywords": ["agent-development", "testing", "claude-code", "development", "ai-agents"],
+  "agents": [
+    "./agents/agent-creator.md",
+    "./agents/agent-definition-improver.md",
+    "./agents/agent-from-command-line-tool-builder.md",
+    "./agents/agent-output-comparator.md",
+    "./agents/agent-suggestor.md",
+    "./agents/agent-testing-and-evaluation.md"
+  ]
+}

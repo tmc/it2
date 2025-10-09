@@ -1,0 +1,17 @@
+{
+  "name": "it2",
+  "description": "iTerm2 terminal automation tools and Claude Code integration agents for the it2 CLI",
+  "version": "1.0.0",
+  "author": {
+    "name": "it2 Development Team",
+    "email": "[email protected]"
+  },
+  "homepage": "https://github.com/tmc/it2",
+  "repository": "https://github.com/tmc/it2",
+  "license": "MIT",
+  "keywords": ["iterm2", "terminal", "automation", "claude-code", "ai-cli"],
+  "agents": [
+      "./agents/iterm2-terminal-automation.md",
+      "./agents/session-work-analyzer.md"
+  ]
+}

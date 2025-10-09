@@ -1,0 +1,16 @@
+{
+  "name": "it2-claude-automation",
+  "description": "Claude Code configuration and session automation using it2 CLI",
+  "version": "1.0.0",
+  "author": {
+    "name": "it2 Development Team",
+    "email": "[email protected]"
+  },
+  "homepage": "https://github.com/tmc/it2",
+  "repository": "https://github.com/tmc/it2",
+  "license": "MIT",
+  "keywords": ["claude-code", "automation", "configuration", "ai", "session", "analysis"],
+  "agents": [
+    "./agents/claude-code-automation.md"
+  ]
+}

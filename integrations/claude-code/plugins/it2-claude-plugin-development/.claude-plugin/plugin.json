@@ -1,0 +1,21 @@
+{
+  "name": "it2-claude-plugin-development",
+  "description": "Tools and agents for developing Claude Code plugins and marketplaces",
+  "version": "1.0.0",
+  "author": {
+    "name": "it2 Development Team",
+    "email": "[email protected]"
+  },
+  "homepage": "https://github.com/tmc/it2",
+  "repository": "https://github.com/tmc/it2",
+  "license": "MIT",
+  "keywords": ["plugin-development", "marketplace", "claude-code", "development"],
+  "agents": [
+    "./agents/plugin-creator.md",
+    "./agents/marketplace-manager.md"
+  ],
+  "commands": [
+    "./commands/claude-plugin-validate.md",
+    "./commands/claude-plugin-validate-all.md"
+  ]
+}

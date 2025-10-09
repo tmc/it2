@@ -1,0 +1,32 @@
+{
+  "name": "it2",
+  "owner": {
+    "name": "it2 Development Team",
+    "email": "[email protected]"
+  },
+  "metadata": {
+    "description": "iTerm2 terminal automation tools and Claude Code integration agents for the it2 CLI",
+    "version": "1.1.0",
+    "homepage": "https://github.com/tmc/it2",
+    "repository": "https://github.com/tmc/it2",
+    "keywords": ["iterm2", "terminal", "automation", "claude-code", "ai-cli"]
+  },
+  "plugins": [
+    {
+      "name": "core",
+      "source": "./integrations/claude-code/plugins/it2-core"
+    },
+    {
+      "name": "claude-automation",
+      "source": "./integrations/claude-code/plugins/it2-claude-automation"
+    },
+    {
+      "name": "claude-plugin-development",
+      "source": "./integrations/claude-code/plugins/it2-claude-plugin-development"
+    },
+    {
+      "name": "claude-agent-development",
+      "source": "./integrations/claude-code/plugins/it2-claude-agent-development"
+    }
+  ]
+}
