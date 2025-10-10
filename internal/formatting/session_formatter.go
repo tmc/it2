@@ -2,12 +2,21 @@ package formatting
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 
 	"github.com/tmc/it2/internal/client"
 	pb "github.com/tmc/it2/proto"
 )
+
+// controlCharPattern matches ANSI escape sequences and other control characters
+var controlCharPattern = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]|\x1b\][0-9;]*.*?\x07|\x1b\][0-9;]*.*?\x1b\\|[\x00-\x08\x0b-\x0c\x0e-\x1f\x7f]`)
+
+// stripControlChars removes ANSI escape sequences and control characters from a string
+func stripControlChars(s string) string {
+	return controlCharPattern.ReplaceAllString(s, "")
+}
 
 // FormatSessions formats a list of sessions for display.
 func (f *Formatter) FormatSessions(sessions []*client.SessionInfo) error {
@@ -67,7 +76,9 @@ func (f *Formatter) formatText(sessions []*client.SessionInfo) error {
 		// Display plugin data if available
 		if len(session.PluginData) > 0 {
 			for key, value := range session.PluginData {
-				fmt.Printf("  %s: %v\n", key, value)
+				// Strip control characters from plugin data
+				valueStr := fmt.Sprintf("%v", value)
+				fmt.Printf("  %s: %v\n", key, stripControlChars(valueStr))
 			}
 		}
 		fmt.Println(strings.Repeat("-", 40))
@@ -202,7 +213,9 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 		// Add plugin data columns in same sorted order
 		for _, col := range pluginCols {
 			if value, exists := session.PluginData[col]; exists {
-				row = append(row, fmt.Sprintf("%v", value))
+				// Strip control characters from plugin data
+				valueStr := fmt.Sprintf("%v", value)
+				row = append(row, stripControlChars(valueStr))
 			} else {
 				row = append(row, "")
 			}
