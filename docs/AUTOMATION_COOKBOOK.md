@@ -33,11 +33,11 @@ MAIN_TAB=$(it2 tab create "Development" --badge "Main" --format json | jq -r '.i
 it2 session send-text "cd $PROJECT_DIR && git status"
 
 # Split for editor (keep main session for git operations)
-EDITOR_SESSION=$(it2 session create --split vertical --profile "Development" --format json | jq -r '.new_session_id')
+EDITOR_SESSION=$(it2 session split --vertical --profile "Development" --quiet)
 it2 session send-text "$EDITOR_SESSION" "cd $PROJECT_DIR && code ."
 
 # Split for backend server
-BACKEND_SESSION=$(it2 session create --split horizontal --profile "Development" --format json | jq -r '.new_session_id')
+BACKEND_SESSION=$(it2 session split --horizontal --profile "Development" --quiet)
 it2 session send-text "$BACKEND_SESSION" "cd $PROJECT_DIR/backend && npm run dev"
 
 # Create separate tab for frontend
@@ -45,7 +45,7 @@ FRONTEND_TAB=$(it2 tab create "Development" --badge "Frontend" --format json | j
 it2 session send-text "cd $PROJECT_DIR/frontend && npm start"
 
 # Split frontend tab for hot reloading logs
-FRONTEND_LOGS=$(it2 session create --split horizontal --profile "Development" --format json | jq -r '.new_session_id')
+FRONTEND_LOGS=$(it2 session split --horizontal --profile "Development" --quiet)
 it2 session send-text "$FRONTEND_LOGS" "cd $PROJECT_DIR/frontend && npm run test:watch"
 
 # Create database monitoring tab
@@ -53,7 +53,7 @@ DB_TAB=$(it2 tab create "Database" --badge "DB" --format json | jq -r '.id')
 it2 session send-text "cd $PROJECT_DIR && docker-compose logs -f postgres"
 
 # Split for database shell access
-DB_SHELL=$(it2 session create --split vertical --profile "Database" --format json | jq -r '.new_session_id')
+DB_SHELL=$(it2 session split --vertical --profile "Database" --quiet)
 it2 session send-text "$DB_SHELL" "cd $PROJECT_DIR && make db-shell"
 
 # Create testing tab
@@ -61,7 +61,7 @@ TEST_TAB=$(it2 tab create "Testing" --badge "Tests" --format json | jq -r '.id')
 it2 session send-text "cd $PROJECT_DIR && npm run test:coverage"
 
 # Split for E2E tests
-E2E_SESSION=$(it2 session create --split horizontal --profile "Testing" --format json | jq -r '.new_session_id')
+E2E_SESSION=$(it2 session split --horizontal --profile "Testing" --quiet)
 it2 session send-text "$E2E_SESSION" "cd $PROJECT_DIR && npm run test:e2e:watch"
 
 echo "✅ Development environment ready!"
@@ -96,7 +96,7 @@ create_repo_session() {
         SESSION_ID=$(it2 session current)
     else
         # Split for additional repos
-        SESSION_ID=$(it2 session create --split horizontal --profile "Development" --format json | jq -r '.new_session_id')
+        SESSION_ID=$(it2 session split --horizontal --profile "Development" --quiet)
     fi
 
     # Set up the repository session
@@ -169,7 +169,7 @@ setup_server_monitoring() {
     if [ "$is_first" = "true" ]; then
         SESSION_ID=$(it2 session current)
     else
-        SESSION_ID=$(it2 session create --split horizontal --profile "SSH" --format json | jq -r '.new_session_id')
+        SESSION_ID=$(it2 session split --horizontal --profile "SSH" --quiet)
     fi
 
     # Connect and start monitoring
@@ -198,13 +198,13 @@ sleep 2
 it2 session send-text "watch -n 5 'uptime; echo; df -h; echo; free -h'"
 
 # Split for network monitoring
-NETWORK_SESSION=$(it2 session create --split vertical --profile "SSH" --format json | jq -r '.new_session_id')
+NETWORK_SESSION=$(it2 session split --vertical --profile "SSH" --quiet)
 it2 session send-text "$NETWORK_SESSION" "ssh web01.prod"
 sleep 2
 it2 session send-text "$NETWORK_SESSION" "watch -n 10 'ss -tuln | head -20'"
 
 # Split for log monitoring
-LOG_SESSION=$(it2 session create --split horizontal --profile "SSH" --format json | jq -r '.new_session_id')
+LOG_SESSION=$(it2 session split --horizontal --profile "SSH" --quiet)
 it2 session send-text "$LOG_SESSION" "ssh web01.prod"
 sleep 2
 it2 session send-text "$LOG_SESSION" "sudo tail -f /var/log/nginx/access.log"
@@ -252,7 +252,7 @@ for env in "${ENVIRONMENTS[@]}"; do
     first_service=true
     for service in "${SERVICES[@]}"; do
         if [ "$first_service" = "false" ]; then
-            SERVICE_SESSION=$(it2 session create --split horizontal --profile "Kubernetes" --format json | jq -r '.new_session_id')
+            SERVICE_SESSION=$(it2 session split --horizontal --profile "Kubernetes" --quiet)
         else
             SERVICE_SESSION=$(it2 session current)
             first_service=false
@@ -335,11 +335,11 @@ it2 session send-text "# Database Administration Dashboard"
 it2 session send-text "watch -n 30 'echo \"=== Database Status ===\"; for db in ${DATABASES[@]}; do echo \"$db:\"; psql -h $DB_HOST -d \$db -c \"SELECT count(*) as active_connections FROM pg_stat_activity WHERE datname='\$db';\"; done'"
 
 # Split for SQL console
-SQL_SESSION=$(it2 session create --split vertical --profile "Database" --format json | jq -r '.new_session_id')
+SQL_SESSION=$(it2 session split --vertical --profile "Database" --quiet)
 it2 session send-text "$SQL_SESSION" "psql -h $DB_HOST -d ${DATABASES[0]}"
 
 # Split for backup operations
-BACKUP_SESSION=$(it2 session create --split horizontal --profile "Database" --format json | jq -r '.new_session_id')
+BACKUP_SESSION=$(it2 session split --horizontal --profile "Database" --quiet)
 
 # Create backup script
 cat > /tmp/db-backup.sh << 'EOF'
@@ -392,7 +392,7 @@ it2 session send-text "\\timing on"
 it2 session send-text "-- Database Performance Dashboard"
 
 # Split for slow query monitoring
-SLOW_QUERY_SESSION=$(it2 session create --split horizontal --profile "Database" --format json | jq -r '.new_session_id')
+SLOW_QUERY_SESSION=$(it2 session split --horizontal --profile "Database" --quiet)
 it2 session send-text "$SLOW_QUERY_SESSION" "# Monitoring slow queries..."
 it2 session send-text "$SLOW_QUERY_SESSION" "tail -f /var/log/postgresql/postgresql-slow.log"
 
@@ -436,7 +436,7 @@ it2 session send-text "watch -n 60 'echo \"=== Build Status ===\"; for project i
 first=true
 for project in "${PROJECTS[@]}"; do
     if [ "$first" = "false" ]; then
-        PROJECT_SESSION=$(it2 session create --split horizontal --profile "Development" --format json | jq -r '.new_session_id')
+        PROJECT_SESSION=$(it2 session split --horizontal --profile "Development" --quiet)
     else
         PROJECT_SESSION=$(it2 session current)
         first=false
@@ -533,7 +533,7 @@ it2 session send-text "watch -n 10 'echo \"=== Error Summary (last 5 minutes) ==
 first=true
 for service in "${SERVICES[@]}"; do
     if [ "$first" = "false" ]; then
-        SERVICE_SESSION=$(it2 session create --split horizontal --profile "Monitoring" --format json | jq -r '.new_session_id')
+        SERVICE_SESSION=$(it2 session split --horizontal --profile "Monitoring" --quiet)
     else
         SERVICE_SESSION=$(it2 session current)
         first=false
@@ -588,7 +588,7 @@ EOF
 it2 session send-text "source /tmp/log-analysis.sh"
 
 # Split for real-time log search
-SEARCH_SESSION=$(it2 session create --split vertical --profile "Monitoring" --format json | jq -r '.new_session_id')
+SEARCH_SESSION=$(it2 session split --vertical --profile "Monitoring" --quiet)
 it2 session send-text "$SEARCH_SESSION" "# Real-time log search"
 it2 session send-text "$SEARCH_SESSION" "# Use: tail -f /var/log/app.log | grep 'pattern'"
 
@@ -633,7 +633,7 @@ it2 session send-text "gh pr list --state open"
 first=true
 for repo in "${REPOS[@]}"; do
     if [ "$first" = "false" ]; then
-        REPO_SESSION=$(it2 session create --split horizontal --profile "Development" --format json | jq -r '.new_session_id')
+        REPO_SESSION=$(it2 session split --horizontal --profile "Development" --quiet)
     else
         REPO_SESSION=$(it2 session current)
         first=false
@@ -706,7 +706,7 @@ EOF
 it2 session send-text "source /tmp/review-tools.sh"
 
 # Split for testing changes
-TEST_SESSION=$(it2 session create --split horizontal --profile "Development" --format json | jq -r '.new_session_id')
+TEST_SESSION=$(it2 session split --horizontal --profile "Development" --quiet)
 it2 session send-text "$TEST_SESSION" "# Testing PR changes"
 it2 session send-text "$TEST_SESSION" "# Use this session to run tests on PR branches"
 
@@ -763,7 +763,7 @@ setup_service_incident_monitoring() {
 first=true
 for service in "${SERVICES[@]}"; do
     if [ "$first" = "false" ]; then
-        SERVICE_SESSION=$(it2 session create --split horizontal --profile "Monitoring" --format json | jq -r '.new_session_id')
+        SERVICE_SESSION=$(it2 session split --horizontal --profile "Monitoring" --quiet)
     else
         SERVICE_SESSION=$(it2 session current)
         first=false
@@ -856,7 +856,7 @@ EOF
 it2 session send-text "source /tmp/incident-response.sh"
 
 # Split for communication
-COMM_SESSION=$(it2 session create --split vertical --profile "Communication" --format json | jq -r '.new_session_id')
+COMM_SESSION=$(it2 session split --vertical --profile "Communication" --quiet)
 it2 session send-text "$COMM_SESSION" "# Incident Communication"
 it2 session send-text "$COMM_SESSION" "echo 'Use this session for stakeholder communication'"
 
@@ -897,7 +897,7 @@ setup_load_testing() {
 first=true
 for endpoint in "${ENDPOINTS[@]}"; do
     if [ "$first" = "false" ]; then
-        ENDPOINT_SESSION=$(it2 session create --split horizontal --profile "Testing" --format json | jq -r '.new_session_id')
+        ENDPOINT_SESSION=$(it2 session split --horizontal --profile "Testing" --quiet)
     else
         ENDPOINT_SESSION=$(it2 session current)
         first=false
@@ -915,12 +915,12 @@ it2 session send-text "# System Performance Monitoring"
 it2 session send-text "watch -n 5 'echo \"=== CPU & Memory ===\"; top -bn1 | head -20; echo; echo \"=== Network ===\"; netstat -i'"
 
 # Split for application metrics
-APP_METRICS_SESSION=$(it2 session create --split vertical --profile "Monitoring" --format json | jq -r '.new_session_id')
+APP_METRICS_SESSION=$(it2 session split --vertical --profile "Monitoring" --quiet)
 it2 session send-text "$APP_METRICS_SESSION" "# Application Metrics"
 it2 session send-text "$APP_METRICS_SESSION" "watch -n 10 'curl -s https://staging.example.com/metrics | grep -E \"response_time|request_count|error_rate\"'"
 
 # Split for database performance
-DB_METRICS_SESSION=$(it2 session create --split horizontal --profile "Database" --format json | jq -r '.new_session_id')
+DB_METRICS_SESSION=$(it2 session split --horizontal --profile "Database" --quiet)
 it2 session send-text "$DB_METRICS_SESSION" "# Database Performance"
 it2 session send-text "$DB_METRICS_SESSION" "watch -n 15 'psql -h db.staging.example.com -c \"SELECT query, calls, mean_time FROM pg_stat_statements ORDER BY mean_time DESC LIMIT 10;\"'"
 

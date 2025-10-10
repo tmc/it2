@@ -77,7 +77,7 @@ Run Codex in a dedicated iTerm2 session:
 
 ```bash
 # Create session and start Codex
-SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --vertical --quiet)
 it2 session set-badge "🤖 Codex" "$SESSION"
 it2 session send-text "$SESSION" "cd ~/my-project && codex 'Add unit tests for auth.ts'"
 ```
@@ -182,7 +182,7 @@ codex --cd ~/project "Add feature"                    # Change directory first
 
 ```bash
 # Create session with configuration
-SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --vertical --quiet)
 it2 session set-badge "🤖 Codex" "$SESSION"
 it2 session set-variable user.ai_type "codex" "$SESSION"
 it2 session set-variable user.project_dir "~/my-app" "$SESSION"
@@ -224,17 +224,17 @@ Run Codex in multiple projects simultaneously:
 
 ```bash
 # Project 1: Add tests
-S1=$(it2 session create --format json | jq -r '.new_session_id')
+S1=$(it2 session split --quiet)
 it2 session set-badge "🧪 Tests" "$S1"
 it2 session send-text "$S1" "cd ~/project1 && codex exec 'Add unit tests for authentication'"
 
 # Project 2: Refactor
-S2=$(it2 session create --format json | jq -r '.new_session_id')
+S2=$(it2 session split --quiet)
 it2 session set-badge "🔧 Refactor" "$S2"
 it2 session send-text "$S2" "cd ~/project2 && codex exec 'Refactor database queries for performance'"
 
 # Project 3: Update deps
-S3=$(it2 session create --format json | jq -r '.new_session_id')
+S3=$(it2 session split --quiet)
 it2 session set-badge "📦 Deps" "$S3"
 it2 session send-text "$S3" "cd ~/project3 && codex exec 'Update dependencies and fix breaking changes'"
 ```
@@ -243,7 +243,7 @@ it2 session send-text "$S3" "cd ~/project3 && codex exec 'Update dependencies an
 
 ```bash
 # Create review session
-SESSION=$(it2 session create --split horizontal --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --horizontal --quiet)
 it2 session set-badge "👁️ Review" "$SESSION"
 
 # Run comprehensive code review
@@ -261,7 +261,7 @@ Generate a comprehensive security review report.'"
 ```bash
 # Process multiple files in parallel
 for file in src/utils/*.ts; do
-    SESSION=$(it2 session create --format json | jq -r '.new_session_id')
+    SESSION=$(it2 session split --quiet)
     filename=$(basename "$file")
     it2 session set-badge "📝 $filename" "$SESSION"
     it2 session send-text "$SESSION" "cd ~/my-app && codex exec 'Add comprehensive JSDoc comments to $file'"
@@ -273,7 +273,7 @@ done
 
 ```bash
 # Generate tests for entire codebase
-SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --vertical --quiet)
 it2 session set-badge "🧪 Test Gen" "$SESSION"
 
 it2 session send-text "$SESSION" "cd ~/my-project"
@@ -289,7 +289,7 @@ it2 session send-text "$SESSION" "codex exec 'For each file in src/:
 
 ```bash
 # Generate API documentation
-SESSION=$(it2 session create --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --quiet)
 it2 session set-badge "📚 Docs" "$SESSION"
 
 it2 session send-text "$SESSION" "cd ~/my-project"
@@ -306,7 +306,7 @@ it2 session send-text "$SESSION" "codex exec 'Generate comprehensive API documen
 ```bash
 # Refactor multiple projects with approval
 for project in frontend backend mobile; do
-    SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
+    SESSION=$(it2 session split --vertical --quiet)
     it2 session set-badge "🔧 $project" "$SESSION"
     it2 session set-variable user.ai_type "codex" "$SESSION"
     it2 session set-variable user.project_name "$project" "$SESSION"
@@ -320,7 +320,7 @@ done
 
 ```bash
 # Fix bugs from issue tracker
-SESSION=$(it2 session create --split horizontal --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --horizontal --quiet)
 it2 session set-badge "🐛 BugFix" "$SESSION"
 
 it2 session send-text "$SESSION" "cd ~/my-project"
@@ -336,7 +336,7 @@ Include:
 
 ```bash
 # Run CI/CD tasks with Codex
-SESSION=$(it2 session create --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --quiet)
 it2 session set-badge "🔄 CI" "$SESSION"
 
 it2 session send-text "$SESSION" "cd ~/my-project"
@@ -351,7 +351,7 @@ it2 session send-text "$SESSION" "codex exec 'Run security audit and fix vulnera
 
 ```bash
 # Implement new feature
-SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --vertical --quiet)
 it2 session set-badge "✨ Feature" "$SESSION"
 
 it2 session send-text "$SESSION" "cd ~/my-project"
@@ -367,7 +367,7 @@ it2 session send-text "$SESSION" "codex --ask-for-approval 'Implement user profi
 
 ```bash
 # Debug using screenshot
-SESSION=$(it2 session create --split horizontal --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --horizontal --quiet)
 it2 session set-badge "🖼️ Debug" "$SESSION"
 
 it2 session send-text "$SESSION" "codex --image ~/Desktop/error-screenshot.png 'Explain this error and suggest fixes'"
@@ -438,7 +438,7 @@ it2 text get-buffer "$SESSION" | grep -q "Error\|Failed"
 
 # If error found, create new session and retry
 if [ $? -eq 0 ]; then
-    NEW_SESSION=$(it2 session create --format json | jq -r '.new_session_id')
+    NEW_SESSION=$(it2 session split --quiet)
     it2 session send-text "$NEW_SESSION" "cd ~/project && codex exec 'Retry task'"
 fi
 ```
@@ -491,7 +491,7 @@ it2 text get-buffer "$SESSION"
 
 # Close and restart if needed
 it2 session close "$SESSION"
-SESSION=$(it2 session create --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --quiet)
 ```
 
 ### Can't Find Project Files
@@ -525,7 +525,7 @@ it2 text get-buffer "$SESSION" | less
 
 ```bash
 # Resume last Codex session in new it2 session
-SESSION=$(it2 session create --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --quiet)
 it2 session set-badge "🔄 Resume" "$SESSION"
 it2 session send-text "$SESSION" "codex resume --last"
 
@@ -537,7 +537,7 @@ it2 session send-text "$SESSION" "codex resume <CODEX_SESSION_ID>"
 
 ```bash
 # Review git diff before committing
-SESSION=$(it2 session create --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --quiet)
 it2 session set-badge "🔍 Review" "$SESSION"
 it2 session send-text "$SESSION" "cd ~/project && codex exec 'Review current git diff and suggest improvements before committing'"
 ```
@@ -546,21 +546,21 @@ it2 session send-text "$SESSION" "cd ~/project && codex exec 'Review current git
 
 ```bash
 # Stage 1: Analysis
-S1=$(it2 session create --format json | jq -r '.new_session_id')
+S1=$(it2 session split --quiet)
 it2 session set-badge "1️⃣ Analysis" "$S1"
 it2 session send-text "$S1" "cd ~/project && codex exec 'Analyze codebase for refactoring opportunities'"
 
 sleep 30  # Wait for analysis
 
 # Stage 2: Refactoring
-S2=$(it2 session create --format json | jq -r '.new_session_id')
+S2=$(it2 session split --quiet)
 it2 session set-badge "2️⃣ Refactor" "$S2"
 it2 session send-text "$S2" "cd ~/project && codex exec 'Apply recommended refactorings'"
 
 sleep 30  # Wait for refactoring
 
 # Stage 3: Testing
-S3=$(it2 session create --format json | jq -r '.new_session_id')
+S3=$(it2 session split --quiet)
 it2 session set-badge "3️⃣ Tests" "$S3"
 it2 session send-text "$S3" "cd ~/project && codex exec 'Run all tests and fix failures'"
 ```
@@ -636,32 +636,32 @@ it2 session get-variable user.project_dir <session-id>
 
 ```bash
 # Generate tests in new session
-it2 session create --format json | jq -r '.new_session_id' | xargs -I {} bash -c 'it2 session send-text {} "cd ~/project && codex exec \"Add tests\""'
+it2 session split --quiet | xargs -I {} bash -c 'it2 session send-text {} "cd ~/project && codex exec \"Add tests\""'
 
 # Code review in split session
-S=$(it2 session create --split horizontal --format json | jq -r '.new_session_id'); it2 session send-text "$S" "cd ~/app && codex exec 'Review code for security issues'"
+S=$(it2 session split --horizontal --quiet); it2 session send-text "$S" "cd ~/app && codex exec 'Review code for security issues'"
 
 # Multi-project parallel execution
-for p in app1 app2 app3; do S=$(it2 session create --format json | jq -r '.new_session_id'); it2 session send-text "$S" "cd ~/$p && codex exec 'Update deps'"; done
+for p in app1 app2 app3; do S=$(it2 session split --quiet); it2 session send-text "$S" "cd ~/$p && codex exec 'Update deps'"; done
 ```
 
 ### Practical Workflows
 
 ```bash
 # Morning code review routine
-SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --vertical --quiet)
 it2 session set-badge "☀️ Morning Review" "$SESSION"
 it2 session send-text "$SESSION" "cd ~/work"
 it2 session send-text "$SESSION" "codex exec 'Review all changes from yesterday and create summary'"
 
 # Pre-commit check
-SESSION=$(it2 session create --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --quiet)
 it2 session set-badge "✅ Pre-commit" "$SESSION"
 it2 session send-text "$SESSION" "cd ~/project"
 it2 session send-text "$SESSION" "codex exec 'Run linter, tests, and security scan'"
 
 # Documentation update
-SESSION=$(it2 session create --format json | jq -r '.new_session_id')
+SESSION=$(it2 session split --quiet)
 it2 session set-badge "📖 Docs" "$SESSION"
 it2 session send-text "$SESSION" "cd ~/repo"
 it2 session send-text "$SESSION" "codex exec 'Update README.md with latest features and API changes'"

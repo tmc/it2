@@ -9,14 +9,16 @@ A comprehensive guide to using Claude Code with the it2 CLI through our plugin.
 
 - [Introduction](#introduction)
 - [Quick Start](#quick-start)
-- [The it2 Plugin](#the-it2-plugin)
-- [Available Agents](#available-agents)
+- [Plugin Marketplace](#plugin-marketplace)
+- [Available Plugins & Agents](#available-plugins--agents)
 - [Installation](#installation)
 - [Usage Examples](#usage-examples)
 - [Automation Workflows](#automation-workflows)
 - [Advanced Topics](#advanced-topics)
 - [Troubleshooting](#troubleshooting)
 - [Reference](#reference)
+- [See Also](#see-also)
+- [Contributing](#contributing)
 
 ---
 
@@ -102,7 +104,7 @@ If you need to use it2 directly:
 
 ```bash
 # Create a session and launch Claude
-SESSION_ID=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
+SESSION_ID=$(it2 session split --vertical --quiet)
 it2 session send-text "$SESSION_ID" "cd ~/project && claude"
 
 # Wait for Claude to be ready
@@ -126,9 +128,9 @@ it2 badge set "$SESSION_ID" "🔵 Analysis"
 **Multi-session setup**:
 ```bash
 # Create three sessions
-BACKEND=$(it2 session create --split horizontal --format json | jq -r '.new_session_id')
-FRONTEND=$(it2 session create --split horizontal --format json | jq -r '.new_session_id')
-TESTING=$(it2 session create --split horizontal --format json | jq -r '.new_session_id')
+BACKEND=$(it2 session split --horizontal --quiet)
+FRONTEND=$(it2 session split --horizontal --quiet)
+TESTING=$(it2 session split --horizontal --quiet)
 
 # Set titles and badges
 it2 session set-title "$BACKEND" "Backend"
@@ -760,8 +762,9 @@ echo $ITERM2_KEY
 ```bash
 # Marketplace configuration
 .claude-plugin/marketplace.json    # Plugin manifest
-
 ```
+
+For Claude Code configuration file locations, see the [official documentation](https://docs.claude.com/en/docs/claude-code/plugins).
 
 ---
 
@@ -782,7 +785,7 @@ echo $ITERM2_KEY
 
 1. Create agent definition following the [plugin manifest schema](https://docs.claude.com/en/docs/claude-code/plugins-reference)
 2. Add entry to `.claude-plugin/marketplace.json`
-2. Add plugin to `integation/claude-code/plugins/*`
+2. Add plugin to `integration/claude-code/plugins/*`
 
 ### Reporting Issues
 

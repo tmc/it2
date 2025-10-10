@@ -71,7 +71,7 @@ Launch an interactive Gemini session in a dedicated terminal split:
 
 ```bash
 # Create a new session split for Gemini
-SESSION_ID=$(it2 session split --vertical --quiet)
+SESSION_ID=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
 
 # Set badge for easy identification
 it2 session set-badge "💎 Gemini" "$SESSION_ID"
@@ -230,7 +230,7 @@ The key benefit of using Gemini CLI with it2 is **session isolation and manageme
 
 ```bash
 # Create a new Gemini session split
-SESSION=$(it2 session split --vertical --quiet)
+SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
 
 # Configure the session
 it2 session set-badge "💎 Gemini" "$SESSION"
@@ -259,7 +259,7 @@ Running Gemini in it2-managed sessions gives you:
 
 ```bash
 # Launch Gemini with additional directories in context
-SESSION=$(it2 session split --vertical --quiet)
+SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
 it2 session set-badge "💎 Gemini" "$SESSION"
 
 # Navigate and launch with extended context
@@ -277,19 +277,19 @@ One powerful it2 pattern is running **multiple Gemini sessions** simultaneously:
 # Create multiple Gemini sessions for different purposes
 
 # Main development assistant (right split)
-MAIN=$(it2 session split --vertical --quiet)
+MAIN=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
 it2 session set-badge "💎 Main" "$MAIN"
 it2 session set-title "$MAIN" "Gemini: Development"
 it2 session send-text "$MAIN" "cd ~/projects/myapp && gemini -m gemini-2.5-pro"
 
 # Code reviewer (bottom split)
-REVIEW=$(it2 session split --horizontal --quiet)
+REVIEW=$(it2 session create --split horizontal --format json | jq -r '.new_session_id')
 it2 session set-badge "👁️ Review" "$REVIEW"
 it2 session set-title "$REVIEW" "Gemini: Review"
 it2 session send-text "$REVIEW" "cd ~/projects/myapp && gemini -m gemini-2.0-flash"
 
 # Quick questions (small bottom-right split)
-QUICK=$(it2 session split --right --quiet)
+QUICK=$(it2 session create --split right --format json | jq -r '.new_session_id')
 it2 session set-badge "⚡ Quick" "$QUICK"
 it2 session set-title "$QUICK" "Gemini: Quick"
 it2 session send-text "$QUICK" "cd ~/projects/myapp && gemini -m gemini-2.5-flash-lite"
@@ -325,7 +325,7 @@ Launch an interactive Gemini session dedicated to code review:
 
 ```bash
 # Create dedicated review session
-SESSION=$(it2 session split --horizontal --quiet)
+SESSION=$(it2 session create --split horizontal --format json | jq -r '.new_session_id')
 it2 session set-badge "👁️ Review" "$SESSION"
 it2 session set-title "$SESSION" "Gemini Code Review"
 
@@ -348,7 +348,7 @@ Use Gemini CLI non-interactively for scripted tasks:
 
 ```bash
 # Create session for the task
-SESSION=$(it2 session split --right --quiet)
+SESSION=$(it2 session create --split right --format json | jq -r '.new_session_id')
 it2 session set-badge "📚 Docs" "$SESSION"
 
 # Navigate and run Gemini in non-interactive mode
@@ -366,7 +366,7 @@ Launch Gemini with additional directories in context:
 
 ```bash
 # Create analysis session with extended context
-SESSION=$(it2 session split --right --quiet)
+SESSION=$(it2 session create --split right --format json | jq -r '.new_session_id')
 it2 session set-badge "🔍 Analysis" "$SESSION"
 it2 session set-title "$SESSION" "Gemini: Analysis"
 
@@ -391,7 +391,7 @@ Watch what Gemini is doing in a session:
 
 ```bash
 # Create a Gemini session
-SESSION=$(it2 session split --vertical --quiet)
+SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
 it2 session set-badge "💎 Gemini" "$SESSION"
 it2 session send-text "$SESSION" "cd ~/projects/myapp && gemini"
 
@@ -412,7 +412,7 @@ Interact with an already-running Gemini session programmatically:
 
 ```bash
 # 1. Create interactive Gemini session
-SESSION=$(it2 session split --vertical --quiet)
+SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
 it2 session set-badge "💎 Gemini" "$SESSION"
 it2 session send-text "$SESSION" "cd ~/projects/myapp && gemini -m gemini-2.0-flash"
 
@@ -438,7 +438,7 @@ Gemini CLI can analyze images, diagrams, and screenshots interactively.
 
 ```bash
 # Create session for screenshot analysis
-SESSION=$(it2 session split --quiet)
+SESSION=$(it2 session create --format json | jq -r '.new_session_id')
 it2 session set-badge "📸 Screenshot" "$SESSION"
 
 # Run Gemini to analyze screenshot (interactive mode works best for images)
@@ -453,7 +453,7 @@ it2 session send-text "$SESSION" "Look at screenshot.png and transcribe the code
 
 ```bash
 # Create session for diagram analysis
-SESSION=$(it2 session split --quiet)
+SESSION=$(it2 session create --format json | jq -r '.new_session_id')
 it2 session set-badge "📊 Diagram" "$SESSION"
 
 # Launch interactive Gemini
@@ -468,7 +468,7 @@ it2 session send-text "$SESSION" "Analyze api_design.png and generate Go code im
 
 ```bash
 # Create multimodal analysis session
-SESSION=$(it2 session split --quiet)
+SESSION=$(it2 session create --format json | jq -r '.new_session_id')
 it2 session set-badge "🎨 Multimodal" "$SESSION"
 
 # Navigate to project and launch Gemini
@@ -489,19 +489,19 @@ it2 session send-text "$SESSION" "Analyze this entire project including code, do
 # Create a complete Gemini workspace for a project
 
 # Main development assistant session
-MAIN=$(it2 session split --vertical --quiet)
+MAIN=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
 it2 session set-badge "💎 Main" "$MAIN"
 it2 session set-title "$MAIN" "Gemini Main"
 it2 session send-text "$MAIN" "cd ~/projects/myapp && gemini -m gemini-2.5-pro"
 
 # Code review session
-REVIEW=$(it2 session split --horizontal --quiet)
+REVIEW=$(it2 session create --split horizontal --format json | jq -r '.new_session_id')
 it2 session set-badge "👁️ Review" "$REVIEW"
 it2 session set-title "$REVIEW" "Code Review"
 it2 session send-text "$REVIEW" "cd ~/projects/myapp && gemini -m gemini-2.0-flash"
 
 # Documentation session
-DOCS=$(it2 session split --right --quiet)
+DOCS=$(it2 session create --split right --format json | jq -r '.new_session_id')
 it2 session set-badge "📚 Docs" "$DOCS"
 it2 session set-title "$DOCS" "Documentation"
 it2 session send-text "$DOCS" "cd ~/projects/myapp && gemini -m gemini-2.5-flash"
@@ -514,7 +514,7 @@ echo "Main: $MAIN | Review: $REVIEW | Docs: $DOCS"
 
 ```bash
 # Create session that watches for file changes and analyzes them
-SESSION=$(it2 session split --quiet)
+SESSION=$(it2 session create --format json | jq -r '.new_session_id')
 it2 session set-badge "👀 Watch" "$SESSION"
 
 it2 session send-text "$SESSION" "cd ~/projects/myapp"
@@ -528,7 +528,7 @@ it2 session send-text "$SESSION" "fswatch -o '*.go' | while read; do clear; echo
 ```bash
 # Create session for PR review
 PR_NUMBER=123
-SESSION=$(it2 session split --quiet)
+SESSION=$(it2 session create --format json | jq -r '.new_session_id')
 it2 session set-badge "🔍 PR #$PR_NUMBER" "$SESSION"
 
 it2 session send-text "$SESSION" "cd ~/projects/myapp"
@@ -584,7 +584,7 @@ choose_model() {
 
 ```bash
 # Use badges and titles for clarity
-SESSION=$(it2 session split --vertical --quiet)
+SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
 
 it2 session set-badge "💎 Gemini" "$SESSION"
 it2 session set-title "$SESSION" "Gemini: myapp"
@@ -602,7 +602,7 @@ mkdir -p ~/projects/myapp/.gemini/{reviews,docs,analysis}
 echo ".gemini/" >> ~/projects/myapp/.gitignore
 
 # Use these directories in Gemini commands
-SESSION=$(it2 session split --vertical --quiet)
+SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
 it2 session send-text "$SESSION" "cd ~/projects/myapp"
 it2 session send-text "$SESSION" "gemini -p 'Review this code' > .gemini/reviews/review_$(date +%Y%m%d).md"
 ```
@@ -611,7 +611,7 @@ it2 session send-text "$SESSION" "gemini -p 'Review this code' > .gemini/reviews
 
 ```bash
 # Respect rate limits when batch processing
-SESSION=$(it2 session split --vertical --quiet)
+SESSION=$(it2 session create --split vertical --format json | jq -r '.new_session_id')
 it2 session send-text "$SESSION" "cd ~/projects/myapp"
 
 # Analyze files with delays
@@ -626,7 +626,7 @@ done
 ```bash
 # For very large projects, analyze in chunks
 for module in ~/projects/myapp/*/; do
-    SESSION=$(it2 session split --quiet)
+    SESSION=$(it2 session create --format json | jq -r '.new_session_id')
     it2 session send-text "$SESSION" "cd $module && gemini -p 'Analyze this module'"
     sleep 3
 done
