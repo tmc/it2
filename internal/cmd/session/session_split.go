@@ -3,6 +3,7 @@ package session
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -37,6 +38,9 @@ session dimensions: vertical split when width > height, horizontal otherwise.`,
 
 			# Split and just output the new session ID (for scripting)
 			$ it2 session split --quiet
+
+			# Split and run a command in the new session
+			$ it2 session split --vertical --command "ssh vm1"
 		`),
 		Args: cobra.RangeArgs(0, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -50,6 +54,7 @@ session dimensions: vertical split when width > height, horizontal otherwise.`,
 			before, _ := cmd.Flags().GetBool("before")
 			profileName, _ := cmd.Flags().GetString("profile")
 			badge, _ := cmd.Flags().GetString("badge")
+			command, _ := cmd.Flags().GetString("command")
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 			quiet, _ := cmd.Flags().GetBool("quiet")
 
@@ -133,6 +138,37 @@ session dimensions: vertical split when width > height, horizontal otherwise.`,
 			case pb.SplitPaneResponse_OK:
 				newSessionIDs := response.GetSessionId()
 				if len(newSessionIDs) > 0 {
+					// Check if the new session is too small and warn the user
+					if len(newSessionIDs) > 0 {
+						gridSizeJSON, err := c.GetSessionProperty(ctx, newSessionIDs[0], "grid_size")
+						if err == nil {
+							var gridSize struct {
+								Width  int `json:"width"`
+								Height int `json:"height"`
+							}
+							if err := json.Unmarshal([]byte(gridSizeJSON), &gridSize); err == nil {
+								const minComfortableWidth = 80
+								const minComfortableHeight = 25
+
+								if gridSize.Width < minComfortableWidth || gridSize.Height < minComfortableHeight {
+									fmt.Fprintf(os.Stderr, "WARNING: New session is small (%dx%d). Consider:\n", gridSize.Width, gridSize.Height)
+									fmt.Fprintf(os.Stderr, "  - Using 'it2 tab layout' to inspect your tab layout\n")
+									fmt.Fprintf(os.Stderr, "  - Splitting in a different tab or window\n")
+									fmt.Fprintf(os.Stderr, "  - Closing unused panes to free up space\n\n")
+								}
+							}
+						}
+					}
+
+					// Send command if requested
+					if command != "" {
+						if err := c.SendText(ctx, newSessionIDs[0], command+"\n"); err != nil {
+							if !quiet {
+								fmt.Fprintf(os.Stderr, "Warning: Failed to send command to new session: %v\n", err)
+							}
+						}
+					}
+
 					// Set badge if requested
 					if badge != "" {
 						for _, sessionID := range newSessionIDs {
@@ -156,6 +192,9 @@ session dimensions: vertical split when width > height, horizontal otherwise.`,
 						if badge != "" {
 							result["badge_set"] = badge
 						}
+						if command != "" {
+							result["command_sent"] = command
+						}
 						return formatting.PrintJSON(result)
 					} else {
 						fmt.Printf("Session split successfully. New session ID: %s\n", newSessionIDs[0])
@@ -164,6 +203,9 @@ session dimensions: vertical split when width > height, horizontal otherwise.`,
 						}
 						if badge != "" {
 							fmt.Printf("Badge set to: %s\n", badge)
+						}
+						if command != "" {
+							fmt.Printf("Command sent: %s\n", command)
 						}
 					}
 				} else {
@@ -200,6 +242,7 @@ session dimensions: vertical split when width > height, horizontal otherwise.`,
 	cmd.Flags().Bool("before", false, "Create new pane before the current one")
 	cmd.Flags().String("profile", "", "Profile name for the new session (optional, uses default if not specified)")
 	cmd.Flags().String("badge", "", "Set badge text on new session(s)")
+	cmd.Flags().String("command", "", "Command to run in the new session")
 	cmd.Flags().Bool("json", false, "Output result as JSON")
 	cmd.Flags().BoolP("quiet", "q", false, "Only output the new session ID (for scripting)")
 	return cmd
