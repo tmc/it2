@@ -69,6 +69,7 @@ func newGetBufferCommand() *cobra.Command {
 
 			colorized, _ := sc.GetCommand().Flags().GetBool("color")
 			escaped, _ := sc.GetCommand().Flags().GetBool("escaped")
+			includeEmptyLines, _ := sc.GetCommand().Flags().GetBool("include-empty-lines")
 			// TODO: scrollback flag
 
 			// Get buffer contents with styles if needed
@@ -83,7 +84,15 @@ func newGetBufferCommand() *cobra.Command {
 			}
 
 			// Format the response based on flags
-			formatter := formatting.New(sc.GetFlags().Format)
+			formatter := formatting.NewWithOptions(
+				sc.GetFlags().Format,
+				nil, // columns
+				"",  // sortBy
+				false, // sortReverse
+				false, // quiet
+			)
+			formatter.SetIncludeEmptyLines(includeEmptyLines)
+
 			if escaped {
 				// Show output with escape sequences visible
 				return formatter.FormatBufferEscaped(resp, colorized)
@@ -101,6 +110,7 @@ func newGetBufferCommand() *cobra.Command {
 	cmd.Flags().Bool("scrollback", false, "Include scrollback history")
 	cmd.Flags().Bool("color", false, "Include ANSI color codes in output")
 	cmd.Flags().Bool("escaped", false, "Show escape sequences as visible characters (like cat -v)")
+	cmd.Flags().Bool("include-empty-lines", false, "Include trailing empty/blank lines in output (default: strip them)")
 
 	return cmd
 }

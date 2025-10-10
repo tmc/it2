@@ -7,6 +7,26 @@ import (
 	pb "github.com/tmc/it2/proto"
 )
 
+// stripTrailingEmptyLines removes empty lines from the end of the buffer contents.
+// This is useful for TUI applications where trailing blank lines clutter the output.
+func stripTrailingEmptyLines(contents []*pb.LineContents) []*pb.LineContents {
+	// Find the last non-empty line
+	lastNonEmpty := len(contents) - 1
+	for lastNonEmpty >= 0 {
+		text := contents[lastNonEmpty].GetText()
+		if strings.TrimSpace(text) != "" {
+			break
+		}
+		lastNonEmpty--
+	}
+
+	// Return slice up to and including the last non-empty line
+	if lastNonEmpty < 0 {
+		return nil // All lines were empty
+	}
+	return contents[:lastNonEmpty+1]
+}
+
 // FormatBuffer formats buffer contents.
 func (f *Formatter) FormatBuffer(resp *pb.GetBufferResponse) error {
 	if resp == nil {
@@ -25,9 +45,14 @@ func (f *Formatter) FormatBuffer(resp *pb.GetBufferResponse) error {
 		return nil
 	}
 
-	for _, line := range contents {
+	// Strip trailing empty lines unless includeEmptyLines is set
+	linesToPrint := contents
+	if !f.includeEmptyLines {
+		linesToPrint = stripTrailingEmptyLines(contents)
+	}
+
+	for _, line := range linesToPrint {
 		text := line.GetText()
-		// Print the line (preserving empty lines for formatting)
 		fmt.Println(text)
 	}
 	return nil
@@ -51,7 +76,13 @@ func (f *Formatter) FormatBufferWithColors(resp *pb.GetBufferResponse) error {
 		return nil
 	}
 
-	for _, line := range contents {
+	// Strip trailing empty lines unless includeEmptyLines is set
+	linesToPrint := contents
+	if !f.includeEmptyLines {
+		linesToPrint = stripTrailingEmptyLines(contents)
+	}
+
+	for _, line := range linesToPrint {
 		text := line.GetText()
 		styles := line.GetStyle()
 
@@ -212,7 +243,13 @@ func (f *Formatter) FormatBufferEscaped(resp *pb.GetBufferResponse, includeColor
 		return nil
 	}
 
-	for _, line := range contents {
+	// Strip trailing empty lines unless includeEmptyLines is set
+	linesToPrint := contents
+	if !f.includeEmptyLines {
+		linesToPrint = stripTrailingEmptyLines(contents)
+	}
+
+	for _, line := range linesToPrint {
 		text := line.GetText()
 		styles := line.GetStyle()
 
