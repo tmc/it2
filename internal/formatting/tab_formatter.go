@@ -9,16 +9,40 @@ import (
 
 // FormatTabResponse formats a tab creation response.
 func (f *Formatter) FormatTabResponse(resp *pb.CreateTabResponse) error {
-	if resp.GetTabId() != 0 {
-		fmt.Printf("Created tab with ID: %d\n", resp.GetTabId())
+	switch f.format {
+	case "json":
+		result := map[string]interface{}{
+			"success": true,
+		}
+		if resp.GetTabId() != 0 {
+			result["tab_id"] = resp.GetTabId()
+		}
+		if resp.GetWindowId() != "" {
+			result["window_id"] = resp.GetWindowId()
+		}
+		if resp.GetSessionId() != "" {
+			result["session_id"] = resp.GetSessionId()
+		}
+		return PrintJSON(result)
+	case "text":
+		// For text format, output just the session ID for easy scripting
+		if resp.GetSessionId() != "" {
+			fmt.Println(resp.GetSessionId())
+		}
+		return nil
+	default:
+		// Default verbose output
+		if resp.GetTabId() != 0 {
+			fmt.Printf("Created tab with ID: %d\n", resp.GetTabId())
+		}
+		if resp.GetWindowId() != "" {
+			fmt.Printf("Window ID: %s\n", resp.GetWindowId())
+		}
+		if resp.GetSessionId() != "" {
+			fmt.Printf("Session ID: %s\n", resp.GetSessionId())
+		}
+		return nil
 	}
-	if resp.GetWindowId() != "" {
-		fmt.Printf("Window ID: %s\n", resp.GetWindowId())
-	}
-	if resp.GetSessionId() != "" {
-		fmt.Printf("Session ID: %s\n", resp.GetSessionId())
-	}
-	return nil
 }
 
 // FormatTabs formats tab information.
