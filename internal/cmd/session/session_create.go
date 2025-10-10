@@ -16,8 +16,13 @@ import (
 func newCreateCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
 		Use:   "create [<session-id>]",
-		Short: "Create a new session",
-		Long: `Create a new iTerm2 session by either:
+		Short: "[DEPRECATED] Create a new session",
+		Long: `[DEPRECATED] This command is deprecated. Please use the clearer alternatives:
+  - For splits: 'it2 session split [<session-id>] --vertical|--horizontal'
+  - For new tabs: 'it2 tab create'
+  - For new windows: 'it2 window create'
+
+This command creates a new iTerm2 session by either:
   1. Creating a new tab (default)
   2. Splitting an existing session (if session-id provided or --split flag used)
 
@@ -25,35 +30,28 @@ When no session-id is provided, creates a new tab with the specified profile.
 When a session-id is provided, splits that session to create a new session.
 When --split flag is used without session-id, splits the current session.`,
 		Example: cmdutil.Doc(`
-			# Create new session in a new tab with Default profile
+			# DEPRECATED: Create new session in a new tab with Default profile
 			$ it2 session create
+			# USE INSTEAD: it2 tab create
 
-			# Create new session with specific profile in new tab
-			$ it2 session create --profile "Development"
-
-			# Create new session in specific window
-			$ it2 session create --window window-id
-
-			# Split current session vertically (no session-id needed)
+			# DEPRECATED: Split current session vertically
 			$ it2 session create --split vertical
+			# USE INSTEAD: it2 session split --vertical
 
-			# Split current session horizontally with specific profile
-			$ it2 session create --split horizontal --profile "SSH"
-
-			# Split existing session by ID
+			# DEPRECATED: Split existing session by ID
 			$ it2 session create session-id --split vertical
-
-			# Create session and get details
-			$ it2 session create --format json
-
-			# Create session with initial command
-			$ it2 session create --command "cd ~/project && npm run dev"
+			# USE INSTEAD: it2 session split <session-id> --vertical
 		`),
 		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			// Print deprecation warning to stderr
+			fmt.Fprintf(os.Stderr, "WARNING: 'it2 session create' is deprecated.\n")
+			fmt.Fprintf(os.Stderr, "  For splits, use: it2 session split [<session-id>] --vertical|--horizontal\n")
+			fmt.Fprintf(os.Stderr, "  For new tabs, use: it2 tab create\n")
+			fmt.Fprintf(os.Stderr, "  For new windows, use: it2 window create\n\n")
 			profile, _ := sc.GetCommand().Flags().GetString("profile")
 			windowID, _ := sc.GetCommand().Flags().GetString("window")
 			splitDirection, _ := sc.GetCommand().Flags().GetString("split")
@@ -71,7 +69,7 @@ When --split flag is used without session-id, splits the current session.`,
 						return fmt.Errorf("--split requires either a session-id argument or ITERM_SESSION_ID environment variable (are you running inside iTerm2?)")
 					}
 					currentSessionID = sessionid.Normalize(currentSessionID)
-					return createSessionBySplit(sc, currentSessionID, profile, splitDirection)
+					return createSessionBySplit(sc, currentSessionID, profile, splitDirection, command)
 				}
 				// Create new tab (which creates a new session)
 				return createSessionByNewTab(sc, profile, windowID, command)
@@ -81,7 +79,7 @@ When --split flag is used without session-id, splits the current session.`,
 				if err != nil {
 					return sc.ReportError("resolve session ID", err)
 				}
-				return createSessionBySplit(sc, sessionID, profile, splitDirection)
+				return createSessionBySplit(sc, sessionID, profile, splitDirection, command)
 			}
 		},
 	}
@@ -91,6 +89,14 @@ When --split flag is used without session-id, splits the current session.`,
 	cmd.Flags().String("window", "", "Window ID to create session in (for new tab)")
 	cmd.Flags().String("split", "horizontal", "Split direction: horizontal or vertical (when splitting existing session)")
 	cmd.Flags().String("command", "", "Initial command to run in the new session")
+
+	// Override the default format to 'text' for better scripting ergonomics
+	// This allows: SESSION_ID=$(it2 session create --split vertical)
+	cmd.Flags().Lookup("format").DefValue = "text"
+	cmd.Flags().Set("format", "text")
+
+	// Hide deprecated command from help output
+	cmd.Hidden = true
 
 	return cmd
 }
@@ -120,7 +126,7 @@ func createSessionByNewTab(sc *cmdutil.StandardCommand, profile, windowID, comma
 	return formatter.FormatTabResponse(response)
 }
 
-func createSessionBySplit(sc *cmdutil.StandardCommand, sessionID, profile, splitDirection string) error {
+func createSessionBySplit(sc *cmdutil.StandardCommand, sessionID, profile, splitDirection, command string) error {
 	// Validate session exists
 	if err := validate.SessionExists(sc.GetContext(), sc.GetClient(), sessionID); err != nil {
 		return err
@@ -154,15 +160,32 @@ func createSessionBySplit(sc *cmdutil.StandardCommand, sessionID, profile, split
 	case pb.SplitPaneResponse_OK:
 		newSessionIDs := response.GetSessionId()
 		if len(newSessionIDs) > 0 {
-			if sc.GetFlags().Format == "json" {
+			// If a command was specified, send it to the new session
+			if command != "" {
+				if err := sc.GetClient().SendText(sc.GetContext(), newSessionIDs[0], command+"\n"); err != nil {
+					fmt.Fprintf(os.Stderr, "Warning: Failed to send command to new session: %v\n", err)
+				}
+			}
+
+			switch sc.GetFlags().Format {
+			case "json":
 				result := map[string]interface{}{
 					"success":         true,
 					"new_session_id":  newSessionIDs[0],
 					"all_session_ids": newSessionIDs,
 				}
+				if command != "" {
+					result["command_sent"] = command
+				}
 				return formatting.PrintJSON(result)
-			} else {
+			case "text":
+				// For text format, output just the session ID for easy scripting
+				fmt.Println(newSessionIDs[0])
+			default:
 				fmt.Printf("Session created successfully. New session ID: %s\n", newSessionIDs[0])
+				if command != "" {
+					fmt.Printf("Command sent: %s\n", command)
+				}
 			}
 		}
 		return nil
