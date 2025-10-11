@@ -12,6 +12,7 @@ import (
 // PluginMetrics tracks execution statistics for a single plugin
 type PluginMetrics struct {
 	Name           string        `json:"name"`
+	Type           string        `json:"type,omitempty"`
 	ExecutionCount int           `json:"execution_count"`
 	TotalDuration  time.Duration `json:"total_duration"`
 	Durations      []int64       `json:"durations"` // Microseconds for compact storage
@@ -25,8 +26,10 @@ type MetricsStore struct {
 	path    string
 }
 
-var globalMetrics *MetricsStore
-var metricsOnce sync.Once
+var (
+	globalMetrics *MetricsStore
+	metricsOnce   sync.Once
+)
 
 // GetMetricsStore returns the global metrics store singleton
 func GetMetricsStore() *MetricsStore {
@@ -51,19 +54,25 @@ func GetMetricsStore() *MetricsStore {
 }
 
 // RecordExecution records a plugin execution with its duration
-func (s *MetricsStore) RecordExecution(pluginName string, duration time.Duration) {
+func (s *MetricsStore) RecordExecution(pluginName, pluginType string, duration time.Duration) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	m, exists := s.metrics[pluginName]
+	key := metricsKey(pluginName, pluginType)
+
+	m, exists := s.metrics[key]
 	if !exists {
 		m = &PluginMetrics{
 			Name:      pluginName,
+			Type:      pluginType,
 			Durations: make([]int64, 0, 100),
 		}
-		s.metrics[pluginName] = m
+		s.metrics[key] = m
 	}
 
+	if m.Type == "" {
+		m.Type = pluginType
+	}
 	m.ExecutionCount++
 	m.TotalDuration += duration
 	m.LastExecuted = time.Now()
@@ -84,11 +93,11 @@ func (s *MetricsStore) GetAllMetrics() map[string]*PluginMetrics {
 	defer s.mu.RUnlock()
 
 	result := make(map[string]*PluginMetrics, len(s.metrics))
-	for name, m := range s.metrics {
+	for key, m := range s.metrics {
 		copy := *m
 		copy.Durations = make([]int64, len(m.Durations))
 		copySlice(copy.Durations, m.Durations)
-		result[name] = &copy
+		result[key] = &copy
 	}
 	return result
 }
@@ -167,4 +176,16 @@ func copySlice(dst, src []int64) {
 	for i, v := range src {
 		dst[i] = v
 	}
+}
+
+func metricsKey(name, pluginType string) string {
+	if pluginType == "" || pluginType == string(PluginTypeUnknown) {
+		return name
+	}
+	return pluginType + "/" + name
+}
+
+// MetricsLookupKey returns the key used to store metrics for a plugin.
+func MetricsLookupKey(name string, pluginType PluginType) string {
+	return metricsKey(name, string(pluginType))
 }

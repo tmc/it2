@@ -44,18 +44,18 @@ The first matching plugin found (by priority) is used, others are shadowed.`,
 			w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 			if showMetrics {
 				if showPaths {
-					fmt.Fprintln(w, "NAME\tSHA256\tSOURCE\tEXEC\tAVG\tP99\tPATH")
-					fmt.Fprintln(w, "----\t------\t------\t----\t---\t---\t----")
+					fmt.Fprintln(w, "NAME\tTYPE\tSHA256\tSOURCE\tEXEC\tAVG\tP99\tPATH")
+					fmt.Fprintln(w, "----\t----\t------\t------\t----\t---\t---\t----")
 				} else {
-					fmt.Fprintln(w, "NAME\tSHA256\tSOURCE\tEXEC\tAVG\tP99")
-					fmt.Fprintln(w, "----\t------\t------\t----\t---\t---")
+					fmt.Fprintln(w, "NAME\tTYPE\tSHA256\tSOURCE\tEXEC\tAVG\tP99")
+					fmt.Fprintln(w, "----\t----\t------\t------\t----\t---\t---")
 				}
 			} else if showPaths {
-				fmt.Fprintln(w, "NAME\tSHA256\tSOURCE\tDUPLICATES\tPATH")
-				fmt.Fprintln(w, "----\t------\t------\t----------\t----")
+				fmt.Fprintln(w, "NAME\tTYPE\tSHA256\tSOURCE\tDUPLICATES\tPATH")
+				fmt.Fprintln(w, "----\t----\t------\t------\t----------\t----")
 			} else {
-				fmt.Fprintln(w, "NAME\tSHA256\tSOURCE\tDUPLICATES")
-				fmt.Fprintln(w, "----\t------\t------\t----------")
+				fmt.Fprintln(w, "NAME\tTYPE\tSHA256\tSOURCE\tDUPLICATES")
+				fmt.Fprintln(w, "----\t----\t------\t------\t----------")
 			}
 
 			for _, meta := range metadata {
@@ -69,7 +69,8 @@ The first matching plugin found (by priority) is used, others are shadowed.`,
 					avgStr := "-"
 					p99Str := "-"
 
-					if m := allMetrics[meta.Name]; m != nil {
+					key := plugins.MetricsLookupKey(meta.Name, meta.Type)
+					if m := lookupMetrics(allMetrics, key, meta.Name); m != nil {
 						execCount = fmt.Sprintf("%d", m.ExecutionCount)
 						avg, _, _, p99 := m.CalculateStats()
 						if avg > 0 {
@@ -79,8 +80,9 @@ The first matching plugin found (by priority) is used, others are shadowed.`,
 					}
 
 					if showPaths {
-						fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+						fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 							meta.Name,
+							string(meta.Type),
 							meta.SHA256,
 							meta.Source,
 							execCount,
@@ -89,8 +91,9 @@ The first matching plugin found (by priority) is used, others are shadowed.`,
 							meta.Path,
 						)
 					} else {
-						fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n",
+						fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 							meta.Name,
+							string(meta.Type),
 							meta.SHA256[:8],
 							meta.Source,
 							execCount,
@@ -100,16 +103,18 @@ The first matching plugin found (by priority) is used, others are shadowed.`,
 					}
 				} else {
 					if showPaths {
-						fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n",
+						fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n",
 							meta.Name,
+							string(meta.Type),
 							meta.SHA256,
 							meta.Source,
 							dupStr,
 							meta.Path,
 						)
 					} else {
-						fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
+						fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n",
 							meta.Name,
+							string(meta.Type),
 							meta.SHA256[:8],
 							meta.Source,
 							dupStr,
@@ -141,4 +146,11 @@ func formatDuration(d time.Duration) string {
 		return fmt.Sprintf("%dms", d.Milliseconds())
 	}
 	return fmt.Sprintf("%.2fs", d.Seconds())
+}
+
+func lookupMetrics(all map[string]*plugins.PluginMetrics, primary, fallback string) *plugins.PluginMetrics {
+	if m := all[primary]; m != nil {
+		return m
+	}
+	return all[fallback]
 }

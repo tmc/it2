@@ -15,6 +15,17 @@ import (
 	"github.com/tmc/it2/internal/formatting"
 )
 
+// PluginType identifies the scope a plugin enriches.
+type PluginType string
+
+const (
+	PluginTypeUnknown        PluginType = "unknown"
+	PluginTypeSession        PluginType = "session"
+	PluginTypeTab            PluginType = "tab"
+	PluginTypeWindow         PluginType = "window"
+	PluginTypeSessionProcess PluginType = "session-process"
+)
+
 // SessionEnricher is an interface for plugins that can add extra data to session listings
 type SessionEnricher interface {
 	// Name returns the name of the enricher
@@ -78,34 +89,14 @@ type EventMonitor interface {
 type ExecPlugin struct {
 	name       string
 	executable string
-	pluginType string // "session", "tab", "window", or "generic"
+	pluginType PluginType
 }
 
 // NewExecPlugin creates a new executable plugin
 func NewExecPlugin(executable string) *ExecPlugin {
 	baseName := filepath.Base(executable)
 
-	// Determine plugin type and clean name based on prefix
-	var pluginType, name string
-	if strings.HasPrefix(baseName, "it2-session-process-") {
-		pluginType = "session-process"
-		name = strings.TrimPrefix(baseName, "it2-session-process-")
-	} else if strings.HasPrefix(baseName, "it2-session-") {
-		pluginType = "session"
-		name = strings.TrimPrefix(baseName, "it2-session-")
-	} else if strings.HasPrefix(baseName, "it2-tab-") {
-		pluginType = "tab"
-		name = strings.TrimPrefix(baseName, "it2-tab-")
-	} else if strings.HasPrefix(baseName, "it2-window-") {
-		pluginType = "window"
-		name = strings.TrimPrefix(baseName, "it2-window-")
-	} else if strings.HasPrefix(baseName, "it2-") {
-		pluginType = "generic"
-		name = strings.TrimPrefix(baseName, "it2-")
-	} else {
-		pluginType = "generic"
-		name = baseName
-	}
+	pluginType, name := classifyPlugin(baseName)
 
 	return &ExecPlugin{
 		name:       name,
@@ -114,9 +105,29 @@ func NewExecPlugin(executable string) *ExecPlugin {
 	}
 }
 
+func classifyPlugin(name string) (PluginType, string) {
+	switch {
+	case strings.HasPrefix(name, "it2-session-process-"):
+		return PluginTypeSessionProcess, strings.TrimPrefix(name, "it2-session-process-")
+	case strings.HasPrefix(name, "it2-session-"):
+		return PluginTypeSession, strings.TrimPrefix(name, "it2-session-")
+	case strings.HasPrefix(name, "it2-tab-"):
+		return PluginTypeTab, strings.TrimPrefix(name, "it2-tab-")
+	case strings.HasPrefix(name, "it2-window-"):
+		return PluginTypeWindow, strings.TrimPrefix(name, "it2-window-")
+	default:
+		return PluginTypeUnknown, name
+	}
+}
+
 // Name returns the name of the plugin
 func (p *ExecPlugin) Name() string {
 	return p.name
+}
+
+// Type reports the plugin type derived from its executable name.
+func (p *ExecPlugin) Type() PluginType {
+	return p.pluginType
 }
 
 // setupPluginEnv adds iTerm2 authentication credentials to the command environment
@@ -149,7 +160,7 @@ func (p *ExecPlugin) EnrichSession(ctx context.Context, session *client.SessionI
 	start := time.Now()
 	defer func() {
 		duration := time.Since(start)
-		GetMetricsStore().RecordExecution(p.name, duration)
+		GetMetricsStore().RecordExecution(p.name, string(p.pluginType), duration)
 	}()
 
 	// Use configurable deadline for plugin execution
@@ -193,7 +204,7 @@ func (p *ExecPlugin) EnrichTab(ctx context.Context, tab *formatting.TabInfo) (ma
 	// Record execution metrics
 	start := time.Now()
 	defer func() {
-		GetMetricsStore().RecordExecution(p.name, time.Since(start))
+		GetMetricsStore().RecordExecution(p.name, string(p.pluginType), time.Since(start))
 	}()
 
 	// Use configurable deadline for plugin execution
@@ -227,7 +238,7 @@ func (p *ExecPlugin) EnrichWindow(ctx context.Context, window *client.WindowInfo
 	// Record execution metrics
 	start := time.Now()
 	defer func() {
-		GetMetricsStore().RecordExecution(p.name, time.Since(start))
+		GetMetricsStore().RecordExecution(p.name, string(p.pluginType), time.Since(start))
 	}()
 
 	// Use configurable deadline for plugin execution
@@ -261,7 +272,7 @@ func (p *ExecPlugin) EnrichProcess(ctx context.Context, sessionID string, pid in
 	// Record execution metrics
 	start := time.Now()
 	defer func() {
-		GetMetricsStore().RecordExecution(p.name, time.Since(start))
+		GetMetricsStore().RecordExecution(p.name, string(p.pluginType), time.Since(start))
 	}()
 
 	// Use configurable deadline for plugin execution

@@ -14,13 +14,14 @@ import (
 // PluginMetadata contains detailed information about a discovered plugin
 type PluginMetadata struct {
 	Name       string
+	Type       PluginType
 	Path       string
 	Source     string // "PATH", "custom", or "embedded"
 	SHA256     string
-	Duplicates int // Count of other plugins with same name
+	Duplicates int // Count of other plugins with same name and type
 }
 
-// DiscoverPlugins finds all it2-* executables in PATH and categorizes them
+// DiscoverPlugins finds plugin executables with supported prefixes in PATH and categorizes them
 // Search order (highest to lowest priority):
 //  1. Directories from PATH environment variable (highest priority)
 //  2. Directories from IT2_PLUGIN_PATHS (--plugin-path flag, middle priority)
@@ -30,7 +31,7 @@ func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, []Pr
 	var tabPlugins []TabEnricher
 	var windowPlugins []WindowEnricher
 	var processPlugins []ProcessEnricher
-	seen := make(map[string]bool) // Track seen plugin names to avoid duplicates
+	seen := make(map[string]bool) // Track seen plugin (type,name) pairs to avoid duplicates
 
 	var paths []string
 
@@ -56,7 +57,7 @@ func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, []Pr
 		return sessionPlugins, tabPlugins, windowPlugins, processPlugins, nil
 	}
 
-	// Look for executables starting with "it2-"
+	// Look for executables starting with "it2-" and having a supported subtype prefix
 	for _, dir := range paths {
 		entries, err := os.ReadDir(dir)
 		if err != nil {
@@ -70,10 +71,6 @@ func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, []Pr
 			}
 
 			name := entry.Name()
-			if !strings.HasPrefix(name, "it2-") {
-				continue
-			}
-
 			fullPath := filepath.Join(dir, name)
 
 			// Check if it's executable
@@ -84,25 +81,30 @@ func DiscoverPlugins() ([]SessionEnricher, []TabEnricher, []WindowEnricher, []Pr
 
 			// Check if file is executable (Unix-like systems)
 			if info.Mode()&0111 != 0 {
-				// Skip if we've already seen this plugin name
-				if seen[name] {
+				if !strings.HasPrefix(name, "it2-") {
 					continue
 				}
-				seen[name] = true
 
 				plugin := NewExecPlugin(fullPath)
+				if plugin.Type() == PluginTypeUnknown {
+					continue
+				}
+
+				key := discoveryKey(plugin.Type(), plugin.Name())
+				if seen[key] {
+					continue
+				}
+				seen[key] = true
 
 				// Add to appropriate plugin lists based on type
-				if plugin.pluginType == "session" || plugin.pluginType == "generic" {
+				switch plugin.Type() {
+				case PluginTypeSession:
 					sessionPlugins = append(sessionPlugins, plugin)
-				}
-				if plugin.pluginType == "tab" || plugin.pluginType == "generic" {
+				case PluginTypeTab:
 					tabPlugins = append(tabPlugins, plugin)
-				}
-				if plugin.pluginType == "window" || plugin.pluginType == "generic" {
+				case PluginTypeWindow:
 					windowPlugins = append(windowPlugins, plugin)
-				}
-				if plugin.pluginType == "session-process" {
+				case PluginTypeSessionProcess:
 					processPlugins = append(processPlugins, plugin)
 				}
 			}
@@ -166,7 +168,7 @@ func (r *Registry) GetProcessEnrichers() []ProcessEnricher {
 // DiscoverPluginMetadata returns detailed metadata about all discovered plugins
 func DiscoverPluginMetadata() ([]PluginMetadata, error) {
 	var metadata []PluginMetadata
-	nameCount := make(map[string]int) // Track duplicates
+	nameCount := make(map[string]int) // Track duplicates per (type,name)
 
 	var paths []string
 	var pathSources []string // Track which source each path comes from
@@ -199,7 +201,7 @@ func DiscoverPluginMetadata() ([]PluginMetadata, error) {
 	}
 
 	// First pass: collect all plugins and count duplicates
-	allPlugins := make(map[string][]PluginMetadata) // name -> list of metadata
+	allPlugins := make(map[string][]PluginMetadata) // key -> list of metadata
 
 	for i, dir := range paths {
 		entries, err := os.ReadDir(dir)
@@ -213,10 +215,6 @@ func DiscoverPluginMetadata() ([]PluginMetadata, error) {
 			}
 
 			name := entry.Name()
-			if !strings.HasPrefix(name, "it2-") {
-				continue
-			}
-
 			fullPath := filepath.Join(dir, name)
 			info, err := os.Stat(fullPath)
 			if err != nil || info.Mode()&0111 == 0 {
@@ -238,17 +236,22 @@ func DiscoverPluginMetadata() ([]PluginMetadata, error) {
 
 			// Determine plugin name (remove prefix)
 			plugin := NewExecPlugin(fullPath)
+			if plugin.Type() == PluginTypeUnknown {
+				continue
+			}
 			pluginName := plugin.Name()
+			key := discoveryKey(plugin.Type(), pluginName)
 
 			meta := PluginMetadata{
 				Name:   pluginName,
+				Type:   plugin.Type(),
 				Path:   fullPath,
 				Source: pathSources[i],
 				SHA256: sha,
 			}
 
-			allPlugins[pluginName] = append(allPlugins[pluginName], meta)
-			nameCount[pluginName]++
+			allPlugins[key] = append(allPlugins[key], meta)
+			nameCount[key]++
 		}
 	}
 
@@ -266,10 +269,6 @@ func DiscoverPluginMetadata() ([]PluginMetadata, error) {
 			}
 
 			name := entry.Name()
-			if !strings.HasPrefix(name, "it2-") {
-				continue
-			}
-
 			fullPath := filepath.Join(dir, name)
 			info, err := os.Stat(fullPath)
 			if err != nil || info.Mode()&0111 == 0 {
@@ -277,18 +276,22 @@ func DiscoverPluginMetadata() ([]PluginMetadata, error) {
 			}
 
 			plugin := NewExecPlugin(fullPath)
-			pluginName := plugin.Name()
-
-			// Only include first occurrence (highest priority)
-			if seen[pluginName] {
+			if plugin.Type() == PluginTypeUnknown {
 				continue
 			}
-			seen[pluginName] = true
+			pluginName := plugin.Name()
+			key := discoveryKey(plugin.Type(), pluginName)
+
+			// Only include first occurrence (highest priority)
+			if seen[key] {
+				continue
+			}
+			seen[key] = true
 
 			// Find this plugin's metadata
-			for _, meta := range allPlugins[pluginName] {
+			for _, meta := range allPlugins[key] {
 				if meta.Path == fullPath {
-					meta.Duplicates = nameCount[pluginName] - 1 // Don't count itself
+					meta.Duplicates = nameCount[key] - 1 // Don't count itself
 					metadata = append(metadata, meta)
 					break
 				}
@@ -297,4 +300,8 @@ func DiscoverPluginMetadata() ([]PluginMetadata, error) {
 	}
 
 	return metadata, nil
+}
+
+func discoveryKey(t PluginType, name string) string {
+	return string(t) + ":" + name
 }

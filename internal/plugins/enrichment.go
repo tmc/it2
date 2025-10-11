@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"context"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -59,6 +60,22 @@ func FilterEnrichers(enrichers []SessionEnricher, columns []string) []SessionEnr
 	}
 
 	return activeEnrichers
+}
+
+// FilterEnrichersByPattern filters enrichers whose names match the provided regexp.
+// If pattern is nil, the original slice is returned.
+func FilterEnrichersByPattern(enrichers []SessionEnricher, pattern *regexp.Regexp) []SessionEnricher {
+	if pattern == nil {
+		return enrichers
+	}
+
+	var filtered []SessionEnricher
+	for _, enricher := range enrichers {
+		if pattern.MatchString(enricher.Name()) {
+			filtered = append(filtered, enricher)
+		}
+	}
+	return filtered
 }
 
 // EnrichSessionsParallel runs plugins concurrently for each session and collects results.
