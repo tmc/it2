@@ -13,6 +13,7 @@
 // Session operations work with session IDs that uniquely identify each
 // terminal instance. These IDs can be obtained from the list command
 // and are used as arguments for most session operations.
+// The list command omits buried sessions by default; use --include-buried to show them.
 //
 // Examples:
 //

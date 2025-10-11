@@ -3,6 +3,7 @@ package cmdutil
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -15,16 +16,19 @@ import (
 
 // SharedListOptions contains common options for list operations
 type SharedListOptions struct {
-	WindowID     string
-	TabID        string
-	SessionID    string
-	ScopeFlag    string
-	Format       string
-	Columns      []string
-	SortBy       string
-	SortReverse  bool
-	Quiet        bool
-	NoHyperlinks bool
+	WindowID      string
+	TabID         string
+	SessionID     string
+	ScopeFlag     string
+	Format        string
+	Columns       []string
+	SortBy        string
+	SortReverse   bool
+	Quiet         bool
+	NoHyperlinks  bool
+	PluginPattern *regexp.Regexp
+	SkipPlugins   bool
+	IncludeBuried bool
 }
 
 // SharedListOperations provides shared listing functionality for both flat and hierarchical commands
@@ -53,7 +57,13 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 		rawResp = resp
 	}
 
-	sessions, err := s.client.ListSessions(s.ctx)
+	var sessions []*client.SessionInfo
+	var err error
+	if opts.IncludeBuried {
+		sessions, err = s.client.ListSessionsWithOptions(s.ctx, client.ListSessionsOptions{IncludeBuried: true})
+	} else {
+		sessions, err = s.client.ListSessions(s.ctx)
+	}
 	if err != nil {
 		return fmt.Errorf("failed to list sessions: %w", err)
 	}
@@ -79,18 +89,22 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 		filteredSessions = append(filteredSessions, session)
 	}
 
-	// Apply plugin enrichment - only if plugin columns are requested or no columns specified
-	if plugins.ShouldRunPlugins(opts.Columns) {
+	// Apply plugin enrichment - only if enabled and columns require it
+	if !opts.SkipPlugins && plugins.ShouldRunPlugins(opts.Columns) {
 		registry := plugins.NewRegistry()
 		if err := registry.DiscoverAndRegister(); err == nil {
 			enrichers := registry.GetEnrichers()
+			if opts.PluginPattern != nil {
+				enrichers = plugins.FilterEnrichersByPattern(enrichers, opts.PluginPattern)
+			}
 			activeEnrichers := plugins.FilterEnrichers(enrichers, opts.Columns)
 
-			// Parallelize plugin execution across all sessions
-			plugins.EnrichSessionsParallel(s.ctx, filteredSessions, activeEnrichers)
+			if len(activeEnrichers) > 0 {
+				plugins.EnrichSessionsParallel(s.ctx, filteredSessions, activeEnrichers)
 
-			// Save metrics after enrichment
-			plugins.GetMetricsStore().Save()
+				// Save metrics after enrichment
+				plugins.GetMetricsStore().Save()
+			}
 		}
 	}
 
@@ -120,11 +134,13 @@ func (s *SharedListOperations) ListTabs(opts SharedListOptions) error {
 	// Build tab info from sessions
 	tabInfos := s.buildTabInfoFromSessions(sessions, opts.WindowID)
 
-	// Apply plugin enrichment
-	registry := plugins.NewRegistry()
-	if err := registry.DiscoverAndRegister(); err == nil {
-		enrichers := registry.GetTabEnrichers()
-		plugins.EnrichTabs(s.ctx, tabInfos, enrichers)
+	// Apply plugin enrichment unless disabled
+	if !opts.SkipPlugins {
+		registry := plugins.NewRegistry()
+		if err := registry.DiscoverAndRegister(); err == nil {
+			enrichers := registry.GetTabEnrichers()
+			plugins.EnrichTabs(s.ctx, tabInfos, enrichers)
+		}
 	}
 
 	// Format and output
@@ -155,11 +171,13 @@ func (s *SharedListOperations) ListWindows(opts SharedListOptions) error {
 		}
 	}
 
-	// Apply plugins to windows
-	registry := plugins.NewRegistry()
-	if err := registry.DiscoverAndRegister(); err == nil {
-		windowEnrichers := registry.GetWindowEnrichers()
-		plugins.EnrichWindows(s.ctx, windows, windowEnrichers)
+	// Apply plugins to windows unless disabled
+	if !opts.SkipPlugins {
+		registry := plugins.NewRegistry()
+		if err := registry.DiscoverAndRegister(); err == nil {
+			windowEnrichers := registry.GetWindowEnrichers()
+			plugins.EnrichWindows(s.ctx, windows, windowEnrichers)
+		}
 	}
 
 	// Disable hyperlinks by default

@@ -173,7 +173,7 @@ func printTree(node *SessionNode, prefix string, isLast bool, showFullIDs bool) 
 	}
 
 	// Print the node
-	fmt.Printf("%s%s%s (%s)%s\n", prefix, connector, node.Name, id, markerStr)
+	fmt.Printf("XX%s%s%s (%s)%s\n", prefix, connector, node.Name, id, markerStr)
 
 	// Determine the new prefix for children
 	newPrefix := prefix

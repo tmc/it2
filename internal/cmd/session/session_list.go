@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"
@@ -42,6 +43,9 @@ func newListCommand() *cobra.Command {
 			# Use partial IDs with quiet mode
 			$ it2 session list -q | cut -c1-8 | xargs -n1 -I {} it2 session send-text {} "test"
 
+			# Include buried sessions when needed
+			$ it2 session list --include-buried
+
 			# Count total sessions
 			$ it2 session list -q | wc -l
 		`),
@@ -59,6 +63,9 @@ func newListCommand() *cobra.Command {
 			// Get quiet flag
 			quiet, _ := cmd.Flags().GetBool("quiet")
 
+			// Include buried flag
+			includeBuried, _ := cmd.Flags().GetBool("include-buried")
+
 			// Print scope notice if IT2_SCOPE is set or --scope flag is used
 			scopeFlag, _ := cmd.Flags().GetString("scope")
 			cmdutil.PrintScopeNoticeWithFlag(format, scopeFlag)
@@ -70,18 +77,45 @@ func newListCommand() *cobra.Command {
 			// Get no-hyperlinks flag
 			noHyperlinks, _ := cmd.Flags().GetBool("no-hyperlinks")
 
+			// Plugin control flags
+			pluginPatternStr, _ := cmd.Flags().GetString("plugins")
+			noPlugins, _ := cmd.Flags().GetBool("no-plugins")
+			pluginsFlagSet := cmd.Flags().Changed("plugins")
+			noPluginsFlagSet := cmd.Flags().Changed("no-plugins")
+			var pluginPattern *regexp.Regexp
+			if pluginPatternStr != "" {
+				var err error
+				pluginPattern, err = regexp.Compile(pluginPatternStr)
+				if err != nil {
+					return fmt.Errorf("invalid --plugins pattern: %w", err)
+				}
+			}
+			skipPlugins := false
+			if format == "tree" && !pluginsFlagSet && !noPluginsFlagSet {
+				skipPlugins = true
+			}
+			if pluginsFlagSet {
+				skipPlugins = false
+			}
+			if noPlugins {
+				skipPlugins = true
+			}
+
 			// Use shared operations
 			sharedOps := cmdutil.NewSharedListOperations(c, ctx)
 			return sharedOps.ListSessions(cmdutil.SharedListOptions{
-				WindowID:     windowID,
-				TabID:        tabID,
-				ScopeFlag:    scopeFlag,
-				Format:       format,
-				Columns:      columns,
-				SortBy:       sortBy,
-				SortReverse:  sortReverse,
-				Quiet:        quiet,
-				NoHyperlinks: noHyperlinks,
+				WindowID:      windowID,
+				TabID:         tabID,
+				ScopeFlag:     scopeFlag,
+				Format:        format,
+				Columns:       columns,
+				SortBy:        sortBy,
+				SortReverse:   sortReverse,
+				Quiet:         quiet,
+				NoHyperlinks:  noHyperlinks,
+				PluginPattern: pluginPattern,
+				SkipPlugins:   skipPlugins,
+				IncludeBuried: includeBuried,
 			})
 		},
 	}
@@ -95,11 +129,18 @@ func newListCommand() *cobra.Command {
 	cmd.Flags().String("window-id", "", "Filter sessions by window ID")
 	cmd.Flags().String("tab-id", "", "Filter sessions by tab ID")
 
+	// Plugin control flags
+	cmd.Flags().String("plugins", "", "Regular expression of plugin names to run (case-sensitive)")
+	cmd.Flags().Bool("no-plugins", false, "Disable plugin enrichment")
+
 	// Add scope support for session filtering
 	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (none,window,tab,parents,siblings,peers,lineage)")
 
 	// Add quiet flag
 	cmd.Flags().BoolP("quiet", "q", false, "Output only session IDs")
+
+	// Add include-buried flag
+	cmd.Flags().Bool("include-buried", false, "Include buried sessions")
 
 	// Add no-hyperlinks flag (hidden)
 	cmd.Flags().Bool("no-hyperlinks", false, "Disable OSC 8 terminal hyperlinks in output")
