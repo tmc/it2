@@ -8,10 +8,13 @@ import (
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 // newLookupSplitRootCommand creates the session lookup split-root command.
 func newLookupSplitRootCommand() *cobra.Command {
+	var short bool
+
 	cmd := &cobra.Command{
 		Use:   "split-root [<session-id>]",
 		Short: "Look up the root session of a split tree",
@@ -30,6 +33,10 @@ If the session is already a root (has no parent), returns the session itself.`,
 
   it2 session split-root
   it2 session split-root sess_abc123
+
+  # Short format (first 8 characters)
+
+  it2 session split-root -s
 
   # Scripting Example - Find all sessions in the same split tree
 
@@ -93,20 +100,25 @@ If the session is already a root (has no parent), returns the session itself.`,
 				rootID = parentID
 			}
 
+			outputID := rootID
+			if short {
+				outputID = sessionid.Shorten(rootID)
+			}
+
 			if jsonOutput {
 				return formatting.PrintJSON(map[string]interface{}{
 					"session_id": sessionID,
-					"root_id":    rootID,
+					"root_id":    outputID,
 				})
 			}
 
 			if quiet {
-				fmt.Println(rootID)
+				fmt.Println(outputID)
 			} else {
 				if rootID == sessionID {
-					fmt.Printf("Session %s is the split root (no parent)\n", rootID)
+					fmt.Printf("Session %s is the split root (no parent)\n", outputID)
 				} else {
-					fmt.Printf("Split root: %s\n", rootID)
+					fmt.Printf("Split root: %s\n", outputID)
 				}
 			}
 
@@ -116,5 +128,6 @@ If the session is already a root (has no parent), returns the session itself.`,
 
 	cmd.Flags().Bool("json", false, "Output result as JSON")
 	cmd.Flags().BoolP("quiet", "q", false, "Only output the root session ID (for scripting)")
+	cmd.Flags().BoolVarP(&short, "short", "s", false, "Output only the first 8 characters of the session ID")
 	return cmd
 }

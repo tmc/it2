@@ -8,10 +8,13 @@ import (
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 // newLookupTabCommand creates the session lookup tab command.
 func newLookupTabCommand() *cobra.Command {
+	var short bool
+
 	cmd := &cobra.Command{
 		Use:   "tab [<session-id>]",
 		Short: "Look up which tab contains a session",
@@ -24,6 +27,10 @@ If no session ID is provided, uses the current session from ITERM_SESSION_ID.`,
 
   it2 session lookup tab
   it2 session lookup tab sess_abc123
+
+  # Short format (first 8 characters)
+
+  it2 session lookup tab -s
 
   # Scripting Example
 
@@ -76,17 +83,22 @@ If no session ID is provided, uses the current session from ITERM_SESSION_ID.`,
 				return fmt.Errorf("session not found: %s", sessionID)
 			}
 
+			outputID := tabID
+			if short {
+				outputID = sessionid.Shorten(tabID)
+			}
+
 			if jsonOutput {
 				return formatting.PrintJSON(map[string]interface{}{
 					"session_id": sessionID,
-					"tab_id":     tabID,
+					"tab_id":     outputID,
 				})
 			}
 
 			if quiet {
-				fmt.Println(tabID)
+				fmt.Println(outputID)
 			} else {
-				fmt.Printf("Tab: %s\n", tabID)
+				fmt.Printf("Tab: %s\n", outputID)
 			}
 
 			return nil
@@ -95,5 +107,6 @@ If no session ID is provided, uses the current session from ITERM_SESSION_ID.`,
 
 	cmd.Flags().Bool("json", false, "Output result as JSON")
 	cmd.Flags().BoolP("quiet", "q", false, "Only output the tab ID (for scripting)")
+	cmd.Flags().BoolVarP(&short, "short", "s", false, "Output only the first 8 characters of the ID")
 	return cmd
 }

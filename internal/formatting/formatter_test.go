@@ -30,6 +30,9 @@ func TestFormatSessionsText(t *testing.T) {
 			WindowID:    "window-1",
 			TabID:       "tab-1",
 			SessionName: "Test Session",
+			PluginData: map[string]interface{}{
+				"plugin-1": "\x1b[31mhello\x1b[0m world",
+			},
 		},
 	}
 
@@ -51,6 +54,9 @@ func TestFormatSessionsText(t *testing.T) {
 	}
 	if !strings.Contains(output, "Test Session") {
 		t.Error("Expected output to contain session name")
+	}
+	if !strings.Contains(output, "plugin-1: hello world") {
+		t.Error("Expected output to contain stripped plugin data")
 	}
 }
 
@@ -128,5 +134,41 @@ func TestFormatSessionsQuiet(t *testing.T) {
 	// Make sure it doesn't contain other session info
 	if strings.Contains(output, "Test Session") || strings.Contains(output, "window-") {
 		t.Error("Quiet output should only contain session IDs")
+	}
+}
+
+func TestStripControlChars(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{
+			name:  "no control characters",
+			input: "hello world",
+			want:  "hello world",
+		},
+		{
+			name:  "ansi escape codes",
+			input: "\x1b[31mhello\x1b[0m world",
+			want:  "hello world",
+		},
+		{
+			name:  "other control characters",
+			input: "hello\x07 world",
+			want:  "hello world",
+		},
+		{
+			name:  "mixed control characters",
+			input: "\x1b[31mhello\x1b[0m\x07 world",
+			want:  "hello world",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := stripControlChars(tt.input); got != tt.want {
+				t.Errorf("stripControlChars() = %q, want %q", got, tt.want)
+			}
+		})
 	}
 }

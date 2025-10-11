@@ -8,10 +8,13 @@ import (
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 // newLookupWindowCommand creates the session lookup window command.
 func newLookupWindowCommand() *cobra.Command {
+	var short bool
+
 	cmd := &cobra.Command{
 		Use:   "window [<session-id>]",
 		Short: "Look up which window contains a session",
@@ -24,6 +27,10 @@ If no session ID is provided, uses the current session from ITERM_SESSION_ID.`,
 
   it2 session lookup window
   it2 session lookup window sess_abc123
+
+  # Short format (first 8 characters)
+
+  it2 session lookup window -s
 
   # Scripting Example
 
@@ -76,17 +83,22 @@ If no session ID is provided, uses the current session from ITERM_SESSION_ID.`,
 				return fmt.Errorf("session not found: %s", sessionID)
 			}
 
+			outputID := windowID
+			if short {
+				outputID = sessionid.Shorten(windowID)
+			}
+
 			if jsonOutput {
 				return formatting.PrintJSON(map[string]interface{}{
 					"session_id": sessionID,
-					"window_id":  windowID,
+					"window_id":  outputID,
 				})
 			}
 
 			if quiet {
-				fmt.Println(windowID)
+				fmt.Println(outputID)
 			} else {
-				fmt.Printf("Window: %s\n", windowID)
+				fmt.Printf("Window: %s\n", outputID)
 			}
 
 			return nil
@@ -95,5 +107,6 @@ If no session ID is provided, uses the current session from ITERM_SESSION_ID.`,
 
 	cmd.Flags().Bool("json", false, "Output result as JSON")
 	cmd.Flags().BoolP("quiet", "q", false, "Only output the window ID (for scripting)")
+	cmd.Flags().BoolVarP(&short, "short", "s", false, "Output only the first 8 characters of the ID")
 	return cmd
 }

@@ -15,3 +15,12 @@ func Normalize(sessionID string) string {
 	}
 	return sessionID
 }
+
+// Shorten returns the first 8 characters of a session ID.
+// If the session ID is shorter than 8 characters, returns the full ID.
+func Shorten(sessionID string) string {
+	if len(sessionID) <= 8 {
+		return sessionID
+	}
+	return sessionID[:8]
+}

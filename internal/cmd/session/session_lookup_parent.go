@@ -8,10 +8,13 @@ import (
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/sessionid"
 )
 
 // newLookupParentCommand creates the session lookup parent command.
 func newLookupParentCommand() *cobra.Command {
+	var short bool
+
 	cmd := &cobra.Command{
 		Use:   "parent [<session-id>]",
 		Short: "Look up the parent session ID",
@@ -27,6 +30,10 @@ If the session has no parent (e.g., it's the original session in a tab), no outp
 
   it2 session parent
   it2 session parent sess_abc123
+
+  # Short format (first 8 characters)
+
+  it2 session parent -s
 
   # Scripting Example
 
@@ -88,17 +95,22 @@ If the session has no parent (e.g., it's the original session in a tab), no outp
 				return nil
 			}
 
+			outputID := parentSessionID
+			if short {
+				outputID = sessionid.Shorten(parentSessionID)
+			}
+
 			if jsonOutput {
 				return formatting.PrintJSON(map[string]interface{}{
 					"session_id": sessionID,
-					"parent_id":  parentSessionID,
+					"parent_id":  outputID,
 				})
 			}
 
 			if quiet {
-				fmt.Println(parentSessionID)
+				fmt.Println(outputID)
 			} else {
-				fmt.Printf("Parent session: %s\n", parentSessionID)
+				fmt.Printf("Parent session: %s\n", outputID)
 			}
 
 			return nil
@@ -107,5 +119,6 @@ If the session has no parent (e.g., it's the original session in a tab), no outp
 
 	cmd.Flags().Bool("json", false, "Output result as JSON")
 	cmd.Flags().BoolP("quiet", "q", false, "Only output the parent session ID (for scripting)")
+	cmd.Flags().BoolVarP(&short, "short", "s", false, "Output only the first 8 characters of the session ID")
 	return cmd
 }
