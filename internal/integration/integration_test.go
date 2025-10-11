@@ -185,7 +185,7 @@ func TestTimeout(t *testing.T) {
 func TestPluginSystem(t *testing.T) {
 	// Create a temporary plugin
 	tmpDir := t.TempDir()
-	pluginPath := tmpDir + "/it2-test-plugin"
+	pluginPath := tmpDir + "/it2-session-test-plugin"
 
 	pluginContent := `#!/bin/bash
 echo "TEST_PLUGIN_OUTPUT"

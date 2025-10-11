@@ -13,6 +13,25 @@ import (
 	"golang.org/x/term"
 )
 
+const (
+	indentUnit               = "  "
+	splitVerticalIndicator   = "[V]"
+	splitHorizontalIndicator = "[H]"
+)
+
+var asciiCleaner = strings.NewReplacer(
+	"\u00a0", " ",
+	"\u2014", "--",
+	"\u2013", "-",
+)
+
+func indent(level int) string {
+	if level <= 0 {
+		return ""
+	}
+	return strings.Repeat(indentUnit, level)
+}
+
 // shouldEnableColors determines if ANSI color codes should be used.
 func shouldEnableColors() bool {
 	if os.Getenv("NO_COLOR") != "" {
@@ -125,7 +144,6 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 
 	// Print header
 	fmt.Println("Session Hierarchy:")
-	fmt.Println()
 
 	// Build sets of window IDs and tab IDs that contain our filtered sessions
 	windowIDs := make(map[string]bool)
@@ -145,13 +163,7 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 		}
 	}
 
-	for windowIndex, window := range filteredWindows {
-		isLastWindow := windowIndex == len(filteredWindows)-1
-		windowConnector := "├─"
-		if isLastWindow {
-			windowConnector = "└─"
-		}
-
+	for _, window := range filteredWindows {
 		windowNum := window.GetNumber()
 
 		// Check if this window contains the current session
@@ -166,12 +178,12 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 			}
 		}
 
-		// Highlight window if it contains the current session
-		if windowContainsCurrent {
-			fmt.Printf("%s%s%s Window %d\n", colorBrightCyan, windowConnector, colorReset, windowNum)
-		} else {
-			fmt.Printf("%s Window %d\n", windowConnector, windowNum)
+		line := fmt.Sprintf("Window %d", windowNum)
+		if currentSessionID != "" && windowContainsCurrent {
+			line += " [current]"
 		}
+		fmt.Println()
+		fmt.Println(line)
 
 		// Print tabs within this window (only those containing filtered sessions)
 		windowID := window.GetWindowId()
@@ -184,19 +196,7 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 			}
 		}
 
-		for tabIndex, tab := range filteredTabs {
-			isLastTab := tabIndex == len(filteredTabs)-1
-
-			tabPrefix := "│ "
-			if isLastWindow {
-				tabPrefix = "  "
-			}
-
-			tabConnector := "├─"
-			if isLastTab {
-				tabConnector = "└─"
-			}
-
+		for _, tab := range filteredTabs {
 			tabID := tab.GetTabId()
 
 			// Check if this tab contains the current session or ancestors
@@ -206,23 +206,14 @@ func (f *Formatter) formatSessionsTreeFromRaw(listResp *pb.ListSessionsResponse,
 				inHighlightedPath = tabContainsSession(root, currentSessionID, ancestorSet)
 			}
 
-			// Highlight tab if it contains the current session
-			if inHighlightedPath {
-				fmt.Printf("%s%s%s%s Tab %s\n", colorBrightCyan, tabPrefix, tabConnector, colorReset, tabID)
-			} else {
-				fmt.Printf("%s%s Tab %s\n", tabPrefix, tabConnector, tabID)
+			line := fmt.Sprintf("%sTab %s", indent(1), tabID)
+			if currentSessionID != "" && inHighlightedPath {
+				line += " [path]"
 			}
-
-			// Print the split tree for this tab
-			sessionPrefix := tabPrefix
-			if isLastTab {
-				sessionPrefix += "  "
-			} else {
-				sessionPrefix += "│ "
-			}
+			fmt.Println(line)
 
 			if root != nil {
-				printSplitTreeNode(root, sessionPrefix, true, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, inHighlightedPath)
+				printSplitTreeNode(root, 2, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, inHighlightedPath)
 			}
 		}
 	}
@@ -272,7 +263,8 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 
 	// Print header
 	fmt.Println("Session Hierarchy:")
-	fmt.Println()
+	fmt.Println("sh")
+	fmt.Println("sh")
 
 	// Sort windows by number
 	var windowNumbers []int32
@@ -284,7 +276,7 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 	})
 
 	// Print tree structure: Windows -> Tabs -> Sessions (with splits)
-	for windowIndex, windowNum := range windowNumbers {
+	for _, windowNum := range windowNumbers {
 		tabGroups := windowGroups[windowNum]
 
 		// Sort tab keys numerically
@@ -306,49 +298,24 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 			return tabKeys[i] < tabKeys[j]
 		})
 
-		isLastWindow := windowIndex == len(windowNumbers)-1
-		windowConnector := "├─"
-		if isLastWindow {
-			windowConnector = "└─"
-		}
-
 		// Print window header
-		fmt.Printf("%s Window %d\n", windowConnector, windowNum)
+		fmt.Printf("Window %d\n", windowNum)
 
 		// Print tabs within this window
-		for tabIndex, tabKey := range tabKeys {
+		for _, tabKey := range tabKeys {
 			sessionList := tabGroups[tabKey]
-			isLastTab := tabIndex == len(tabKeys)-1
-
-			tabPrefix := "│ "
-			if isLastWindow {
-				tabPrefix = "  "
-			}
-
-			tabConnector := "├─"
-			if isLastTab {
-				tabConnector = "└─"
-			}
 
 			tabTitle := fmt.Sprintf("Tab %s", tabKey)
 			if tabKey == "no-tab" {
 				tabTitle = "Tab (no ID)"
 			}
 
-			fmt.Printf("%s%s %s\n", tabPrefix, tabConnector, tabTitle)
+			fmt.Printf("%s%s\n", indent(1), tabTitle)
 
 			// Build session hierarchy within this tab (with panel structure)
 			sessionHierarchy := buildSessionHierarchy(sessionList)
 
-			// Print sessions within this tab
-			sessionPrefix := tabPrefix
-			if isLastTab {
-				sessionPrefix += "  "
-			} else {
-				sessionPrefix += "│ "
-			}
-
-			printSessionHierarchy(sessionHierarchy, sessionPrefix, pluginCols)
+			printSessionHierarchy(sessionHierarchy, 2, pluginCols)
 		}
 	}
 
@@ -356,28 +323,29 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 }
 
 // printFormattedTreeLine prints a tree line with session details.
-func printFormattedTreeLine(prefix, title, sessionID, pidDisplay, state, command string, pluginCols []string, pluginData map[string]interface{}) {
-	// Build output with fixed column widths for proper alignment
+func printFormattedTreeLine(prefix, title, sessionID, pidDisplay, state, command string, pluginCols []string, pluginData map[string]interface{}, suffix string) {
 	var output strings.Builder
 
-	// Column 1: prefix + session ID (fixed width including tree chars)
+	title = normalizeSpaces(title)
+	command = normalizeSpaces(command)
+	state = normalizeSpaces(state)
+
 	output.WriteString(prefix)
 	if sessionID != "" {
-		output.WriteString(fmt.Sprintf("[%s]", sessionID))
-	} else {
-		output.WriteString(strings.Repeat(" ", 10))
+		output.WriteString("[")
+		output.WriteString(sessionID)
+		output.WriteString("]")
 	}
-	output.WriteString("    ") // 4 spaces separator
 
 	// Column 2: PID (right-aligned, fixed width)
 	if pidDisplay != "" {
-		output.WriteString(fmt.Sprintf("%13s", pidDisplay)) // 13 chars for pid/pid format
-	} else {
-		output.WriteString(strings.Repeat(" ", 13))
+		if output.Len() > 0 {
+			output.WriteByte(' ')
+		}
+		output.WriteString(pidDisplay)
 	}
-	output.WriteString("    ") // 4 spaces separator
 
-	// Column 3: Title + state + command (variable width, but calculate for alignment)
+	// Column 3: Title + state + command
 	var titleSection strings.Builder
 	if title != "" {
 		// Truncate title to reasonable length
@@ -402,38 +370,56 @@ func printFormattedTreeLine(prefix, title, sessionID, pidDisplay, state, command
 		if titleSection.Len() > 0 {
 			titleSection.WriteString(" ")
 		}
-		titleSection.WriteString(fmt.Sprintf("— %s", command))
+		titleSection.WriteString(fmt.Sprintf("-- %s", command))
 	}
 
-	titleStr := titleSection.String()
-	output.WriteString(titleStr)
+	titleStr := normalizeSpaces(titleSection.String())
+	if titleStr != "" {
+		if output.Len() > 0 {
+			output.WriteByte(' ')
+		}
+		output.WriteString(titleStr)
+	}
 
-	// Add plugin data aligned to fixed column position
+	// Add plugin data
 	var pluginParts []string
-	for _, col := range pluginCols {
-		if pluginData != nil {
-			if value, exists := pluginData[col]; exists {
-				if v := fmt.Sprintf("%v", value); v != "" && v != "-" {
-					pluginParts = append(pluginParts, fmt.Sprintf("%s:%v", col, value))
-				}
+	if pluginData != nil {
+		for _, col := range pluginCols {
+			value, ok := pluginData[col]
+			if !ok {
+				continue
 			}
+			valueStr := strings.TrimSpace(stripControlChars(fmt.Sprintf("%v", value)))
+			valueStr = normalizeSpaces(valueStr)
+			if valueStr == "" || valueStr == "-" {
+				continue
+			}
+			pluginParts = append(pluginParts, fmt.Sprintf("%s:%s", col, valueStr))
 		}
 	}
 
 	if len(pluginParts) > 0 {
-		// Calculate total visible width so far (prefix + ID + PID + title)
-		currentWidth := visibleLen(prefix) + 10 + 4 + 13 + 4 + visibleLen(titleStr)
-		// Align plugin data to absolute column position
-		targetCol := 120
-		if currentWidth < targetCol {
-			output.WriteString(strings.Repeat(" ", targetCol-currentWidth))
-		} else {
-			output.WriteString("    ") // minimum spacing if content is too long
+		if output.Len() > 0 {
+			output.WriteByte(' ')
 		}
 		output.WriteString(strings.Join(pluginParts, " "))
 	}
 
+	if suffix != "" {
+		if output.Len() > 0 {
+			output.WriteByte(' ')
+		}
+		output.WriteString(suffix)
+	}
+
 	fmt.Println(output.String())
+}
+
+func normalizeSpaces(s string) string {
+	if s == "" {
+		return s
+	}
+	return asciiCleaner.Replace(s)
 }
 
 // buildSessionHierarchy builds parent-child relationships within a list of sessions.
@@ -476,97 +462,69 @@ func buildSessionHierarchy(sessions []*client.SessionInfo) map[string]*TreeNode 
 }
 
 // printSessionHierarchy prints sessions with proper hierarchy within a tab.
-func printSessionHierarchy(nodeMap map[string]*TreeNode, prefix string, pluginCols []string) {
-	// Find root sessions (those without parents in this hierarchy)
+func printSessionHierarchy(nodeMap map[string]*TreeNode, level int, pluginCols []string) {
 	var roots []*TreeNode
 	for _, node := range nodeMap {
 		if node.ParentID == "" {
 			roots = append(roots, node)
-		} else {
-			// Check if parent exists in this hierarchy
-			if _, exists := nodeMap[node.ParentID]; !exists {
-				// Parent doesn't exist in this hierarchy, treat as root
-				roots = append(roots, node)
-			}
+		} else if _, exists := nodeMap[node.ParentID]; !exists {
+			roots = append(roots, node)
 		}
 	}
 
-	// Sort roots by name for consistent output
 	sortTreeNodes(roots)
 
-	// Print each root and its children
-	for i, root := range roots {
-		isLast := i == len(roots)-1
-		printSessionNode(root, prefix, isLast, pluginCols)
+	for _, root := range roots {
+		printSessionNode(root, level, pluginCols)
 	}
 }
 
 // printSessionNode prints a session node with its children.
-func printSessionNode(node *TreeNode, prefix string, isLast bool, pluginCols []string) {
-	// Determine the connector with split direction indicator
-	connector := "├─"
-	if isLast {
-		connector = "└─"
+func printSessionNode(node *TreeNode, level int, pluginCols []string) {
+	if node == nil {
+		return
 	}
 
-	// Add split direction indicator if this is a split
+	indicator := ""
 	if node.SplitVertical != nil {
 		if *node.SplitVertical {
-			connector += "⫴" // Vertical split indicator
+			indicator = splitVerticalIndicator + " "
 		} else {
-			connector += "⫻" // Horizontal split indicator
+			indicator = splitHorizontalIndicator + " "
 		}
 	}
 
-	// Format session information
 	sessionID := node.ShortID
 	pidDisplay := ""
 	if node.ShellPID != 0 && node.JobPID != 0 && node.ShellPID != node.JobPID {
-		// Show both PIDs when they differ (shell/job)
 		pidDisplay = fmt.Sprintf("%d/%d", node.ShellPID, node.JobPID)
 	} else if node.JobPID != 0 {
-		// Show only job PID if available
 		pidDisplay = fmt.Sprintf("%d", node.JobPID)
 	} else if node.ShellPID != 0 {
-		// Fall back to shell PID if no job PID
 		pidDisplay = fmt.Sprintf("%d", node.ShellPID)
 	}
 
-	// Shorten state with indicators
 	state := node.PromptState
 	switch state {
 	case "AT_COMMAND_LINE", "PROMPT_STATE_AT_COMMAND_LINE":
-		state = "✓ READY"
+		state = "ready"
 	case "IN_COMMAND", "PROMPT_STATE_IN_COMMAND":
-		state = "🚧"
+		state = "busy"
 	case "AT_PASSWORD_PROMPT", "PROMPT_STATE_AT_PASSWORD_PROMPT":
-		state = "🔒"
+		state = "locked"
 	case "FILE_TRANSFER", "PROMPT_STATE_FILE_TRANSFER":
-		state = "📁"
+		state = "file-xfer"
 	case "UNKNOWN", "PROMPT_STATE_UNKNOWN", "":
 		state = ""
 	default:
 		state = ""
 	}
 
-	// Format title and command - don't truncate, let terminal wrap naturally
-	title := node.Name
-	command := node.CurrentCommand
+	linePrefix := indent(level) + indicator
+	printFormattedTreeLine(linePrefix, node.Name, sessionID, pidDisplay, state, node.CurrentCommand, pluginCols, node.PluginData, "")
 
-	// Print the session
-	printFormattedTreeLine(prefix+connector+" ", title, sessionID, pidDisplay, state, command, pluginCols, node.PluginData)
-
-	// Print children (splits) - use compressed indent
-	newPrefix := prefix
-	if isLast {
-		newPrefix += "  "
-	} else {
-		newPrefix += "│ "
-	}
-
-	for i, child := range node.Children {
-		childIsLast := i == len(node.Children)-1
-		printSessionNode(child, newPrefix, childIsLast, pluginCols)
+	for _, child := range node.Children {
+		printSessionNode(child, level+1, pluginCols)
 	}
 }
 
@@ -583,7 +541,7 @@ func sortTreeNodes(nodes []*TreeNode) {
 }
 
 // printSplitTreeNode recursively prints a split tree node (either a split container or a session).
-func printSplitTreeNode(node *pb.SplitTreeNode, prefix string, isLast bool, sessionInfoMap map[string]*client.SessionInfo, pluginCols []string, currentSessionID string, ancestorSet map[string]bool, inHighlightedPath bool) {
+func printSplitTreeNode(node *pb.SplitTreeNode, level int, sessionInfoMap map[string]*client.SessionInfo, pluginCols []string, currentSessionID string, ancestorSet map[string]bool, inHighlightedPath bool) {
 	if node == nil {
 		return
 	}
@@ -593,40 +551,21 @@ func printSplitTreeNode(node *pb.SplitTreeNode, prefix string, isLast bool, sess
 		return
 	}
 
-	// If this node has multiple links, it's a split container
 	if len(links) > 1 {
-		// Print split container
-		connector := "├─"
-		if isLast {
-			connector = "└─"
-		}
-
-		// Add split direction indicator
-		splitType := "Horizontal Split"
-		dirIndicator := "⫻"
+		dirIndicator := splitHorizontalIndicator
+		label := "horizontal split"
 		if node.GetVertical() {
-			splitType = "Vertical Split"
-			dirIndicator = "⫴"
+			dirIndicator = splitVerticalIndicator
+			label = "vertical split"
 		}
 
-		// Apply bright cyan highlighting if this split is in the path to current session
-		if inHighlightedPath {
-			fmt.Printf("%s%s%s%s %s [%s]\n", colorBrightCyan, prefix, connector, colorReset, dirIndicator, splitType)
-		} else {
-			fmt.Printf("%s%s %s [%s]\n", prefix, connector, dirIndicator, splitType)
+		line := fmt.Sprintf("%s%s %s", indent(level), dirIndicator, label)
+		if currentSessionID != "" && inHighlightedPath {
+			line += " [path]"
 		}
+		fmt.Println(line)
 
-		// Print children with appropriate prefix
-		newPrefix := prefix
-		if isLast {
-			newPrefix += "  "
-		} else {
-			newPrefix += "│ "
-		}
-
-		for i, link := range links {
-			childIsLast := i == len(links)-1
-			// Check if this child link contains the current session or ancestors
+		for _, link := range links {
 			var childInPath bool
 			switch child := link.GetChild().(type) {
 			case *pb.SplitTreeNode_SplitTreeLink_Session:
@@ -637,42 +576,35 @@ func printSplitTreeNode(node *pb.SplitTreeNode, prefix string, isLast bool, sess
 			case *pb.SplitTreeNode_SplitTreeLink_Node:
 				childInPath = tabContainsSession(child.Node, currentSessionID, ancestorSet)
 			}
-			printSplitTreeLink(link, newPrefix, childIsLast, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, childInPath)
+			printSplitTreeLink(link, level+1, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, childInPath)
 		}
-	} else {
-		// Single link - just print it directly
-		// Check if this link is in the highlighted path
-		var linkInPath bool
-		switch child := links[0].GetChild().(type) {
-		case *pb.SplitTreeNode_SplitTreeLink_Session:
-			if child.Session != nil {
-				sessionID := child.Session.GetUniqueIdentifier()
-				linkInPath = sessionID == currentSessionID || ancestorSet[sessionID]
-			}
-		case *pb.SplitTreeNode_SplitTreeLink_Node:
-			linkInPath = tabContainsSession(child.Node, currentSessionID, ancestorSet)
-		}
-		printSplitTreeLink(links[0], prefix, isLast, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, linkInPath)
+		return
 	}
+
+	var linkInPath bool
+	switch child := links[0].GetChild().(type) {
+	case *pb.SplitTreeNode_SplitTreeLink_Session:
+		if child.Session != nil {
+			sessionID := child.Session.GetUniqueIdentifier()
+			linkInPath = sessionID == currentSessionID || ancestorSet[sessionID]
+		}
+	case *pb.SplitTreeNode_SplitTreeLink_Node:
+		linkInPath = tabContainsSession(child.Node, currentSessionID, ancestorSet)
+	}
+	printSplitTreeLink(links[0], level, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, linkInPath)
 }
 
 // printSplitTreeLink prints a link in the split tree (can be a session or another split node).
-func printSplitTreeLink(link *pb.SplitTreeNode_SplitTreeLink, prefix string, isLast bool, sessionInfoMap map[string]*client.SessionInfo, pluginCols []string, currentSessionID string, ancestorSet map[string]bool, inHighlightedPath bool) {
+func printSplitTreeLink(link *pb.SplitTreeNode_SplitTreeLink, level int, sessionInfoMap map[string]*client.SessionInfo, pluginCols []string, currentSessionID string, ancestorSet map[string]bool, inHighlightedPath bool) {
 	if link == nil {
 		return
 	}
 
 	switch child := link.GetChild().(type) {
 	case *pb.SplitTreeNode_SplitTreeLink_Session:
-		// Print session
 		session := child.Session
 		if session == nil {
 			return
-		}
-
-		connector := "├─"
-		if isLast {
-			connector = "└─"
 		}
 
 		sessionID := session.GetUniqueIdentifier()
@@ -681,10 +613,8 @@ func printSplitTreeLink(link *pb.SplitTreeNode_SplitTreeLink, prefix string, isL
 			shortID = sessionID[:8]
 		}
 
-		// Get enriched session info if available
 		sessionInfo := sessionInfoMap[sessionID]
 
-		// Format session information
 		pidDisplay := ""
 		state := ""
 		command := ""
@@ -700,46 +630,34 @@ func printSplitTreeLink(link *pb.SplitTreeNode_SplitTreeLink, prefix string, isL
 				pidDisplay = fmt.Sprintf("%d", sessionInfo.ShellPID)
 			}
 
-			// Format state
 			switch sessionInfo.PromptState {
 			case "AT_COMMAND_LINE", "PROMPT_STATE_AT_COMMAND_LINE":
-				state = "✳"
+				state = "ready"
 			case "IN_COMMAND", "PROMPT_STATE_IN_COMMAND":
-				state = "🚧"
+				state = "busy"
 			case "AT_PASSWORD_PROMPT", "PROMPT_STATE_AT_PASSWORD_PROMPT":
-				state = "🔒"
+				state = "locked"
 			case "FILE_TRANSFER", "PROMPT_STATE_FILE_TRANSFER":
-				state = "📁"
+				state = "file-xfer"
 			}
 
 			command = sessionInfo.CurrentCommand
 			pluginData = sessionInfo.PluginData
 		}
 
-		// Determine highlighting: current session vs ancestor vs normal
-		isCurrent := currentSessionID != "" && sessionID == currentSessionID
-		isAncestor := ancestorSet[sessionID]
-
-		// Build the line prefix with appropriate highlighting
-		var linePrefix string
-		if isCurrent {
-			// Current session: cyan connector with green indicator
-			linePrefix = prefix + colorBrightCyan + connector + colorReset + " " + colorGreen + "● " + colorReset
-		} else if isAncestor {
-			// Ancestor in path: bright cyan connector
-			linePrefix = prefix + colorBrightCyan + connector + colorReset + " "
-		} else {
-			// No highlighting - normal display
-			linePrefix = prefix + connector + " "
+		suffix := ""
+		if currentSessionID != "" {
+			if sessionID == currentSessionID {
+				suffix = "[current]"
+			} else if ancestorSet[sessionID] {
+				suffix = "[path]"
+			}
 		}
 
-		// Print the session using the formatted tree line
-		printFormattedTreeLine(linePrefix, title, shortID, pidDisplay, state, command, pluginCols, pluginData)
+		printFormattedTreeLine(indent(level), title, shortID, pidDisplay, state, command, pluginCols, pluginData, suffix)
 
 	case *pb.SplitTreeNode_SplitTreeLink_Node:
-		// Check if this child node contains the current session or ancestors
 		childInPath := tabContainsSession(child.Node, currentSessionID, ancestorSet)
-		// Recursively print child split tree node
-		printSplitTreeNode(child.Node, prefix, isLast, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, childInPath)
+		printSplitTreeNode(child.Node, level, sessionInfoMap, pluginCols, currentSessionID, ancestorSet, childInPath)
 	}
 }
