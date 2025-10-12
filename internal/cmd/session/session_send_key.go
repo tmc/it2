@@ -138,8 +138,7 @@ Supported special keys:
 				}
 			}
 
-			err = c.SendText(ctx, sessionID, keyCode)
-			if err != nil {
+			if err := c.SendText(ctx, sessionID, keyCode); err != nil {
 				return fmt.Errorf("failed to send key: %w", err)
 			}
 

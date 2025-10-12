@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 
 	pb "github.com/tmc/it2/proto"
 )
@@ -28,9 +27,6 @@ func (c *Client) SendText(ctx context.Context, sessionID, text string) error {
 		return err
 	}
 
-	// Debug: log that we're chunking
-	fmt.Fprintf(os.Stderr, "DEBUG: Chunking %d bytes into %d chunks\n", len(text), (len(text)+chunkSize-1)/chunkSize)
-
 	// Split large text into chunks
 	chunkNum := 0
 	for i := 0; i < len(text); i += chunkSize {
@@ -41,7 +37,6 @@ func (c *Client) SendText(ctx context.Context, sessionID, text string) error {
 		chunkNum++
 
 		chunk := text[i:end]
-		fmt.Fprintf(os.Stderr, "DEBUG: Sending chunk %d/%d (%d bytes)\n", chunkNum, (len(text)+chunkSize-1)/chunkSize, len(chunk))
 
 		msg := &pb.ClientOriginatedMessage{
 			Submessage: &pb.ClientOriginatedMessage_SendTextRequest{
@@ -54,10 +49,8 @@ func (c *Client) SendText(ctx context.Context, sessionID, text string) error {
 
 		_, err := c.SendRequest(ctx, msg)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "DEBUG: Chunk %d failed: %v\n", chunkNum, err)
 			return err
 		}
-		fmt.Fprintf(os.Stderr, "DEBUG: Chunk %d sent successfully\n", chunkNum)
 
 		// Check for cancellation between chunks
 		if end < len(text) {
@@ -68,7 +61,6 @@ func (c *Client) SendText(ctx context.Context, sessionID, text string) error {
 			}
 		}
 	}
-	fmt.Fprintf(os.Stderr, "DEBUG: All chunks sent successfully\n")
 
 	return nil
 }

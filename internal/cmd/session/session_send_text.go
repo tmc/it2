@@ -73,17 +73,51 @@ func applyTemplate(templateStr, text, sessionID string) (string, error) {
 	return buf.String(), nil
 }
 
-// sendTextWithConfirmation sends text and verifies receipt by checking screen contents
-func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, text, terminator, format string, maxRetries int, retryDelay time.Duration) error {
-	var lastResult DeliveryResult
+type confirmationOptions struct {
+	terminator            string
+	delayBeforeTerminator time.Duration
+	delayBeforeCheck      time.Duration
+	format                string
+	maxRetries            int
+	retryDelay            time.Duration
+}
 
-	for attempt := 0; attempt <= maxRetries; attempt++ {
+type sendTextInput struct {
+	rawSessionID    string
+	text            string
+	explicitSession bool
+}
+
+type sendTextSettings struct {
+	template            string
+	confirm             bool
+	skipConfirm         bool
+	requireConditions   []string
+	requireTimeout      time.Duration
+	verbosePrecondition bool
+	terminator          string
+	delayBeforeTerm     time.Duration
+	delayBeforeCheck    time.Duration
+	format              string
+	retryCount          int
+	retryDelay          time.Duration
+}
+
+// sendTextWithConfirmation sends text and verifies receipt by checking screen contents
+func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, text string, opts confirmationOptions) error {
+	var lastResult DeliveryResult
+	delayBeforeCheck := opts.delayBeforeCheck
+	if delayBeforeCheck < 0 {
+		delayBeforeCheck = 200 * time.Millisecond
+	}
+
+	for attempt := 0; attempt <= opts.maxRetries; attempt++ {
 		if attempt > 0 {
 			// Wait before retrying
-			if format != "json" {
-				fmt.Fprintf(os.Stderr, "Retrying attempt %d/%d...\n", attempt, maxRetries)
+			if opts.format != "json" {
+				fmt.Fprintf(os.Stderr, "Retrying attempt %d/%d...\n", attempt, opts.maxRetries)
 			}
-			time.Sleep(retryDelay)
+			time.Sleep(opts.retryDelay)
 		}
 
 		// Get screen contents before sending
@@ -98,16 +132,8 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 			return fmt.Errorf("failed to send text: %w", err)
 		}
 
-		// Send terminator if specified
-		if terminator != "" {
-			err = c.SendText(ctx, sessionID, terminator)
-			if err != nil {
-				return fmt.Errorf("failed to send terminator: %w", err)
-			}
-		}
-
 		// Wait briefly for the text to appear on screen
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(delayBeforeCheck)
 
 		// Get screen contents after sending
 		afterResp, err := c.GetScreenContents(ctx, sessionID)
@@ -121,6 +147,14 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 		// Create result structure
 		switch result {
 		case "success":
+			if opts.terminator != "" {
+				if opts.delayBeforeTerminator > 0 {
+					time.Sleep(opts.delayBeforeTerminator)
+				}
+				if err := c.SendText(ctx, sessionID, opts.terminator); err != nil {
+					return fmt.Errorf("failed to send terminator: %w", err)
+				}
+			}
 			lastResult = DeliveryResult{
 				Status:    "success",
 				Message:   "Text delivered successfully",
@@ -128,30 +162,46 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 				Delivered: true,
 			}
 		case "partial":
+			message := "Text partially delivered (some characters may be missing)"
+			if opts.terminator != "" {
+				message += "; line terminator not sent"
+			}
 			lastResult = DeliveryResult{
 				Status:    "partial",
-				Message:   "Text partially delivered (some characters may be missing)",
+				Message:   message,
 				ExitCode:  2,
 				Delivered: true,
 			}
 		case "none-sent":
+			message := "Text not delivered (session may be at modal, busy, or unresponsive)"
+			if opts.terminator != "" {
+				message += "; line terminator not sent"
+			}
 			lastResult = DeliveryResult{
 				Status:    "none-sent",
-				Message:   "Text not delivered (session may be at modal, busy, or unresponsive)",
+				Message:   message,
 				ExitCode:  3,
 				Delivered: false,
 			}
 		case "modal-detected":
+			message := "Modal dialog detected - text sending blocked for safety"
+			if opts.terminator != "" {
+				message += "; line terminator not sent"
+			}
 			lastResult = DeliveryResult{
 				Status:    "modal-detected",
-				Message:   "Modal dialog detected - text sending blocked for safety",
+				Message:   message,
 				ExitCode:  4,
 				Delivered: false,
 			}
 		default:
+			message := "Unable to confirm delivery (unexpected error)"
+			if opts.terminator != "" {
+				message += "; line terminator not sent"
+			}
 			lastResult = DeliveryResult{
 				Status:    "error",
-				Message:   "Unable to confirm delivery (unexpected error)",
+				Message:   message,
 				ExitCode:  1,
 				Delivered: false,
 			}
@@ -163,18 +213,18 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 		}
 
 		// Only retry on specific exit codes (2=partial, 3=none-sent)
-		if lastResult.ExitCode == 1 || attempt == maxRetries {
+		if lastResult.ExitCode == 1 || attempt == opts.maxRetries {
 			break
 		}
 	}
 
 	// Add retry info to message if we retried
-	if maxRetries > 0 {
-		lastResult.Message = fmt.Sprintf("%s (after %d attempt(s))", lastResult.Message, maxRetries+1)
+	if opts.maxRetries > 0 {
+		lastResult.Message = fmt.Sprintf("%s (after %d attempt(s))", lastResult.Message, opts.maxRetries+1)
 	}
 
 	// Output result based on format
-	if format == "json" {
+	if opts.format == "json" {
 		jsonBytes, err := json.Marshal(lastResult)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error formatting JSON: %v\n", err)
@@ -360,226 +410,7 @@ Multiple conditions can be specified and all must pass.`,
 		`),
 		Args: cobra.RangeArgs(0, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var sessionID, text string
-			var err error
-			var explicitSessionID bool
-
-			file, _ := cmd.Flags().GetString("file")
-
-			if file != "" {
-				// Reading from file or stdin
-				var reader io.Reader
-				if file == "-" {
-					reader = os.Stdin
-				} else {
-					f, err := os.Open(file)
-					if err != nil {
-						return fmt.Errorf("failed to open file %s: %w", file, err)
-					}
-					defer f.Close()
-					reader = f
-				}
-
-				textBytes, err := io.ReadAll(reader)
-				if err != nil {
-					return fmt.Errorf("failed to read input: %w", err)
-				}
-				text = string(textBytes)
-
-				// Session ID handling when using file
-				if len(args) == 1 {
-					sessionID = args[0]
-					explicitSessionID = true
-				} else {
-					sessionID = ""
-					explicitSessionID = false
-				}
-			} else {
-				// Original text argument handling
-				if len(args) == 0 {
-					return fmt.Errorf("no text provided - use text argument or -f/--file flag")
-				} else if len(args) == 1 {
-					// Only text provided, use environment variable for session ID
-					sessionID = ""
-					text = args[0]
-					explicitSessionID = false
-				} else {
-					// Both session ID and text provided
-					sessionID = args[0]
-					text = args[1]
-					explicitSessionID = true
-				}
-			}
-
-			// Move client connection before session resolution
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-			if timeout == 0 {
-				timeout = 60 * time.Second
-			}
-
-			ctx, cancel := cmdcore.CreateContext(timeout)
-			defer cancel()
-
-			c, err := cmdcore.ConnectClient(ctx)
-			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
-			}
-			defer c.Close()
-
-			// Resolve session ID with environment fallback and prefix matching
-			sessionID, err = c.ResolveSessionID(ctx, sessionID)
-			if err != nil {
-				return fmt.Errorf("failed to resolve session ID: %w", err)
-			}
-
-			// Apply template if specified
-			templateStr, _ := cmd.Flags().GetString("template")
-			if templateStr != "" {
-				text, err = applyTemplate(templateStr, text, sessionID)
-				if err != nil {
-					return fmt.Errorf("template error: %w", err)
-				}
-			}
-
-			// Prompt for confirmation if using implicit session ID and --confirm flag is set
-			confirm, _ := cmd.Flags().GetBool("confirm")
-			if confirm && !explicitSessionID {
-				// Get session info for display
-				sessions, err := c.ListSessions(ctx)
-				if err != nil {
-					return fmt.Errorf("failed to list sessions: %w", err)
-				}
-				var sessionName string
-				for _, s := range sessions {
-					if s.SessionID == sessionID {
-						sessionName = s.SessionName
-						break
-					}
-				}
-
-				// Show preview of text (truncate if too long)
-				previewText := text
-				if len(previewText) > 50 {
-					previewText = previewText[:47] + "..."
-				}
-				fmt.Fprintf(os.Stderr, "Send text '%s' to session %s?\n", previewText, sessionID)
-				if sessionName != "" {
-					fmt.Fprintf(os.Stderr, "  Name: %s\n", sessionName)
-				}
-				fmt.Fprintf(os.Stderr, "Proceed? (y/N): ")
-
-				reader := bufio.NewReader(os.Stdin)
-				response, err := reader.ReadString('\n')
-				if err != nil {
-					return fmt.Errorf("failed to read confirmation: %w", err)
-				}
-				response = strings.TrimSpace(strings.ToLower(response))
-				if response != "y" && response != "yes" {
-					return fmt.Errorf("cancelled by user")
-				}
-			}
-
-			// Check pre-conditions if --require flag is set
-			requireFlags, _ := cmd.Flags().GetStringSlice("require")
-			requireTimeout, _ := cmd.Flags().GetDuration("require-timeout")
-
-			for _, condition := range requireFlags {
-				if condition == "" {
-					continue
-				}
-
-				// Pass session ID as argument to the pre-condition checker
-				args := []string{sessionID}
-				if text != "" {
-					// Optionally pass the text as second argument for context
-					args = append(args, text)
-				}
-
-				// Create a context with the specified timeout
-				ctx, cancel := cmdcore.CreateContext(requireTimeout)
-				defer cancel()
-
-				// Wait for the condition to be met
-				result, err := plugins.WaitForCondition(ctx, condition, args, requireTimeout)
-				if err != nil {
-					return fmt.Errorf("pre-condition check failed: %w", err)
-				}
-
-				if !result.Success {
-					return fmt.Errorf("pre-condition not met: %s", result.Message)
-				}
-
-				// If verbose, print success message
-				if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
-					fmt.Fprintf(os.Stderr, "Pre-condition satisfied: %s\n", result.Message)
-				}
-			}
-
-			// Handle text termination based on flags
-			sendCR, _ := cmd.Flags().GetBool("send-cr")
-			sendLF, _ := cmd.Flags().GetBool("send-lf")
-			skipNewline, _ := cmd.Flags().GetBool("skip-newline")
-
-			// Validate mutually exclusive flags
-			terminatorFlags := 0
-			if sendCR {
-				terminatorFlags++
-			}
-			if sendLF {
-				terminatorFlags++
-			}
-			if skipNewline {
-				terminatorFlags++
-			}
-
-			if terminatorFlags > 1 {
-				return fmt.Errorf("terminator flags --send-cr, --send-lf, and --skip-newline are mutually exclusive")
-			}
-
-			// Client already connected above
-
-			// Determine terminator first (needed for both confirmation and non-confirmation paths)
-			var terminator string
-			if sendCR {
-				terminator = "\r" // Carriage return - executes command
-			} else if sendLF {
-				terminator = "\n" // Line feed - moves to new line
-			} else if skipNewline {
-				terminator = "" // Explicitly no terminator
-			} else {
-				// NEW DEFAULT: send carriage return to execute command
-				terminator = "\r"
-			}
-
-			// Check if confirmation is disabled
-			skipConfirm, _ := cmd.Flags().GetBool("skip-confirm")
-			if !skipConfirm {
-				format, _ := cmd.Flags().GetString("format")
-				retryCount, _ := cmd.Flags().GetInt("retry")
-				retryDelay, _ := cmd.Flags().GetDuration("retry-delay")
-				return sendTextWithConfirmation(ctx, c, sessionID, text, terminator, format, retryCount, retryDelay)
-			}
-
-			// Send the text first
-			err = c.SendText(ctx, sessionID, text)
-			if err != nil {
-				return fmt.Errorf("failed to send text: %w", err)
-			}
-
-			// Send terminator if one was specified
-			if terminator != "" {
-				delay, _ := cmd.Flags().GetDuration("delay-before-terminator")
-				if delay > 0 {
-					time.Sleep(delay)
-				}
-
-				err = c.SendText(ctx, sessionID, terminator)
-				if err != nil {
-					return fmt.Errorf("failed to send line terminator: %w", err)
-				}
-			}
-
-			return nil
+			return runSendText(cmd, args)
 		},
 	}
 
@@ -597,7 +428,9 @@ Multiple conditions can be specified and all must pass.`,
 		}
 		return pflag.NormalizedName(name)
 	})
-	cmd.Flags().Duration("delay-before-terminator", 0, "Delay before sending line terminator")
+	cmd.Flags().Duration("delay-before-terminator", 90*time.Millisecond, "Delay before sending line terminator")
+	cmd.Flags().Duration("delay-before-check", 200*time.Millisecond, "Delay before verifying screen contents")
+	cmd.Flags().MarkHidden("delay-before-check")
 	cmd.Flags().StringP("file", "f", "", "Read text from file (use '-' for stdin)")
 	cmd.Flags().StringSlice("require", nil, "Pre-condition plugins to check before sending (comma-separated or multiple flags, e.g., 'is-at-prompt,has-no-partial-input')")
 	cmd.Flags().Duration("require-timeout", 10*time.Second, "Timeout for pre-condition checks")
@@ -605,19 +438,274 @@ Multiple conditions can be specified and all must pass.`,
 	cmd.Flags().Bool("skip-confirm", false, "Skip text delivery confirmation (confirmation is enabled by default)")
 	cmd.Flags().Int("retry", 0, "Number of retry attempts for failed deliveries (only retries on exit codes 2 and 3)")
 	cmd.Flags().Duration("retry-delay", 1*time.Second, "Delay between retry attempts")
-	cmd.Flags().Duration("delay-before-return", 0*time.Millisecond, "Delay before sending carriage return")
-	cmd.Flags().MarkHidden("delay-before-return")
-
-	// Add scope support
-	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (none,window,tab,parents,siblings,peers,lineage)")
-	cmd.Flags().Bool("dry-run", false, "Show what would be affected without executing")
-	cmd.Flags().Bool("stop-on-error", false, "Stop on first error instead of continuing")
-
-	// Mark mutually exclusive flags
-	cmd.MarkFlagsMutuallyExclusive("skip-newline", "send-return", "send-cr", "send-lf")
 
 	// Add completion for session ID as first argument
 	cmd.ValidArgsFunction = completion.SessionIDCompletion
 
 	return cmd
+}
+
+func runSendText(cmd *cobra.Command, args []string) error {
+	input, err := parseSendTextInput(cmd, args)
+	if err != nil {
+		return err
+	}
+
+	settings, err := gatherSendTextSettings(cmd)
+	if err != nil {
+		return err
+	}
+
+	timeout, _ := cmd.Flags().GetDuration("timeout")
+	if timeout == 0 {
+		timeout = 60 * time.Second
+	}
+
+	ctx, cancel := cmdcore.CreateContext(timeout)
+	defer cancel()
+
+	c, err := cmdcore.ConnectClient(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to connect: %w", err)
+	}
+	defer c.Close()
+
+	sessionID, err := c.ResolveSessionID(ctx, input.rawSessionID)
+	if err != nil {
+		return fmt.Errorf("failed to resolve session ID: %w", err)
+	}
+
+	text := input.text
+	if settings.template != "" {
+		text, err = applyTemplate(settings.template, text, sessionID)
+		if err != nil {
+			return fmt.Errorf("template error: %w", err)
+		}
+	}
+
+	if err := maybeConfirmSend(ctx, cmd, c, sessionID, text, settings, input.explicitSession); err != nil {
+		return err
+	}
+
+	if err := runPreconditions(cmd, sessionID, text, settings); err != nil {
+		return err
+	}
+
+	opts := confirmationOptions{
+		terminator:            settings.terminator,
+		delayBeforeTerminator: settings.delayBeforeTerm,
+		delayBeforeCheck:      settings.delayBeforeCheck,
+		format:                settings.format,
+		maxRetries:            settings.retryCount,
+		retryDelay:            settings.retryDelay,
+	}
+
+	if !settings.skipConfirm {
+		return sendTextWithConfirmation(ctx, c, sessionID, text, opts)
+	}
+
+	return sendWithoutConfirmation(ctx, c, sessionID, text, opts)
+}
+
+func resolveTerminator(cmd *cobra.Command) (string, error) {
+	sendCR, _ := cmd.Flags().GetBool("send-cr")
+	sendLF, _ := cmd.Flags().GetBool("send-lf")
+	skipNewline, _ := cmd.Flags().GetBool("skip-newline")
+
+	sendCRChanged := cmd.Flags().Changed("send-cr")
+	sendLFChanged := cmd.Flags().Changed("send-lf")
+	skipNewlineChanged := cmd.Flags().Changed("skip-newline")
+
+	var conflicts int
+	if sendCR && sendCRChanged {
+		conflicts++
+	}
+	if sendLF && sendLFChanged {
+		conflicts++
+	}
+	if skipNewline && skipNewlineChanged {
+		conflicts++
+	}
+	if conflicts > 1 {
+		return "", fmt.Errorf("terminator flags --send-cr, --send-lf, and --skip-newline are mutually exclusive")
+	}
+
+	switch {
+	case skipNewline && skipNewlineChanged:
+		return "", nil
+	case sendLF && sendLFChanged:
+		return "\n", nil
+	case sendCR && sendCRChanged:
+		return "\r", nil
+	case sendCR:
+		return "\r", nil // default behaviour: execute the command
+	case sendLF:
+		return "\n", nil
+	default:
+		return "", nil // no terminator when everything is explicitly disabled
+	}
+}
+
+func parseSendTextInput(cmd *cobra.Command, args []string) (sendTextInput, error) {
+	var input sendTextInput
+
+	file, _ := cmd.Flags().GetString("file")
+	switch {
+	case file != "":
+		var reader io.Reader
+		if file == "-" {
+			reader = os.Stdin
+		} else {
+			f, err := os.Open(file)
+			if err != nil {
+				return input, fmt.Errorf("failed to open file %s: %w", file, err)
+			}
+			defer f.Close()
+			reader = f
+		}
+
+		textBytes, err := io.ReadAll(reader)
+		if err != nil {
+			return input, fmt.Errorf("failed to read input: %w", err)
+		}
+		input.text = string(textBytes)
+
+		if len(args) == 1 {
+			input.rawSessionID = args[0]
+			input.explicitSession = true
+		}
+	default:
+		if len(args) == 0 {
+			return input, fmt.Errorf("no text provided - use text argument or -f/--file flag")
+		}
+		if len(args) == 1 {
+			input.text = args[0]
+		} else {
+			input.rawSessionID = args[0]
+			input.text = args[1]
+			input.explicitSession = true
+		}
+	}
+
+	return input, nil
+}
+
+func gatherSendTextSettings(cmd *cobra.Command) (sendTextSettings, error) {
+	settings := sendTextSettings{}
+
+	settings.template, _ = cmd.Flags().GetString("template")
+	settings.confirm, _ = cmd.Flags().GetBool("confirm")
+	settings.skipConfirm, _ = cmd.Flags().GetBool("skip-confirm")
+	settings.requireConditions, _ = cmd.Flags().GetStringSlice("require")
+	settings.requireTimeout, _ = cmd.Flags().GetDuration("require-timeout")
+	settings.verbosePrecondition, _ = cmd.Flags().GetBool("verbose")
+	settings.delayBeforeTerm, _ = cmd.Flags().GetDuration("delay-before-terminator")
+	settings.delayBeforeCheck, _ = cmd.Flags().GetDuration("delay-before-check")
+	settings.format, _ = cmd.Flags().GetString("format")
+	settings.retryCount, _ = cmd.Flags().GetInt("retry")
+	settings.retryDelay, _ = cmd.Flags().GetDuration("retry-delay")
+
+	terminator, err := resolveTerminator(cmd)
+	if err != nil {
+		return settings, err
+	}
+	settings.terminator = terminator
+
+	return settings, nil
+}
+
+func maybeConfirmSend(ctx context.Context, cmd *cobra.Command, c *client.Client, sessionID, text string, settings sendTextSettings, explicit bool) error {
+	if !settings.confirm || explicit {
+		return nil
+	}
+
+	sessions, err := c.ListSessions(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to list sessions: %w", err)
+	}
+
+	var sessionName string
+	for _, s := range sessions {
+		if s.SessionID == sessionID {
+			sessionName = s.SessionName
+			break
+		}
+	}
+
+	previewText := text
+	if len(previewText) > 50 {
+		previewText = previewText[:47] + "..."
+	}
+
+	fmt.Fprintf(os.Stderr, "Send text '%s' to session %s?\n", previewText, sessionID)
+	if sessionName != "" {
+		fmt.Fprintf(os.Stderr, "  Name: %s\n", sessionName)
+	}
+	fmt.Fprintf(os.Stderr, "Proceed? (y/N): ")
+
+	reader := bufio.NewReader(os.Stdin)
+	response, err := reader.ReadString('\n')
+	if err != nil {
+		return fmt.Errorf("failed to read confirmation: %w", err)
+	}
+	response = strings.TrimSpace(strings.ToLower(response))
+	if response != "y" && response != "yes" {
+		return fmt.Errorf("cancelled by user")
+	}
+
+	return nil
+}
+
+func runPreconditions(cmd *cobra.Command, sessionID, text string, settings sendTextSettings) error {
+	if len(settings.requireConditions) == 0 {
+		return nil
+	}
+
+	for _, condition := range settings.requireConditions {
+		if condition == "" {
+			continue
+		}
+
+		args := []string{sessionID}
+		if text != "" {
+			args = append(args, text)
+		}
+
+		ctx, cancel := cmdcore.CreateContext(settings.requireTimeout)
+		result, err := plugins.WaitForCondition(ctx, condition, args, settings.requireTimeout)
+		cancel()
+		if err != nil {
+			return fmt.Errorf("pre-condition check failed: %w", err)
+		}
+
+		if !result.Success {
+			return fmt.Errorf("pre-condition not met: %s", result.Message)
+		}
+
+		if settings.verbosePrecondition {
+			fmt.Fprintf(os.Stderr, "Pre-condition satisfied: %s\n", result.Message)
+		}
+	}
+
+	return nil
+}
+
+func sendWithoutConfirmation(ctx context.Context, c *client.Client, sessionID, text string, opts confirmationOptions) error {
+	if err := c.SendText(ctx, sessionID, text); err != nil {
+		return fmt.Errorf("failed to send text: %w", err)
+	}
+
+	if opts.terminator == "" {
+		return nil
+	}
+
+	if opts.delayBeforeTerminator > 0 {
+		time.Sleep(opts.delayBeforeTerminator)
+	}
+
+	if err := c.SendText(ctx, sessionID, opts.terminator); err != nil {
+		return fmt.Errorf("failed to send line terminator: %w", err)
+	}
+
+	return nil
 }

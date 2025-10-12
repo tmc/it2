@@ -2,7 +2,6 @@ package window
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"

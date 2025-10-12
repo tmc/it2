@@ -33,6 +33,11 @@ type SessionInfo struct {
 	WorkingDirectory string // Current working directory from session.path
 }
 
+// ListSessionsOptions controls optional session listing behaviour.
+type ListSessionsOptions struct {
+	IncludeBuried bool
+}
+
 // ListSessionsRaw returns the raw protobuf response with full window/tab tree
 func (c *Client) ListSessionsRaw(ctx context.Context) (*pb.ListSessionsResponse, error) {
 	msg := &pb.ClientOriginatedMessage{
@@ -55,6 +60,15 @@ func (c *Client) ListSessionsRaw(ctx context.Context) (*pb.ListSessionsResponse,
 }
 
 func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
+	return c.listSessions(ctx, true)
+}
+
+// ListSessionsWithOptions returns sessions using the provided options.
+func (c *Client) ListSessionsWithOptions(ctx context.Context, opts ListSessionsOptions) ([]*SessionInfo, error) {
+	return c.listSessions(ctx, opts.IncludeBuried)
+}
+
+func (c *Client) listSessions(ctx context.Context, includeBuried bool) ([]*SessionInfo, error) {
 	listResp, err := c.ListSessionsRaw(ctx)
 	if err != nil {
 		return nil, err
@@ -70,12 +84,13 @@ func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
 		}
 	}
 
-	// Add buried sessions
-	for _, buried := range listResp.GetBuriedSessions() {
-		sessions = append(sessions, &SessionInfo{
-			SessionID:   buried.GetUniqueIdentifier(),
-			SessionName: buried.GetTitle(),
-		})
+	if includeBuried {
+		for _, buried := range listResp.GetBuriedSessions() {
+			sessions = append(sessions, &SessionInfo{
+				SessionID:   buried.GetUniqueIdentifier(),
+				SessionName: buried.GetTitle(),
+			})
+		}
 	}
 
 	// Populate job information for all sessions

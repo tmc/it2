@@ -242,3 +242,83 @@ func TestApplyTemplateErrorHandling(t *testing.T) {
 		})
 	}
 }
+
+func TestResolveTerminator(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		args    []string
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "default sends carriage return",
+			args: nil,
+			want: "\r",
+		},
+		{
+			name: "skip newline",
+			args: []string{"--skip-newline"},
+			want: "",
+		},
+		{
+			name: "skip newline with send-cr false",
+			args: []string{"--skip-newline", "--send-cr=false"},
+			want: "",
+		},
+		{
+			name: "explicit send-cr false only",
+			args: []string{"--send-cr=false"},
+			want: "",
+		},
+		{
+			name: "send line feed",
+			args: []string{"--send-lf"},
+			want: "\n",
+		},
+		{
+			name: "send line feed with send-cr false",
+			args: []string{"--send-lf", "--send-cr=false"},
+			want: "\n",
+		},
+		{
+			name:    "conflicting skip newline and send-cr",
+			args:    []string{"--skip-newline", "--send-cr"},
+			wantErr: true,
+		},
+		{
+			name:    "conflicting skip newline and send-lf",
+			args:    []string{"--skip-newline", "--send-lf"},
+			wantErr: true,
+		},
+		{
+			name: "send return alias",
+			args: []string{"--send-return"},
+			want: "\r",
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			cmd := newSendTextCommand()
+			if err := cmd.ParseFlags(tt.args); err != nil {
+				t.Fatalf("ParseFlags() error = %v", err)
+			}
+
+			got, err := resolveTerminator(cmd)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("resolveTerminator() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr {
+				return
+			}
+			if got != tt.want {
+				t.Fatalf("resolveTerminator() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
