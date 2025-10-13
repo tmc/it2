@@ -49,7 +49,6 @@ If the session has no parent (e.g., it's the original session in a tab), no outp
 			}
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
-			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -107,11 +106,8 @@ If the session has no parent (e.g., it's the original session in a tab), no outp
 				})
 			}
 
-			if quiet {
-				fmt.Println(outputID)
-			} else {
-				fmt.Printf("Parent session: %s\n", outputID)
-			}
+			// Just print the session ID
+			fmt.Println(outputID)
 
 			return nil
 		},

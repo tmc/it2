@@ -50,7 +50,6 @@ If the session is already a root (has no parent), returns the session itself.`,
 			}
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
-			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -112,15 +111,8 @@ If the session is already a root (has no parent), returns the session itself.`,
 				})
 			}
 
-			if quiet {
-				fmt.Println(outputID)
-			} else {
-				if rootID == sessionID {
-					fmt.Printf("Session %s is the split root (no parent)\n", outputID)
-				} else {
-					fmt.Printf("Split root: %s\n", outputID)
-				}
-			}
+			// Just print the session ID
+			fmt.Println(outputID)
 
 			return nil
 		},

@@ -44,7 +44,6 @@ If no session ID is provided, uses the current session from ITERM_SESSION_ID.`,
 			}
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
-			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -95,11 +94,8 @@ If no session ID is provided, uses the current session from ITERM_SESSION_ID.`,
 				})
 			}
 
-			if quiet {
-				fmt.Println(outputID)
-			} else {
-				fmt.Printf("Tab: %s\n", outputID)
-			}
+			// Just print the ID
+			fmt.Println(outputID)
 
 			return nil
 		},
