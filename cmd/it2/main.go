@@ -240,6 +240,164 @@ func newConfigCommand() *cobra.Command {
 	return cmd
 }
 
+// newQuickstartCommand creates the quickstart help command
+func newQuickstartCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "quickstart",
+		Short: "Get started with it2 - comprehensive guide for core workflows",
+		Long: `it2 - iTerm2 Command-Line Automation
+
+A powerful command-line tool for controlling iTerm2, with comprehensive
+session management, automation, and agent integration capabilities.
+
+GETTING STARTED
+
+  it2 session list
+            List all active sessions with IDs and names
+            Sessions are the fundamental unit of control
+
+  it2 session split --horizontal
+  it2 session split --vertical
+            Create new sessions by splitting the current one
+            Sessions inherit the working directory
+
+MANAGING SESSIONS
+
+  it2 session send-text <session-id> 'echo hello'
+            Send text to a session as if typed
+            Includes delivery confirmation by default
+
+  it2 session send-key <session-id> enter
+  it2 session send-key <session-id> ctrl-c
+            Send special keys and key combinations
+
+  it2 session get-screen <session-id>
+  it2 session get-buffer <session-id>
+            Retrieve session contents for monitoring or analysis
+
+  it2 session set-badge <session-id> "Label"
+            Add visual labels to sessions for identification
+
+SESSION LOOKUP
+
+  it2 session lookup window <window-id>
+            Find all sessions in a window
+
+  it2 session lookup left
+  it2 session lookup right
+  it2 session lookup up
+  it2 session lookup down
+            Find sessions by spatial relationship
+
+  it2 session tree
+            Visualize session hierarchy
+
+BADGES FOR ORGANIZATION
+
+  # Standard pattern: session ID + label
+  SID=$(it2 session create)
+  it2 session set-badge "$SID" "$(echo ${SID:0:8})\nBuild"
+
+  # Use badges to identify session roles
+  it2 session set-badge "$SID" "$(echo ${SID:0:8})\nClaude"
+  it2 session set-badge "$SID" "$(echo ${SID:0:8})\nMonitor"
+
+AUTOMATION PATTERNS
+
+  # Safe text sending with pre-conditions
+  it2 session send-text $SID --require is-at-prompt 'ls -la'
+  it2 session send-text $SID --require has-no-partial-input 'git status'
+
+  # Multiple conditions for Claude sessions
+  it2 session send-text $SID \
+    --require is-claude-session,is-at-prompt,has-no-queued-messages \
+    'continue with the next task'
+
+  # Retry on failure
+  it2 session send-text $SID --retry 3 --retry-delay 1s 'command'
+
+  # JSON output for programmatic use
+  it2 session list --format json | jq '.[] | select(.name | contains("prod"))'
+  it2 session get-info $SID --format json | jq .grid_size
+
+WORKING WITH WINDOWS & TABS
+
+  it2 window list
+  it2 window create
+  it2 tab create "Profile Name"
+  it2 tab list
+
+PLUGINS & PRE-CONDITIONS
+
+  # List available plugins
+  it2 plugin list
+  it2 plugin list --type condition
+
+  # Common pre-condition plugins
+  is-at-prompt              Check if shell prompt is visible
+  has-no-partial-input      Ensure no incomplete command input
+  is-claude-session         Detect Claude Code sessions
+  has-no-queued-messages    For Claude sessions only
+
+  # Create custom plugins in ~/.it2/plugins/
+
+AGENT INTEGRATION
+
+  it2 is designed for AI-supervised workflows:
+    • Session IDs are stable and work across restarts
+    • Use badges to label and track session purposes
+    • Pre-condition plugins prevent unsafe automation
+    • JSON output enables programmatic parsing
+    • send-text includes delivery confirmation
+
+  Example agent workflow:
+    # Create and label a work session
+    SID=$(it2 session split --vertical)
+    it2 session set-badge "$SID" "$(echo ${SID:0:8})\nAgent Work"
+
+    # Send commands safely
+    it2 session send-text "$SID" --require is-at-prompt 'make build'
+
+    # Monitor results
+    it2 session get-screen "$SID" | tail -20
+
+INTEGRATION WITH BD (BEADS)
+
+  bd is a dependency-aware issue tracker that pairs perfectly with it2:
+    • Use session IDs as assignees: bd update task-1 --assignee $SID
+    • Query work by session: bd list --assignee $SID
+    • Multi-session workflows with dependency tracking
+
+  Example:
+    bd init --prefix it2
+    SID=$(it2 session split --vertical)
+    TASK=$(bd ready --json | jq -r '.[0].id')
+    bd update $TASK --assignee "$SID" --status in_progress
+    it2 session set-badge "$SID" "$(echo ${SID:0:8})\n$TASK"
+
+CONFIGURATION
+
+  # Show configuration
+  it2 config show
+  it2 config path
+
+  # Initialize configuration file
+  it2 config init
+
+  # Global flags
+  --format json|yaml|table    Output format
+  --timeout 60s                Operation timeout
+
+Ready to start!
+Run 'it2 session list' to see your active sessions.
+Run 'it2 session split --horizontal' to create your first split.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println(cmd.Long)
+		},
+	}
+	return cmd
+}
+
 func init() {
 	// Load configuration from file/env and use as defaults
 	cfg, err := config.Load()
@@ -277,6 +435,7 @@ func init() {
 	// Add shell completion commands
 	rootCmd.AddCommand(newCompletionCommand())
 	rootCmd.AddCommand(newConfigCommand())
+	rootCmd.AddCommand(newQuickstartCommand())
 
 	// Add organized command groups
 	rootCmd.AddCommand(app.NewCommand())
