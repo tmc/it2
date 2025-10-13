@@ -270,6 +270,17 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 		return "success"
 	}
 
+	// Handle wrapped text: remove all newlines and normalize whitespace
+	// This handles the case where text wraps across multiple lines in narrow terminals
+	afterStrNoWraps := strings.ReplaceAll(afterStr, "\n", " ")
+	afterStrNoWraps = strings.Join(strings.Fields(afterStrNoWraps), " ")
+	cleanSentTextNormalized := strings.Join(strings.Fields(cleanSentText), " ")
+
+	if strings.Contains(afterStrNoWraps, cleanSentTextNormalized) {
+		// Full text found after removing line wrapping - success
+		return "success"
+	}
+
 	// For very short text, be more lenient
 	if len(cleanSentText) <= 3 && len(cleanSentText) > 0 {
 		// For short text, check if it appears anywhere in the difference
@@ -330,11 +341,11 @@ func formatScreenResponse(resp *pb.GetBufferResponse) string {
 
 func newSendTextCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "send-text [<session-id>] <text>",
+		Use:   "send-text <session-id> <text>",
 		Short: "Send text to a session as if typed",
 		Long: `Send text to a session as if typed.
 
-If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
+The session-id is required and can be a full UUID or partial ID (4+ characters).
 
 By default, sends a carriage return (\\r) after the text to execute commands.
 Use --skip-newline to send text without any line terminator.
@@ -345,9 +356,6 @@ The --require flag allows checking pre-conditions before sending text.
 This is useful for automation to ensure the session is ready.
 Multiple conditions can be specified and all must pass.`,
 		Example: cmdutil.Doc(`
-			# Send to current session (uses $ITERM_SESSION_ID)
-			$ it2 session send-text 'hello world'
-
 			# Send to specific session (full UUID)
 			$ it2 session send-text 7AA97682-C080-4D65-8C19-FDEF4669AA84 'hello world'
 
@@ -356,65 +364,65 @@ Multiple conditions can be specified and all must pass.`,
 			$ it2 session send-text 6b1a 'test message'
 
 			# Send text without any line terminator
-			$ it2 session send-text --skip-newline 'partial text'
+			$ it2 session send-text 7AA9 --skip-newline 'partial text'
 
 			# Send command with carriage return for execution
-			$ it2 session send-text --send-return 'ls -la'
+			$ it2 session send-text 7AA9 --send-return 'ls -la'
 
 			# Wait for session to have no partial input before sending
-			$ it2 session send-text --require has-no-partial-input 'ls -la'
+			$ it2 session send-text 7AA9 --require has-no-partial-input 'ls -la'
 
 			# Multiple pre-conditions (comma-separated)
-			$ it2 session send-text --require is-at-prompt,has-no-partial-input 'pwd'
+			$ it2 session send-text 7AA9 --require is-at-prompt,has-no-partial-input 'pwd'
 
 			# Multiple pre-conditions (multiple flags or comma-separated)
-			$ it2 session send-text --require is-at-prompt --require has-no-partial-input --require-timeout 30s 'pwd'
+			$ it2 session send-text 7AA9 --require is-at-prompt --require has-no-partial-input --require-timeout 30s 'pwd'
 
 			# Multiple conditions for Claude sessions
-			$ it2 session send-text --require is-claude-session,is-at-prompt,is-at-empty-prompt,has-no-queued-messages 'your command'
+			$ it2 session send-text 7AA9 --require is-claude-session,is-at-prompt,is-at-empty-prompt,has-no-queued-messages 'your command'
 
 			# Send from file
-			$ it2 session send-text -f file.txt
+			$ it2 session send-text 7AA9 -f file.txt
 
 			# Send from stdin
-			$ echo 'hello world' | it2 session send-text -f -
+			$ echo 'hello world' | it2 session send-text 7AA9 -f -
 
 			# Send escape character (for vim, etc.)
-			$ it2 session send-text $'\x1b'
+			$ it2 session send-text 7AA9 $'\x1b'
 
 			# Send control characters
-			$ it2 session send-text $'\x03'  # Ctrl+C
-			$ it2 session send-text $'\x04'  # Ctrl+D
+			$ it2 session send-text 7AA9 $'\x03'  # Ctrl+C
+			$ it2 session send-text 7AA9 $'\x04'  # Ctrl+D
 
 			# Send vim commands with escape
-			$ it2 session send-text $'\x1b:w\n'  # ESC + :w + Enter
+			$ it2 session send-text 7AA9 $'\x1b:w\n'  # ESC + :w + Enter
 
 			# Send vim commands with force quit
-			$ it2 session send-text $'\x1b:q\x21\n'  # ESC + :q! + Enter
+			$ it2 session send-text 7AA9 $'\x1b:q\x21\n'  # ESC + :q! + Enter
 
 			# Alternative methods for exclamation mark
-			$ it2 session send-text ':q!'         # Single quotes protect
-			$ it2 session send-text ':q\!'        # Backslash escape
+			$ it2 session send-text 7AA9 ':q!'         # Single quotes protect
+			$ it2 session send-text 7AA9 ':q\!'        # Backslash escape
 
 			# Template wrapping for structured messaging
-			$ it2 session send-text --template '<msg from="{{.ShortID}}">{{.Content}}</msg>' "hello"
+			$ it2 session send-text 7AA9 --template '<msg from="{{.ShortID}}">{{.Content}}</msg>' "hello"
 
 			# JSON formatting with timestamp
-			$ it2 session send-text --template '{"text":"{{.Content}}","session":"{{.SessionID}}","ts":"{{.Timestamp}}"}' "status update"
+			$ it2 session send-text 7AA9 --template '{"text":"{{.Content}}","session":"{{.SessionID}}","ts":"{{.Timestamp}}"}' "status update"
 
 			# XML message with metadata
-			$ it2 session send-text --template '<message session="{{.ShortID}}" time="{{.Timestamp}}">{{.Content}}</message>' "deploy complete"
+			$ it2 session send-text 7AA9 --template '<message session="{{.ShortID}}" time="{{.Timestamp}}">{{.Content}}</message>' "deploy complete"
 
 			# Simple prefix/suffix wrapping
-			$ it2 session send-text --template '[{{.ShortID}}] {{.Content}}' "log message"
+			$ it2 session send-text 7AA9 --template '[{{.ShortID}}] {{.Content}}' "log message"
 		`),
-		Args: cobra.RangeArgs(0, 2),
+		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runSendText(cmd, args)
 		},
 	}
 
-	cmd.Flags().Bool("confirm", false, "Prompt for confirmation when using implicit session ID ($ITERM_SESSION_ID)")
+	cmd.Flags().Bool("confirm", false, "Prompt for confirmation before sending text")
 	cmd.Flags().Bool("skip-newline", false, "Don't send any line terminator")
 	cmd.Flags().BoolP("send-cr", "r", true, "Send carriage return (\\r) to execute command (enabled by default)")
 	cmd.Flags().Bool("send-lf", false, "Send line feed (\\n) to move to new line")
@@ -549,6 +557,14 @@ func resolveTerminator(cmd *cobra.Command) (string, error) {
 func parseSendTextInput(cmd *cobra.Command, args []string) (sendTextInput, error) {
 	var input sendTextInput
 
+	// Session ID is always required as first argument
+	if len(args) < 1 {
+		return input, fmt.Errorf("session-id is required")
+	}
+
+	input.rawSessionID = args[0]
+	input.explicitSession = true
+
 	file, _ := cmd.Flags().GetString("file")
 	switch {
 	case file != "":
@@ -569,22 +585,11 @@ func parseSendTextInput(cmd *cobra.Command, args []string) (sendTextInput, error
 			return input, fmt.Errorf("failed to read input: %w", err)
 		}
 		input.text = string(textBytes)
-
-		if len(args) == 1 {
-			input.rawSessionID = args[0]
-			input.explicitSession = true
-		}
 	default:
-		if len(args) == 0 {
-			return input, fmt.Errorf("no text provided - use text argument or -f/--file flag")
+		if len(args) < 2 {
+			return input, fmt.Errorf("text argument is required when not using -f/--file flag")
 		}
-		if len(args) == 1 {
-			input.text = args[0]
-		} else {
-			input.rawSessionID = args[0]
-			input.text = args[1]
-			input.explicitSession = true
-		}
+		input.text = args[1]
 	}
 
 	return input, nil

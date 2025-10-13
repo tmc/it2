@@ -232,7 +232,7 @@ func TestErrorMessages(t *testing.T) {
 		{
 			name:    "missing required argument",
 			args:    []string{"session", "send-text"},
-			wantErr: "no text provided",
+			wantErr: "accepts between 1 and 2 arg(s), received 0",
 		},
 		{
 			name:    "invalid timeout",
