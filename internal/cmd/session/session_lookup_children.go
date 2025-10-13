@@ -40,7 +40,6 @@ If the session has no children, returns empty output.`,
 			}
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
-			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -82,19 +81,9 @@ If the session has no children, returns empty output.`,
 				})
 			}
 
-			if quiet {
-				for _, child := range children {
-					fmt.Println(child)
-				}
-			} else {
-				if len(children) == 0 {
-					fmt.Printf("Session %s has no children\n", sessionID)
-				} else {
-					fmt.Printf("Children (%d):\n", len(children))
-					for _, child := range children {
-						fmt.Printf("  %s\n", child)
-					}
-				}
+			// Just print the child session IDs (one per line)
+			for _, child := range children {
+				fmt.Println(child)
 			}
 
 			return nil

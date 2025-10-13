@@ -41,7 +41,6 @@ If the session has no siblings, returns empty output.`,
 			}
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
-			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -77,7 +76,7 @@ If the session has no siblings, returns empty output.`,
 				}
 			}
 
-			// If no parent, no siblings
+			// If no parent, no siblings - just return silently
 			if parentID == "" {
 				if jsonOutput {
 					return formatting.PrintJSON(map[string]interface{}{
@@ -85,9 +84,6 @@ If the session has no siblings, returns empty output.`,
 						"siblings":   []string{},
 						"count":      0,
 					})
-				}
-				if !quiet {
-					fmt.Printf("Session %s has no siblings (no parent)\n", sessionID)
 				}
 				return nil
 			}
@@ -109,19 +105,9 @@ If the session has no siblings, returns empty output.`,
 				})
 			}
 
-			if quiet {
-				for _, sibling := range siblings {
-					fmt.Println(sibling)
-				}
-			} else {
-				if len(siblings) == 0 {
-					fmt.Printf("Session %s has no siblings\n", sessionID)
-				} else {
-					fmt.Printf("Siblings (%d):\n", len(siblings))
-					for _, sibling := range siblings {
-						fmt.Printf("  %s\n", sibling)
-					}
-				}
+			// Just print the sibling session IDs (one per line)
+			for _, sibling := range siblings {
+				fmt.Println(sibling)
 			}
 
 			return nil

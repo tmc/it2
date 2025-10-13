@@ -44,7 +44,6 @@ If no session ID is provided, uses the current session from ITERM_SESSION_ID.`,
 			}
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
-			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -118,35 +117,9 @@ If no session ID is provided, uses the current session from ITERM_SESSION_ID.`,
 				})
 			}
 
-			if quiet {
-				// Output all lineage session IDs
-				for _, sid := range lineage {
-					fmt.Println(sid)
-				}
-			} else {
-				fmt.Printf("Lineage for session: %s\n\n", sessionID)
-
-				if len(ancestors) > 0 {
-					fmt.Printf("Ancestors (%d, from parent to root):\n", len(ancestors))
-					for _, ancestor := range ancestors {
-						fmt.Printf("  ↑ %s\n", ancestor)
-					}
-				} else {
-					fmt.Println("Ancestors: (none - this is root)")
-				}
-
-				fmt.Printf("\n● %s (current)\n\n", sessionID)
-
-				if len(descendants) > 0 {
-					fmt.Printf("Descendants (%d, all children recursively):\n", len(descendants))
-					for _, descendant := range descendants {
-						fmt.Printf("  ↓ %s\n", descendant)
-					}
-				} else {
-					fmt.Println("Descendants: (none)")
-				}
-
-				fmt.Printf("\nTotal lineage: %d related sessions\n", len(lineage))
+			// Just print all lineage session IDs (one per line)
+			for _, sid := range lineage {
+				fmt.Println(sid)
 			}
 
 			return nil

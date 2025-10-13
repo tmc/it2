@@ -41,7 +41,6 @@ If the session has no ancestors (is already root), returns empty output.`,
 			}
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
-			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -104,19 +103,9 @@ If the session has no ancestors (is already root), returns empty output.`,
 				})
 			}
 
-			if quiet {
-				for _, ancestor := range ancestors {
-					fmt.Println(ancestor)
-				}
-			} else {
-				if len(ancestors) == 0 {
-					fmt.Printf("Session %s has no ancestors (is root)\n", sessionID)
-				} else {
-					fmt.Printf("Ancestors (%d, from parent to root):\n", len(ancestors))
-					for _, ancestor := range ancestors {
-						fmt.Printf("  %s\n", ancestor)
-					}
-				}
+			// Just print the ancestor session IDs (one per line)
+			for _, ancestor := range ancestors {
+				fmt.Println(ancestor)
 			}
 
 			return nil

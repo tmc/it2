@@ -41,7 +41,6 @@ If the session has no descendants, returns empty output.`,
 			}
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
-			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -87,19 +86,9 @@ If the session has no descendants, returns empty output.`,
 				})
 			}
 
-			if quiet {
-				for _, desc := range descendants {
-					fmt.Println(desc)
-				}
-			} else {
-				if len(descendants) == 0 {
-					fmt.Printf("Session %s has no descendants\n", sessionID)
-				} else {
-					fmt.Printf("Descendants (%d):\n", len(descendants))
-					for _, desc := range descendants {
-						fmt.Printf("  %s\n", desc)
-					}
-				}
+			// Just print the descendant session IDs (one per line)
+			for _, desc := range descendants {
+				fmt.Println(desc)
 			}
 
 			return nil
