@@ -42,7 +42,6 @@ If there is no pane above, returns empty output.`,
 			}
 
 			jsonOutput, _ := cmd.Flags().GetBool("json")
-			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			timeout, _ := cmd.Flags().GetDuration("timeout")
 			if timeout == 0 {
@@ -85,16 +84,9 @@ If there is no pane above, returns empty output.`,
 				return formatting.PrintJSON(result)
 			}
 
-			if quiet {
-				if aboveSessionID != "" {
-					fmt.Println(aboveSessionID)
-				}
-			} else {
-				if aboveSessionID == "" {
-					fmt.Printf("No pane above session %s\n", sessionID)
-				} else {
-					fmt.Printf("Pane above: %s\n", aboveSessionID)
-				}
+			// Just print the session ID (empty if not found)
+			if aboveSessionID != "" {
+				fmt.Println(aboveSessionID)
 			}
 
 			return nil
