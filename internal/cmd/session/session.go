@@ -92,6 +92,18 @@ func NewCommand() *cobra.Command {
 	moveCmd.GroupID = "management"
 	cmd.AddCommand(moveCmd)
 
+	buryCmd := newBuryCommand()
+	buryCmd.GroupID = "management"
+	cmd.AddCommand(buryCmd)
+
+	restoreCmd := newRestoreCommand()
+	restoreCmd.GroupID = "management"
+	cmd.AddCommand(restoreCmd)
+
+	listBuriedCmd := newListBuriedCommand()
+	listBuriedCmd.GroupID = "management"
+	cmd.AddCommand(listBuriedCmd)
+
 	currentCmd := newCurrentCommand()
 	currentCmd.GroupID = "management"
 	cmd.AddCommand(currentCmd)
@@ -156,6 +168,10 @@ func NewCommand() *cobra.Command {
 	sendKeyCmd := newSendKeyCommand()
 	sendKeyCmd.GroupID = "interaction"
 	cmd.AddCommand(sendKeyCmd)
+
+	injectCmd := newInjectCommand()
+	injectCmd.GroupID = "interaction"
+	cmd.AddCommand(injectCmd)
 
 	copyCmd := newCopyCommand()
 	copyCmd.GroupID = "interaction"
