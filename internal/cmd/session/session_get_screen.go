@@ -1,18 +1,44 @@
 package session
 
 import (
+	"time"
+
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	pb "github.com/tmc/it2/proto"
 )
+
+const defaultStabilityDuration = 1 * time.Second
 
 func newGetScreenCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:            "get-screen [<session-id>]",
-		Short:          "Get current screen contents of a session",
-		Long:           "Get the current visible screen contents of a session without scrollback history. If no session-id is provided, uses $ITERM_SESSION_ID environment variable.",
-		Args:           cobra.RangeArgs(0, 1),
+		Use:   "get-screen [<session-id>]",
+		Short: "Get current screen contents of a session",
+		Long: `Get the current visible screen contents of a session without scrollback history.
+
+If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
+
+The --wait-for-stability flag enables polling mode where the command waits
+until the screen contents remain unchanged for the specified duration. This
+is useful for automation scenarios where you need to wait for command output
+to complete before capturing the screen.
+
+Examples:
+  # Get immediate screen contents
+  it2 session get-screen E0A8
+
+  # Wait for screen to stabilize (default 1s stability)
+  it2 session get-screen E0A8 --wait-for-stability
+
+  # Wait for 2s of stability before capturing
+  it2 session get-screen E0A8 --wait-for-stability=2s
+
+  # Replaces the pattern: sleep 5 && it2 session get-screen E0A8
+  it2 session send-text E0A8 "long-running-command"
+  it2 session get-screen E0A8 --wait-for-stability | tail -20`,
+		Args: cobra.RangeArgs(0, 1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.SessionIDCompletion,
@@ -31,11 +57,29 @@ func newGetScreenCommand() *cobra.Command {
 			// Get command flags
 			colorized, _ := sc.GetCommand().Flags().GetBool("color")
 			escaped, _ := sc.GetCommand().Flags().GetBool("escaped")
+			waitForStability, _ := sc.GetCommand().Flags().GetDuration("wait-for-stability")
+			waitFlag := sc.GetCommand().Flags().Lookup("wait-for-stability")
+			pollInterval, _ := sc.GetCommand().Flags().GetDuration("poll-interval")
 
-			// Get screen contents with optional styling
-			resp, err := sc.GetClient().GetScreenContentsWithStyles(sc.GetContext(), sessionID, colorized || escaped)
-			if err != nil {
-				return sc.ReportError("get screen contents", err)
+			var resp *pb.GetBufferResponse
+
+			// If --wait-for-stability flag is present (even without explicit value), use default duration
+			if waitFlag.Changed && waitForStability == 0 {
+				waitForStability = defaultStabilityDuration
+			}
+
+			// Wait for stability if requested
+			if waitForStability > 0 {
+				resp, err = waitForStableScreen(sc, sessionID, waitForStability, pollInterval, colorized, escaped)
+				if err != nil {
+					return sc.ReportError("wait for stable screen", err)
+				}
+			} else {
+				// Get screen contents with optional styling (immediate)
+				resp, err = sc.GetClient().GetScreenContentsWithStyles(sc.GetContext(), sessionID, colorized || escaped)
+				if err != nil {
+					return sc.ReportError("get screen contents", err)
+				}
 			}
 
 			// Format the buffer content based on flags
@@ -58,6 +102,8 @@ func newGetScreenCommand() *cobra.Command {
 	// Add command-specific flags
 	cmd.Flags().Bool("color", false, "Include ANSI color codes in output")
 	cmd.Flags().Bool("escaped", false, "Show escape sequences as visible characters (like cat -v)")
+	cmd.Flags().Duration("wait-for-stability", 0, "Wait until screen contents remain unchanged (default: 1s when flag is present, 0 to disable)")
+	cmd.Flags().Duration("poll-interval", 200*time.Millisecond, "Interval between screen polls when waiting for stability")
 
 	return cmd
 }
