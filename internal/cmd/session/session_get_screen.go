@@ -29,6 +29,9 @@ Examples:
   # Get immediate screen contents
   it2 session get-screen E0A8
 
+  # Wait for screen to stabilize with reasonable defaults (shorthand)
+  it2 session get-screen E0A8 --wait-stable
+
   # Wait for screen to stabilize (default 1s stability)
   it2 session get-screen E0A8 --wait-for-stability
 
@@ -37,7 +40,7 @@ Examples:
 
   # Replaces the pattern: sleep 5 && it2 session get-screen E0A8
   it2 session send-text E0A8 "long-running-command"
-  it2 session get-screen E0A8 --wait-for-stability | tail -20`,
+  it2 session get-screen E0A8 --wait-stable | tail -20`,
 		Args: cobra.RangeArgs(0, 1),
 		RequiresClient: true,
 		SupportsFormat: true,
@@ -59,9 +62,15 @@ Examples:
 			escaped, _ := sc.GetCommand().Flags().GetBool("escaped")
 			waitForStability, _ := sc.GetCommand().Flags().GetDuration("wait-for-stability")
 			waitFlag := sc.GetCommand().Flags().Lookup("wait-for-stability")
+			waitStable, _ := sc.GetCommand().Flags().GetBool("wait-stable")
 			pollInterval, _ := sc.GetCommand().Flags().GetDuration("poll-interval")
 
 			var resp *pb.GetBufferResponse
+
+			// If --wait-stable is set, use default stability duration
+			if waitStable {
+				waitForStability = defaultStabilityDuration
+			}
 
 			// If --wait-for-stability flag is present (even without explicit value), use default duration
 			if waitFlag.Changed && waitForStability == 0 {
@@ -102,6 +111,7 @@ Examples:
 	// Add command-specific flags
 	cmd.Flags().Bool("color", false, "Include ANSI color codes in output")
 	cmd.Flags().Bool("escaped", false, "Show escape sequences as visible characters (like cat -v)")
+	cmd.Flags().Bool("wait-stable", false, "Wait for screen to stabilize with reasonable defaults (1s stability)")
 	cmd.Flags().Duration("wait-for-stability", 0, "Wait until screen contents remain unchanged (default: 1s when flag is present, 0 to disable)")
 	cmd.Flags().Duration("poll-interval", 200*time.Millisecond, "Interval between screen polls when waiting for stability")
 
