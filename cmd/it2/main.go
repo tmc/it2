@@ -25,6 +25,7 @@ import (
 	"github.com/tmc/it2/internal/cmd/keyboard"
 	"github.com/tmc/it2/internal/cmd/lifecycle"
 	"github.com/tmc/it2/internal/cmd/notification"
+	"github.com/tmc/it2/internal/cmd/notify"
 	"github.com/tmc/it2/internal/cmd/plugins"
 	"github.com/tmc/it2/internal/cmd/preference"
 	"github.com/tmc/it2/internal/cmd/profile"
@@ -447,6 +448,7 @@ func init() {
 	rootCmd.AddCommand(color.NewCommand())
 	rootCmd.AddCommand(job.NewCommand())
 	rootCmd.AddCommand(notification.NewCommand())
+	rootCmd.AddCommand(notify.NewCommand())
 	rootCmd.AddCommand(plugins.NewCommand())
 	rootCmd.AddCommand(profile.NewCommand())
 	rootCmd.AddCommand(prompt.NewCommand())

@@ -19,7 +19,6 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newListTypesCommand())
 	cmd.AddCommand(newMonitorCommand())
 	cmd.AddCommand(newUnsubscribeCommand())
-	cmd.AddCommand(newTestCommand())
 	cmd.AddCommand(newStatusCommand())
 
 	return cmd
@@ -55,7 +54,20 @@ type notificationTypeInfo struct {
 func validateNotificationType(notifType string) error {
 	types := getNotificationTypes()
 	if _, exists := types[notifType]; !exists {
-		return fmt.Errorf("unknown notification type: %s", notifType)
+		return fmt.Errorf("unknown notification type: %s\n\nAvailable types:\n%s\n\nRun 'it2 notification list-types' for detailed information", notifType, formatTypesList(types))
 	}
 	return nil
+}
+
+// formatTypesList returns a formatted string of notification types
+func formatTypesList(types map[string]notificationTypeInfo) string {
+	result := ""
+	for name, info := range types {
+		scope := "Global"
+		if info.sessionScoped {
+			scope = "Session"
+		}
+		result += fmt.Sprintf("  %-12s %-8s %s\n", name, scope, info.description)
+	}
+	return result
 }
