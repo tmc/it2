@@ -10,7 +10,10 @@ import (
 	pb "github.com/tmc/it2/proto"
 )
 
-const defaultStabilityDuration = 1 * time.Second
+// defaultStabilityDuration is set to 2.5s to work well with watch commands
+// which typically update every 2 seconds. The extra 0.5s buffer ensures we
+// capture output after a complete watch cycle.
+const defaultStabilityDuration = 2500 * time.Millisecond
 
 func newGetScreenCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
@@ -24,6 +27,9 @@ The --wait-for-stability flag enables polling mode where the command waits
 until the screen contents remain unchanged for the specified duration. This
 is useful for automation scenarios where you need to wait for command output
 to complete before capturing the screen.
+
+The default stability duration of 2.5s is optimized for watch commands which
+typically update every 2 seconds, ensuring capture after a complete cycle.
 
 Examples:
   # Get immediate screen contents
@@ -111,7 +117,7 @@ Examples:
 	// Add command-specific flags
 	cmd.Flags().Bool("color", false, "Include ANSI color codes in output")
 	cmd.Flags().Bool("escaped", false, "Show escape sequences as visible characters (like cat -v)")
-	cmd.Flags().Bool("wait-stable", false, "Wait for screen to stabilize with reasonable defaults (1s stability)")
+	cmd.Flags().Bool("wait-stable", false, "Wait for screen to stabilize with reasonable defaults (2.5s stability, works well with watch)")
 	cmd.Flags().Duration("wait-for-stability", 0, "Wait until screen contents remain unchanged (default: 1s when flag is present, 0 to disable)")
 	cmd.Flags().Duration("poll-interval", 200*time.Millisecond, "Interval between screen polls when waiting for stability")
 
