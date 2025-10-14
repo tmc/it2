@@ -125,9 +125,12 @@ Examples:
 	// Add command-specific flags
 	cmd.Flags().Bool("color", false, "Include ANSI color codes in output")
 	cmd.Flags().Bool("escaped", false, "Show escape sequences as visible characters (like cat -v)")
-	cmd.Flags().Duration("wait-stable", 0, "Wait for screen to stabilize (default: 2.5s if no value, 0 to disable). Shorthand for --wait-for-stability")
+	cmd.Flags().Duration("wait-stable", 0, "Wait for screen to stabilize with reasonable defaults (2.5s stability, works well with watch)")
 	cmd.Flags().Duration("wait-for-stability", 0, "Wait until screen contents remain unchanged (default: 1s when flag is present, 0 to disable)")
 	cmd.Flags().Duration("poll-interval", 200*time.Millisecond, "Interval between screen polls when waiting for stability")
+
+	// Make wait-stable accept optional value
+	cmd.Flags().Lookup("wait-stable").NoOptDefVal = "2.5s"
 
 	return cmd
 }
