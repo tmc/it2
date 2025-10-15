@@ -169,9 +169,10 @@ func NewCommand() *cobra.Command {
 	sendKeyCmd.GroupID = "interaction"
 	cmd.AddCommand(sendKeyCmd)
 
-	injectCmd := newInjectCommand()
-	injectCmd.GroupID = "interaction"
-	cmd.AddCommand(injectCmd)
+	// TODO: implement newInjectCommand
+	// injectCmd := newInjectCommand()
+	// injectCmd.GroupID = "interaction"
+	// cmd.AddCommand(injectCmd)
 
 	copyCmd := newCopyCommand()
 	copyCmd.GroupID = "interaction"
