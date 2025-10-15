@@ -131,8 +131,14 @@ func (s *SharedListOperations) ListTabs(opts SharedListOptions) error {
 		return fmt.Errorf("failed to list sessions: %w", err)
 	}
 
+	// Get the currently selected tab to mark it as active
+	selectedTabID := ""
+	if focusInfo, err := s.client.GetFocus(s.ctx); err == nil {
+		selectedTabID = focusInfo.TabId
+	}
+
 	// Build tab info from sessions
-	tabInfos := s.buildTabInfoFromSessions(sessions, opts.WindowID)
+	tabInfos := s.buildTabInfoFromSessions(sessions, opts.WindowID, selectedTabID)
 
 	// Apply plugin enrichment unless disabled
 	if !opts.SkipPlugins {
@@ -187,7 +193,7 @@ func (s *SharedListOperations) ListWindows(opts SharedListOptions) error {
 }
 
 // buildTabInfoFromSessions builds tab information from session data
-func (s *SharedListOperations) buildTabInfoFromSessions(sessions []*client.SessionInfo, windowID string) []*formatting.TabInfo {
+func (s *SharedListOperations) buildTabInfoFromSessions(sessions []*client.SessionInfo, windowID string, selectedTabID string) []*formatting.TabInfo {
 	tabMap := make(map[string]*formatting.TabInfo)
 
 	for _, session := range sessions {
@@ -204,13 +210,15 @@ func (s *SharedListOperations) buildTabInfoFromSessions(sessions []*client.Sessi
 			if title == "" && session.SessionName != "" {
 				title = session.SessionName
 			}
+			// Check if this tab is the selected one
+			isActive := (session.TabID == selectedTabID)
 			tabMap[key] = &formatting.TabInfo{
 				WindowID:     session.WindowID,
 				WindowNumber: int(session.WindowNumber),
 				TabID:        session.TabID,
 				Title:        title,
-				Position:     0,     // Position needs to be determined differently
-				Active:       false, // Will be determined by checking session focus
+				Position:     0,       // Position needs to be determined differently
+				Active:       isActive, // Set based on selected tab
 				Sessions:     []*client.SessionInfo{session},
 			}
 		} else {
