@@ -21,6 +21,7 @@ import (
 	"github.com/tmc/it2/internal/cmd/event"
 	"github.com/tmc/it2/internal/cmd/filepanel"
 	"github.com/tmc/it2/internal/cmd/focus"
+	"github.com/tmc/it2/internal/cmd/shortcuts"
 	"github.com/tmc/it2/internal/cmd/job"
 	"github.com/tmc/it2/internal/cmd/keyboard"
 	"github.com/tmc/it2/internal/cmd/lifecycle"
@@ -72,6 +73,9 @@ var rootCmd = &cobra.Command{
 session management, and advanced iTerm2 features.
 
 COMMAND GROUPS:
+
+Quick Access Commands
+  get-screen, get-buffer, split - Convenient shortcuts for common operations
 
 Core Operations
   app, session, tab, window - Control application and core UI elements
@@ -427,6 +431,7 @@ func init() {
 	rootCmd.RegisterFlagCompletionFunc("format", completion.FormatCompletion)
 
 	// Add command groups like GitHub CLI
+	rootCmd.AddGroup(&cobra.Group{ID: "shortcuts", Title: "Quick Access Commands"})
 	rootCmd.AddGroup(&cobra.Group{ID: "core", Title: "Core Operations"})
 	rootCmd.AddGroup(&cobra.Group{ID: "content", Title: "Content & Text"})
 	rootCmd.AddGroup(&cobra.Group{ID: "config", Title: "Configuration"})
@@ -437,6 +442,11 @@ func init() {
 	rootCmd.AddCommand(newCompletionCommand())
 	rootCmd.AddCommand(newConfigCommand())
 	rootCmd.AddCommand(newQuickstartCommand())
+
+	// Add shortcut commands (top-level shortcuts)
+	rootCmd.AddCommand(shortcuts.NewGetScreenCommand())
+	rootCmd.AddCommand(shortcuts.NewGetBufferCommand())
+	rootCmd.AddCommand(shortcuts.NewSplitCommand())
 
 	// Add organized command groups
 	rootCmd.AddCommand(app.NewCommand())
