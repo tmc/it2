@@ -95,8 +95,13 @@ func newFocusCommand() *cobra.Command {
 				}
 			}
 
-			// Then activate the session (with defaults for internal API flags)
-			_, err = sc.GetClient().ActivateSessionWithOptions(sc.GetContext(), sessionID, true, focusWindow, focusTab)
+			// Then activate the session
+			// By default, bring window to front and select tab for visible focus
+			// Unless explicitly disabled via flags
+			orderWindowFront := true
+			selectTab := true
+
+			_, err = sc.GetClient().ActivateSessionWithOptions(sc.GetContext(), sessionID, true, orderWindowFront, selectTab)
 			if err != nil {
 				return sc.ReportError("focus session", err)
 			}
