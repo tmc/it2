@@ -71,13 +71,16 @@ func (c *Client) CloseTabs(ctx context.Context, tabIDs []string, force bool) (*p
 
 // ActivateTab activates and optionally selects a tab
 func (c *Client) ActivateTab(ctx context.Context, tabID string, selectTab bool) (*pb.ActivateResponse, error) {
+	// Always bring window to front for tab activation to be visible
+	orderWindowFront := true
 	msg := &pb.ClientOriginatedMessage{
 		Submessage: &pb.ClientOriginatedMessage_ActivateRequest{
 			ActivateRequest: &pb.ActivateRequest{
 				Identifier: &pb.ActivateRequest_TabId{
 					TabId: tabID,
 				},
-				SelectTab: &selectTab,
+				OrderWindowFront: &orderWindowFront,
+				SelectTab:        &selectTab,
 			},
 		},
 	}
