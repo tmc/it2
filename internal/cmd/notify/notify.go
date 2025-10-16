@@ -50,6 +50,7 @@ func NewCommand() *cobra.Command {
 
 			// iTerm2 notification escape sequence: ESC ] 9 ; <message> BEL
 			// This posts a notification to macOS Notification Center
+			// Format: \x1b]9;<message>\x07
 			escapeSequence := fmt.Sprintf("\x1b]9;%s\x07", message)
 
 			// Inject the escape sequence into the session

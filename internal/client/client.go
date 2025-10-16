@@ -544,6 +544,14 @@ func (c *Client) InputAlert(ctx context.Context, prompt, title, defaultText stri
 	return c.InvokeFunction(ctx, invocation, nil, nil, nil, 10.0)
 }
 
+// PostNotification posts a notification to macOS Notification Center
+func (c *Client) PostNotification(ctx context.Context, message string) (interface{}, error) {
+	invocation := fmt.Sprintf("iterm2.notify(\"%s\")",
+		escapeJSONString(message))
+
+	return c.InvokeFunction(ctx, invocation, nil, nil, nil, 5.0)
+}
+
 // escapeJSONString escapes a string for safe inclusion in JSON
 func escapeJSONString(s string) string {
 	escaped := strings.ReplaceAll(s, "\\", "\\\\")
