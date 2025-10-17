@@ -177,3 +177,12 @@ func (d *Detector) TimeUntilMaxWait() time.Duration {
 	}
 	return d.config.MaxWait - elapsed
 }
+
+// MaxWaitReached returns true if the MaxWait timeout has been exceeded.
+// Returns false if MaxWait is not configured (0).
+func (d *Detector) MaxWaitReached() bool {
+	if d.config.MaxWait == 0 {
+		return false
+	}
+	return d.TimeSinceCreation() >= d.config.MaxWait
+}

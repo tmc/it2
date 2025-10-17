@@ -317,7 +317,11 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 				if !contentChanged {
 					// No change - check stability if enabled
 					if detector != nil && detector.IsStable() {
-						fmt.Fprintf(os.Stderr, "Buffer stable. Done tailing.\n")
+						if detector.MaxWaitReached() {
+							fmt.Fprintf(os.Stderr, "warning: max-wait timeout reached without full stability. Exiting.\n")
+						} else {
+							fmt.Fprintf(os.Stderr, "Buffer stable. Done tailing.\n")
+						}
 						return nil
 					}
 					continue
