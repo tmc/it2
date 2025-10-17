@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	pb "github.com/tmc/it2/proto"
 )
 
 func TestApplyTemplate(t *testing.T) {
@@ -238,6 +240,210 @@ func TestApplyTemplateErrorHandling(t *testing.T) {
 
 			if !strings.Contains(err.Error(), tt.wantErrorMsg) {
 				t.Errorf("applyTemplate() error = %q, want to contain %q", err.Error(), tt.wantErrorMsg)
+			}
+		})
+	}
+}
+
+func TestAnalyzeTextDelivery(t *testing.T) {
+	tests := []struct {
+		name     string
+		before   *pb.GetBufferResponse
+		after    *pb.GetBufferResponse
+		sentText string
+		want     string
+	}{
+		{
+			name: "text not delivered",
+			before: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("prompt $ ")},
+				},
+			},
+			after: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("prompt $ ")},
+				},
+			},
+			sentText: "echo hello",
+			want:     "none-sent",
+		},
+		{
+			name: "simple delivery without wrapping",
+			before: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("prompt $ ")},
+				},
+			},
+			after: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("prompt $ echo hello")},
+				},
+			},
+			sentText: "echo hello",
+			want:     "success",
+		},
+		{
+			name: "delivery with soft EOL wrapping",
+			before: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("prompt $ ")},
+				},
+			},
+			after: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("prompt $ ./cdp --use-profile Default --url 'https://notebooklm.google.com/notebo"), Continuation: pb.LineContents_CONTINUATION_SOFT_EOL.Enum()},
+					{Text: strPtr("ok/c77f3a10-3f33-4738-af59-29ed6f356972' --dump-network")},
+				},
+			},
+			sentText: "./cdp --use-profile Default --url 'https://notebooklm.google.com/notebook/c77f3a10-3f33-4738-af59-29ed6f356972' --dump-network",
+			want:     "success",
+		},
+		{
+			name: "delivery with multiple soft EOL wraps",
+			before: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("$ ")},
+				},
+			},
+			after: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("$ echo 'This is a very long text that wraps across multiple lines in a narrow termin"), Continuation: pb.LineContents_CONTINUATION_SOFT_EOL.Enum()},
+					{Text: strPtr("al window because it exceeds the terminal width and needs to continue on the next li"), Continuation: pb.LineContents_CONTINUATION_SOFT_EOL.Enum()},
+					{Text: strPtr("ne'")},
+				},
+			},
+			sentText: "echo 'This is a very long text that wraps across multiple lines in a narrow terminal window because it exceeds the terminal width and needs to continue on the next line'",
+			want:     "success",
+		},
+		{
+			name: "hard EOL preserved between commands",
+			before: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("$ echo first")},
+					{Text: strPtr("first")},
+					{Text: strPtr("$ ")},
+				},
+			},
+			after: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("$ echo first")},
+					{Text: strPtr("first")},
+					{Text: strPtr("$ echo second")},
+				},
+			},
+			sentText: "echo second",
+			want:     "success",
+		},
+		{
+			name: "partial delivery detection",
+			before: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("$ ")},
+				},
+			},
+			after: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("$ echo hello world")},
+				},
+			},
+			sentText: "echo hello world and more text that didn't appear",
+			want:     "partial",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := analyzeTextDelivery(tt.before, tt.after, tt.sentText, "test-session")
+			if got != tt.want {
+				t.Errorf("analyzeTextDelivery() = %q, want %q", got, tt.want)
+				// Debug output
+				beforeStr := formatScreenResponse(tt.before)
+				afterStr := formatScreenResponse(tt.after)
+				t.Logf("Before screen: %q", beforeStr)
+				t.Logf("After screen: %q", afterStr)
+				t.Logf("Sent text: %q", tt.sentText)
+			}
+		})
+	}
+}
+
+// strPtr returns a pointer to the given string
+func strPtr(s string) *string {
+	return &s
+}
+
+func TestFormatScreenResponse(t *testing.T) {
+	tests := []struct {
+		name string
+		resp *pb.GetBufferResponse
+		want string
+	}{
+		{
+			name: "nil response",
+			resp: nil,
+			want: "",
+		},
+		{
+			name: "single line",
+			resp: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("hello world")},
+				},
+			},
+			want: "hello world",
+		},
+		{
+			name: "multiple lines with hard EOL",
+			resp: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("line 1")},
+					{Text: strPtr("line 2")},
+					{Text: strPtr("line 3")},
+				},
+			},
+			want: "line 1\nline 2\nline 3",
+		},
+		{
+			name: "soft EOL wrapping",
+			resp: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("This is a long line that wrap"), Continuation: pb.LineContents_CONTINUATION_SOFT_EOL.Enum()},
+					{Text: strPtr("s to the next line")},
+				},
+			},
+			want: "This is a long line that wraps to the next line",
+		},
+		{
+			name: "mixed hard and soft EOL",
+			resp: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("$ echo 'Long text that wrap"), Continuation: pb.LineContents_CONTINUATION_SOFT_EOL.Enum()},
+					{Text: strPtr("s across lines'")},
+					{Text: strPtr("Long text that wraps across lines")},
+					{Text: strPtr("$ ")},
+				},
+			},
+			want: "$ echo 'Long text that wraps across lines'\nLong text that wraps across lines\n$ ",
+		},
+		{
+			name: "empty text lines",
+			resp: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("line 1")},
+					{Text: strPtr("")},
+					{Text: strPtr("line 3")},
+				},
+			},
+			want: "line 1\n\nline 3",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatScreenResponse(tt.resp)
+			if got != tt.want {
+				t.Errorf("formatScreenResponse() = %q, want %q", got, tt.want)
 			}
 		})
 	}

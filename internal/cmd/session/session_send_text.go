@@ -264,20 +264,22 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 		return "none-sent"
 	}
 
-	// Check if the sent text appears in the new screen content
-	if strings.Contains(afterStr, cleanSentText) {
-		// Full text found - success
-		return "success"
+	// Debug logging (enabled with IT2_DEBUG_DELIVERY=1)
+	if os.Getenv("IT2_DEBUG_DELIVERY") != "" {
+		fmt.Fprintf(os.Stderr, "\n[DEBUG] analyzeTextDelivery:\n")
+		fmt.Fprintf(os.Stderr, "  Sent: %q (%d chars)\n", truncate(cleanSentText, 80), len(cleanSentText))
+		fmt.Fprintf(os.Stderr, "  Screen: %q\n", truncate(afterStr, 150))
+		fmt.Fprintf(os.Stderr, "  Match: %v\n", strings.Contains(afterStr, cleanSentText))
+		if strings.Contains(afterStr, cleanSentText) {
+			fmt.Fprintf(os.Stderr, "  Position: %d\n", strings.Index(afterStr, cleanSentText))
+		}
 	}
 
-	// Handle wrapped text: remove all newlines and normalize whitespace
-	// This handles the case where text wraps across multiple lines in narrow terminals
-	afterStrNoWraps := strings.ReplaceAll(afterStr, "\n", " ")
-	afterStrNoWraps = strings.Join(strings.Fields(afterStrNoWraps), " ")
-	cleanSentTextNormalized := strings.Join(strings.Fields(cleanSentText), " ")
-
-	if strings.Contains(afterStrNoWraps, cleanSentTextNormalized) {
-		// Full text found after removing line wrapping - success
+	// Check if the sent text appears in the screen content
+	// The formatScreenResponse function now properly handles line wrapping using
+	// the continuation field, so wrapped lines are already joined without newlines
+	if strings.Contains(afterStr, cleanSentText) {
+		// Full text found - success
 		return "success"
 	}
 
@@ -323,20 +325,42 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 }
 
 // formatScreenResponse converts GetBufferResponse to string for comparison
+// It uses the continuation field to properly handle line wrapping:
+// - CONTINUATION_HARD_EOL (or default): real newline, join with \n
+// - CONTINUATION_SOFT_EOL: UI wrap, join without any separator
 func formatScreenResponse(resp *pb.GetBufferResponse) string {
 	if resp == nil {
 		return ""
 	}
 
-	var lines []string
-	for _, line := range resp.GetContents() {
+	var result strings.Builder
+	contents := resp.GetContents()
+
+	for i, line := range contents {
 		text := line.GetText()
-		if text != "" {
-			lines = append(lines, text)
+		result.WriteString(text)
+
+		// Add separator based on continuation type
+		if i < len(contents)-1 {
+			// Check if this line continues to the next (soft wrap)
+			if line.GetContinuation() == pb.LineContents_CONTINUATION_SOFT_EOL {
+				// Soft EOL: line wraps, no separator needed
+			} else {
+				// Hard EOL (or default): real newline
+				result.WriteString("\n")
+			}
 		}
 	}
 
-	return strings.Join(lines, "\n")
+	return result.String()
+}
+
+// truncate returns a truncated string if it exceeds maxLen
+func truncate(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen] + "..."
 }
 
 func newSendTextCommand() *cobra.Command {
