@@ -275,6 +275,15 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 		}
 	}
 
+	// Check for bracketed paste mode indicator
+	// When the shell has bracketed paste mode enabled, it shows "[Pasted text #N +X lines]"
+	// instead of the actual pasted content. We can't verify delivery in this case.
+	if strings.Contains(afterStr, "[Pasted text #") && strings.Contains(afterStr, "lines]") {
+		// Bracketed paste detected - we can't verify the actual text, but the paste indicator
+		// suggests the shell received input. Consider this a success since we can't do better.
+		return "success"
+	}
+
 	// Check if the sent text appears in the screen content
 	// The formatScreenResponse function now properly handles line wrapping using
 	// the continuation field, so wrapped lines are already joined without newlines
