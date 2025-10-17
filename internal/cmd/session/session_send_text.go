@@ -162,7 +162,7 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 				Delivered: true,
 			}
 		case "partial":
-			message := "Text partially delivered (some characters may be missing)"
+			message := "Text partially delivered (some characters may be missing); use 'it2 session get-screen' to check session state"
 			if opts.terminator != "" {
 				message += "; line terminator not sent"
 			}
