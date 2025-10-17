@@ -1,12 +1,16 @@
 package session
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/waitstable"
 )
 
 func newPromptCommand() *cobra.Command {
@@ -24,6 +28,15 @@ This command retrieves information about the current shell prompt including:
 
 Requires shell integration to be enabled in the session.
 
+Use --wait-stable to wait until the prompt stabilizes before retrieving metadata.
+This is useful for automation where you need to wait for a command to complete.
+
+Stability options:
+  --wait-stable                                 - Normal tolerance (2s), max-wait 10s
+  --wait-stable --wait-stable-tolerance=low    - Quick detection (500ms), max-wait 10s
+  --wait-stable --wait-stable-tolerance=high   - Lenient (5s), max-wait 10s
+  --wait-stable --wait-stable-max-wait=30s     - Normal tolerance (2s), but max 30s total
+
 Examples:
   # Get prompt info for current session
   $ it2 session prompt
@@ -33,6 +46,16 @@ Examples:
 
   # Get as JSON
   $ it2 session prompt --format json
+
+  # Wait until session stabilizes before getting prompt info (command finished)
+  $ it2 session prompt ABC12345 --wait-stable
+
+  # Quick detection with low tolerance
+  $ it2 session prompt ABC12345 --wait-stable --wait-stable-tolerance=low
+
+  # Wait for automation script completion
+  $ it2 session send-text ABC12345 "long-running-script.sh"
+  $ it2 session prompt ABC12345 --wait-stable --format json
 `,
 		Args:           cobra.MaximumNArgs(1),
 		RequiresClient: true,
@@ -46,13 +69,31 @@ Examples:
 			}
 
 			// Resolve session ID
-			sessionID, err := sc.GetClient().ResolveSessionID(sc.GetContext(), sessionID)
+			ctx := sc.GetContext()
+			sessionID, err := sc.GetClient().ResolveSessionID(ctx, sessionID)
 			if err != nil {
 				return sc.ReportError("resolve session ID", err)
 			}
 
+			// Get stability-related flags
+			waitStableEnabled, _ := sc.GetCommand().Flags().GetBool("wait-stable")
+			waitStableMaxWait, _ := sc.GetCommand().Flags().GetDuration("wait-stable-max-wait")
+			waitStableTolerance, _ := sc.GetCommand().Flags().GetString("wait-stable-tolerance")
+
+			// Wait for stability if enabled
+			if waitStableEnabled {
+				if err := waitForStablePrompt(ctx, sc, sessionID, waitstable.FlagOptions{
+					Enabled:   true,
+					Tolerance: waitStableTolerance,
+					MaxWait:   waitStableMaxWait,
+					Threshold: 100 * time.Millisecond,
+				}); err != nil {
+					return sc.ReportError("wait for stable prompt", err)
+				}
+			}
+
 			// Get prompt metadata
-			promptResp, err := sc.GetClient().GetPrompt(sc.GetContext(), sessionID)
+			promptResp, err := sc.GetClient().GetPrompt(ctx, sessionID)
 			if err != nil {
 				return sc.ReportError("get prompt", err)
 			}
@@ -147,5 +188,51 @@ Examples:
 		},
 	}
 
-	return cmdutil.NewCommandFromTemplate(template)
+	cmd := cmdutil.NewCommandFromTemplate(template)
+
+	// Stability detection flags
+	cmd.Flags().Bool("wait-stable", false, "Wait until prompt is stable (uses --wait-stable-tolerance for timing)")
+	cmd.Flags().Duration("wait-stable-max-wait", 10*time.Second, "Maximum total time to wait for stability (default: 10s). 0 for no limit")
+	cmd.Flags().String("wait-stable-tolerance", "normal", "Stability tolerance level: low (500ms), normal (2s), high (5s)")
+
+	return cmd
+}
+
+// waitForStablePrompt polls the prompt until it stabilizes
+func waitForStablePrompt(ctx context.Context, sc *cmdutil.StandardCommand, sessionID string, opts waitstable.FlagOptions) error {
+	config := opts.ComputeConfig()
+	if !opts.IsEnabled() {
+		return nil
+	}
+
+	detector := waitstable.New(config, nil)
+	ticker := time.NewTicker(opts.Threshold)
+	defer ticker.Stop()
+
+	lastState := ""
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+			// Get current prompt to check for changes
+			promptResp, err := sc.GetClient().GetPrompt(ctx, sessionID)
+			if err != nil {
+				return err
+			}
+
+			// Track state changes
+			currentState := promptResp.GetPromptState().String()
+			if currentState != lastState {
+				detector.RecordChange()
+				lastState = currentState
+			}
+
+			if detector.IsStable() {
+				fmt.Fprintf(os.Stderr, "Prompt stable. Retrieving prompt info.\n")
+				return nil
+			}
+		}
+	}
 }
