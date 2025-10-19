@@ -1,6 +1,7 @@
 package session
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/jqutil"
 )
 
 func newListCommand() *cobra.Command {
@@ -22,6 +24,21 @@ func newListCommand() *cobra.Command {
 			# List sessions in JSON format for scripting
 			$ it2 session list --format json
 
+			# Output only session IDs (quiet mode)
+			$ it2 session list -q
+
+			# Select specific JSON fields
+			$ it2 session list --json id,name,cwd
+
+			# Filter sessions with jq (requires --json)
+			$ it2 session list --json id,name --jq '.[] | select(.name | test("vim"))'
+
+			# Complex jq filter: wide vim sessions in /src
+			$ it2 session list --json name,cwd,grid_size --jq '.[] | select(.name | test("vim") and .grid_size.width > 120 and .cwd | test("/src"))'
+
+			# Format output with jq
+			$ it2 session list --json id,name --jq '.[] | "\(.id): \(.name)"'
+
 			# List sessions in a specific window
 			$ it2 session list --window-id 1
 
@@ -31,17 +48,8 @@ func newListCommand() *cobra.Command {
 			# Sort sessions by name
 			$ it2 session list --sort name
 
-			# Export session list for backup
-			$ it2 session list --format json > sessions-backup.json
-
-			# Output only session IDs (quiet mode)
-			$ it2 session list -q
-
 			# Use with xargs to send text to all sessions
 			$ it2 session list -q | xargs -n1 -I {} it2 session send-text {} "echo hello"
-
-			# Use partial IDs with quiet mode
-			$ it2 session list -q | cut -c1-8 | xargs -n1 -I {} it2 session send-text {} "test"
 
 			# Include buried sessions when needed
 			$ it2 session list --include-buried
@@ -73,6 +81,20 @@ func newListCommand() *cobra.Command {
 			// Get filter flags
 			windowID, _ := cmd.Flags().GetString("window-id")
 			tabID, _ := cmd.Flags().GetString("tab-id")
+
+			// Get --json and --jq flags
+			jsonFields, _ := cmd.Flags().GetString("json")
+			jqExpr, _ := cmd.Flags().GetString("jq")
+
+			// Validate: --jq requires --json
+			if jqExpr != "" && !cmd.Flags().Changed("json") {
+				return fmt.Errorf("cannot use --jq without specifying --json")
+			}
+
+			// If --json is specified, override format to json
+			if cmd.Flags().Changed("json") {
+				format = "json"
+			}
 
 			// Get no-hyperlinks flag
 			noHyperlinks, _ := cmd.Flags().GetBool("no-hyperlinks")
@@ -128,6 +150,10 @@ func newListCommand() *cobra.Command {
 	// Add filtering flags
 	cmd.Flags().String("window-id", "", "Filter sessions by window ID")
 	cmd.Flags().String("tab-id", "", "Filter sessions by tab ID")
+
+	// Add JSON and jq flags (GitHub CLI pattern)
+	cmd.Flags().String("json", "", "Output JSON with specified fields (comma-separated, or empty for all fields)")
+	cmd.Flags().String("jq", "", "Filter JSON output using a jq expression (requires --json)")
 
 	// Plugin control flags
 	cmd.Flags().String("plugins", "", "Regular expression of plugin names to run (case-sensitive)")
