@@ -40,7 +40,7 @@ func newListCommand() *cobra.Command {
 			$ it2 session list --json id,name --jq '.[] | "\(.id): \(.name)"'
 
 			# List sessions in a specific window
-			$ it2 session list --window-id 1
+			$ it2 session list --window 1
 
 			# List sessions with custom columns
 			$ it2 session list --columns id,name,title
@@ -78,9 +78,15 @@ func newListCommand() *cobra.Command {
 			scopeFlag, _ := cmd.Flags().GetString("scope")
 			cmdutil.PrintScopeNoticeWithFlag(format, scopeFlag)
 
-			// Get filter flags
-			windowID, _ := cmd.Flags().GetString("window-id")
-			tabID, _ := cmd.Flags().GetString("tab-id")
+			// Get filter flags (check both short and long forms)
+			windowID, _ := cmd.Flags().GetString("window")
+			if windowID == "" {
+				windowID, _ = cmd.Flags().GetString("window-id")
+			}
+			tabID, _ := cmd.Flags().GetString("tab")
+			if tabID == "" {
+				tabID, _ = cmd.Flags().GetString("tab-id")
+			}
 
 			// Get --json and --jq flags
 			jsonFields, _ := cmd.Flags().GetString("json")
@@ -148,8 +154,13 @@ func newListCommand() *cobra.Command {
 	cmd.Flags().Bool("reverse", false, "Reverse sort order (descending)")
 
 	// Add filtering flags
-	cmd.Flags().String("window-id", "", "Filter sessions by window ID")
-	cmd.Flags().String("tab-id", "", "Filter sessions by tab ID")
+	cmd.Flags().String("window", "", "Filter sessions by window ID")
+	cmd.Flags().String("tab", "", "Filter sessions by tab ID")
+	// Keep old flag names for backward compatibility (hidden)
+	cmd.Flags().String("window-id", "", "Filter sessions by window ID (deprecated, use --window)")
+	cmd.Flags().String("tab-id", "", "Filter sessions by tab ID (deprecated, use --tab)")
+	cmd.Flags().MarkHidden("window-id")
+	cmd.Flags().MarkHidden("tab-id")
 
 	// Add JSON and jq flags (GitHub CLI pattern)
 	cmd.Flags().String("json", "", "Output JSON with specified fields (comma-separated, or empty for all fields)")
@@ -173,6 +184,8 @@ func newListCommand() *cobra.Command {
 	cmd.Flags().MarkHidden("no-hyperlinks")
 
 	// Add completion functions
+	cmd.RegisterFlagCompletionFunc("window", completion.WindowIDCompletion)
+	cmd.RegisterFlagCompletionFunc("tab", completion.TabIDCompletion)
 	cmd.RegisterFlagCompletionFunc("window-id", completion.WindowIDCompletion)
 	cmd.RegisterFlagCompletionFunc("tab-id", completion.TabIDCompletion)
 
