@@ -302,28 +302,40 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 	}
 
 	// Check for partial delivery (at least some characters appeared)
+	// Calculate the difference between before and after screens to avoid false positives
+	// from responses that contain the same words as the input (e.g., Claude Code sessions)
+	diff := strings.Replace(afterStr, beforeStr, "", 1)
+
 	if len(cleanSentText) > 1 {
-		// Check if at least half the text appeared
+		// Check if at least half the text appeared in the NEW content (diff)
 		halfLength := len(cleanSentText) / 2
 		if halfLength > 0 {
 			prefix := cleanSentText[:halfLength]
 			suffix := cleanSentText[len(cleanSentText)-halfLength:]
 
-			if strings.Contains(afterStr, prefix) || strings.Contains(afterStr, suffix) {
+			if strings.Contains(diff, prefix) || strings.Contains(diff, suffix) {
 				return "partial"
 			}
 		}
 
-		// Check for individual words in longer text
+		// Check for individual words in longer text - BUT ONLY IN THE DIFF
+		// This avoids false positives where response text contains the same words as input
 		words := strings.Fields(cleanSentText)
 		if len(words) > 1 {
 			foundWords := 0
 			for _, word := range words {
-				if len(word) > 2 && strings.Contains(afterStr, word) {
+				// Require longer words (>3 chars) to reduce false matches on common words
+				if len(word) > 3 && strings.Contains(diff, word) {
 					foundWords++
 				}
 			}
-			if foundWords > 0 && foundWords < len(words) {
+			// Require at least 30% of words to be found to declare partial delivery
+			// This reduces false positives from coincidental word matches
+			threshold := len(words) / 3
+			if threshold < 1 {
+				threshold = 1
+			}
+			if foundWords >= threshold && foundWords < len(words) {
 				return "partial"
 			}
 		}
