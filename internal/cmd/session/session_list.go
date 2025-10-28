@@ -1,7 +1,6 @@
 package session
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
 
@@ -9,7 +8,6 @@ import (
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
-	"github.com/tmc/it2/internal/jqutil"
 )
 
 func newListCommand() *cobra.Command {
@@ -89,7 +87,7 @@ func newListCommand() *cobra.Command {
 			}
 
 			// Get --json and --jq flags
-			jsonFields, _ := cmd.Flags().GetString("json")
+			_, _ = cmd.Flags().GetString("json") // Keep flag registered but value unused
 			jqExpr, _ := cmd.Flags().GetString("jq")
 
 			// Validate: --jq requires --json
