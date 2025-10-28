@@ -320,20 +320,29 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 
 		// Check for individual words in longer text - BUT ONLY IN THE DIFF
 		// This avoids false positives where response text contains the same words as input
+		// We use the FIRST 2 LINES of the diff only to avoid matching words in responses
+		// (reduced from 5 to minimize false positives from fast AI responses)
+		diffLines := strings.Split(diff, "\n")
+		firstFewLines := diff
+		if len(diffLines) > 2 {
+			firstFewLines = strings.Join(diffLines[:2], "\n")
+		}
+
 		words := strings.Fields(cleanSentText)
 		if len(words) > 1 {
 			foundWords := 0
 			for _, word := range words {
 				// Require longer words (>3 chars) to reduce false matches on common words
-				if len(word) > 3 && strings.Contains(diff, word) {
+				if len(word) > 3 && strings.Contains(firstFewLines, word) {
 					foundWords++
 				}
 			}
-			// Require at least 30% of words to be found to declare partial delivery
-			// This reduces false positives from coincidental word matches
-			threshold := len(words) / 3
-			if threshold < 1 {
-				threshold = 1
+			// Require at least 70% of words to be found to declare partial delivery
+			// (increased from 30% to reduce false positives from coincidental word matches,
+			// especially in interactive sessions where responses may contain similar keywords)
+			threshold := (len(words) * 7) / 10
+			if threshold < 2 {
+				threshold = 2 // Require at least 2 words for partial detection
 			}
 			if foundWords >= threshold && foundWords < len(words) {
 				return "partial"
