@@ -167,6 +167,83 @@ it2 session list | less -S
 it2 --format yaml session list
 ```
 
+## send-text Delivery Issues
+
+### Problem: "Text partially delivered" warnings
+
+```
+⚠ Text partially delivered (some characters may be missing)
+```
+
+**Understanding exit codes:**
+- Exit 0: Success (text delivered and confirmed)
+- Exit 1: Error (connection failure, invalid arguments)
+- Exit 2: Partial delivery (some text delivered, retryable)
+- Exit 3: No delivery (session busy/modal, retryable)
+- Exit 4: Modal detected (not safe to send)
+
+**Solutions:**
+
+1. **Skip verification for speed (recommended for automation):**
+   ```bash
+   it2 session send-text SESSION_ID --skip-confirm "command"
+   ```
+
+2. **Enable automatic retry on transient failures:**
+   ```bash
+   it2 session send-text SESSION_ID --retry 3 --retry-delay 2s "command"
+   ```
+
+3. **Wait for session to be ready before sending:**
+   ```bash
+   it2 session send-text SESSION_ID --require is-at-prompt,has-no-partial-input "command"
+   ```
+
+4. **Debug delivery confirmation:**
+   ```bash
+   IT2_DEBUG_DELIVERY=1 it2 session send-text SESSION_ID "test"
+   ```
+   This shows exactly what text is being matched and why delivery confirmation succeeds or fails.
+
+5. **Combine strategies for reliable automation:**
+   ```bash
+   it2 session send-text SESSION_ID \
+     --require is-at-prompt \
+     --retry 3 \
+     --retry-delay 2s \
+     "make build"
+   ```
+
+**Note:** The "partially delivered" warning can be a false positive, especially with interactive sessions. If you're certain the text was delivered (check with `it2 session get-screen`), use `--skip-confirm` to bypass verification.
+
+### Problem: Text not appearing in session
+
+**Check session state:**
+```bash
+# Get current screen contents
+it2 session get-screen SESSION_ID
+
+# Check if session is at a prompt
+it2 session send-text SESSION_ID --require is-at-prompt --verbose "test"
+```
+
+**Common causes:**
+- Session has a modal dialog open (use `--require` preconditions)
+- Session is running a TUI application (vim, htop, etc.)
+- Session has partial input that conflicts with sent text
+
+**Solutions:**
+```bash
+# Wait for session to be ready
+it2 session send-text SESSION_ID --require has-no-partial-input "command"
+
+# Check for specific session states
+it2 session send-text SESSION_ID \
+  --require is-at-prompt,has-no-partial-input \
+  --require-timeout 30s \
+  "command"
+```
+
 ## Session Management Issues
 
 ### Problem: Session ID not found

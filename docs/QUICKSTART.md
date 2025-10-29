@@ -256,6 +256,25 @@ it2 auth request
 - **"Session not found"**: Session may have closed, check `it2 session list`
 - **Command not responding**: Try with shorter timeout: `--timeout 2s`
 
+### send-text Delivery Issues
+
+If you see "⚠ Text partially delivered" warnings:
+```bash
+# Skip verification for speed (no false positives)
+it2 session send-text SESSION_ID --skip-confirm "command"
+
+# Auto-retry on failures
+it2 session send-text SESSION_ID --retry 3 --retry-delay 2s "command"
+
+# Wait for session to be ready before sending
+it2 session send-text SESSION_ID --require is-at-prompt,has-no-partial-input "command"
+
+# Debug what's happening
+IT2_DEBUG_DELIVERY=1 it2 session send-text SESSION_ID "test"
+```
+
+Exit codes: 0=success, 1=error, 2=partial (retry), 3=busy (retry), 4=modal
+
 ## Shell Integration Setup
 
 For advanced features like command history and job monitoring:
