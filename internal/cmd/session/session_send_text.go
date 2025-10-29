@@ -387,7 +387,21 @@ Use --send-lf to send line feed (\\n) to move to new line without executing.
 Pre-conditions:
 The --require flag allows checking pre-conditions before sending text.
 This is useful for automation to ensure the session is ready.
-Multiple conditions can be specified and all must pass.`,
+Multiple conditions can be specified and all must pass.
+
+Exit Codes:
+  0 - Success (text delivered and confirmed)
+  1 - Error (connection failure, invalid arguments)
+  2 - Partial delivery (some text delivered, retryable with --retry)
+  3 - No delivery (session busy/modal, retryable with --retry)
+  4 - Modal detected (not safe to send)
+
+Troubleshooting:
+If you see "⚠ Text partially delivered" warnings:
+  1. Use --skip-confirm to bypass verification (faster, no false positives)
+  2. Use --retry 3 to automatically retry on transient failures
+  3. Use --require is-at-prompt,has-no-partial-input to ensure session is ready
+  4. Set IT2_DEBUG_DELIVERY=1 to see detailed delivery diagnostics`,
 		Example: cmdutil.Doc(`
 			# Send to specific session (full UUID)
 			$ it2 session send-text 7AA97682-C080-4D65-8C19-FDEF4669AA84 'hello world'
@@ -413,6 +427,15 @@ Multiple conditions can be specified and all must pass.`,
 
 			# Multiple conditions for Claude sessions
 			$ it2 session send-text 7AA9 --require is-claude-session,is-at-prompt,is-at-empty-prompt,has-no-queued-messages 'your command'
+
+			# Retry on transient failures (exits 2 or 3)
+			$ it2 session send-text 7AA9 --retry 3 --retry-delay 2s 'command'
+
+			# Skip confirmation for speed (when you don't need verification)
+			$ it2 session send-text 7AA9 --skip-confirm 'command'
+
+			# Debug delivery issues
+			$ IT2_DEBUG_DELIVERY=1 it2 session send-text 7AA9 'test'
 
 			# Send from file
 			$ it2 session send-text 7AA9 -f file.txt
