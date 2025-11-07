@@ -264,12 +264,13 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 }
 
 // analyzeTextDelivery compares before/after screen contents to determine delivery status
+// Uses a multi-level detection strategy to handle different terminal applications and UI formatting
 func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionID string) string {
 	// Convert responses to string format for comparison
 	beforeStr := formatScreenResponse(before)
 	afterStr := formatScreenResponse(after)
 
-	// Remove newlines/carriage returns from sent text for comparison
+	// Remove trailing newlines/carriage returns from sent text for comparison
 	cleanSentText := strings.TrimRight(strings.TrimRight(sentText, "\n"), "\r")
 
 	// If screen contents are identical, nothing was delivered
@@ -277,94 +278,192 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 		return "none-sent"
 	}
 
+	// Calculate the delta (what changed)
+	diff := strings.Replace(afterStr, beforeStr, "", 1)
+
 	// Debug logging (enabled with IT2_DEBUG_DELIVERY=1)
 	if os.Getenv("IT2_DEBUG_DELIVERY") != "" {
 		fmt.Fprintf(os.Stderr, "\n[DEBUG] analyzeTextDelivery:\n")
 		fmt.Fprintf(os.Stderr, "  Sent: %q (%d chars)\n", truncate(cleanSentText, 80), len(cleanSentText))
-		fmt.Fprintf(os.Stderr, "  Screen: %q\n", truncate(afterStr, 150))
-		fmt.Fprintf(os.Stderr, "  Match: %v\n", strings.Contains(afterStr, cleanSentText))
-		if strings.Contains(afterStr, cleanSentText) {
-			fmt.Fprintf(os.Stderr, "  Position: %d\n", strings.Index(afterStr, cleanSentText))
-		}
+		fmt.Fprintf(os.Stderr, "  Delta: %q (%d chars)\n", truncate(diff, 150), len(diff))
+		fmt.Fprintf(os.Stderr, "  Exact match: %v\n", strings.Contains(afterStr, cleanSentText))
 	}
 
 	// Check for bracketed paste mode indicator
-	// When the shell has bracketed paste mode enabled, it shows "[Pasted text #N +X lines]"
-	// instead of the actual pasted content. We can't verify delivery in this case.
 	if strings.Contains(afterStr, "[Pasted text #") && strings.Contains(afterStr, "lines]") {
-		// Bracketed paste detected - we can't verify the actual text, but the paste indicator
-		// suggests the shell received input. Consider this a success since we can't do better.
 		return "success"
 	}
 
-	// Check if the sent text appears in the screen content
-	// The formatScreenResponse function now properly handles line wrapping using
-	// the continuation field, so wrapped lines are already joined without newlines
+	// Level 1: Exact match (fastest path)
 	if strings.Contains(afterStr, cleanSentText) {
-		// Full text found - success
 		return "success"
 	}
 
-	// For very short text, be more lenient
-	if len(cleanSentText) <= 3 && len(cleanSentText) > 0 {
-		// For short text, check if it appears anywhere in the difference
-		diff := strings.Replace(afterStr, beforeStr, "", 1)
-		if strings.Contains(diff, cleanSentText) {
-			return "success"
+	// Level 2: Normalized match (handles minor whitespace differences)
+	normalizedSent := normalizeWhitespace(cleanSentText)
+	normalizedDiff := normalizeWhitespace(diff)
+	if strings.Contains(normalizedDiff, normalizedSent) {
+		if os.Getenv("IT2_DEBUG_DELIVERY") != "" {
+			fmt.Fprintf(os.Stderr, "  Normalized match: true\n")
+		}
+		return "success"
+	}
+
+	// Level 3: Line-by-line match for multi-line text
+	if strings.Contains(sentText, "\n") {
+		result := checkLineByLineMatch(diff, cleanSentText)
+		if result != "" {
+			if os.Getenv("IT2_DEBUG_DELIVERY") != "" {
+				fmt.Fprintf(os.Stderr, "  Line-by-line result: %s\n", result)
+			}
+			return result
 		}
 	}
 
-	// Check for partial delivery (at least some characters appeared)
-	// Calculate the difference between before and after screens to avoid false positives
-	// from responses that contain the same words as the input (e.g., Claude Code sessions)
-	diff := strings.Replace(afterStr, beforeStr, "", 1)
+	// Level 4: Word-based verification (handles UI formatting like Claude Code)
+	wordResult := checkWordBasedMatch(diff, cleanSentText)
+	if wordResult != "" {
+		if os.Getenv("IT2_DEBUG_DELIVERY") != "" {
+			fmt.Fprintf(os.Stderr, "  Word-based result: %s\n", wordResult)
+		}
+		return wordResult
+	}
 
-	if len(cleanSentText) > 1 {
-		// Check if at least half the text appeared in the NEW content (diff)
+	// Level 5: Partial delivery detection (prefix/suffix)
+	if len(cleanSentText) > 10 {
 		halfLength := len(cleanSentText) / 2
 		if halfLength > 0 {
 			prefix := cleanSentText[:halfLength]
 			suffix := cleanSentText[len(cleanSentText)-halfLength:]
 
 			if strings.Contains(diff, prefix) || strings.Contains(diff, suffix) {
-				return "partial"
-			}
-		}
-
-		// Check for individual words in longer text - BUT ONLY IN THE DIFF
-		// This avoids false positives where response text contains the same words as input
-		// We use the FIRST 2 LINES of the diff only to avoid matching words in responses
-		// (reduced from 5 to minimize false positives from fast AI responses)
-		diffLines := strings.Split(diff, "\n")
-		firstFewLines := diff
-		if len(diffLines) > 2 {
-			firstFewLines = strings.Join(diffLines[:2], "\n")
-		}
-
-		words := strings.Fields(cleanSentText)
-		if len(words) > 1 {
-			foundWords := 0
-			for _, word := range words {
-				// Require longer words (>3 chars) to reduce false matches on common words
-				if len(word) > 3 && strings.Contains(firstFewLines, word) {
-					foundWords++
+				if os.Getenv("IT2_DEBUG_DELIVERY") != "" {
+					fmt.Fprintf(os.Stderr, "  Partial (prefix/suffix) match: true\n")
 				}
-			}
-			// Require at least 70% of words to be found to declare partial delivery
-			// (increased from 30% to reduce false positives from coincidental word matches,
-			// especially in interactive sessions where responses may contain similar keywords)
-			threshold := (len(words) * 7) / 10
-			if threshold < 2 {
-				threshold = 2 // Require at least 2 words for partial detection
-			}
-			if foundWords >= threshold && foundWords < len(words) {
 				return "partial"
 			}
 		}
 	}
 
-	// Screen changed but sent text not found - could be command execution or other changes
+	// For very short text, be more lenient
+	if len(cleanSentText) <= 3 && len(cleanSentText) > 0 {
+		if strings.Contains(diff, cleanSentText) {
+			return "success"
+		}
+	}
+
+	// Screen changed but sent text not confirmed
 	return "none-sent"
+}
+
+// normalizeWhitespace normalizes whitespace for comparison
+func normalizeWhitespace(s string) string {
+	// Replace multiple spaces with single space
+	s = strings.Join(strings.Fields(s), " ")
+	// Normalize line endings
+	s = strings.ReplaceAll(s, "\r\n", "\n")
+	s = strings.ReplaceAll(s, "\r", "\n")
+	return s
+}
+
+// checkLineByLineMatch verifies multi-line text line by line
+func checkLineByLineMatch(screenDiff, sentText string) string {
+	lines := strings.Split(sentText, "\n")
+	if len(lines) <= 1 {
+		return ""
+	}
+
+	foundLines := 0
+	missingLines := 0
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue // Skip empty lines
+		}
+
+		// Check if this line appears in the diff (allows for indentation/formatting)
+		if strings.Contains(screenDiff, line) {
+			foundLines++
+		} else {
+			// Try normalized version
+			normalizedLine := normalizeWhitespace(line)
+			normalizedDiff := normalizeWhitespace(screenDiff)
+			if strings.Contains(normalizedDiff, normalizedLine) {
+				foundLines++
+			} else {
+				missingLines++
+			}
+		}
+	}
+
+	totalSignificantLines := foundLines + missingLines
+	if totalSignificantLines == 0 {
+		return ""
+	}
+
+	// All lines found = success
+	if missingLines == 0 {
+		return "success"
+	}
+
+	// Most lines found = partial
+	if foundLines >= totalSignificantLines/2 {
+		return "partial"
+	}
+
+	return ""
+}
+
+// checkWordBasedMatch verifies text by checking for significant words
+// This handles cases where UI formatting changes text layout (like Claude Code)
+func checkWordBasedMatch(screenDiff, sentText string) string {
+	words := strings.Fields(sentText)
+	if len(words) <= 2 {
+		return ""
+	}
+
+	// Filter for significant words (>3 chars)
+	significantWords := make([]string, 0)
+	for _, word := range words {
+		// Remove common punctuation
+		word = strings.Trim(word, ".,!?;:()")
+		if len(word) > 3 {
+			significantWords = append(significantWords, word)
+		}
+	}
+
+	if len(significantWords) == 0 {
+		return ""
+	}
+
+	// Count how many significant words appear in the diff
+	foundWords := 0
+	for _, word := range significantWords {
+		if strings.Contains(screenDiff, word) {
+			foundWords++
+		}
+	}
+
+	// Calculate percentage found
+	percentFound := (foundWords * 100) / len(significantWords)
+
+	if os.Getenv("IT2_DEBUG_DELIVERY") != "" {
+		fmt.Fprintf(os.Stderr, "  Word-based: %d/%d significant words found (%d%%)\n",
+			foundWords, len(significantWords), percentFound)
+	}
+
+	// 90%+ of significant words found = success
+	if percentFound >= 90 {
+		return "success"
+	}
+
+	// 60-89% of significant words found = partial
+	if percentFound >= 60 {
+		return "partial"
+	}
+
+	return ""
 }
 
 // formatScreenResponse converts GetBufferResponse to string for comparison
