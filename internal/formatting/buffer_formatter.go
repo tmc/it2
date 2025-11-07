@@ -133,6 +133,11 @@ func (f *Formatter) FormatBufferWithColors(resp *pb.GetBufferResponse) error {
 
 		fmt.Println(output.String())
 	}
+
+	// Ensure terminal formatting is reset after all output
+	// This prevents ANSI codes from bleeding into the calling session
+	fmt.Print("\033[0m")
+
 	return nil
 }
 
