@@ -22,7 +22,12 @@ func newSplitCommand() *cobra.Command {
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 If neither --horizontal nor --vertical is specified, automatically chooses based on
-session dimensions: vertical split when width > height, horizontal otherwise.`,
+session dimensions: vertical split when width > height, horizontal otherwise.
+
+NOTE: The new pane is positioned adjacent to the session being split. When splitting
+the same session twice, the second new pane appears next to the original session,
+not next to the first split. Use --before flag or split from newly created sessions
+to control positioning.`,
 		Example: cmdutil.Doc(`
 			# Split current session (auto-detects best direction)
 			$ it2 session split
@@ -41,6 +46,11 @@ session dimensions: vertical split when width > height, horizontal otherwise.`,
 
 			# Split and run a command in the new session
 			$ it2 session split --vertical --command "ssh vm1"
+
+			# Create left-right layout: use --before for left, default for right
+			$ LEFT=$(it2 session split --vertical --before)
+			$ RIGHT=$(it2 session split --vertical)
+			# Result: [LEFT] [ORIGINAL] [RIGHT]
 		`),
 		Args: cobra.RangeArgs(0, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -1,12 +1,15 @@
 package session
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/sessionid"
 	"github.com/tmc/it2/internal/waitstable"
 	pb "github.com/tmc/it2/proto"
 )
@@ -64,6 +67,18 @@ Examples:
 				return sc.ReportError("resolve session ID", err)
 			}
 
+			// Log session context
+			srcSessionID := sessionid.Normalize(os.Getenv("ITERM_SESSION_ID"))
+			srcShort := sessionid.Shorten(srcSessionID)
+			dstShort := sessionid.Shorten(sessionID)
+			fmt.Fprintf(os.Stderr, "[it2:get-screen src=%s dst=%s]\n", srcShort, dstShort)
+
+			// Check for self-read and warn
+			allowSelf, _ := sc.GetCommand().Flags().GetBool("allow-self")
+			if !allowSelf && srcSessionID != "" && srcSessionID == sessionID {
+				return fmt.Errorf("refusing to read screen from the same session (src=%s dst=%s); use --allow-self to override", srcShort, dstShort)
+			}
+
 			// Get command flags
 			colorized, _ := sc.GetCommand().Flags().GetBool("color")
 			escaped, _ := sc.GetCommand().Flags().GetBool("escaped")
@@ -115,11 +130,13 @@ Examples:
 	}
 
 	cmd := cmdutil.NewCommandFromTemplate(template)
+	cmd.SilenceUsage = true // Don't show usage for runtime errors
 
 	// Add command-specific flags
 	cmd.Flags().Bool("color", false, "Include ANSI color codes in output")
 	cmd.Flags().Bool("escaped", false, "Show escape sequences as visible characters (like cat -v)")
 	cmd.Flags().Duration("poll-interval", 200*time.Millisecond, "Interval between screen polls when waiting for stability")
+	cmd.Flags().Bool("allow-self", false, "Allow reading screen from the same session (disabled by default for safety)")
 
 	// Stability detection flags
 	cmd.Flags().Bool("wait-stable", false, "Wait until screen is stable (uses --wait-stable-tolerance for timing)")

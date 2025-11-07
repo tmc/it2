@@ -63,7 +63,7 @@ func (c *Client) ResolveSessionID(ctx context.Context, sessionID string) (string
 
 	switch len(matches) {
 	case 0:
-		return "", fmt.Errorf("no session found matching ID or prefix: %s", sessionID)
+		return "", fmt.Errorf("no session found matching ID or prefix '%s'; run 'it2 session list' to see available sessions", sessionID)
 	case 1:
 		return matches[0], nil
 	default:

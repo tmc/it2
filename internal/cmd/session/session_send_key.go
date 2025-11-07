@@ -10,13 +10,15 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/sessionid"
 	"github.com/tmc/it2/internal/utils"
 )
 
 func newSendKeyCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "send-key [<session-id>] <key>",
-		Short: "Send a special key to a session",
+		Use:          "send-key [<session-id>] <key>",
+		Short:        "Send a special key to a session",
+		SilenceUsage: true, // Don't show usage for runtime errors
 		Long: `Send a key or character to a session.
 
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
@@ -105,6 +107,18 @@ Supported special keys:
 				return fmt.Errorf("failed to resolve session ID: %w", err)
 			}
 
+			// Log session context
+			srcSessionID := sessionid.Normalize(os.Getenv("ITERM_SESSION_ID"))
+			srcShort := sessionid.Shorten(srcSessionID)
+			dstShort := sessionid.Shorten(sessionID)
+			fmt.Fprintf(os.Stderr, "[it2:send-key src=%s dst=%s]\n", srcShort, dstShort)
+
+			// Check for self-send unless explicitly allowed
+			allowSelf, _ := cmd.Flags().GetBool("allow-self")
+			if !allowSelf && srcSessionID != "" && srcSessionID == sessionID {
+				return fmt.Errorf("refusing to send key to the same session (src=%s dst=%s); use --allow-self to override", srcShort, dstShort)
+			}
+
 			// Prompt for confirmation if using implicit session ID and --confirm flag is set
 			confirm, _ := cmd.Flags().GetBool("confirm")
 			if confirm && !explicitSessionID {
@@ -148,6 +162,7 @@ Supported special keys:
 
 	cmd.Flags().Bool("no-broadcast", false, "Suppress broadcasting even if enabled")
 	cmd.Flags().Bool("confirm", false, "Prompt for confirmation when using implicit session ID ($ITERM_SESSION_ID)")
+	cmd.Flags().Bool("allow-self", false, "Allow sending key to the same session (disabled by default for safety)")
 
 	// Add scope support
 	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (none,window,tab,parents,siblings,peers,lineage)")

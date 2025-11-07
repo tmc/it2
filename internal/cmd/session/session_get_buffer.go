@@ -10,6 +10,7 @@ import (
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/sessionid"
 	"github.com/tmc/it2/internal/waitstable"
 )
 
@@ -116,6 +117,18 @@ Stability options:
 				return sc.ReportError("resolve session ID", err)
 			}
 
+			// Log session context
+			srcSessionID := sessionid.Normalize(os.Getenv("ITERM_SESSION_ID"))
+			srcShort := sessionid.Shorten(srcSessionID)
+			dstShort := sessionid.Shorten(sessionID)
+			fmt.Fprintf(os.Stderr, "[it2:get-buffer src=%s dst=%s]\n", srcShort, dstShort)
+
+			// Check for self-read and warn
+			allowSelf, _ := sc.GetCommand().Flags().GetBool("allow-self")
+			if !allowSelf && srcSessionID != "" && srcSessionID == sessionID {
+				return fmt.Errorf("refusing to read buffer from the same session (src=%s dst=%s); use --allow-self to override", srcShort, dstShort)
+			}
+
 			// Get buffer-specific flags
 			lines, _ := sc.GetCommand().Flags().GetInt32("lines")
 			lastLines, _ := sc.GetCommand().Flags().GetInt32("last")
@@ -179,12 +192,14 @@ Stability options:
 	}
 
 	cmd := cmdutil.NewCommandFromTemplate(template)
+	cmd.SilenceUsage = true // Don't show usage for runtime errors
 	cmd.Flags().Int32("lines", 10000, "Number of lines to retrieve")
 	cmd.Flags().Int32("last", 0, "Number of last lines to retrieve (alias for --lines)")
 	cmd.Flags().Bool("scrollback", false, "Include scrollback history")
 	cmd.Flags().Bool("color", false, "Include ANSI color codes in output")
 	cmd.Flags().Bool("escaped", false, "Show escape sequences as visible characters (like cat -v)")
 	cmd.Flags().Bool("include-empty-lines", false, "Include trailing empty/blank lines in output (default: strip them)")
+	cmd.Flags().Bool("allow-self", false, "Allow reading buffer from the same session (disabled by default for safety)")
 
 	// Stability detection flags
 	cmd.Flags().Bool("wait-stable", false, "Wait until buffer is stable (uses --wait-stable-tolerance for timing)")

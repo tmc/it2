@@ -19,6 +19,7 @@ import (
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/plugins"
+	"github.com/tmc/it2/internal/sessionid"
 	pb "github.com/tmc/it2/proto"
 )
 
@@ -80,6 +81,7 @@ type confirmationOptions struct {
 	format                string
 	maxRetries            int
 	retryDelay            time.Duration
+	allowSelf             bool
 }
 
 type sendTextInput struct {
@@ -105,6 +107,17 @@ type sendTextSettings struct {
 
 // sendTextWithConfirmation sends text and verifies receipt by checking screen contents
 func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, text string, opts confirmationOptions) error {
+	// Log session context to stderr in structured format
+	srcSessionID := sessionid.Normalize(os.Getenv("ITERM_SESSION_ID"))
+	srcShort := sessionid.Shorten(srcSessionID)
+	dstShort := sessionid.Shorten(sessionID)
+	fmt.Fprintf(os.Stderr, "[it2:send-text src=%s dst=%s]\n", srcShort, dstShort)
+
+	// Check for self-send unless explicitly allowed
+	if !opts.allowSelf && srcSessionID != "" && srcSessionID == sessionID {
+		return fmt.Errorf("refusing to send text to the same session (src=%s dst=%s); use --allow-self to override", srcShort, dstShort)
+	}
+
 	var lastResult DeliveryResult
 	delayBeforeCheck := opts.delayBeforeCheck
 	if delayBeforeCheck < 0 {
@@ -395,8 +408,9 @@ func truncate(s string, maxLen int) string {
 
 func newSendTextCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "send-text <session-id> <text>",
-		Short: "Send text to a session as if typed",
+		Use:          "send-text <session-id> <text>",
+		Short:        "Send text to a session as if typed",
+		SilenceUsage: true, // Don't show usage for runtime errors
 		Long: `Send text to a session as if typed.
 
 The session-id is required and can be a full UUID or partial ID (4+ characters).
@@ -410,9 +424,14 @@ The --require flag allows checking pre-conditions before sending text.
 This is useful for automation to ensure the session is ready.
 Multiple conditions can be specified and all must pass.
 
+Session Context Logging:
+  Each send-text command outputs a structured log line to stderr showing source and destination:
+    [it2:send-text src=<source-session-id> dst=<destination-session-id>]
+  This helps debug cross-session automation and prevents accidentally sending to the wrong session.
+
 Exit Codes:
   0 - Success (text delivered and confirmed)
-  1 - Error (connection failure, invalid arguments)
+  1 - Error (connection failure, invalid arguments, self-send without --allow-self)
   2 - Partial delivery (some text delivered, retryable with --retry)
   3 - No delivery (session busy/modal, retryable with --retry)
   4 - Modal detected (not safe to send)
@@ -494,9 +513,7 @@ If you see "⚠ Text partially delivered" warnings:
 			$ it2 session send-text 7AA9 --template '[{{.ShortID}}] {{.Content}}' "log message"
 		`),
 		Args: cobra.RangeArgs(1, 2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runSendText(cmd, args)
-		},
+		RunE: runSendText,
 	}
 
 	cmd.Flags().Bool("confirm", false, "Prompt for confirmation before sending text")
@@ -523,6 +540,7 @@ If you see "⚠ Text partially delivered" warnings:
 	cmd.Flags().Bool("skip-confirm", false, "Skip text delivery confirmation (confirmation is enabled by default)")
 	cmd.Flags().Int("retry", 0, "Number of retry attempts for failed deliveries (only retries on exit codes 2 and 3)")
 	cmd.Flags().Duration("retry-delay", 1*time.Second, "Delay between retry attempts")
+	cmd.Flags().Bool("allow-self", false, "Allow sending text to the same session (disabled by default for safety)")
 
 	// Add completion for session ID as first argument
 	cmd.ValidArgsFunction = completion.SessionIDCompletion
@@ -576,6 +594,7 @@ func runSendText(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	allowSelf, _ := cmd.Flags().GetBool("allow-self")
 	opts := confirmationOptions{
 		terminator:            settings.terminator,
 		delayBeforeTerminator: settings.delayBeforeTerm,
@@ -583,6 +602,7 @@ func runSendText(cmd *cobra.Command, args []string) error {
 		format:                settings.format,
 		maxRetries:            settings.retryCount,
 		retryDelay:            settings.retryDelay,
+		allowSelf:             allowSelf,
 	}
 
 	if !settings.skipConfirm {
@@ -773,6 +793,17 @@ func runPreconditions(cmd *cobra.Command, sessionID, text string, settings sendT
 }
 
 func sendWithoutConfirmation(ctx context.Context, c *client.Client, sessionID, text string, opts confirmationOptions) error {
+	// Log session context to stderr in structured format
+	srcSessionID := sessionid.Normalize(os.Getenv("ITERM_SESSION_ID"))
+	srcShort := sessionid.Shorten(srcSessionID)
+	dstShort := sessionid.Shorten(sessionID)
+	fmt.Fprintf(os.Stderr, "[it2:send-text src=%s dst=%s]\n", srcShort, dstShort)
+
+	// Check for self-send unless explicitly allowed
+	if !opts.allowSelf && srcSessionID != "" && srcSessionID == sessionID {
+		return fmt.Errorf("refusing to send text to the same session (src=%s dst=%s); use --allow-self to override", srcShort, dstShort)
+	}
+
 	if err := c.SendText(ctx, sessionID, text); err != nil {
 		return fmt.Errorf("failed to send text: %w", err)
 	}
