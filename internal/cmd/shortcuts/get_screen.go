@@ -7,13 +7,9 @@ import (
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
+	"github.com/tmc/it2/internal/waitstable"
 	pb "github.com/tmc/it2/proto"
 )
-
-// defaultStabilityDuration is set to 2.5s to work well with watch commands
-// which typically update every 2 seconds. The extra 0.5s buffer ensures we
-// capture output after a complete watch cycle.
-const defaultStabilityDuration = 2500 * time.Millisecond
 
 // newGetScreenCommandImpl creates the implementation of the top-level get-screen command.
 func newGetScreenCommandImpl() *cobra.Command {
@@ -23,7 +19,17 @@ func newGetScreenCommandImpl() *cobra.Command {
 		Long: `Get the current visible screen contents of a session without scrollback history.
 If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
 
-This is a convenience wrapper for 'it2 session get-screen'.`,
+This is a convenience wrapper for 'it2 session get-screen'.
+
+Use --wait-stable to wait until the screen contents stabilize before capturing.
+This is useful for automation scenarios where you need to wait for command output
+to complete before capturing the screen.
+
+Stability options:
+  --wait-stable                                 - Normal tolerance (2s), max-wait 10s
+  --wait-stable --wait-stable-tolerance=low    - Quick detection (500ms), max-wait 10s
+  --wait-stable --wait-stable-tolerance=high   - Lenient (5s), max-wait 10s
+  --wait-stable --wait-stable-max-wait=30s     - Normal tolerance (2s), but max 30s total`,
 		Example: cmdutil.Doc(`
 			# Get immediate screen contents
 			$ it2 get-screen
@@ -34,8 +40,14 @@ This is a convenience wrapper for 'it2 session get-screen'.`,
 			# Include color information
 			$ it2 get-screen --color
 
-			# Wait for screen to stabilize
+			# Wait for screen to stabilize (default 2s tolerance)
 			$ it2 get-screen --wait-stable
+
+			# Quick detection with low tolerance (500ms)
+			$ it2 get-screen --wait-stable --wait-stable-tolerance=low
+
+			# Wait with custom max timeout
+			$ it2 get-screen --wait-stable --wait-stable-max-wait=30s
 		`),
 		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,
@@ -56,31 +68,27 @@ This is a convenience wrapper for 'it2 session get-screen'.`,
 			// Get command flags
 			colorized, _ := sc.GetCommand().Flags().GetBool("color")
 			escaped, _ := sc.GetCommand().Flags().GetBool("escaped")
-			waitForStability, _ := sc.GetCommand().Flags().GetDuration("wait-for-stability")
-			waitFlag := sc.GetCommand().Flags().Lookup("wait-for-stability")
-			waitStable, _ := sc.GetCommand().Flags().GetDuration("wait-stable")
-			waitStableFlag := sc.GetCommand().Flags().Lookup("wait-stable")
 			pollInterval, _ := sc.GetCommand().Flags().GetDuration("poll-interval")
+
+			// Get stability-related flags
+			waitStableEnabled, _ := sc.GetCommand().Flags().GetBool("wait-stable")
+			waitStableMaxWait, _ := sc.GetCommand().Flags().GetDuration("wait-stable-max-wait")
+			waitStableTolerance, _ := sc.GetCommand().Flags().GetString("wait-stable-tolerance")
 
 			var resp *pb.GetBufferResponse
 
-			// If --wait-stable is set, use its value or default
-			if waitStableFlag.Changed {
-				if waitStable > 0 {
-					waitForStability = waitStable
-				} else {
-					waitForStability = defaultStabilityDuration
-				}
-			}
-
-			// If --wait-for-stability flag is present (even without explicit value), use default duration
-			if waitFlag.Changed && waitForStability == 0 {
-				waitForStability = defaultStabilityDuration
-			}
-
 			// Wait for stability if requested
-			if waitForStability > 0 {
-				resp, err = waitForStableScreen(sc, sessionID, waitForStability, pollInterval, colorized, escaped)
+			if waitStableEnabled {
+				opts := waitstable.FlagOptions{
+					Enabled:   true,
+					Tolerance: waitStableTolerance,
+					MaxWait:   waitStableMaxWait,
+					Threshold: pollInterval,
+				}
+				config := opts.ComputeConfig()
+				stabilityDuration := config.ComputeTimeout()
+
+				resp, err = waitForStableScreen(sc, sessionID, stabilityDuration, pollInterval, colorized, escaped)
 				if err != nil {
 					return sc.ReportError("wait for stable screen", err)
 				}
@@ -112,12 +120,12 @@ This is a convenience wrapper for 'it2 session get-screen'.`,
 	// Add command-specific flags
 	cmd.Flags().Bool("color", false, "Include ANSI color codes in output")
 	cmd.Flags().Bool("escaped", false, "Show escape sequences as visible characters (like cat -v)")
-	cmd.Flags().Duration("wait-stable", 0, "Wait for screen to stabilize with reasonable defaults (2.5s stability, works well with watch)")
-	cmd.Flags().Duration("wait-for-stability", 0, "Wait until screen contents remain unchanged (default: 1s when flag is present, 0 to disable)")
 	cmd.Flags().Duration("poll-interval", 200*time.Millisecond, "Interval between screen polls when waiting for stability")
 
-	// Make wait-stable accept optional value
-	cmd.Flags().Lookup("wait-stable").NoOptDefVal = "2.5s"
+	// Stability detection flags
+	cmd.Flags().Bool("wait-stable", false, "Wait until screen is stable (uses --wait-stable-tolerance for timing)")
+	cmd.Flags().Duration("wait-stable-max-wait", 10*time.Second, "Maximum total time to wait for stability (default: 10s). 0 for no limit")
+	cmd.Flags().String("wait-stable-tolerance", "normal", "Stability tolerance level: low (500ms), normal (2s), high (5s)")
 
 	// Mark this command as a helper
 	cmd.Annotations = map[string]string{
