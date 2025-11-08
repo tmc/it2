@@ -41,8 +41,10 @@ type AutomationNotEnabledError struct{}
 func (e *AutomationNotEnabledError) Error() string {
 	return `iTerm2 API automation is not enabled.
 
-To enable iTerm2 automation:
+To enable it programmatically:
+  it2 auth enable
 
+Or enable it manually:
   1. Open iTerm2 → Settings (⌘,)
   2. Go to General → Magic
   3. Check "Enable Python API"

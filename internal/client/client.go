@@ -144,9 +144,9 @@ func (c *Client) Connect(ctx context.Context) error {
 	conn, resp, err := dialer.DialContext(ctx, u.String(), headers)
 	if err != nil {
 		if resp != nil && resp.StatusCode == 401 {
-			return fmt.Errorf("authentication required: set ITERM2_COOKIE and ITERM2_KEY environment variables")
+			return fmt.Errorf("authentication required for URL %s: set ITERM2_COOKIE and ITERM2_KEY environment variables", c.url)
 		}
-		return c.formatConnectionError(fmt.Errorf("connection failed: %w", err))
+		return c.formatConnectionError(fmt.Errorf("connection failed (url: %s): %w", c.url, err))
 	}
 
 	c.conn = conn
@@ -173,9 +173,9 @@ func (c *Client) connectUnixSocket(ctx context.Context, socketPath string) error
 	conn, resp, err := dialer.DialContext(ctx, "ws://localhost/", headers)
 	if err != nil {
 		if resp != nil && resp.StatusCode == 401 {
-			return fmt.Errorf("authentication required: set ITERM2_COOKIE and ITERM2_KEY environment variables")
+			return fmt.Errorf("authentication required for socket %s: set ITERM2_COOKIE and ITERM2_KEY environment variables", socketPath)
 		}
-		return fmt.Errorf("unix socket connection failed: %w", err)
+		return fmt.Errorf("unix socket connection failed (path: %s): %w", socketPath, err)
 	}
 
 	c.conn = conn
