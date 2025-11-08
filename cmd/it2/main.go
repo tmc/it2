@@ -373,7 +373,6 @@ INTEGRATION WITH BD (BEADS)
     • Multi-session workflows with dependency tracking
 
   Example:
-    bd init --prefix it2
     SID=$(it2 session split --vertical)
     TASK=$(bd ready --json | jq -r '.[0].id')
     bd update $TASK --assignee "$SID" --status in_progress
