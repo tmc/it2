@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func newMonitorCommand() *cobra.Command {
@@ -37,6 +39,7 @@ The command will run until interrupted (Ctrl+C).`,
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 			followPrompts, _ := cmd.Flags().GetBool("follow-prompts")
 			includeOutput, _ := cmd.Flags().GetBool("include-output")
+			verbose, _ := cmd.Flags().GetBool("verbose")
 
 			// Default event types if none specified
 			if len(eventTypes) == 0 {
@@ -121,7 +124,7 @@ The command will run until interrupted (Ctrl+C).`,
 						}
 						return nil
 					}
-					if err := handlePromptNotification(ctx, c, promptNotif, jsonOutput, includeOutput); err != nil {
+					if err := handlePromptNotification(ctx, c, promptNotif, jsonOutput, includeOutput, verbose); err != nil {
 						fmt.Fprintf(os.Stderr, "Error handling prompt notification: %v\n", err)
 					}
 				}
@@ -133,10 +136,38 @@ The command will run until interrupted (Ctrl+C).`,
 	cmd.Flags().Bool("json", false, "Output events as JSON")
 	cmd.Flags().Bool("follow-prompts", false, "Monitor only prompt events (shortcut for --events=prompt)")
 	cmd.Flags().Bool("include-output", false, "Include command output in prompt events (requires --json)")
+	cmd.Flags().BoolP("verbose", "v", false, "Output complete raw protobuf notification as JSON")
 	return cmd
 }
 
-func handlePromptNotification(ctx context.Context, c *client.Client, notif *pb.PromptNotification, jsonOutput bool, includeOutput bool) error {
+func handlePromptNotification(ctx context.Context, c *client.Client, notif *pb.PromptNotification, jsonOutput bool, includeOutput bool, verbose bool) error {
+	// If verbose mode, output the complete raw protobuf as JSON
+	if verbose {
+		marshaler := protojson.MarshalOptions{
+			Multiline:       false,
+			Indent:          "",
+			EmitUnpopulated: true,
+		}
+		jsonBytes, err := marshaler.Marshal(notif)
+		if err != nil {
+			return fmt.Errorf("failed to marshal notification: %w", err)
+		}
+
+		// Pretty-print or add metadata wrapper
+		var rawEvent map[string]interface{}
+		if err := json.Unmarshal(jsonBytes, &rawEvent); err != nil {
+			return fmt.Errorf("failed to unmarshal for wrapping: %w", err)
+		}
+
+		// Add timestamp to the raw event
+		wrapper := map[string]interface{}{
+			"timestamp": time.Now().Format(time.RFC3339),
+			"raw_event": rawEvent,
+		}
+
+		return formatting.PrintJSON(wrapper)
+	}
+
 	if jsonOutput {
 		event := map[string]interface{}{
 			"type":       "prompt",
