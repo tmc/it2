@@ -82,7 +82,7 @@ func newRestartCommand() *cobra.Command {
 	cmd.Flags().Bool("only-if-exited", false, "Only restart the session if it has already exited")
 
 	// Add scope support
-	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (none,window,tab,parents,siblings,peers,lineage)")
+	cmd.Flags().String("scope", "", "Filter sessions by scope (default: all sessions). Options: none, window, tab, parents, siblings, peers, lineage. Overrides IT2_SCOPE env var.")
 	cmd.Flags().Bool("dry-run", false, "Show what would be affected without executing")
 	cmd.Flags().Bool("stop-on-error", false, "Stop on first error instead of continuing")
 

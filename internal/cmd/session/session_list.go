@@ -16,7 +16,7 @@ func newListCommand() *cobra.Command {
 		Short: "List all iTerm2 sessions",
 		Long:  `List iTerm2 sessions with optional filtering and output customization.`,
 		Example: cmdutil.Doc(`
-			# List all sessions in table format
+			# List all sessions in table format (default: all sessions)
 			$ it2 session list
 
 			# List sessions in JSON format for scripting
@@ -28,6 +28,12 @@ func newListCommand() *cobra.Command {
 			# Select specific JSON fields
 			$ it2 session list --json id,name,cwd
 
+			# Scope filtering - only sessions in current window
+			$ it2 session list --scope window
+
+			# Scope filtering - only sessions in current tab
+			$ it2 session list --scope tab
+
 			# Filter sessions with jq (requires --json)
 			$ it2 session list --json id,name --jq '.[] | select(.name | test("vim"))'
 
@@ -37,7 +43,7 @@ func newListCommand() *cobra.Command {
 			# Format output with jq
 			$ it2 session list --json id,name --jq '.[] | "\(.id): \(.name)"'
 
-			# List sessions in a specific window
+			# List sessions in a specific window (by window ID)
 			$ it2 session list --window 1
 
 			# List sessions with custom columns
@@ -169,7 +175,7 @@ func newListCommand() *cobra.Command {
 	cmd.Flags().Bool("no-plugins", false, "Disable plugin enrichment")
 
 	// Add scope support for session filtering
-	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (none,window,tab,parents,siblings,peers,lineage)")
+	cmd.Flags().String("scope", "", "Filter sessions by scope (default: all sessions). Options: none, window, tab, parents, siblings, peers, lineage. Overrides IT2_SCOPE env var.")
 
 	// Add quiet flag
 	cmd.Flags().BoolP("quiet", "q", false, "Output only session IDs")

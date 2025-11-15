@@ -39,11 +39,16 @@ cat /tmp/session_groups.json | jq -c '.[]' | while read -r group; do
     anchor="${sessions[0]}"
     echo "Anchor (oldest): $anchor"
 
-    # Move all other sessions to split with anchor (maintaining time order)
+    # Move all other sessions to vertical splits with anchor (maintaining time order)
+    # Using vertical splits to maximize usable width and avoid crowding
+    # Note: iTerm2's session move doesn't support custom split fractions,
+    # it uses equal splits. For better control, you may need to manually adjust
+    # pane sizes after running this script.
     for ((i=1; i<${#sessions[@]}; i++)); do
         sid="${sessions[$i]}"
-        echo "Moving session $i: $sid to split with $anchor"
-        it2 session move "$sid" "$anchor" --quiet || {
+        echo "Moving session $i: $sid to vertical split with $anchor"
+
+        it2 session move "$sid" "$anchor" --vertical --quiet || {
             echo "Warning: Failed to move $sid, continuing..."
         }
     done

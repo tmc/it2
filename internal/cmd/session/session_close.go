@@ -112,7 +112,7 @@ func newCloseCommand() *cobra.Command {
 	cmd.Flags().Bool("force", false, "Force close the session without prompting")
 
 	// Add scope support
-	cmd.Flags().String("scope", "", "Override IT2_SCOPE env var (none,window,tab,parents,siblings,peers,lineage)")
+	cmd.Flags().String("scope", "", "Filter sessions by scope (default: all sessions). Options: none, window, tab, parents, siblings, peers, lineage. Overrides IT2_SCOPE env var.")
 	cmd.Flags().Bool("dry-run", false, "Show what would be affected without executing")
 	cmd.Flags().Bool("stop-on-error", false, "Stop on first error instead of continuing")
 

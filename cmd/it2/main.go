@@ -45,6 +45,7 @@ import (
 	"github.com/tmc/it2/internal/cmd/window"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/config"
+	"github.com/tmc/it2/internal/suggestions"
 )
 
 var (
@@ -58,6 +59,9 @@ var (
 var rootCmd = &cobra.Command{
 	Use:   "it2",
 	Short: "Comprehensive command-line interface for iTerm2 automation",
+	// Disable Cobra's built-in suggestions to use our own
+	DisableSuggestions: true,
+	SilenceErrors:      true, // Handle errors ourselves
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// Set IT2_PLUGIN_PATHS environment variable from flag
 		if len(pluginPaths) > 0 {
@@ -530,6 +534,28 @@ func init() {
 
 func main() {
 	if err := rootCmd.Execute(); err != nil {
+		errMsg := err.Error()
+
+		// Print the base error message
+		fmt.Fprintf(os.Stderr, "Error: %s\n", errMsg)
+
+		// Check if this is an unknown command error and provide suggestions
+		if strings.Contains(errMsg, "unknown command") {
+			// Extract the invalid command from the error message
+			// Error format: 'unknown command "COMMAND" for "it2"'
+			if startIdx := strings.Index(errMsg, `"`); startIdx != -1 {
+				endIdx := strings.Index(errMsg[startIdx+1:], `"`)
+				if endIdx != -1 {
+					invalidCmd := errMsg[startIdx+1 : startIdx+1+endIdx]
+					similarCmds := suggestions.FindSimilarCommands(rootCmd, invalidCmd)
+					if suggestMsg := suggestions.FormatSuggestions(invalidCmd, similarCmds); suggestMsg != "" {
+						fmt.Fprint(os.Stderr, suggestMsg)
+					}
+				}
+			}
+		}
+
+		fmt.Fprintln(os.Stderr, "Run 'it2 --help' for usage.")
 		os.Exit(1)
 	}
 }

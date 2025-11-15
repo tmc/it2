@@ -32,14 +32,6 @@ func NewCommand() *cobra.Command {
 	})
 
 	// Buffer Operations
-	getBufferCmd := newGetBufferAliasCommand()
-	getBufferCmd.GroupID = "buffer"
-	cmd.AddCommand(getBufferCmd)
-
-	getScreenCmd := newGetScreenCommand()
-	getScreenCmd.GroupID = "buffer"
-	cmd.AddCommand(getScreenCmd)
-
 	getContentsCmd := newGetContentsCommand()
 	getContentsCmd.GroupID = "buffer"
 	cmd.AddCommand(getContentsCmd)
@@ -79,10 +71,6 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(highlightCmd)
 
 	// Content Interaction
-	sendCmd := newSendCommand()
-	sendCmd.GroupID = "interaction"
-	cmd.AddCommand(sendCmd)
-
 	injectCmd := newInjectCommand()
 	injectCmd.GroupID = "interaction"
 	cmd.AddCommand(injectCmd)

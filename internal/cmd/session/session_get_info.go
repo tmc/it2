@@ -26,15 +26,37 @@ func newGetInfoCommand() *cobra.Command {
   - Current prompt information (if Shell Integration enabled)
   - Process information
 
+Session ID can be:
+  - Omitted (uses current session from $ITERM_SESSION_ID)
+  - Full UUID
+  - Partial ID (minimum 4 characters)
+
 This command combines multiple API calls to provide a complete view of the session.`,
-		Example: `  # Basic Usage
+		Example: `  # Basic Usage (defaults to current session)
 
   it2 session get-info
-  it2 session get-info sess_abc123
 
-  # Output Formats
+  # Using full session ID
+  it2 session get-info 7AA97682-C080-4D65-8C19-FDEF4669AA84
 
-  it2 session get-info --format json`,
+  # Using partial session ID (4+ characters)
+  it2 session get-info 7aa9
+  it2 session get-info 6b1a4c
+
+  # Output Formats (default: text)
+
+  it2 session get-info --format json
+  it2 session get-info --format yaml
+
+  # Include session properties
+  it2 session get-info --properties
+
+  # Include prompt information
+  it2 session get-info --prompt
+
+  # Extract specific fields
+  it2 session get-info --extract name
+  it2 session get-info --extract grid_size.width`,
 		Args: cobra.RangeArgs(0, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID string

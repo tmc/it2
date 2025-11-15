@@ -472,10 +472,31 @@ func printPromptInfo(promptResp *pb.GetPromptResponse, format string) {
 			"prompt_state":      promptResp.GetPromptState().String(),
 			"working_directory": promptResp.GetWorkingDirectory(),
 			"command":           promptResp.GetCommand(),
+			"unique_prompt_id":  promptResp.GetUniquePromptId(),
 		}
 
 		if promptResp.GetPromptState().String() == "FINISHED" {
 			data["exit_status"] = promptResp.GetExitStatus()
+		}
+
+		// Add coordinate ranges if available
+		if pr := promptResp.GetPromptRange(); pr != nil {
+			data["prompt_range"] = map[string]interface{}{
+				"start": map[string]interface{}{"x": pr.GetStart().GetX(), "y": pr.GetStart().GetY()},
+				"end":   map[string]interface{}{"x": pr.GetEnd().GetX(), "y": pr.GetEnd().GetY()},
+			}
+		}
+		if cr := promptResp.GetCommandRange(); cr != nil {
+			data["command_range"] = map[string]interface{}{
+				"start": map[string]interface{}{"x": cr.GetStart().GetX(), "y": cr.GetStart().GetY()},
+				"end":   map[string]interface{}{"x": cr.GetEnd().GetX(), "y": cr.GetEnd().GetY()},
+			}
+		}
+		if or := promptResp.GetOutputRange(); or != nil {
+			data["output_range"] = map[string]interface{}{
+				"start": map[string]interface{}{"x": or.GetStart().GetX(), "y": or.GetStart().GetY()},
+				"end":   map[string]interface{}{"x": or.GetEnd().GetX(), "y": or.GetEnd().GetY()},
+			}
 		}
 
 		jsonData, err := json.Marshal(data)
@@ -489,18 +510,31 @@ func printPromptInfo(promptResp *pb.GetPromptResponse, format string) {
 	state := promptResp.GetPromptState().String()
 	cmd := promptResp.GetCommand()
 	cwd := promptResp.GetWorkingDirectory()
+	promptID := promptResp.GetUniquePromptId()
 
 	switch state {
 	case "EDITING":
-		fmt.Fprintf(os.Stderr, "→ [EDITING] %s\n", cwd)
+		fmt.Fprintf(os.Stderr, "→ [EDITING] %s", cwd)
+		if promptID != "" {
+			fmt.Fprintf(os.Stderr, " (id: %s)", promptID)
+		}
+		fmt.Fprintln(os.Stderr)
 	case "RUNNING":
-		fmt.Fprintf(os.Stderr, "→ [RUNNING] %s (cwd: %s)\n", cmd, cwd)
+		fmt.Fprintf(os.Stderr, "→ [RUNNING] %s (cwd: %s)", cmd, cwd)
+		if promptID != "" {
+			fmt.Fprintf(os.Stderr, " (id: %s)", promptID)
+		}
+		fmt.Fprintln(os.Stderr)
 	case "FINISHED":
 		exitStatus := promptResp.GetExitStatus()
 		statusIcon := "✓"
 		if exitStatus != 0 {
 			statusIcon = "✗"
 		}
-		fmt.Fprintf(os.Stderr, "→ [FINISHED] %s %s (exit: %d, cwd: %s)\n", statusIcon, cmd, exitStatus, cwd)
+		fmt.Fprintf(os.Stderr, "→ [FINISHED] %s %s (exit: %d, cwd: %s)", statusIcon, cmd, exitStatus, cwd)
+		if promptID != "" {
+			fmt.Fprintf(os.Stderr, " (id: %s)", promptID)
+		}
+		fmt.Fprintln(os.Stderr)
 	}
 }
