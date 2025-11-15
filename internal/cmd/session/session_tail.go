@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
@@ -15,6 +16,7 @@ import (
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/formatting"
 	"github.com/tmc/it2/internal/waitstable"
+	pb "github.com/tmc/it2/proto"
 )
 
 func newTailCommand() *cobra.Command {
@@ -113,6 +115,7 @@ Stability options (when using --wait-stable):
 			grepInvert, _ := sc.GetCommand().Flags().GetString("grep-v")
 			ignoreCase, _ := sc.GetCommand().Flags().GetBool("ignore-case")
 			outputOnly, _ := sc.GetCommand().Flags().GetBool("output-only")
+			showPrompts, _ := sc.GetCommand().Flags().GetBool("show-prompts")
 			waitStableEnabled, _ := sc.GetCommand().Flags().GetBool("wait-stable")
 			waitStableMaxWait, _ := sc.GetCommand().Flags().GetDuration("wait-stable-max-wait")
 			waitStableTolerance, _ := sc.GetCommand().Flags().GetString("wait-stable-tolerance")
@@ -175,6 +178,7 @@ Stability options (when using --wait-stable):
 				grepPattern:           grepRE,
 				grepInvert:            grepInvertRE,
 				outputOnly:            outputOnly,
+				showPrompts:           showPrompts,
 				waitStableDuration:    waitStableDuration,
 				waitStableMaxWait:     waitStableMaxWait,
 				waitStableTolerance:   waitStableTolerance,
@@ -192,6 +196,7 @@ Stability options (when using --wait-stable):
 	cmd.Flags().String("grep-v", "", "Only show lines NOT matching this pattern")
 	cmd.Flags().BoolP("ignore-case", "i", false, "Case-insensitive pattern matching")
 	cmd.Flags().Bool("output-only", false, "Hide command echoes and prompts, show only output")
+	cmd.Flags().Bool("show-prompts", false, "Show prompt metadata (command, exit status, working directory)")
 	cmd.Flags().Bool("wait-stable", false, "Wait until buffer is stable (uses --wait-stable-tolerance for timing)")
 	cmd.Flags().Duration("wait-stable-max-wait", 10*time.Second, "Maximum total time to wait for stability (default: 10s). 0 for no limit")
 	cmd.Flags().String("wait-stable-tolerance", "normal", "Stability tolerance level: low (500ms), normal (2s), high (5s)")
@@ -206,6 +211,7 @@ type tailOptions struct {
 	grepPattern           *regexp.Regexp
 	grepInvert            *regexp.Regexp
 	outputOnly            bool
+	showPrompts           bool
 	waitStableDuration    time.Duration
 	waitStableMaxWait     time.Duration
 	waitStableTolerance   string
@@ -255,6 +261,7 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 	// This approach is more robust against dynamic prompts
 	var lastLines []string
 	var lastLineCount int
+	var lastPromptState string
 
 	// Setup stability detector if enabled
 	var detector *waitstable.Detector
@@ -273,6 +280,19 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
+			// Get prompt metadata if enabled
+			if opts.showPrompts {
+				promptResp, err := sc.GetClient().GetPrompt(ctx, sessionID)
+				if err == nil && promptResp.GetStatus().String() == "OK" {
+					currentState := promptResp.GetPromptState().String()
+					// Only print prompt info when state changes
+					if currentState != lastPromptState {
+						printPromptInfo(promptResp, sc.GetFlags().Format)
+						lastPromptState = currentState
+					}
+				}
+			}
+
 			// Get current buffer (last 100 lines should be enough for most cases)
 			resp, err := sc.GetClient().GetBufferWithStyles(ctx, sessionID, 100, opts.colorized)
 			if err != nil {
@@ -443,4 +463,44 @@ func printLine(line string, opts tailOptions) {
 
 	// Print the line
 	fmt.Println(line)
+}
+
+// printPromptInfo prints prompt metadata in the requested format
+func printPromptInfo(promptResp *pb.GetPromptResponse, format string) {
+	if format == "json" {
+		data := map[string]interface{}{
+			"prompt_state":      promptResp.GetPromptState().String(),
+			"working_directory": promptResp.GetWorkingDirectory(),
+			"command":           promptResp.GetCommand(),
+		}
+
+		if promptResp.GetPromptState().String() == "FINISHED" {
+			data["exit_status"] = promptResp.GetExitStatus()
+		}
+
+		jsonData, err := json.Marshal(data)
+		if err == nil {
+			fmt.Println(string(jsonData))
+		}
+		return
+	}
+
+	// Text format
+	state := promptResp.GetPromptState().String()
+	cmd := promptResp.GetCommand()
+	cwd := promptResp.GetWorkingDirectory()
+
+	switch state {
+	case "EDITING":
+		fmt.Fprintf(os.Stderr, "→ [EDITING] %s\n", cwd)
+	case "RUNNING":
+		fmt.Fprintf(os.Stderr, "→ [RUNNING] %s (cwd: %s)\n", cmd, cwd)
+	case "FINISHED":
+		exitStatus := promptResp.GetExitStatus()
+		statusIcon := "✓"
+		if exitStatus != 0 {
+			statusIcon = "✗"
+		}
+		fmt.Fprintf(os.Stderr, "→ [FINISHED] %s %s (exit: %d, cwd: %s)\n", statusIcon, cmd, exitStatus, cwd)
+	}
 }
