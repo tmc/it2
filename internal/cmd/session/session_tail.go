@@ -242,13 +242,22 @@ func getBufferLines(sc *cmdutil.StandardCommand, sessionID string, lines int32, 
 	// In JSON format, output each line as a JSON object
 	if format == "json" {
 		contents := resp.GetContents()
-		for _, line := range contents {
-			data := map[string]interface{}{
-				"type":    "output",
-				"content": line.GetText(),
-			}
-			if jsonData, err := json.Marshal(data); err == nil {
-				fmt.Println(string(jsonData))
+		// Join soft-wrapped lines
+		var currentLine string
+		for i, line := range contents {
+			currentLine += line.GetText()
+			// Check if this line is soft-wrapped (continues on next line)
+			isSoftWrap := line.GetContinuation().String() == "CONTINUATION_SOFT_EOL"
+			// Output the line if it's not soft-wrapped or if it's the last line
+			if !isSoftWrap || i == len(contents)-1 {
+				data := map[string]interface{}{
+					"type":    "output",
+					"content": currentLine,
+				}
+				if jsonData, err := json.Marshal(data); err == nil {
+					fmt.Println(string(jsonData))
+				}
+				currentLine = ""
 			}
 		}
 		return nil
@@ -333,10 +342,18 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 				continue
 			}
 
-			// Build the current buffer as a slice of lines
+			// Build the current buffer as a slice of lines, joining soft-wrapped lines
 			var currentLines []string
-			for _, line := range contents {
-				currentLines = append(currentLines, line.GetText())
+			var currentLine string
+			for i, line := range contents {
+				currentLine += line.GetText()
+				// Check if this line is soft-wrapped (continues on next line)
+				isSoftWrap := line.GetContinuation().String() == "CONTINUATION_SOFT_EOL"
+				// Append the line if it's not soft-wrapped or if it's the last line
+				if !isSoftWrap || i == len(contents)-1 {
+					currentLines = append(currentLines, currentLine)
+					currentLine = ""
+				}
 			}
 
 			// First poll - just record what we have, don't print
