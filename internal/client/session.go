@@ -338,14 +338,44 @@ func (c *Client) MonitorSession(ctx context.Context, sessionID string, events []
 			return nil, err
 		}
 
-		msg := &pb.ClientOriginatedMessage{
-			Submessage: &pb.ClientOriginatedMessage_NotificationRequest{
-				NotificationRequest: &pb.NotificationRequest{
-					Subscribe:        &subscribe,
-					NotificationType: &notifType,
-					Session:          &sessionID,
+		var msg *pb.ClientOriginatedMessage
+
+		// Variable monitoring requires special handling with VariableMonitorRequest
+		if event == "variable" {
+			// For variable monitoring, we need to create a VariableMonitorRequest
+			// We'll monitor all variables ("*") for the session scope
+			varName := "*"
+			varScope := pb.VariableScope_SESSION
+			varIdentifier := sessionID
+
+			varMonitorReq := &pb.VariableMonitorRequest{
+				Name:       &varName,
+				Scope:      &varScope,
+				Identifier: &varIdentifier,
+			}
+
+			msg = &pb.ClientOriginatedMessage{
+				Submessage: &pb.ClientOriginatedMessage_NotificationRequest{
+					NotificationRequest: &pb.NotificationRequest{
+						Subscribe:        &subscribe,
+						NotificationType: &notifType,
+						Arguments: &pb.NotificationRequest_VariableMonitorRequest{
+							VariableMonitorRequest: varMonitorReq,
+						},
+					},
 				},
-			},
+			}
+		} else {
+			// For other event types, use the session field
+			msg = &pb.ClientOriginatedMessage{
+				Submessage: &pb.ClientOriginatedMessage_NotificationRequest{
+					NotificationRequest: &pb.NotificationRequest{
+						Subscribe:        &subscribe,
+						NotificationType: &notifType,
+						Session:          &sessionID,
+					},
+				},
+			}
 		}
 
 		// Send subscription request
