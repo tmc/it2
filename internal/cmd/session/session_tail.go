@@ -293,6 +293,7 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 	var lastLines []string
 	var lastLineCount int
 	var lastPromptState string
+	var lastPromptID string
 
 	// Setup stability detector if enabled
 	var detector *waitstable.Detector
@@ -316,13 +317,37 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 				promptResp, err := sc.GetClient().GetPrompt(ctx, sessionID)
 				if err == nil && promptResp.GetStatus().String() == "OK" {
 					currentState := promptResp.GetPromptState().String()
-					// Only print prompt info when state changes
-					if currentState != lastPromptState {
-						// If on-finish mode, only print when state is FINISHED
-						if !opts.onFinish || currentState == "FINISHED" {
+					currentPromptID := promptResp.GetUniquePromptId()
+
+					// In on-finish mode, we want to print when commands finish
+					// Two cases: 1) we catch FINISHED state directly, or 2) prompt ID changed (command completed)
+					if opts.onFinish {
+						// Case 1: Caught FINISHED state directly
+						if currentState == "FINISHED" && lastPromptState != "FINISHED" {
 							printPromptInfo(promptResp, opts.format)
+							lastPromptState = currentState
+							lastPromptID = currentPromptID
+						} else if currentState == "EDITING" && currentPromptID != "" && lastPromptID != "" && currentPromptID != lastPromptID {
+							// Case 2: New prompt in EDITING (previous finished but we missed FINISHED state)
+							// Note: We don't have exit status here, so print what we have
+							printPromptInfo(promptResp, opts.format)
+							lastPromptID = currentPromptID
+							lastPromptState = ""  // Reset so we can catch next FINISHED
+						} else {
+							// Update tracking vars without printing
+							if currentPromptID != "" {
+								lastPromptID = currentPromptID
+							}
+							if currentState != lastPromptState {
+								lastPromptState = currentState
+							}
 						}
-						lastPromptState = currentState
+					} else {
+						// Normal mode: print on every state change
+						if currentState != lastPromptState {
+							printPromptInfo(promptResp, opts.format)
+							lastPromptState = currentState
+						}
 					}
 				}
 			}
