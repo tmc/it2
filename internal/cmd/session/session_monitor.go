@@ -36,6 +36,7 @@ The command will run until interrupted (Ctrl+C).`,
 			eventTypes, _ := cmd.Flags().GetStringSlice("events")
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 			followPrompts, _ := cmd.Flags().GetBool("follow-prompts")
+			includeOutput, _ := cmd.Flags().GetBool("include-output")
 
 			// Default event types if none specified
 			if len(eventTypes) == 0 {
@@ -120,7 +121,7 @@ The command will run until interrupted (Ctrl+C).`,
 						}
 						return nil
 					}
-					if err := handlePromptNotification(promptNotif, jsonOutput); err != nil {
+					if err := handlePromptNotification(ctx, c, promptNotif, jsonOutput, includeOutput); err != nil {
 						fmt.Fprintf(os.Stderr, "Error handling prompt notification: %v\n", err)
 					}
 				}
@@ -131,10 +132,11 @@ The command will run until interrupted (Ctrl+C).`,
 	cmd.Flags().StringSlice("events", []string{}, "Event types to monitor (prompt, keystroke, screen)")
 	cmd.Flags().Bool("json", false, "Output events as JSON")
 	cmd.Flags().Bool("follow-prompts", false, "Monitor only prompt events (shortcut for --events=prompt)")
+	cmd.Flags().Bool("include-output", false, "Include command output in prompt events (requires --json)")
 	return cmd
 }
 
-func handlePromptNotification(notif *pb.PromptNotification, jsonOutput bool) error {
+func handlePromptNotification(ctx context.Context, c *client.Client, notif *pb.PromptNotification, jsonOutput bool, includeOutput bool) error {
 	if jsonOutput {
 		event := map[string]interface{}{
 			"type":       "prompt",
@@ -204,6 +206,39 @@ func handlePromptNotification(notif *pb.PromptNotification, jsonOutput bool) err
 							"x": outRange.GetEnd().GetX(),
 							"y": outRange.GetEnd().GetY(),
 						},
+					}
+
+					// Fetch command output if requested
+					if includeOutput {
+						sessionID := notif.GetSession()
+						// Calculate number of lines in output range
+						startY := outRange.GetStart().GetY()
+						endY := outRange.GetEnd().GetY()
+						numLines := int32(endY - startY + 1)
+
+						if numLines > 0 && numLines < 1000 { // Sanity check
+							// Get buffer content for the output range
+							bufResp, err := c.GetBufferWithStyles(ctx, sessionID, numLines, false)
+							if err == nil && bufResp != nil {
+								// Extract output lines, joining soft-wrapped lines
+								contents := bufResp.GetContents()
+								var outputLines []string
+								var currentLine string
+								for i, line := range contents {
+									currentLine += line.GetText()
+									// Check if this line is soft-wrapped (continues on next line)
+									isSoftWrap := line.GetContinuation().String() == "CONTINUATION_SOFT_EOL"
+									// Output the line if it's not soft-wrapped or if it's the last line
+									if !isSoftWrap || i == len(contents)-1 {
+										outputLines = append(outputLines, currentLine)
+										currentLine = ""
+									}
+								}
+								if len(outputLines) > 0 {
+									event["output"] = outputLines
+								}
+							}
+						}
 					}
 				}
 			}
