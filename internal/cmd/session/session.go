@@ -269,6 +269,10 @@ func NewCommand() *cobra.Command {
 	promptCmd.GroupID = "monitoring"
 	cmd.AddCommand(promptCmd)
 
+	artifactsCmd := newArtifactsCommand()
+	artifactsCmd.GroupID = "monitoring"
+	cmd.AddCommand(artifactsCmd)
+
 	// Hidden/Advanced commands (no group)
 	cmd.AddCommand(newSplitsCommand())
 	cmd.AddCommand(newSplitsAliasCommand())
