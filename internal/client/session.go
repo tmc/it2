@@ -238,8 +238,22 @@ func (c *Client) GetPrompt(ctx context.Context, sessionID string) (*pb.GetPrompt
 }
 
 // NotificationEventTypes returns all supported notification event types
+// that use the session parameter
 func NotificationEventTypes() []string {
 	return []string{"prompt", "keystroke", "screen", "variable", "escape"}
+}
+
+// NotificationEventTypesGlobal returns notification types that ignore the session parameter
+func NotificationEventTypesGlobal() []string {
+	return []string{"new-session", "terminate-session", "layout-change", "focus-change", "server-rpc", "broadcast-change", "profile-change"}
+}
+
+// NotificationEventTypesAll returns all notification event types
+func NotificationEventTypesAll() []string {
+	all := make([]string, 0, len(NotificationEventTypes())+len(NotificationEventTypesGlobal()))
+	all = append(all, NotificationEventTypes()...)
+	all = append(all, NotificationEventTypesGlobal()...)
+	return all
 }
 
 // NotificationTypeFromString converts a string to a NotificationType enum value
@@ -255,8 +269,23 @@ func NotificationTypeFromString(event string) (pb.NotificationType, error) {
 		return pb.NotificationType_NOTIFY_ON_VARIABLE_CHANGE, nil
 	case "escape":
 		return pb.NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE, nil
+	// Global (non-session) notification types
+	case "new-session":
+		return pb.NotificationType_NOTIFY_ON_NEW_SESSION, nil
+	case "terminate-session":
+		return pb.NotificationType_NOTIFY_ON_TERMINATE_SESSION, nil
+	case "layout-change":
+		return pb.NotificationType_NOTIFY_ON_LAYOUT_CHANGE, nil
+	case "focus-change":
+		return pb.NotificationType_NOTIFY_ON_FOCUS_CHANGE, nil
+	case "server-rpc":
+		return pb.NotificationType_NOTIFY_ON_SERVER_ORIGINATED_RPC, nil
+	case "broadcast-change":
+		return pb.NotificationType_NOTIFY_ON_BROADCAST_CHANGE, nil
+	case "profile-change":
+		return pb.NotificationType_NOTIFY_ON_PROFILE_CHANGE, nil
 	default:
-		return 0, fmt.Errorf("unsupported event type: %s (supported: %v)", event, NotificationEventTypes())
+		return 0, fmt.Errorf("unsupported event type: %s (supported: %v)", event, NotificationEventTypesAll())
 	}
 }
 
@@ -273,6 +302,20 @@ func NotificationTypeToString(notifType pb.NotificationType) string {
 		return "variable"
 	case pb.NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE:
 		return "escape"
+	case pb.NotificationType_NOTIFY_ON_NEW_SESSION:
+		return "new-session"
+	case pb.NotificationType_NOTIFY_ON_TERMINATE_SESSION:
+		return "terminate-session"
+	case pb.NotificationType_NOTIFY_ON_LAYOUT_CHANGE:
+		return "layout-change"
+	case pb.NotificationType_NOTIFY_ON_FOCUS_CHANGE:
+		return "focus-change"
+	case pb.NotificationType_NOTIFY_ON_SERVER_ORIGINATED_RPC:
+		return "server-rpc"
+	case pb.NotificationType_NOTIFY_ON_BROADCAST_CHANGE:
+		return "broadcast-change"
+	case pb.NotificationType_NOTIFY_ON_PROFILE_CHANGE:
+		return "profile-change"
 	default:
 		return "unknown"
 	}

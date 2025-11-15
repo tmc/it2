@@ -18,7 +18,8 @@ import (
 )
 
 func newMonitorCommand() *cobra.Command {
-	supportedEvents := client.NotificationEventTypes()
+	sessionEvents := client.NotificationEventTypes()
+	globalEvents := client.NotificationEventTypesGlobal()
 	cmd := &cobra.Command{
 		Use:   "monitor <session-id>",
 		Short: "Monitor session events in real-time",
@@ -26,17 +27,28 @@ func newMonitorCommand() *cobra.Command {
 
 This command subscribes to session notifications and displays them as they occur.
 
-Supported event types: %v
+Session-specific event types: %v
   - prompt: Shell prompt changes (requires Shell Integration)
   - keystroke: Individual keystrokes
   - screen: Screen content updates
   - variable: Session variable changes
   - escape: Custom escape sequences
+
+Global event types (ignore session parameter): %v
+  - new-session: New sessions created
+  - terminate-session: Sessions terminated
+  - layout-change: Window/tab layout changes
+  - focus-change: Focus changes between sessions
+  - server-rpc: Server-originated RPC calls
+  - broadcast-change: Broadcast domain changes
+  - profile-change: Profile changes
+
+Special keywords:
   - all: Subscribe to all event types
 
 Multiple event types can be specified with comma-separated values.
 
-The command will run until interrupted (Ctrl+C).`, supportedEvents),
+The command will run until interrupted (Ctrl+C).`, sessionEvents, globalEvents),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionID := args[0]
@@ -52,7 +64,7 @@ The command will run until interrupted (Ctrl+C).`, supportedEvents),
 			// Handle "all" keyword
 			for i, event := range eventTypes {
 				if event == "all" {
-					eventTypes = client.NotificationEventTypes()
+					eventTypes = client.NotificationEventTypesAll()
 					break
 				}
 				eventTypes[i] = event
@@ -149,7 +161,8 @@ The command will run until interrupted (Ctrl+C).`, supportedEvents),
 		},
 	}
 
-	eventHelp := fmt.Sprintf("Event types to monitor: %v, or 'all' for all types", strings.Join(supportedEvents, ", "))
+	allEvents := client.NotificationEventTypesAll()
+	eventHelp := fmt.Sprintf("Event types to monitor: %v, or 'all' for all types", strings.Join(allEvents, ", "))
 	cmd.Flags().StringSlice("events", []string{}, eventHelp)
 	cmd.Flags().Bool("json", false, "Output events as JSON")
 	cmd.Flags().Bool("follow-prompts", false, "Monitor only prompt events (shortcut for --events=prompt)")
