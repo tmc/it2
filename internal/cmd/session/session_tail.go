@@ -322,22 +322,24 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 					// In on-finish mode, we want to print when commands finish
 					// Two cases: 1) we catch FINISHED state directly, or 2) prompt ID changed (command completed)
 					if opts.onFinish {
+						// Initialize lastPromptID on first poll
+						if lastPromptID == "" && currentPromptID != "" {
+							lastPromptID = currentPromptID
+						}
+
 						// Case 1: Caught FINISHED state directly
 						if currentState == "FINISHED" && lastPromptState != "FINISHED" {
 							printPromptInfo(promptResp, opts.format)
 							lastPromptState = currentState
 							lastPromptID = currentPromptID
-						} else if currentState == "EDITING" && currentPromptID != "" && lastPromptID != "" && currentPromptID != lastPromptID {
-							// Case 2: New prompt in EDITING (previous finished but we missed FINISHED state)
-							// Note: We don't have exit status here, so print what we have
+						} else if currentPromptID != "" && lastPromptID != "" && currentPromptID != lastPromptID {
+							// Case 2: New prompt ID (previous command finished but we missed FINISHED state)
+							// Note: We don't have exit status here since we're looking at the NEW prompt
 							printPromptInfo(promptResp, opts.format)
 							lastPromptID = currentPromptID
 							lastPromptState = ""  // Reset so we can catch next FINISHED
 						} else {
 							// Update tracking vars without printing
-							if currentPromptID != "" {
-								lastPromptID = currentPromptID
-							}
 							if currentState != lastPromptState {
 								lastPromptState = currentState
 							}
