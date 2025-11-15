@@ -60,6 +60,7 @@ The command will run until interrupted (Ctrl+C).`, sessionEvents, globalEvents),
 			followPrompts, _ := cmd.Flags().GetBool("follow-prompts")
 			includeOutput, _ := cmd.Flags().GetBool("include-output")
 			verbose, _ := cmd.Flags().GetBool("verbose")
+			followChildren, _ := cmd.Flags().GetBool("follow-children")
 
 			// Handle "all" keyword
 			for i, event := range eventTypes {
@@ -168,6 +169,7 @@ The command will run until interrupted (Ctrl+C).`, sessionEvents, globalEvents),
 	cmd.Flags().Bool("follow-prompts", false, "Monitor only prompt events (shortcut for --events=prompt)")
 	cmd.Flags().Bool("include-output", false, "Include command output in prompt events (requires --json)")
 	cmd.Flags().BoolP("verbose", "v", false, "Output complete raw protobuf notification as JSON")
+	cmd.Flags().Bool("follow-children", false, "Automatically follow child sessions spawned from the monitored session")
 	return cmd
 }
 
