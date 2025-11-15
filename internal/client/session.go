@@ -237,6 +237,47 @@ func (c *Client) GetPrompt(ctx context.Context, sessionID string) (*pb.GetPrompt
 	return nil, fmt.Errorf("unexpected response type")
 }
 
+// NotificationEventTypes returns all supported notification event types
+func NotificationEventTypes() []string {
+	return []string{"prompt", "keystroke", "screen", "variable", "escape"}
+}
+
+// NotificationTypeFromString converts a string to a NotificationType enum value
+func NotificationTypeFromString(event string) (pb.NotificationType, error) {
+	switch event {
+	case "prompt":
+		return pb.NotificationType_NOTIFY_ON_PROMPT, nil
+	case "keystroke":
+		return pb.NotificationType_NOTIFY_ON_KEYSTROKE, nil
+	case "screen":
+		return pb.NotificationType_NOTIFY_ON_SCREEN_UPDATE, nil
+	case "variable":
+		return pb.NotificationType_NOTIFY_ON_VARIABLE_CHANGE, nil
+	case "escape":
+		return pb.NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE, nil
+	default:
+		return 0, fmt.Errorf("unsupported event type: %s (supported: %v)", event, NotificationEventTypes())
+	}
+}
+
+// NotificationTypeToString converts a NotificationType enum value to a string
+func NotificationTypeToString(notifType pb.NotificationType) string {
+	switch notifType {
+	case pb.NotificationType_NOTIFY_ON_PROMPT:
+		return "prompt"
+	case pb.NotificationType_NOTIFY_ON_KEYSTROKE:
+		return "keystroke"
+	case pb.NotificationType_NOTIFY_ON_SCREEN_UPDATE:
+		return "screen"
+	case pb.NotificationType_NOTIFY_ON_VARIABLE_CHANGE:
+		return "variable"
+	case pb.NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE:
+		return "escape"
+	default:
+		return "unknown"
+	}
+}
+
 // MonitorSession starts monitoring a session for prompt events
 func (c *Client) MonitorSession(ctx context.Context, sessionID string, events []string) (<-chan *pb.PromptNotification, error) {
 	ch := make(chan *pb.PromptNotification, 100)
@@ -249,20 +290,9 @@ func (c *Client) MonitorSession(ctx context.Context, sessionID string, events []
 	// Subscribe to requested notification types
 	subscribe := true
 	for _, event := range events {
-		var notifType pb.NotificationType
-		switch event {
-		case "prompt":
-			notifType = pb.NotificationType_NOTIFY_ON_PROMPT
-		case "keystroke":
-			notifType = pb.NotificationType_NOTIFY_ON_KEYSTROKE
-		case "screen":
-			notifType = pb.NotificationType_NOTIFY_ON_SCREEN_UPDATE
-		case "variable":
-			notifType = pb.NotificationType_NOTIFY_ON_VARIABLE_CHANGE
-		case "escape":
-			notifType = pb.NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE
-		default:
-			return nil, fmt.Errorf("unsupported event type: %s", event)
+		notifType, err := NotificationTypeFromString(event)
+		if err != nil {
+			return nil, err
 		}
 
 		msg := &pb.ClientOriginatedMessage{
