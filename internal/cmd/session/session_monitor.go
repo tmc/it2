@@ -159,13 +159,24 @@ func handlePromptNotification(ctx context.Context, c *client.Client, notif *pb.P
 			return fmt.Errorf("failed to unmarshal for wrapping: %w", err)
 		}
 
-		// Add timestamp to the raw event
-		wrapper := map[string]interface{}{
-			"timestamp": time.Now().Format(time.RFC3339),
-			"raw_event": rawEvent,
+		// Determine event type for easier filtering
+		eventType := "unknown"
+		if notif.GetPrompt() != nil {
+			eventType = "prompt"
+		} else if notif.GetCommandStart() != nil {
+			eventType = "command_start"
+		} else if notif.GetCommandEnd() != nil {
+			eventType = "command_end"
 		}
 
-		return formatting.PrintJSON(wrapper)
+		// Add timestamp and event type to the raw event
+		wrapper := map[string]interface{}{
+			"timestamp":  time.Now().Format(time.RFC3339),
+			"event_type": eventType,
+			"raw_event":  rawEvent,
+		}
+
+		return formatting.PrintCompactJSON(wrapper)
 	}
 
 	if jsonOutput {
@@ -275,7 +286,7 @@ func handlePromptNotification(ctx context.Context, c *client.Client, notif *pb.P
 			}
 		}
 
-		return formatting.PrintJSON(event)
+		return formatting.PrintCompactJSON(event)
 	} else {
 		fmt.Printf("[%s] Prompt event in session %s",
 			time.Now().Format("15:04:05"),

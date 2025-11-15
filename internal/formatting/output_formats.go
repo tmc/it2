@@ -20,6 +20,12 @@ func PrintJSON(v interface{}) error {
 	return encoder.Encode(v)
 }
 
+// PrintCompactJSON prints JSON in compact NDJSON format (no indentation).
+func PrintCompactJSON(v interface{}) error {
+	encoder := json.NewEncoder(os.Stdout)
+	return encoder.Encode(v)
+}
+
 func (f *Formatter) formatYAML(v interface{}) error {
 	return PrintYAML(v)
 }
