@@ -35,6 +35,7 @@ import (
 	"github.com/tmc/it2/internal/cmd/shell"
 	"github.com/tmc/it2/internal/cmd/snippet"
 	"github.com/tmc/it2/internal/cmd/statusbar"
+	"github.com/tmc/it2/internal/cmd/subscribe"
 	"github.com/tmc/it2/internal/cmd/tab"
 	"github.com/tmc/it2/internal/cmd/text"
 	"github.com/tmc/it2/internal/cmd/tmux"
@@ -472,6 +473,7 @@ func init() {
 	rootCmd.AddCommand(session.NewCommand())
 	rootCmd.AddCommand(shell.NewCommand())
 	rootCmd.AddCommand(statusbar.NewCommand())
+	rootCmd.AddCommand(subscribe.NewCommand())
 	rootCmd.AddCommand(tab.NewCommand())
 	rootCmd.AddCommand(text.NewCommand())
 	rootCmd.AddCommand(tmux.NewCommand())
