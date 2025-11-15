@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -17,18 +18,25 @@ import (
 )
 
 func newMonitorCommand() *cobra.Command {
+	supportedEvents := client.NotificationEventTypes()
 	cmd := &cobra.Command{
 		Use:   "monitor <session-id>",
 		Short: "Monitor session events in real-time",
-		Long: `Monitor a session for various events in real-time.
+		Long: fmt.Sprintf(`Monitor a session for various events in real-time.
 
 This command subscribes to session notifications and displays them as they occur.
-Supported event types:
+
+Supported event types: %v
   - prompt: Shell prompt changes (requires Shell Integration)
   - keystroke: Individual keystrokes
   - screen: Screen content updates
+  - variable: Session variable changes
+  - escape: Custom escape sequences
+  - all: Subscribe to all event types
 
-The command will run until interrupted (Ctrl+C).`,
+Multiple event types can be specified with comma-separated values.
+
+The command will run until interrupted (Ctrl+C).`, supportedEvents),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionID := args[0]
@@ -40,6 +48,15 @@ The command will run until interrupted (Ctrl+C).`,
 			followPrompts, _ := cmd.Flags().GetBool("follow-prompts")
 			includeOutput, _ := cmd.Flags().GetBool("include-output")
 			verbose, _ := cmd.Flags().GetBool("verbose")
+
+			// Handle "all" keyword
+			for i, event := range eventTypes {
+				if event == "all" {
+					eventTypes = client.NotificationEventTypes()
+					break
+				}
+				eventTypes[i] = event
+			}
 
 			// Default event types if none specified
 			if len(eventTypes) == 0 {
@@ -132,7 +149,8 @@ The command will run until interrupted (Ctrl+C).`,
 		},
 	}
 
-	cmd.Flags().StringSlice("events", []string{}, "Event types to monitor (prompt, keystroke, screen)")
+	eventHelp := fmt.Sprintf("Event types to monitor: %v, or 'all' for all types", strings.Join(supportedEvents, ", "))
+	cmd.Flags().StringSlice("events", []string{}, eventHelp)
 	cmd.Flags().Bool("json", false, "Output events as JSON")
 	cmd.Flags().Bool("follow-prompts", false, "Monitor only prompt events (shortcut for --events=prompt)")
 	cmd.Flags().Bool("include-output", false, "Include command output in prompt events (requires --json)")
