@@ -116,6 +116,7 @@ Stability options (when using --wait-stable):
 			ignoreCase, _ := sc.GetCommand().Flags().GetBool("ignore-case")
 			outputOnly, _ := sc.GetCommand().Flags().GetBool("output-only")
 			showPrompts, _ := sc.GetCommand().Flags().GetBool("show-prompts")
+			onFinish, _ := sc.GetCommand().Flags().GetBool("on-finish")
 			waitStableEnabled, _ := sc.GetCommand().Flags().GetBool("wait-stable")
 			waitStableMaxWait, _ := sc.GetCommand().Flags().GetDuration("wait-stable-max-wait")
 			waitStableTolerance, _ := sc.GetCommand().Flags().GetString("wait-stable-tolerance")
@@ -161,12 +162,12 @@ Stability options (when using --wait-stable):
 
 			if !followMode {
 				// Just show initial lines and exit (like tail without -f)
-				return getBufferLines(sc, sessionID, initialLines, colorized)
+				return getBufferLines(sc, sessionID, initialLines, colorized, sc.GetFlags().Format)
 			}
 
 			// Show initial context if requested
 			if initialLines > 0 {
-				if err := getBufferLines(sc, sessionID, initialLines, colorized); err != nil {
+				if err := getBufferLines(sc, sessionID, initialLines, colorized, sc.GetFlags().Format); err != nil {
 					return err
 				}
 			}
@@ -179,6 +180,8 @@ Stability options (when using --wait-stable):
 				grepInvert:            grepInvertRE,
 				outputOnly:            outputOnly,
 				showPrompts:           showPrompts,
+				onFinish:              onFinish,
+				format:                sc.GetFlags().Format,
 				waitStableDuration:    waitStableDuration,
 				waitStableMaxWait:     waitStableMaxWait,
 				waitStableTolerance:   waitStableTolerance,
@@ -197,6 +200,7 @@ Stability options (when using --wait-stable):
 	cmd.Flags().BoolP("ignore-case", "i", false, "Case-insensitive pattern matching")
 	cmd.Flags().Bool("output-only", false, "Hide command echoes and prompts, show only output")
 	cmd.Flags().Bool("show-prompts", false, "Show prompt metadata (command, exit status, working directory)")
+	cmd.Flags().Bool("on-finish", false, "Only show prompt info when command finishes (requires --show-prompts)")
 	cmd.Flags().Bool("wait-stable", false, "Wait until buffer is stable (uses --wait-stable-tolerance for timing)")
 	cmd.Flags().Duration("wait-stable-max-wait", 10*time.Second, "Maximum total time to wait for stability (default: 10s). 0 for no limit")
 	cmd.Flags().String("wait-stable-tolerance", "normal", "Stability tolerance level: low (500ms), normal (2s), high (5s)")
@@ -212,13 +216,15 @@ type tailOptions struct {
 	grepInvert            *regexp.Regexp
 	outputOnly            bool
 	showPrompts           bool
+	onFinish              bool
+	format                string
 	waitStableDuration    time.Duration
 	waitStableMaxWait     time.Duration
 	waitStableTolerance   string
 }
 
 // getBufferLines fetches and displays the last N lines from a session
-func getBufferLines(sc *cmdutil.StandardCommand, sessionID string, lines int32, colorized bool) error {
+func getBufferLines(sc *cmdutil.StandardCommand, sessionID string, lines int32, colorized bool, format string) error {
 	if lines <= 0 {
 		return nil
 	}
@@ -233,7 +239,23 @@ func getBufferLines(sc *cmdutil.StandardCommand, sessionID string, lines int32, 
 		return sc.ReportError("get buffer", err)
 	}
 
-	formatter := formatting.New(sc.GetFlags().Format)
+	// In JSON format, output each line as a JSON object
+	if format == "json" {
+		contents := resp.GetContents()
+		for _, line := range contents {
+			data := map[string]interface{}{
+				"type":    "output",
+				"content": line.GetText(),
+			}
+			if jsonData, err := json.Marshal(data); err == nil {
+				fmt.Println(string(jsonData))
+			}
+		}
+		return nil
+	}
+
+	// Otherwise use the standard formatter
+	formatter := formatting.New(format)
 	if colorized {
 		return formatter.FormatBufferWithColors(resp)
 	}
@@ -287,7 +309,10 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 					currentState := promptResp.GetPromptState().String()
 					// Only print prompt info when state changes
 					if currentState != lastPromptState {
-						printPromptInfo(promptResp, sc.GetFlags().Format)
+						// If on-finish mode, only print when state is FINISHED
+						if !opts.onFinish || currentState == "FINISHED" {
+							printPromptInfo(promptResp, opts.format)
+						}
 						lastPromptState = currentState
 					}
 				}
@@ -461,14 +486,27 @@ func printLine(line string, opts tailOptions) {
 		}
 	}
 
-	// Print the line
-	fmt.Println(line)
+	// Print the line in appropriate format
+	if opts.format == "json" {
+		// Output as JSON object with type and content
+		data := map[string]interface{}{
+			"type":    "output",
+			"content": line,
+		}
+		if jsonData, err := json.Marshal(data); err == nil {
+			fmt.Println(string(jsonData))
+		}
+	} else {
+		// Text format - print as-is
+		fmt.Println(line)
+	}
 }
 
 // printPromptInfo prints prompt metadata in the requested format
 func printPromptInfo(promptResp *pb.GetPromptResponse, format string) {
 	if format == "json" {
 		data := map[string]interface{}{
+			"type":              "prompt",
 			"prompt_state":      promptResp.GetPromptState().String(),
 			"working_directory": promptResp.GetWorkingDirectory(),
 			"command":           promptResp.GetCommand(),
