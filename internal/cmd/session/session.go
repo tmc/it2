@@ -245,6 +245,10 @@ func NewCommand() *cobra.Command {
 	monitorCmd.GroupID = "monitoring"
 	cmd.AddCommand(monitorCmd)
 
+	subscribeCmd := newSubscribeCommand()
+	subscribeCmd.GroupID = "monitoring"
+	cmd.AddCommand(subscribeCmd)
+
 	getInfoCmd := newGetInfoCommand()
 	getInfoCmd.GroupID = "monitoring"
 	cmd.AddCommand(getInfoCmd)

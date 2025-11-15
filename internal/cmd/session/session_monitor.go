@@ -60,7 +60,8 @@ The command will run until interrupted (Ctrl+C).`, sessionEvents, globalEvents),
 			followPrompts, _ := cmd.Flags().GetBool("follow-prompts")
 			includeOutput, _ := cmd.Flags().GetBool("include-output")
 			verbose, _ := cmd.Flags().GetBool("verbose")
-			followChildren, _ := cmd.Flags().GetBool("follow-children")
+			// TODO: implement --follow-children to auto-monitor child sessions
+			_ = cmd.Flags().Lookup("follow-children")
 
 			// Handle "all" keyword
 			for i, event := range eventTypes {
@@ -90,6 +91,7 @@ The command will run until interrupted (Ctrl+C).`, sessionEvents, globalEvents),
 
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
+			// TODO: best-effor unsubscribe on exit
 
 			// Handle interruption signals
 			sigChan := make(chan os.Signal, 1)
