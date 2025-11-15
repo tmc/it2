@@ -146,9 +146,30 @@ func handlePromptNotification(notif *pb.PromptNotification, jsonOutput bool) err
 			event["unique_prompt_id"] = uniqueID
 		}
 
+		// Check for command_start event
+		if cmdStart := notif.GetCommandStart(); cmdStart != nil {
+			event["event"] = "command_start"
+			event["command"] = cmdStart.GetCommand()
+		}
+
+		// Check for command_end event (has exit status)
+		if cmdEnd := notif.GetCommandEnd(); cmdEnd != nil {
+			event["event"] = "command_end"
+			event["exit_status"] = cmdEnd.GetStatus()
+		}
+
 		// Check if this is a prompt event with detailed info
 		if promptEvent := notif.GetPrompt(); promptEvent != nil {
+			event["event"] = "prompt"
 			if prompt := promptEvent.GetPrompt(); prompt != nil {
+				// Add all available prompt metadata
+				event["prompt_state"] = prompt.GetPromptState().String()
+				event["working_directory"] = prompt.GetWorkingDirectory()
+				event["command"] = prompt.GetCommand()
+				if prompt.GetPromptState().String() == "FINISHED" {
+					event["exit_status"] = prompt.GetExitStatus()
+				}
+
 				if promptRange := prompt.GetPromptRange(); promptRange != nil {
 					event["prompt_range"] = map[string]interface{}{
 						"start": map[string]interface{}{
@@ -158,6 +179,30 @@ func handlePromptNotification(notif *pb.PromptNotification, jsonOutput bool) err
 						"end": map[string]interface{}{
 							"x": promptRange.GetEnd().GetX(),
 							"y": promptRange.GetEnd().GetY(),
+						},
+					}
+				}
+				if cmdRange := prompt.GetCommandRange(); cmdRange != nil {
+					event["command_range"] = map[string]interface{}{
+						"start": map[string]interface{}{
+							"x": cmdRange.GetStart().GetX(),
+							"y": cmdRange.GetStart().GetY(),
+						},
+						"end": map[string]interface{}{
+							"x": cmdRange.GetEnd().GetX(),
+							"y": cmdRange.GetEnd().GetY(),
+						},
+					}
+				}
+				if outRange := prompt.GetOutputRange(); outRange != nil {
+					event["output_range"] = map[string]interface{}{
+						"start": map[string]interface{}{
+							"x": outRange.GetStart().GetX(),
+							"y": outRange.GetStart().GetY(),
+						},
+						"end": map[string]interface{}{
+							"x": outRange.GetEnd().GetX(),
+							"y": outRange.GetEnd().GetY(),
 						},
 					}
 				}
