@@ -241,29 +241,51 @@ func (c *Client) GetPrompt(ctx context.Context, sessionID string) (*pb.GetPrompt
 func (c *Client) MonitorSession(ctx context.Context, sessionID string, events []string) (<-chan *pb.PromptNotification, error) {
 	ch := make(chan *pb.PromptNotification, 100)
 
-	// Subscribe to prompt notifications
+	// Default to prompt notifications if no events specified
+	if len(events) == 0 {
+		events = []string{"prompt"}
+	}
+
+	// Subscribe to requested notification types
 	subscribe := true
-	notifType := pb.NotificationType_NOTIFY_ON_PROMPT
-	msg := &pb.ClientOriginatedMessage{
-		Submessage: &pb.ClientOriginatedMessage_NotificationRequest{
-			NotificationRequest: &pb.NotificationRequest{
-				Subscribe:        &subscribe,
-				NotificationType: &notifType,
-				Session:          &sessionID,
+	for _, event := range events {
+		var notifType pb.NotificationType
+		switch event {
+		case "prompt":
+			notifType = pb.NotificationType_NOTIFY_ON_PROMPT
+		case "keystroke":
+			notifType = pb.NotificationType_NOTIFY_ON_KEYSTROKE
+		case "screen":
+			notifType = pb.NotificationType_NOTIFY_ON_SCREEN_UPDATE
+		case "variable":
+			notifType = pb.NotificationType_NOTIFY_ON_VARIABLE_CHANGE
+		case "escape":
+			notifType = pb.NotificationType_NOTIFY_ON_CUSTOM_ESCAPE_SEQUENCE
+		default:
+			return nil, fmt.Errorf("unsupported event type: %s", event)
+		}
+
+		msg := &pb.ClientOriginatedMessage{
+			Submessage: &pb.ClientOriginatedMessage_NotificationRequest{
+				NotificationRequest: &pb.NotificationRequest{
+					Subscribe:        &subscribe,
+					NotificationType: &notifType,
+					Session:          &sessionID,
+				},
 			},
-		},
-	}
+		}
 
-	// Send subscription request
-	response, err := c.SendRequest(ctx, msg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to subscribe to prompt notifications: %w", err)
-	}
+		// Send subscription request
+		response, err := c.SendRequest(ctx, msg)
+		if err != nil {
+			return nil, fmt.Errorf("failed to subscribe to %s notifications: %w", event, err)
+		}
 
-	// Check response
-	if resp := response.GetNotificationResponse(); resp != nil {
-		if resp.GetStatus() != pb.NotificationResponse_OK {
-			return nil, fmt.Errorf("prompt monitoring subscription failed: %v", resp.GetStatus())
+		// Check response
+		if resp := response.GetNotificationResponse(); resp != nil {
+			if resp.GetStatus() != pb.NotificationResponse_OK {
+				return nil, fmt.Errorf("%s monitoring subscription failed: %v", event, resp.GetStatus())
+			}
 		}
 	}
 
