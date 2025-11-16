@@ -273,6 +273,10 @@ func NewCommand() *cobra.Command {
 	artifactsCmd.GroupID = "monitoring"
 	cmd.AddCommand(artifactsCmd)
 
+	exportRecordingCmd := newExportRecordingCommand()
+	exportRecordingCmd.GroupID = "monitoring"
+	cmd.AddCommand(exportRecordingCmd)
+
 	// Hidden/Advanced commands (no group)
 	cmd.AddCommand(newSplitsCommand())
 	cmd.AddCommand(newSplitsAliasCommand())
