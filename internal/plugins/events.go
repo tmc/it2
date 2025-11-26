@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-// PluginEvent represents a single plugin execution event
-type PluginEvent struct {
+// PluginExecutionEvent represents a single plugin execution event for metrics.
+type PluginExecutionEvent struct {
 	Timestamp   time.Time `json:"timestamp"`
 	PluginName  string    `json:"plugin_name"`
 	PluginType  string    `json:"plugin_type"`
@@ -51,7 +51,7 @@ func initGlobalEventFile() error {
 // RecordPluginEvent appends an event to both global and session-specific files
 // Uses file locking with short timeout (10ms), spills to .overflow/ on contention
 func RecordPluginEvent(pluginName, pluginType, sessionID string, duration time.Duration, err error) {
-	event := PluginEvent{
+	event := PluginExecutionEvent{
 		Timestamp:  time.Now(),
 		PluginName: pluginName,
 		PluginType: pluginType,
