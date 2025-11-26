@@ -17,24 +17,24 @@ func TestDetectorIsStable(t *testing.T) {
 		{
 			name: "stability disabled returns false",
 			config: Config{
-				Timeout:   0,
-				Threshold: 500 * time.Millisecond,
+				WaitStable: 0,
+				Threshold:  500 * time.Millisecond,
 			},
 			expectedStable: false,
 		},
 		{
 			name: "immediately after creation is not stable",
 			config: Config{
-				Timeout:   1 * time.Second,
-				Threshold: 500 * time.Millisecond,
+				WaitStable: 1 * time.Second,
+				Threshold:  500 * time.Millisecond,
 			},
 			expectedStable: false,
 		},
 		{
 			name: "after timeout duration passes is stable",
 			config: Config{
-				Timeout:   100 * time.Millisecond,
-				Threshold: 10 * time.Millisecond,
+				WaitStable: 100 * time.Millisecond,
+				Threshold:  10 * time.Millisecond,
 			},
 			setup: func(d *Detector) {
 				time.Sleep(150 * time.Millisecond)
@@ -44,8 +44,8 @@ func TestDetectorIsStable(t *testing.T) {
 		{
 			name: "change resets stability timer",
 			config: Config{
-				Timeout:   100 * time.Millisecond,
-				Threshold: 10 * time.Millisecond,
+				WaitStable: 100 * time.Millisecond,
+				Threshold:  10 * time.Millisecond,
 			},
 			setup: func(d *Detector) {
 				time.Sleep(50 * time.Millisecond)
@@ -81,8 +81,8 @@ func TestDetectorRecordChange(t *testing.T) {
 	}
 
 	config := Config{
-		Timeout:   1 * time.Second,
-		Threshold: 500 * time.Millisecond,
+		WaitStable: 1 * time.Second,
+		Threshold:  500 * time.Millisecond,
 	}
 
 	d := New(config, onChange)
@@ -110,8 +110,8 @@ func TestDetectorRecordChange(t *testing.T) {
 
 func TestDetectorReset(t *testing.T) {
 	config := Config{
-		Timeout:   100 * time.Millisecond,
-		Threshold: 10 * time.Millisecond,
+		WaitStable: 100 * time.Millisecond,
+		Threshold:  10 * time.Millisecond,
 	}
 
 	d := New(config, nil)
@@ -137,8 +137,8 @@ func TestDetectorReset(t *testing.T) {
 
 func TestDetectorTimeSinceLastChange(t *testing.T) {
 	config := Config{
-		Timeout:   1 * time.Second,
-		Threshold: 50 * time.Millisecond,
+		WaitStable: 1 * time.Second,
+		Threshold:  50 * time.Millisecond,
 	}
 
 	d := New(config, nil)
@@ -166,8 +166,8 @@ func TestDetectorTimeSinceLastChange(t *testing.T) {
 
 func TestDetectorSetOnChange(t *testing.T) {
 	config := Config{
-		Timeout:   1 * time.Second,
-		Threshold: 500 * time.Millisecond,
+		WaitStable: 1 * time.Second,
+		Threshold:  500 * time.Millisecond,
 	}
 
 	d := New(config, nil)
@@ -189,8 +189,8 @@ func TestDetectorSetOnChange(t *testing.T) {
 
 func TestDetectorCheckAndReport(t *testing.T) {
 	config := Config{
-		Timeout:   100 * time.Millisecond,
-		Threshold: 10 * time.Millisecond,
+		WaitStable: 100 * time.Millisecond,
+		Threshold:  10 * time.Millisecond,
 	}
 
 	d := New(config, nil)
@@ -217,8 +217,8 @@ func TestDetectorCheckAndReport(t *testing.T) {
 
 func TestDetectorConcurrency(t *testing.T) {
 	config := Config{
-		Timeout:   100 * time.Millisecond,
-		Threshold: 10 * time.Millisecond,
+		WaitStable: 100 * time.Millisecond,
+		Threshold:  10 * time.Millisecond,
 	}
 
 	d := New(config, nil)

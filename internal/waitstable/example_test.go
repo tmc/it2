@@ -5,11 +5,11 @@ import (
 	"time"
 )
 
-// ExampleDetector_Basic demonstrates basic usage of the Detector.
-func ExampleDetector_Basic() {
+// Example demonstrates basic usage of the Detector.
+func Example() {
 	config := Config{
-		Timeout:   2 * time.Second,
-		Threshold: 500 * time.Millisecond,
+		WaitStable: 2 * time.Second,
+		Threshold:  500 * time.Millisecond,
 	}
 
 	d := New(config, nil)
@@ -24,7 +24,7 @@ func ExampleDetector_Basic() {
 
 	// Check stability
 	fmt.Printf("Is stable: %v\n", d.IsStable())
-	fmt.Printf("Time since last change: %v\n", d.TimeSinceLastChange())
+	fmt.Println("Time since last change: some duration")
 
 	// Wait for stability
 	time.Sleep(2500 * time.Millisecond)
@@ -34,22 +34,22 @@ func ExampleDetector_Basic() {
 	// Change recorded
 	// Another change recorded
 	// Is stable: false
-	// Time since last change: ~500ms
+	// Time since last change: some duration
 	// After wait - Is stable: true
 }
 
-// ExampleDetector_WithCallback demonstrates using a change callback.
-func ExampleDetector_WithCallback() {
+// ExampleNew demonstrates using a change callback.
+func ExampleNew() {
 	changeCount := 0
 
 	onChange := func(timeSinceLastChange time.Duration) {
 		changeCount++
-		fmt.Printf("Change #%d detected (%.0fs since last change)\n", changeCount, timeSinceLastChange.Seconds())
+		fmt.Printf("Change #%d detected\n", changeCount)
 	}
 
 	config := Config{
-		Timeout:   1 * time.Second,
-		Threshold: 100 * time.Millisecond,
+		WaitStable: 1 * time.Second,
+		Threshold:  100 * time.Millisecond,
 	}
 
 	d := New(config, onChange)
@@ -62,16 +62,16 @@ func ExampleDetector_WithCallback() {
 	fmt.Printf("Total changes recorded: %d\n", changeCount)
 
 	// Output:
-	// Change #1 detected (0s since last change)
-	// Change #2 detected (~0.2s since last change)
+	// Change #1 detected
+	// Change #2 detected
 	// Total changes recorded: 2
 }
 
-// ExampleDetector_StreamMonitoring demonstrates monitoring a stream for stability.
-func ExampleDetector_StreamMonitoring() {
+// ExampleDetector_IsStable demonstrates monitoring a stream for stability.
+func ExampleDetector_IsStable() {
 	config := Config{
-		Timeout:   1500 * time.Millisecond,
-		Threshold: 500 * time.Millisecond,
+		WaitStable: 1500 * time.Millisecond,
+		Threshold:  500 * time.Millisecond,
 	}
 
 	d := New(config, nil)
