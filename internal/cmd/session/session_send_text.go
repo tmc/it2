@@ -329,8 +329,19 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 		return wordResult
 	}
 
-	// Level 5: Partial delivery detection (prefix/suffix)
-	if len(cleanSentText) > 10 {
+	// Level 5: Partial delivery detection
+	// Check if diff is a significant prefix of what we sent (partial delivery)
+	// Or if sent text contains a significant prefix/suffix that's in the diff
+	if len(cleanSentText) > 10 && len(diff) > 0 {
+		// Check if the diff is a prefix of the sent text (partial delivery case)
+		if strings.HasPrefix(cleanSentText, diff) && len(diff) >= 10 {
+			if os.Getenv("IT2_DEBUG_DELIVERY") != "" {
+				fmt.Fprintf(os.Stderr, "  Partial (diff is prefix of sent): true\n")
+			}
+			return "partial"
+		}
+
+		// Check if significant portions of sent text appear in diff
 		halfLength := len(cleanSentText) / 2
 		if halfLength > 0 {
 			prefix := cleanSentText[:halfLength]
