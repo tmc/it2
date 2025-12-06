@@ -76,7 +76,7 @@ func gitCommit(dir, message string) error {
 	}
 
 	// Create commit
-	commitCmd := exec.Command("git", "commit", "-m", message)
+	commitCmd := exec.Command("git", "commit", "--no-gpg-sign", "-m", message)
 	commitCmd.Dir = dir
 	return commitCmd.Run()
 }
