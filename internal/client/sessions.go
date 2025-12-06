@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sync"
 
 	pb "github.com/tmc/it2/proto"
 )
@@ -205,42 +206,70 @@ func extractSessionsFromNode(node *pb.SplitTreeNode, windowID string, windowNumb
 	return sessions
 }
 
-// populateJobInfo adds job information to sessions using GetPrompt and GetVariable
+// populateJobInfo adds job information to sessions using GetPrompt and GetVariable.
+// All sessions are processed in parallel for performance.
 func (c *Client) populateJobInfo(ctx context.Context, sessions []*SessionInfo) {
+	var wg sync.WaitGroup
 	for _, session := range sessions {
-		// Get prompt information
+		wg.Add(1)
+		go func(s *SessionInfo) {
+			defer wg.Done()
+			c.populateSessionJobInfo(ctx, s)
+		}(session)
+	}
+	wg.Wait()
+}
+
+// populateSessionJobInfo populates job info for a single session.
+// All API calls are made in parallel for performance.
+func (c *Client) populateSessionJobInfo(ctx context.Context, session *SessionInfo) {
+	var wg sync.WaitGroup
+	wg.Add(5)
+
+	// Get prompt information
+	go func() {
+		defer wg.Done()
 		if promptResp, err := c.GetPrompt(ctx, session.SessionID); err == nil {
 			session.CurrentCommand = promptResp.GetCommand()
 			session.ExitCode = promptResp.GetExitStatus()
 			session.PromptState = promptResp.GetPromptState().String()
 		}
+	}()
 
-		// Get command count by listing all prompts for this session
+	// Get command count by listing all prompts for this session
+	go func() {
+		defer wg.Done()
 		if listResp, err := c.ListPrompts(ctx, session.SessionID); err == nil {
 			session.CommandCount = int32(len(listResp.GetUniquePromptId()))
 		}
+	}()
 
-		// Try to get shell PID from session variables
+	// Try to get shell PID from session variables
+	go func() {
+		defer wg.Done()
 		if pidStr, err := c.GetVariableWithScope(ctx, "session", session.SessionID, "pid"); err == nil && pidStr != "" {
-			// Parse PID if it's a valid number
 			var pid int32
 			if n, parseErr := fmt.Sscanf(pidStr, "%d", &pid); parseErr == nil && n == 1 {
 				session.ShellPID = pid
 			}
 		}
+	}()
 
-		// Try to get job PID from session variables
+	// Try to get job PID from session variables
+	go func() {
+		defer wg.Done()
 		if pidStr, err := c.GetVariableWithScope(ctx, "session", session.SessionID, "jobPid"); err == nil && pidStr != "" {
-			// Parse PID if it's a valid number
 			var pid int32
 			if n, parseErr := fmt.Sscanf(pidStr, "%d", &pid); parseErr == nil && n == 1 {
 				session.JobPID = pid
 			}
 		}
+	}()
 
-		// Try to get working directory from session.path variable
+	// Try to get working directory from session.path variable
+	go func() {
+		defer wg.Done()
 		if path, err := c.GetVariableWithScope(ctx, "session", session.SessionID, "path"); err == nil && path != "" {
-			// Unescape JSON string (iTerm2 returns path as JSON-encoded string)
 			var unescaped string
 			if err := json.Unmarshal([]byte(path), &unescaped); err == nil {
 				session.WorkingDirectory = unescaped
@@ -248,5 +277,7 @@ func (c *Client) populateJobInfo(ctx context.Context, sessions []*SessionInfo) {
 				session.WorkingDirectory = path
 			}
 		}
-	}
+	}()
+
+	wg.Wait()
 }

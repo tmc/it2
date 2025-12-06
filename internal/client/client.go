@@ -30,6 +30,7 @@ type Client struct {
 	done           chan struct{}
 	requestCounter int64
 	mu             sync.Mutex
+	writeMu        sync.Mutex // protects concurrent websocket writes
 	pending        map[int64]chan *pb.ServerOriginatedMessage
 	debug          bool
 }
@@ -342,7 +343,10 @@ func (c *Client) SendRequest(ctx context.Context, msg *pb.ClientOriginatedMessag
 		return nil, fmt.Errorf("marshal error: %w", err)
 	}
 
-	if err := c.conn.WriteMessage(websocket.BinaryMessage, data); err != nil {
+	c.writeMu.Lock()
+	err = c.conn.WriteMessage(websocket.BinaryMessage, data)
+	c.writeMu.Unlock()
+	if err != nil {
 		return nil, fmt.Errorf("write error: %w", err)
 	}
 
