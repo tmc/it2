@@ -207,13 +207,21 @@ func extractSessionsFromNode(node *pb.SplitTreeNode, windowID string, windowNumb
 }
 
 // populateJobInfo adds job information to sessions using GetPrompt and GetVariable.
-// All sessions are processed in parallel for performance.
+// Uses limited concurrency to avoid overwhelming the WebSocket connection.
 func (c *Client) populateJobInfo(ctx context.Context, sessions []*SessionInfo) {
+	// Limit concurrent session info requests to avoid WebSocket contention.
+	// Each session makes 3 API calls, so 10 concurrent sessions = ~30 in-flight requests.
+	const maxConcurrency = 10
+
 	var wg sync.WaitGroup
+	sem := make(chan struct{}, maxConcurrency)
+
 	for _, session := range sessions {
 		wg.Add(1)
 		go func(s *SessionInfo) {
 			defer wg.Done()
+			sem <- struct{}{}        // Acquire semaphore
+			defer func() { <-sem }() // Release semaphore
 			c.populateSessionJobInfo(ctx, s)
 		}(session)
 	}
@@ -221,10 +229,10 @@ func (c *Client) populateJobInfo(ctx context.Context, sessions []*SessionInfo) {
 }
 
 // populateSessionJobInfo populates job info for a single session.
-// All API calls are made in parallel for performance.
+// Uses batched API calls for performance: 3 calls instead of 5.
 func (c *Client) populateSessionJobInfo(ctx context.Context, session *SessionInfo) {
 	var wg sync.WaitGroup
-	wg.Add(5)
+	wg.Add(3) // 3 API calls: GetPrompt, ListPrompts, GetMultipleVariables
 
 	// Get prompt information
 	go func() {
@@ -244,32 +252,32 @@ func (c *Client) populateSessionJobInfo(ctx context.Context, session *SessionInf
 		}
 	}()
 
-	// Try to get shell PID from session variables
+	// Get all variables in a single batched call (pid, jobPid, path)
 	go func() {
 		defer wg.Done()
-		if pidStr, err := c.GetVariableWithScope(ctx, "session", session.SessionID, "pid"); err == nil && pidStr != "" {
+		vars, err := c.GetMultipleVariablesWithScope(ctx, "session", session.SessionID, []string{"pid", "jobPid", "path"})
+		if err != nil {
+			return
+		}
+
+		// Parse shell PID
+		if pidStr, ok := vars["pid"]; ok && pidStr != "" {
 			var pid int32
 			if n, parseErr := fmt.Sscanf(pidStr, "%d", &pid); parseErr == nil && n == 1 {
 				session.ShellPID = pid
 			}
 		}
-	}()
 
-	// Try to get job PID from session variables
-	go func() {
-		defer wg.Done()
-		if pidStr, err := c.GetVariableWithScope(ctx, "session", session.SessionID, "jobPid"); err == nil && pidStr != "" {
+		// Parse job PID
+		if pidStr, ok := vars["jobPid"]; ok && pidStr != "" {
 			var pid int32
 			if n, parseErr := fmt.Sscanf(pidStr, "%d", &pid); parseErr == nil && n == 1 {
 				session.JobPID = pid
 			}
 		}
-	}()
 
-	// Try to get working directory from session.path variable
-	go func() {
-		defer wg.Done()
-		if path, err := c.GetVariableWithScope(ctx, "session", session.SessionID, "path"); err == nil && path != "" {
+		// Parse working directory (JSON-escaped)
+		if path, ok := vars["path"]; ok && path != "" {
 			var unescaped string
 			if err := json.Unmarshal([]byte(path), &unescaped); err == nil {
 				session.WorkingDirectory = unescaped

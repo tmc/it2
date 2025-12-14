@@ -11,18 +11,17 @@ import (
 )
 
 // ShouldRunPlugins determines if plugins should be executed based on requested columns.
-// It returns true if:
-//   - No columns are specified (run all plugins)
-//   - Any non-standard column is requested
+// Plugins only run when explicitly requested via non-standard columns.
+// This avoids slow plugin discovery/execution on every session list command.
 func ShouldRunPlugins(columns []string) bool {
 	if len(columns) == 0 {
-		return true // Run all plugins if no columns specified
+		return false // Don't run plugins unless columns explicitly request them
 	}
 
 	// Standard columns that don't require plugins
 	standardCols := map[string]bool{
 		"id": true, "split from": true, "pid": true, "exit": true, "state": true,
-		"window": true, "tab": true, "title": true, "command": true,
+		"window": true, "tab": true, "title": true, "command": true, "path": true,
 	}
 
 	// Check if any plugin column is requested

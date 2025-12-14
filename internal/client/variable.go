@@ -84,6 +84,66 @@ func (c *Client) GetVariableWithScope(ctx context.Context, scope string, id stri
 	return "", fmt.Errorf("unexpected response type")
 }
 
+// GetMultipleVariablesWithScope gets multiple variable values in a single API call.
+// Returns a map of variable name to value. Variables that don't exist are omitted.
+func (c *Client) GetMultipleVariablesWithScope(ctx context.Context, scope string, id string, names []string) (map[string]string, error) {
+	req := &pb.VariableRequest{
+		Get: names,
+	}
+
+	// Set scope based on type
+	switch scope {
+	case "session":
+		normalizedID := NormalizeSessionID(id)
+		req.Scope = &pb.VariableRequest_SessionId{
+			SessionId: normalizedID,
+		}
+	case "tab":
+		req.Scope = &pb.VariableRequest_TabId{
+			TabId: id,
+		}
+	case "window":
+		req.Scope = &pb.VariableRequest_WindowId{
+			WindowId: id,
+		}
+	case "app":
+		req.Scope = &pb.VariableRequest_App{
+			App: true,
+		}
+	default:
+		return nil, fmt.Errorf("invalid scope: %s (must be session, tab, window, or app)", scope)
+	}
+
+	msg := &pb.ClientOriginatedMessage{
+		Submessage: &pb.ClientOriginatedMessage_VariableRequest{
+			VariableRequest: req,
+		},
+	}
+
+	response, err := c.SendRequest(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if varResponse := response.GetVariableResponse(); varResponse != nil {
+		// Check response status first
+		if varResponse.GetStatus() != pb.VariableResponse_OK {
+			return nil, formatVariableError(varResponse.GetStatus())
+		}
+
+		result := make(map[string]string)
+		values := varResponse.GetValues()
+		for i, name := range names {
+			if i < len(values) && values[i] != "" {
+				result[name] = values[i]
+			}
+		}
+		return result, nil
+	}
+
+	return nil, fmt.Errorf("unexpected response type")
+}
+
 // SetVariableWithScope sets a variable value with explicit scope control
 func (c *Client) SetVariableWithScope(ctx context.Context, scope string, id string, name string, value string) error {
 	req := &pb.VariableRequest{
