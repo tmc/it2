@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -248,6 +250,76 @@ func newConfigCommand() *cobra.Command {
 	})
 
 	return cmd
+}
+
+// newDeprecatedToolCommand creates the deprecated 'tool' command that wraps 'plugin'
+// It warns once per day and delegates to the plugin command.
+func newDeprecatedToolCommand() *cobra.Command {
+	// Get the plugin command to wrap
+	pluginCmd := plugins.NewCommand()
+
+	cmd := &cobra.Command{
+		Use:        "tool",
+		Short:      "[DEPRECATED] Use 'it2 plugin' instead",
+		Long:       "DEPRECATED: The 'it2 tool' command has been renamed to 'it2 plugin'.\n\nPlease use 'it2 plugin' for all plugin-related operations.",
+		Hidden:     true, // Hide from main help
+		GroupID:    "config",
+		Deprecated: "use 'it2 plugin' instead",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			maybeWarnDeprecation()
+		},
+	}
+
+	// Copy all subcommands from plugin to tool
+	for _, subCmd := range pluginCmd.Commands() {
+		cmd.AddCommand(subCmd)
+	}
+
+	// Copy command groups
+	for _, group := range pluginCmd.Groups() {
+		cmd.AddGroup(group)
+	}
+
+	return cmd
+}
+
+// maybeWarnDeprecation checks if we should warn about deprecation (once per day)
+func maybeWarnDeprecation() {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		// Can't check, just warn
+		fmt.Fprintln(os.Stderr, "Warning: 'it2 tool' is deprecated, use 'it2 plugin' instead")
+		return
+	}
+
+	warnFile := filepath.Join(home, ".it2", "deprecation-warnings.json")
+
+	// Try to read existing warnings
+	var warnings map[string]string
+	data, err := os.ReadFile(warnFile)
+	if err == nil {
+		json.Unmarshal(data, &warnings)
+	}
+	if warnings == nil {
+		warnings = make(map[string]string)
+	}
+
+	// Check if we warned today
+	today := time.Now().Format("2006-01-02")
+	if lastWarn, ok := warnings["tool"]; ok && lastWarn == today {
+		return // Already warned today
+	}
+
+	// Warn and record
+	fmt.Fprintln(os.Stderr, "Warning: 'it2 tool' is deprecated, use 'it2 plugin' instead")
+	warnings["tool"] = today
+
+	// Save warnings
+	if err := os.MkdirAll(filepath.Dir(warnFile), 0755); err == nil {
+		if data, err := json.Marshal(warnings); err == nil {
+			os.WriteFile(warnFile, data, 0644)
+		}
+	}
 }
 
 // newQuickstartCommand creates the quickstart help command
@@ -534,6 +606,9 @@ func init() {
 	utilityCmd := utility.NewCommand()
 	utilityCmd.Hidden = true
 	rootCmd.AddCommand(utilityCmd)
+
+	// Add deprecated 'tool' command (hidden, warns once per day)
+	rootCmd.AddCommand(newDeprecatedToolCommand())
 }
 
 func main() {
