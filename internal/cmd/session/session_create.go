@@ -150,6 +150,7 @@ func createSessionBySplit(sc *cmdutil.StandardCommand, sessionID, profile, split
 		isVertical,
 		false, // before (false = after)
 		profile,
+		nil, // no custom profile properties
 	)
 	if err != nil {
 		return sc.ReportError("create session (split)", err)

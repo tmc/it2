@@ -66,7 +66,7 @@ func (c *Client) SendText(ctx context.Context, sessionID, text string) error {
 }
 
 // SplitPane splits a session pane vertically or horizontally
-func (c *Client) SplitPane(ctx context.Context, sessionID string, vertical bool, before bool, profileName string) (*pb.SplitPaneResponse, error) {
+func (c *Client) SplitPane(ctx context.Context, sessionID string, vertical bool, before bool, profileName string, customProps []*pb.ProfileProperty) (*pb.SplitPaneResponse, error) {
 	splitDirection := pb.SplitPaneRequest_HORIZONTAL
 	if vertical {
 		splitDirection = pb.SplitPaneRequest_VERTICAL
@@ -81,6 +81,11 @@ func (c *Client) SplitPane(ctx context.Context, sessionID string, vertical bool,
 	// Only set ProfileName if it's not empty
 	if profileName != "" {
 		splitRequest.ProfileName = &profileName
+	}
+
+	// Set custom profile properties if provided
+	if len(customProps) > 0 {
+		splitRequest.CustomProfileProperties = customProps
 	}
 
 	msg := &pb.ClientOriginatedMessage{

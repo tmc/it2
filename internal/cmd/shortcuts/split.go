@@ -128,7 +128,7 @@ This is a convenience wrapper for 'it2 session split'.`,
 				}
 			}
 
-			response, err := c.SplitPane(ctx, sessionID, isVertical, before, profileName)
+			response, err := c.SplitPane(ctx, sessionID, isVertical, before, profileName, nil)
 			if err != nil {
 				return fmt.Errorf("failed to split session: %w", err)
 			}

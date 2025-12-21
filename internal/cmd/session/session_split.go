@@ -47,6 +47,9 @@ to control positioning.`,
 			# Split and run a command in the new session
 			$ it2 session split --vertical --command "ssh vm1"
 
+			# Split with a specific working directory
+			$ it2 session split --cwd /path/to/project
+
 			# Create left-right layout: use --before for left, default for right
 			$ LEFT=$(it2 session split --vertical --before)
 			$ RIGHT=$(it2 session split --vertical)
@@ -65,6 +68,7 @@ to control positioning.`,
 			profileName, _ := cmd.Flags().GetString("profile")
 			badge, _ := cmd.Flags().GetString("badge")
 			command, _ := cmd.Flags().GetString("command")
+			cwd, _ := cmd.Flags().GetString("cwd")
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 			quiet, _ := cmd.Flags().GetBool("quiet")
 
@@ -138,7 +142,25 @@ to control positioning.`,
 				}
 			}
 
-			response, err := c.SplitPane(ctx, sessionID, isVertical, before, profileName)
+			// Build custom profile properties for working directory
+			// Default to caller's CWD if --cwd not specified
+			if cwd == "" {
+				cwd, _ = os.Getwd()
+			}
+			var customProps []*pb.ProfileProperty
+			if cwd != "" {
+				// Set Custom Directory to "Yes" and provide the working directory
+				customDirKey := "Custom Directory"
+				customDirVal := `"Yes"`
+				workingDirKey := "Working Directory"
+				workingDirVal := fmt.Sprintf("%q", cwd) // JSON-encode the path
+				customProps = []*pb.ProfileProperty{
+					{Key: &customDirKey, JsonValue: &customDirVal},
+					{Key: &workingDirKey, JsonValue: &workingDirVal},
+				}
+			}
+
+			response, err := c.SplitPane(ctx, sessionID, isVertical, before, profileName, customProps)
 			if err != nil {
 				return fmt.Errorf("failed to split session: %w", err)
 			}
@@ -253,6 +275,7 @@ to control positioning.`,
 	cmd.Flags().String("profile", "", "Profile name for the new session (optional, uses default if not specified)")
 	cmd.Flags().String("badge", "", "Set badge text on new session(s)")
 	cmd.Flags().String("command", "", "Command to run in the new session")
+	cmd.Flags().String("cwd", "", "Working directory for the new session (defaults to caller's CWD)")
 	cmd.Flags().Bool("json", false, "Output result as JSON")
 	cmd.Flags().BoolP("quiet", "q", false, "Only output the new session ID (for scripting)")
 	return cmd

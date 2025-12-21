@@ -440,7 +440,7 @@ func executeSessionSplit(cmd *cobra.Command, sessionID string, args []string) er
 		}
 	}
 
-	if _, err := c.SplitPane(ctx, sessionID, vertical, false, ""); err != nil {
+	if _, err := c.SplitPane(ctx, sessionID, vertical, false, "", nil); err != nil {
 		return fmt.Errorf("failed to split session %s: %w", sessionID, err)
 	}
 
