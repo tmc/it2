@@ -35,29 +35,38 @@ it2 auth check
 
 The first time you run `it2`, iTerm2 will prompt you to allow API access. Click "Allow" to continue.
 
-### Plugin Scripts
+### Extensibility
 
-Plugin scripts provide additional functionality for Claude Code integration and session management. They are automatically embedded in the `it2` binary and extracted on first use to `~/.it2/plugins/{version}/`.
+it2 supports extensibility through **plugins** and **hooks**:
 
-The plugin discovery system searches for plugins in this priority order:
-1. Executables in your `PATH` (highest priority)
-2. Directories from `IT2_PLUGIN_PATHS` environment variable
-3. Embedded plugins extracted from the binary (fallback)
+- **Plugins** — External executables (`it2-*`) discovered by it2 that enrich session listings or provide automation
+- **Hooks** — Executables triggered by external tools (Claude Code, Gemini CLI) for event logging and automation
 
-List available plugins:
+Plugins are automatically discovered from your PATH or embedded in the binary (extracted to `~/.it2/plugins/{version}/`).
+
 ```bash
-it2 plugins list
+# List available plugins
+it2 plugin list
+
+# Run a plugin
+it2 plugin <name> [args...]
+
+# Install Claude Code hooks
+it2 plugin claude-code-hook --install
 ```
 
-Available plugin scripts (embedded):
-- `it2-session-has-no-queued-claude-messages` - Detect if Claude is idle
-- `it2-session-claude-suggest-action` - Suggest interventions for stuck Claude sessions
+Available plugins (embedded):
 - `it2-session-is-at-prompt` - Check if session is at a shell prompt
 - `it2-session-claude-has-modal` - Check if Claude has a modal dialog
+- `it2-session-claude-suggest-action` - Suggest interventions for stuck Claude sessions
 - `it2-session-claude-auto-approve` - Auto-approve safe operations
-- And other session management utilities
+- `it2-claude-code-hook` - Log Claude Code events to session artifacts
 
 To override embedded plugins, place your own version in your `PATH`.
+
+See [docs/TAXONOMY.md](docs/TAXONOMY.md) for the full extensibility model.
+
+For more details on Claude Code integration, see [docs/CLAUDE_PLUGINS_REFERENCE.md](docs/CLAUDE_PLUGINS_REFERENCE.md).
 
 ## Quick Start
 
@@ -199,6 +208,9 @@ it2 arrangement restore "my-dev-setup"
 - `notification` - Subscribe to real-time iTerm2 events
 - `broadcast` - Manage broadcast input domains
 - `statusbar` - Configure status bar components
+
+**Extensibility:**
+- `plugin` - Manage and run it2 plugins
 
 **Advanced:**
 - `tmux` - Control tmux integration
