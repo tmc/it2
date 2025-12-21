@@ -4,6 +4,8 @@
 
 Plugin manifest defines permissions, verification data, and sandbox constraints for it2 plugins.
 
+> **See also:** [TAXONOMY.md](TAXONOMY.md) for plugin terminology and trust levels.
+
 ## Schema v1
 
 ```json
@@ -31,6 +33,13 @@ Plugin manifest defines permissions, verification data, and sandbox constraints 
     "size_bytes": 4194304,
     "platform": "darwin/arm64"
   },
+
+  "capabilities": {
+    "enrichment": ["session", "process"],
+    "automation": ["suggest"]
+  },
+
+  "trust_level": "verified",
 
   "verification": {
     "reproducible_build": true,
@@ -61,6 +70,13 @@ Plugin manifest defines permissions, verification data, and sandbox constraints 
     "max_output_bytes": 512
   },
 
+  "caching": {
+    "enabled": true,
+    "ttl_seconds": 60,
+    "cache_key": ["session_id"],
+    "invalidate_on": ["session_change", "screen_change"]
+  },
+
   "output": {
     "format": "json",
     "schema": {
@@ -71,6 +87,47 @@ Plugin manifest defines permissions, verification data, and sandbox constraints 
   }
 }
 ```
+
+## Capabilities
+
+The `capabilities` field declares what the plugin can do:
+
+### Enrichment Capabilities
+
+| Capability | Description |
+|------------|-------------|
+| `session` | Adds data to session listings |
+| `tab` | Adds data to tab listings |
+| `window` | Adds data to window listings |
+| `process` | Adds process inspection data |
+
+### Automation Capabilities
+
+| Capability | Description |
+|------------|-------------|
+| `suggest` | Returns recommendations (e.g., "send 'continue'") |
+| `execute` | Performs actions (sends keystrokes, modifies state) |
+
+Example:
+```json
+"capabilities": {
+  "enrichment": ["session", "process"],
+  "automation": ["suggest"]
+}
+```
+
+## Trust Levels
+
+The `trust_level` field indicates how the plugin was verified:
+
+| Level | Description | Permissions |
+|-------|-------------|-------------|
+| `core` | Embedded in it2 binary | Full access |
+| `verified` | Reproducible build verified | As declared in manifest |
+| `community` | Has manifest, not verified | As declared in manifest |
+| `untrusted` | No manifest | Minimal (session ID only) |
+
+This field is typically set by it2 during verification, not by the plugin author.
 
 ## Sandbox Levels
 
@@ -92,6 +149,99 @@ Plugin manifest defines permissions, verification data, and sandbox constraints 
 - Cannot access network
 - Cannot execute subprocesses
 - Timeout: 50ms
+
+## Network and Exec Permissions
+
+By default, plugins **cannot** make network requests or execute subprocesses. This ensures:
+- Plugins cannot exfiltrate data
+- Plugins cannot download and run malicious code
+- Plugins cannot modify the system beyond their declared scope
+
+### Requesting Network Access
+
+Network access can be requested in the manifest but requires **elevated trust**:
+
+```json
+"sandbox": {
+  "network": true,
+  "allowed_hosts": ["api.github.com", "api.anthropic.com"],
+  "allowed_ports": [443]
+}
+```
+
+Network-enabled plugins:
+- Must be **verified** (reproducible build)
+- Are subject to additional review
+- Must declare specific hosts (no wildcard)
+- Are logged for audit purposes
+
+### Requesting Exec Access
+
+Subprocess execution is rarely needed and requires explicit justification:
+
+```json
+"sandbox": {
+  "allow_exec": true,
+  "allowed_executables": ["/usr/bin/git", "/usr/bin/ssh"]
+}
+```
+
+Exec-enabled plugins:
+- Must be **verified**
+- Must declare specific executables (no shell access)
+- Cannot execute arbitrary paths
+- Are heavily sandboxed even when exec is allowed
+
+## Output Caching
+
+Plugin output can be cached to improve performance and reduce repeated executions.
+
+### Cache Configuration
+
+```json
+"caching": {
+  "enabled": true,
+  "ttl_seconds": 60,
+  "cache_key": ["session_id"],
+  "invalidate_on": ["session_change", "screen_change"]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `enabled` | Whether caching is enabled (default: true for enrichment plugins) |
+| `ttl_seconds` | Time-to-live in seconds (default: 60 for verified, 30 for unverified) |
+| `cache_key` | Fields that form the cache key (e.g., `["session_id"]`, `["session_id", "working_directory"]`) |
+| `invalidate_on` | Events that invalidate the cache |
+
+### Cache Key Strategies
+
+| Strategy | Use Case |
+|----------|----------|
+| `["session_id"]` | Output depends only on session identity |
+| `["session_id", "screen_hash"]` | Output depends on current screen content |
+| `["session_id", "working_directory"]` | Output depends on current directory |
+| `[]` (empty) | Global cache (same output for all sessions) |
+
+### Invalidation Events
+
+| Event | Description |
+|-------|-------------|
+| `session_change` | Session state changes (new command, output) |
+| `screen_change` | Screen content changes |
+| `explicit` | Only invalidate on explicit refresh (e.g., `--refresh` flag) |
+| `never` | Cache persists until TTL expires |
+
+### Default Caching Behavior
+
+| Trust Level | Default TTL | Default Invalidation |
+|-------------|-------------|---------------------|
+| Core | 60s | `session_change` |
+| Verified | 60s | `session_change` |
+| Community | 30s | `session_change` |
+| Untrusted | 30s | `session_change` |
+
+Plugins can opt out of caching with `"enabled": false`, but this impacts performance for frequently-polled enrichment plugins.
 
 ## Verification Process
 
@@ -169,12 +319,15 @@ Output is validated against `manifest.output.schema` and sanitized before displa
 - Invalid output: enrichment omitted (bad data doesn't break display)
 - Sandbox violation: logged, plugin auto-disabled after threshold
 
-## Caching Strategy
+## Caching Strategy (Summary)
 
+See [Output Caching](#output-caching) above for detailed configuration.
+
+Default behavior:
 - Verified plugins: 60s TTL
 - Unverified plugins: 30s TTL
 - Failed plugins: exponential backoff (5s, 10s, 20s, ...)
-- Cache invalidation: on explicit refresh flag
+- Cache invalidation: on session change or explicit refresh flag
 
 ## Example Usage
 
