@@ -1,10 +1,13 @@
-# Claude Code Extensions for it2
+# Claude Code Plugins Reference
+
+> **Terminology note:** This document describes *plugins* (executables discovered and invoked by it2).
+> For the distinction between plugins, hooks, and tools, see [TAXONOMY.md](TAXONOMY.md).
 
 ## Overview
 
 The it2 CLI includes a comprehensive suite of plugins specifically designed for automating and orchestrating Claude Code sessions. These plugins enable detection, monitoring, and intelligent interaction with Claude sessions.
 
-## Extension Categories
+## Plugin Categories
 
 ### 1. Session Detection & Identification
 
@@ -545,7 +548,7 @@ ITERM2_DEBUG=1 it2-session-is-claude-code A1B2C3D4
 
 ---
 
-## Extension Development
+## Plugin Development
 
 To create a new Claude-related plugin:
 
@@ -594,7 +597,7 @@ echo "result"
 
 ## Summary
 
-The Claude Code extension ecosystem for it2 provides:
+The Claude Code plugin ecosystem for it2 provides:
 
 - ✅ **Detection**: Identify Claude sessions by process
 - ✅ **Modal handling**: Detect and auto-approve safe operations
