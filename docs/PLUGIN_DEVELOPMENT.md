@@ -2,13 +2,27 @@
 
 This guide covers developing plugins for the it2 command-line interface for iTerm2 automation.
 
+> **See also:** [TAXONOMY.md](TAXONOMY.md) for the authoritative definitions of plugins, hooks, and tools.
+
 ## Overview
 
-it2 supports extensibility through an executable plugin system that can:
+**Plugins** are external executables that extend it2 functionality. They are discovered automatically from your PATH and invoked programmatically by it2.
 
-1. **Enrich session information** - Add metadata to session, tab, and window listings
-2. **Monitor and respond to events** - Automate responses based on patterns
-3. **Filter and categorize** - Apply tool-specific logic for better organization
+Plugins can:
+
+1. **Enrich listings** - Add metadata to session, tab, and window listings
+2. **Automate responses** - Monitor and respond to patterns
+3. **Categorize entities** - Apply context-specific logic for better organization
+
+### Plugins vs Hooks vs Tools
+
+| Concept | Definition | Invocation |
+|---------|------------|------------|
+| **Plugin** | Extends it2, auto-discovered | By it2 (`it2 plugin <name>`) |
+| **Hook** | Responds to external tool events | By Claude Code, Gemini CLI, etc. |
+| **Tool** | Standalone CLI program | Directly by user |
+
+Plugins are **it2-facing**: it2 discovers and invokes them. Hooks are **external-tool-facing**: Claude Code or other tools invoke them based on their configuration.
 
 ## Plugin Architecture
 
@@ -30,6 +44,33 @@ it2 recognizes three types of plugins based on executable naming:
 2. **Tab Enrichers** (`it2-tab-*`) - Add data to tab listings
 3. **Window Enrichers** (`it2-window-*`) - Add data to window listings
 4. **Generic Plugins** (`it2-*`) - Apply to all entity types
+
+### Capabilities
+
+Plugins declare capabilities that determine what they can do:
+
+**Enrichment Capabilities:**
+- `session` - Adds data to session listings
+- `tab` - Adds data to tab listings
+- `window` - Adds data to window listings
+- `process` - Adds process inspection data
+
+**Automation Capabilities:**
+- `suggest` - Returns recommendations (e.g., "send 'continue'")
+- `execute` - Performs actions (sends keystrokes, modifies state)
+
+Capabilities are inferred from the plugin name or declared explicitly in a manifest. See [plugin-manifest-schema.md](plugin-manifest-schema.md) for manifest format.
+
+### Trust Levels
+
+Plugins are assigned trust levels based on their source:
+
+| Level | Source | Permissions |
+|-------|--------|-------------|
+| **Core** | Embedded in it2 binary | Full access |
+| **Verified** | Reproducible build verified | As declared in manifest |
+| **Community** | Has manifest, not verified | As declared in manifest |
+| **Untrusted** | No manifest | Minimal (session ID only) |
 
 ## Quick Start
 
@@ -328,6 +369,39 @@ See the `examples/` directory for working plugin implementations:
 - **vim-monitoring/**: Advanced vim session detection and assistance
 - **tmux-monitoring/**: tmux session integration
 - **shell-monitoring/**: Shell state detection
+
+## Using the CLI
+
+### List Available Plugins
+
+```bash
+it2 plugin list
+```
+
+### Run a Plugin
+
+```bash
+# Via it2 (automatic session ID injection)
+it2 plugin <name> [args...]
+
+# Or directly (if in PATH)
+it2-session-example <session-id> [args...]
+```
+
+The `it2 plugin` wrapper provides:
+- Automatic session ID injection from `$ITERM_SESSION_ID`
+- Plugin discovery information
+- Consistent error handling
+
+### Install Claude Code Hooks
+
+```bash
+# Install to project settings (.claude/settings.json)
+it2 plugin claude-code-hook --install
+
+# Install to global settings (~/.claude/settings.json)
+it2 plugin claude-code-hook --install --scope global
+```
 
 ## Plugin Registry (Future)
 
