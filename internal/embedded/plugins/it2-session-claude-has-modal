@@ -15,6 +15,9 @@
 #   - "input" for text input prompts
 #   - "none" if no modal detected
 #   - Exit code 0 if modal found, 1 if no modal
+#
+# NOTE: This is a thin wrapper around `it2 session has-modal`.
+# The native Go implementation provides faster and more reliable detection.
 
 set -euo pipefail
 
@@ -39,6 +42,12 @@ if [[ -z "$IT2_BIN" ]]; then
     exit 1
 fi
 
+# Use native command if available (it2 v2.x+)
+if $IT2_BIN session has-modal --help &>/dev/null; then
+    exec $IT2_BIN session has-modal "$SESSION_ID" 2>/dev/null
+fi
+
+# Fallback to legacy implementation for older it2 versions
 SCREEN_CONTENT=$($IT2_BIN text get-screen "$SESSION_ID" 2>/dev/null || echo "")
 
 if [[ -z "$SCREEN_CONTENT" ]]; then
@@ -46,7 +55,6 @@ if [[ -z "$SCREEN_CONTENT" ]]; then
     exit 1
 fi
 
-# Look for Claude modal patterns in the screen content
 # Remove ANSI escape sequences for clean pattern matching
 CLEAN_CONTENT=$(echo "$SCREEN_CONTENT" | sed 's/\x1b\[[0-9;]*m//g')
 

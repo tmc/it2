@@ -11,10 +11,14 @@
 # Returns:
 #   - "continue" - session has todos and is stuck, should send continue
 #   - "tab" - session has pending edits to accept
-#   - "modal:<action>" - session needs modal interaction (e.g., "modal:approve")
+#   - "modal:approve" - session needs modal auto-approval
+#   - "modal:review" - session has modal requiring human review
 #   - "wait" - session is actively working, should wait
 #   - "none" - no intervention needed
 #   - Exit code 0 for actionable suggestions, 1 for wait/none
+#
+# NOTE: This is a thin wrapper around `it2 session suggest-action`.
+# The native Go implementation provides faster and more reliable detection.
 
 set -euo pipefail
 
@@ -26,7 +30,7 @@ if [[ -z "$SESSION_ID" ]]; then
     exit 1
 fi
 
-# Find it2 binary and plugins
+# Find it2 binary
 IT2_BIN=""
 if [[ -x "./it2" ]]; then
     IT2_BIN="./it2"
@@ -41,6 +45,16 @@ if [[ -z "$IT2_BIN" ]]; then
     exit 1
 fi
 
+# Use native command if available (it2 v2.x+)
+if $IT2_BIN session suggest-action --help &>/dev/null; then
+    if [[ "$EXECUTE" == "--execute" ]]; then
+        exec $IT2_BIN session suggest-action "$SESSION_ID" --execute 2>/dev/null
+    else
+        exec $IT2_BIN session suggest-action "$SESSION_ID" 2>/dev/null
+    fi
+fi
+
+# Fallback to legacy implementation
 PLUGIN_DIR="$(dirname "$0")"
 
 # Get current screen content
@@ -74,19 +88,7 @@ if [[ "$MODAL_TYPE" != "none" ]]; then
     fi
 fi
 
-# Priority 2: Check for edit acceptance prompts
-if echo "$CLEAN_CONTENT" | grep -q "⏵⏵ accept edits" || \
-   echo "$CLEAN_CONTENT" | grep -q "shift+tab to cycle"; then
-    if [[ "$EXECUTE" == "--execute" ]]; then
-        $IT2_BIN session send-key "$SESSION_ID" "Tab"
-        echo "tab:sent"
-    else
-        echo "tab"
-    fi
-    exit 0
-fi
-
-# Priority 3: Check for active work indicators (should wait)
+# Priority 2: Check for active work indicators (should wait)
 if echo "$CLEAN_CONTENT" | grep -qE "⏺|✳|✽|✶|✢|⚡|🔄|🔍|🏗️|⚙️"; then
     echo "wait"
     exit 1
@@ -102,64 +104,32 @@ if echo "$CLEAN_CONTENT" | grep -qE "(esc to interrupt|ctrl\+t to hide|please wa
     exit 1
 fi
 
+# Priority 3: Check for edit acceptance prompts
+if echo "$CLEAN_CONTENT" | grep -q "⏵⏵ accept edits" || \
+   echo "$CLEAN_CONTENT" | grep -q "shift+tab to cycle"; then
+    if [[ "$EXECUTE" == "--execute" ]]; then
+        $IT2_BIN session send-key "$SESSION_ID" "Tab"
+        echo "tab:sent"
+    else
+        echo "tab"
+    fi
+    exit 0
+fi
+
 # Priority 4: Check if at a clean prompt with incomplete todos
 AT_PROMPT=$("$PLUGIN_DIR/it2-session-is-at-prompt" "$SESSION_ID" 2>/dev/null || echo "false")
 HAS_INCOMPLETE_TODOS=$(echo "$CLEAN_CONTENT" | grep -c "☐" 2>/dev/null || echo "0")
 HAS_INCOMPLETE_TODOS=$(echo "$HAS_INCOMPLETE_TODOS" | tr -d '\n\r')
 
 if [[ "$AT_PROMPT" == "true" ]] && [[ "$HAS_INCOMPLETE_TODOS" -gt 0 ]]; then
-    # Analyze todo context for better suggestions
-
-    # Check for specific todo patterns that need different approaches
-    if echo "$CLEAN_CONTENT" | grep -q "☐.*[Mm]onitor.*progress" && \
-       ! echo "$CLEAN_CONTENT" | grep -qE "☐.*(Phase|milestone|completion|specific)"; then
-        # Vague monitoring todos
-        if [[ "$EXECUTE" == "--execute" ]]; then
-            $IT2_BIN session send-text "$SESSION_ID" "Let me break down the monitoring into specific milestones and actionable todos."
-            $IT2_BIN session send-key "$SESSION_ID" "Return"
-            echo "continue:milestone-breakdown"
-        else
-            echo "continue:milestone-breakdown"
-        fi
-        exit 0
-
-    elif echo "$CLEAN_CONTENT" | grep -q "☐.*[Tt]est" && \
-         echo "$CLEAN_CONTENT" | grep -q "☐.*[Bb]uild"; then
-        # Test and build todos - suggest running them
-        if [[ "$EXECUTE" == "--execute" ]]; then
-            $IT2_BIN session send-text "$SESSION_ID" "continue with testing and building"
-            $IT2_BIN session send-key "$SESSION_ID" "Return"
-            echo "continue:test-build"
-        else
-            echo "continue:test-build"
-        fi
-        exit 0
-
+    if [[ "$EXECUTE" == "--execute" ]]; then
+        $IT2_BIN session send-text "$SESSION_ID" "continue"
+        $IT2_BIN session send-key "$SESSION_ID" "Return"
+        echo "continue:sent"
     else
-        # Generic continue for other incomplete todos
-        if [[ "$EXECUTE" == "--execute" ]]; then
-            $IT2_BIN session send-text "$SESSION_ID" "continue"
-            $IT2_BIN session send-key "$SESSION_ID" "Return"
-            echo "continue:generic"
-        else
-            echo "continue"
-        fi
-        exit 0
+        echo "continue"
     fi
-fi
-
-# Priority 5: Check for error states that might need intervention
-if echo "$CLEAN_CONTENT" | grep -qE "(Error|error|Failed|failed|Exception|exception)"; then
-    echo "review:error"
-    exit 1
-fi
-
-# Priority 6: Check for long idle without todos (might need status check)
-LAST_LINES=$(echo "$CLEAN_CONTENT" | tail -5)
-if echo "$LAST_LINES" | grep -qE "^>\s*$" && \
-   [[ "$HAS_INCOMPLETE_TODOS" -eq 0 ]]; then
-    echo "none"
-    exit 1
+    exit 0
 fi
 
 # Default: no intervention needed
