@@ -5,7 +5,78 @@
 
 ## Overview
 
-The it2 CLI includes a comprehensive suite of plugins specifically designed for automating and orchestrating Claude Code sessions. These plugins enable detection, monitoring, and intelligent interaction with Claude sessions.
+The it2 CLI includes a comprehensive suite of plugins and native commands specifically designed for automating and orchestrating Claude Code sessions. These enable detection, monitoring, and intelligent interaction with Claude sessions.
+
+## Native Session Commands (v2.x+)
+
+Starting with it2 v2.x, native Go commands are available that provide faster and more reliable detection than shell-based plugins. These commands use the `sessionstate` package for agent-agnostic state detection.
+
+### Core State Detection Commands
+
+| Command | Purpose | Exit Codes |
+|---------|---------|------------|
+| `it2 session get-state` | Comprehensive state analysis | 0=success |
+| `it2 session is-active` | Check if session is actively working | 0=active, 1=idle |
+| `it2 session has-modal` | Detect modal dialogs | 0=modal, 1=no modal |
+| `it2 session suggest-action` | Suggest intervention action | 0=actionable, 1=wait/none |
+| `it2 session claude-status` | Human-readable Claude status | 0=success |
+
+### Usage Examples
+
+```bash
+# Get comprehensive state with Claude detection
+it2 session get-state E0A8 --agent=claude --format json
+
+# Check if session is actively working
+if it2 session is-active E0A8 --agent=claude; then
+    echo "Session busy, waiting..."
+    sleep 5
+fi
+
+# Detect modal and get type
+modal=$(it2 session has-modal E0A8)
+case "$modal" in
+    approval) echo "Approval needed" ;;
+    choice) echo "Selection needed" ;;
+    none) echo "No modal" ;;
+esac
+
+# Get suggested action and optionally execute it
+it2 session suggest-action E0A8 --execute
+
+# Human-readable status display
+it2 session claude-status E0A8
+```
+
+### Watch Command (Event-Driven Monitoring)
+
+The `watch` command provides event-driven session monitoring with NDJSON output:
+
+```bash
+# Watch for state transitions
+it2 session watch E0A8 --agent=claude
+
+# Auto-execute suggested actions
+it2 session watch E0A8 --agent=claude --auto-act
+
+# Verbose output with full state on each transition
+it2 session watch E0A8 --agent=claude --verbose
+```
+
+Output format (NDJSON):
+```json
+{"timestamp":"2024-12-25T09:00:00Z","session_id":"E0A8...","state":"active","previous_state":"idle","action":"wait"}
+{"timestamp":"2024-12-25T09:00:05Z","session_id":"E0A8...","state":"modal","previous_state":"active","modal_type":"approval","safe":true,"action":"modal:approve"}
+```
+
+### Agent Detection
+
+All state detection commands support the `--agent` flag:
+- `--agent=claude` - Use Claude Code detection patterns
+- `--agent=auto` - Auto-detect the agent
+- (empty) - Use generic detection patterns
+
+The shell-based plugins (`it2-session-claude-has-modal`, `it2-session-claude-suggest-action`) now delegate to these native commands when available, falling back to legacy implementation for older it2 versions.
 
 ## Plugin Categories
 
