@@ -2,270 +2,243 @@ package session
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/client"
-	"github.com/tmc/it2/internal/connect"
+	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/sessionid"
+	"github.com/tmc/it2/internal/sessionstate"
+
+	// Register agent profiles
+	_ "github.com/tmc/it2/internal/sessionstate/agents/claude"
 )
 
-// SessionWatcher monitors multiple sessions
-type SessionWatcher struct {
-	SessionID   string
-	Name        string
-	LastContent string
-	Status      string
-	LastAction  time.Time
+// StateTransition represents a state change event
+type StateTransition struct {
+	Timestamp     time.Time                    `json:"timestamp"`
+	SessionID     string                       `json:"session_id"`
+	State         sessionstate.State           `json:"state"`
+	PreviousState sessionstate.State           `json:"previous_state"`
+	TriggerEvent  string                       `json:"trigger_event"`
+	ModalType     sessionstate.ModalType       `json:"modal_type,omitempty"`
+	Safe          bool                         `json:"safe,omitempty"`
+	Action        sessionstate.SuggestedAction `json:"action,omitempty"`
+	ActionTaken   bool                         `json:"action_taken,omitempty"`
 }
 
 func newWatchCommand() *cobra.Command {
-	var interval int
-	var filter string
-	var autoRespond bool
-	var verbose bool
+	template := cmdutil.CommandTemplate{
+		Use:   "watch [<session-id>]",
+		Short: "Watch session for state transitions",
+		Long: `Event-driven monitoring that outputs state transitions.
 
-	cmd := &cobra.Command{
-		Use:   "watch",
-		Short: "Watch sessions and provide status overview",
-		Long: `Watch iTerm2 sessions with a real-time dashboard view.
+Unlike 'monitor' which outputs raw events, 'watch' detects state changes
+and only outputs when the session transitions between states.
 
-This command provides a dashboard view of sessions and can:
-- Monitor multiple sessions simultaneously
-- Auto-respond to prompts based on patterns
-- Show session activity status
-- Highlight sessions needing attention
+With --agent, enables agent-specific state detection:
+  - Active/idle state based on spinners and work indicators
+  - Modal detection and type classification
+  - Todo tracking
+  - Suggested action for each state
+
+With --auto-act, automatically executes suggested actions:
+  - Approves safe modals
+  - Sends "continue" when idle with todos
+  - Accepts pending edits
+
+Events are output as NDJSON (one JSON object per line).
 
 Examples:
-  # Watch all sessions
-  it2 session watch
+  # Watch for state changes with Claude detection
+  it2 session watch E0A8 --agent=claude
 
-  # Filter sessions by name pattern with auto-response
-  it2 session watch --filter "project-*" --auto-respond
+  # Watch and auto-execute suggested actions
+  it2 session watch E0A8 --agent=claude --auto-act
 
-  # Verbose monitoring with custom interval
-  it2 session watch --verbose --interval 2
-`,
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, cancel := context.WithCancel(context.Background())
+  # Verbose output with full state on each transition
+  it2 session watch E0A8 --agent=claude --verbose`,
+		Args:           cobra.RangeArgs(0, 1),
+		RequiresClient: true,
+		ValidArgsFunc:  completion.SessionIDCompletion,
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			var sessionID string
+			if len(args) > 0 {
+				sessionID = args[0]
+			}
+
+			ctx, cancel := context.WithCancel(sc.GetContext())
 			defer cancel()
+
+			c := sc.GetClient()
+			sessionID, err := c.ResolveSessionID(ctx, sessionID)
+			if err != nil {
+				return sc.ReportError("resolve session ID", err)
+			}
+
+			// Log session context
+			srcSessionID := sessionid.Normalize(os.Getenv("ITERM_SESSION_ID"))
+			srcShort := sessionid.Shorten(srcSessionID)
+			dstShort := sessionid.Shorten(sessionID)
+			fmt.Fprintf(os.Stderr, "[it2:watch src=%s dst=%s]\n", srcShort, dstShort)
+
+			// Get flags
+			agentName, _ := sc.GetCommand().Flags().GetString("agent")
+			autoAct, _ := sc.GetCommand().Flags().GetBool("auto-act")
+			verbose, _ := sc.GetCommand().Flags().GetBool("verbose")
+			pollInterval, _ := sc.GetCommand().Flags().GetDuration("poll-interval")
+
+			// Handle backward compat for --detect-claude
+			if detectClaude, _ := sc.GetCommand().Flags().GetBool("detect-claude"); detectClaude && agentName == "" {
+				agentName = "claude"
+			}
 
 			// Handle interruption signals
 			sigChan := make(chan os.Signal, 1)
 			signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 			go func() {
 				<-sigChan
-				fmt.Fprintf(os.Stderr, "\nStopping watcher...\n")
+				fmt.Fprintf(os.Stderr, "\nStopping watch...\n")
 				cancel()
 			}()
 
-			c, err := connect.ConnectClient(ctx)
-			if err != nil {
-				return fmt.Errorf("failed to connect: %w", err)
-			}
-			defer c.Close()
+			fmt.Fprintf(os.Stderr, "Watching session %s (agent=%s, auto-act=%v)\n", dstShort, agentName, autoAct)
+			fmt.Fprintf(os.Stderr, "Press Ctrl+C to stop\n\n")
 
-			// Get all sessions
-			sessions, err := c.ListSessions(ctx)
-			if err != nil {
-				return fmt.Errorf("failed to list sessions: %w", err)
-			}
-
-			// Initialize watchers
-			watchers := make(map[string]*SessionWatcher)
-			for _, session := range sessions {
-				name := session.SessionName
-				sessionID := session.SessionID
-
-				// Apply filter if specified
-				if filter != "" && !strings.Contains(strings.ToLower(name), strings.ToLower(filter)) {
-					continue
-				}
-
-				watchers[sessionID] = &SessionWatcher{
-					SessionID: sessionID,
-					Name:      name,
-					Status:    "Active",
-				}
-			}
-
-			if len(watchers) == 0 {
-				fmt.Println("No sessions found to watch")
-				return nil
-			}
-
-			fmt.Printf("Watching %d sessions\n", len(watchers))
-			fmt.Printf("Update interval: %ds\n", interval)
-			if autoRespond {
-				fmt.Println("Auto-response: ENABLED")
-			}
-			fmt.Printf("Press Ctrl+C to stop\n\n")
-
-			// Main monitoring loop
-			ticker := time.NewTicker(time.Duration(interval) * time.Second)
-			defer ticker.Stop()
-
-			for {
-				select {
-				case <-ctx.Done():
-					return nil
-				case <-ticker.C:
-					// Clear screen for dashboard update
-					if !verbose {
-						fmt.Print("\033[H\033[2J") // Clear screen
-						fmt.Printf("=== Session Monitor === [%s]\n\n",
-							time.Now().Format("15:04:05"))
-					}
-
-					for _, watcher := range watchers {
-						if err := updateWatcher(c, watcher, autoRespond, verbose); err != nil {
-							if verbose {
-								fmt.Fprintf(os.Stderr, "Error updating %s: %v\n",
-									watcher.SessionID, err)
-							}
-							watcher.Status = "Error"
-						}
-
-						// Display status
-						displayWatcherStatus(watcher, verbose)
-					}
-
-					if !verbose {
-						fmt.Printf("\n[Monitoring %d sessions, updating every %ds]\n",
-							len(watchers), interval)
-					}
-				}
-			}
+			// Run the watch loop
+			return runWatchLoop(ctx, c, sessionID, agentName, autoAct, verbose, pollInterval)
 		},
 	}
 
-	cmd.Flags().IntVar(&interval, "interval", 5, "Update interval in seconds")
-	cmd.Flags().StringVar(&filter, "filter", "", "Filter sessions by name pattern")
-	cmd.Flags().BoolVar(&autoRespond, "auto-respond", false, "Enable auto-response for prompts")
-	cmd.Flags().BoolVar(&verbose, "verbose", false, "Show detailed monitoring information")
+	cmd := cmdutil.NewCommandFromTemplate(template)
+	cmd.SilenceUsage = true
+
+	// Add command-specific flags
+	cmd.Flags().String("agent", "", "Agent to detect: claude, auto, or empty (generic)")
+	cmd.Flags().Bool("detect-claude", false, "Enable Claude Code-specific detection (deprecated, use --agent=claude)")
+	cmd.Flags().Bool("auto-act", false, "Automatically execute suggested actions")
+	cmd.Flags().BoolP("verbose", "v", false, "Output full state on each transition")
+	cmd.Flags().Duration("poll-interval", 2*time.Second, "Interval between state checks")
+
+	// Hide deprecated flag
+	_ = cmd.Flags().MarkHidden("detect-claude")
 
 	return cmd
 }
 
-func updateWatcher(c *client.Client, watcher *SessionWatcher, autoRespond, verbose bool) error {
-	response, err := c.GetScreenContents(context.Background(), watcher.SessionID)
+// runWatchLoop implements the main watch loop
+func runWatchLoop(ctx context.Context, c *client.Client, sessionID string, agentName string, autoAct, verbose bool, pollInterval time.Duration) error {
+	opts := sessionstate.DetectOptions{
+		AgentName:   agentName,
+		RecentLines: 20,
+	}
+
+	var lastState sessionstate.State
+	var lastModalType sessionstate.ModalType
+
+	ticker := time.NewTicker(pollInterval)
+	defer ticker.Stop()
+
+	// Get initial state
+	initialState, err := sessionstate.DetectState(ctx, c, sessionID, opts)
 	if err != nil {
-		return err
+		return fmt.Errorf("initial state detection: %w", err)
+	}
+	lastState = initialState.State
+	if initialState.Agent != nil && initialState.Agent.Modal != nil {
+		lastModalType = initialState.Agent.Modal.Type
 	}
 
-	// Extract text content from response
-	var lines []string
-	for _, lineContent := range response.Contents {
-		if lineContent.Text != nil {
-			lines = append(lines, *lineContent.Text)
-		}
-	}
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-ticker.C:
+			state, err := sessionstate.DetectState(ctx, c, sessionID, opts)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error detecting state: %v\n", err)
+				continue
+			}
 
-	// Get last 30 lines for analysis
-	if len(lines) > 30 {
-		lines = lines[len(lines)-30:]
-	}
-	recentContent := strings.Join(lines, "\n")
+			// Check for state transition
+			currentModalType := sessionstate.ModalNone
+			if state.Agent != nil && state.Agent.Modal != nil {
+				currentModalType = state.Agent.Modal.Type
+			}
 
-	// Detect status
-	watcher.Status = detectSessionStatus(recentContent)
+			stateChanged := state.State != lastState
+			modalChanged := currentModalType != lastModalType
 
-	// Auto-respond if enabled and needed
-	if autoRespond && shouldAutoRespond(watcher, recentContent) {
-		if err := performAutoResponse(c, watcher, recentContent, verbose); err != nil {
-			return err
-		}
-	}
+			if stateChanged || modalChanged {
+				// Build transition event
+				transition := StateTransition{
+					Timestamp:     time.Now(),
+					SessionID:     sessionID,
+					State:         state.State,
+					PreviousState: lastState,
+					TriggerEvent:  "poll",
+				}
 
-	watcher.LastContent = recentContent
-	return nil
-}
+				if currentModalType != sessionstate.ModalNone {
+					transition.ModalType = currentModalType
+					if state.Agent.Modal != nil {
+						transition.Safe = state.Agent.Modal.SafeToApprove
+					}
+				}
 
-func detectSessionStatus(content string) string {
-	// Check for various states
-	if strings.Contains(content, "Press Enter to continue") ||
-		strings.Contains(content, "Do you want to proceed?") {
-		return "⏸️  Waiting"
-	}
+				// Get suggested action
+				action := sessionstate.SuggestAction(state)
+				transition.Action = action
 
-	if strings.Contains(content, "Error:") || strings.Contains(content, "failed") {
-		return "❌ Error"
-	}
+				// Auto-execute if enabled
+				if autoAct && isActionableSession(action) {
+					if err := executeActionSession(c, ctx, sessionID, action); err != nil {
+						fmt.Fprintf(os.Stderr, "Error executing action: %v\n", err)
+					} else {
+						transition.ActionTaken = true
+					}
+				}
 
-	if strings.Contains(content, "☐") || strings.Contains(content, "in_progress") {
-		return "🔄 Working"
-	}
+				// Output transition
+				if verbose {
+					// Full state output
+					output := struct {
+						Transition StateTransition           `json:"transition"`
+						State      *sessionstate.SessionState `json:"state"`
+					}{
+						Transition: transition,
+						State:      state,
+					}
+					if err := printJSON(output); err != nil {
+						fmt.Fprintf(os.Stderr, "Error printing JSON: %v\n", err)
+					}
+				} else {
+					// Compact transition output
+					if err := printJSON(transition); err != nil {
+						fmt.Fprintf(os.Stderr, "Error printing JSON: %v\n", err)
+					}
+				}
 
-	if strings.Contains(content, "☒") || strings.Contains(content, "completed") {
-		return "✅ Progress"
-	}
-
-	if strings.Contains(content, "$") || strings.Contains(content, ">") {
-		return "💭 Idle"
-	}
-
-	return "📊 Active"
-}
-
-func shouldAutoRespond(watcher *SessionWatcher, content string) bool {
-	// Check if we should auto-respond
-	if time.Since(watcher.LastAction) < 3*time.Second {
-		return false // Cooldown period
-	}
-
-	// Check for prompts
-	return strings.Contains(content, "Press Enter to continue") ||
-		strings.Contains(content, "Do you want to proceed?") ||
-		strings.Contains(content, "❯ 1. Yes")
-}
-
-func performAutoResponse(c *client.Client, watcher *SessionWatcher, content string, verbose bool) error {
-	// Check for menu selection with "❯ 1. Yes"
-	if strings.Contains(content, "❯ 1. Yes") {
-		if verbose {
-			fmt.Printf("[AUTO] Sending '1' to select menu option in %s\n", watcher.Name)
-		}
-		watcher.LastAction = time.Now()
-		// Send "1" to select the option
-		return c.SendText(context.Background(), watcher.SessionID, "1\r")
-	}
-
-	// Check for simple Enter prompts
-	if strings.Contains(content, "Press Enter to continue") ||
-		strings.Contains(content, "Press ENTER to continue") {
-		if verbose {
-			fmt.Printf("[AUTO] Sending Enter to %s\n", watcher.Name)
-		}
-		watcher.LastAction = time.Now()
-		return c.SendText(context.Background(), watcher.SessionID, "\r")
-	}
-
-	return nil
-}
-
-func displayWatcherStatus(watcher *SessionWatcher, verbose bool) {
-	statusLine := fmt.Sprintf("%-50s %s", watcher.Name, watcher.Status)
-
-	// Add last action time if recent
-	if time.Since(watcher.LastAction) < 1*time.Minute {
-		statusLine += fmt.Sprintf(" (acted %s ago)", time.Since(watcher.LastAction).Round(time.Second))
-	}
-
-	fmt.Println(statusLine)
-
-	if verbose && watcher.Status == "⏸️  Waiting" {
-		// Show what it's waiting for
-		lines := strings.Split(watcher.LastContent, "\n")
-		for _, line := range lines {
-			if strings.Contains(line, "Press") || strings.Contains(line, "proceed") {
-				fmt.Printf("    -> %s\n", strings.TrimSpace(line))
-				break
+				// Update last state
+				lastState = state.State
+				lastModalType = currentModalType
 			}
 		}
 	}
+}
+
+// printJSON outputs a value as compact JSON with newline
+func printJSON(v interface{}) error {
+	data, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(data))
+	return nil
 }
