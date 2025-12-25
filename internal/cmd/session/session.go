@@ -261,6 +261,27 @@ func NewCommand() *cobra.Command {
 	watchCmd.GroupID = "monitoring"
 	cmd.AddCommand(watchCmd)
 
+	// Claude Code state detection commands
+	getStateCmd := newGetStateCommand()
+	getStateCmd.GroupID = "monitoring"
+	cmd.AddCommand(getStateCmd)
+
+	isActiveCmd := newIsActiveCommand()
+	isActiveCmd.GroupID = "monitoring"
+	cmd.AddCommand(isActiveCmd)
+
+	hasModalCmd := newHasModalCommand()
+	hasModalCmd.GroupID = "monitoring"
+	cmd.AddCommand(hasModalCmd)
+
+	suggestActionCmd := newSuggestActionCommand()
+	suggestActionCmd.GroupID = "monitoring"
+	cmd.AddCommand(suggestActionCmd)
+
+	claudeStatusCmd := newClaudeStatusCommand()
+	claudeStatusCmd.GroupID = "monitoring"
+	cmd.AddCommand(claudeStatusCmd)
+
 	hasShellIntegrationCmd := newHasShellIntegrationCmd()
 	hasShellIntegrationCmd.GroupID = "monitoring"
 	cmd.AddCommand(hasShellIntegrationCmd)
