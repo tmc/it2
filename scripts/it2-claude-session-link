@@ -1,0 +1,48 @@
+#!/bin/bash
+# it2-claude-session-link - Links Claude Code session IDs to iTerm2 session variables
+#
+# This script is designed to be called as a Claude Code hook. It reads hook event
+# JSON from stdin and sets the Claude session ID as an iTerm2 user variable.
+#
+# Usage in ~/.claude/settings.json:
+#   "hooks": {
+#     "SessionStart": [{
+#       "type": "command",
+#       "command": "it2-claude-session-link"
+#     }]
+#   }
+
+set -e
+
+# Read JSON from stdin
+input=$(cat)
+
+# Extract the Claude session ID from the hook event
+claude_session_id=$(echo "$input" | jq -r '.session_id // empty')
+
+if [ -z "$claude_session_id" ]; then
+    exit 0  # No session ID in event, silently exit
+fi
+
+# Get the iTerm2 session ID from environment
+iterm_session_id="${ITERM_SESSION_ID:-}"
+
+if [ -z "$iterm_session_id" ]; then
+    exit 0  # Not running in iTerm2
+fi
+
+# Set the Claude session ID as an iTerm2 user variable
+# This allows querying: it2 session get-variable $SID user.claude_session_id
+it2 session set-variable "$iterm_session_id" user.claude_session_id "$claude_session_id" 2>/dev/null || true
+
+# Also store the transcript path for convenience
+transcript_path=$(echo "$input" | jq -r '.transcript_path // empty')
+if [ -n "$transcript_path" ]; then
+    it2 session set-variable "$iterm_session_id" user.claude_transcript "$transcript_path" 2>/dev/null || true
+fi
+
+# Store the hook event name for debugging
+hook_event=$(echo "$input" | jq -r '.hook_event_name // empty')
+if [ -n "$hook_event" ]; then
+    it2 session set-variable "$iterm_session_id" user.claude_last_event "$hook_event" 2>/dev/null || true
+fi

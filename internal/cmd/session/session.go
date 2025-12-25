@@ -298,6 +298,10 @@ func NewCommand() *cobra.Command {
 	exportRecordingCmd.GroupID = "monitoring"
 	cmd.AddCommand(exportRecordingCmd)
 
+	claudeCmd := newClaudeCommand()
+	claudeCmd.GroupID = "monitoring"
+	cmd.AddCommand(claudeCmd)
+
 	// Hidden/Advanced commands (no group)
 	cmd.AddCommand(newSplitsCommand())
 	cmd.AddCommand(newSplitsAliasCommand())
