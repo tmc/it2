@@ -214,6 +214,52 @@ fi
 
 ## Advanced Features (Quick Overview)
 
+### Claude Code Session Monitoring
+
+Monitor and automate Claude Code sessions with native commands:
+
+```bash
+# Human-readable status
+it2 session claude-status
+
+# JSON state for scripting
+it2 session get-state --agent=claude --format=json
+
+# Check if session is actively working (exit 0=active, 1=idle)
+if it2 session is-active --agent=claude; then
+    echo "Claude is working..."
+fi
+
+# Detect modals (exit 0=modal present, 1=no modal)
+MODAL=$(it2 session has-modal)
+echo "Modal type: $MODAL"  # none, approval, choice, confirmation, input
+
+# Get suggested action
+ACTION=$(it2 session suggest-action)
+echo "Suggested: $ACTION"  # wait, continue, tab, modal:approve, none
+
+# Watch state changes in real-time (NDJSON output)
+it2 session watch --agent=claude
+
+# Auto-execute suggested actions
+it2 session watch --agent=claude --auto-act
+```
+
+### Session Filtering
+
+```bash
+# Filter by name or title (case-insensitive)
+it2 session list --filter vim
+it2 session list --filter "my project"
+```
+
+### Split with Working Directory
+
+```bash
+# Create split that starts in specific directory
+it2 session split --horizontal --cwd /path/to/project
+```
+
 ### Shell Integration Features
 Requires iTerm2 Shell Integration to be installed:
 ```bash
@@ -305,14 +351,23 @@ For advanced features like command history and job monitoring:
 ## Quick Reference Card
 
 ```bash
-# Essential commands to remember:
+# Essential commands:
 it2 session list                    # List all sessions
+it2 session list --filter vim       # Filter by name/title
 it2 session send-text "command"     # Execute command
 it2 session split --vertical        # Split pane
+it2 session split --cwd /path       # Split with working dir
 it2 tab create "Profile"            # New tab
 it2 text get-screen                 # Capture output
-it2 profile list                    # Available profiles
 it2 auth check                      # Verify connection
+
+# Claude Code monitoring:
+it2 session claude-status           # Human-readable status
+it2 session get-state --agent=claude  # JSON state
+it2 session is-active               # Check if working
+it2 session has-modal               # Detect modals
+it2 session suggest-action          # Get suggested action
+it2 session watch --agent=claude    # Real-time monitoring
 
 # Pro tips:
 it2 session get-info --json         # Detailed session data
@@ -320,4 +375,4 @@ it2 tab create "Default" --badge "Label"  # Labeled tabs
 ITERM2_DEBUG=1 it2 [cmd]           # Debug mode
 ```
 
-Happy automating! 🚀
+Happy automating!

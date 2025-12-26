@@ -11,6 +11,7 @@ Real-world automation recipes for common development and system administration t
 - [Monitoring & Logging](#monitoring--logging)
 - [Team Collaboration](#team-collaboration)
 - [Advanced Automation](#advanced-automation)
+- [Claude Code Automation](#claude-code-automation)
 
 ## Development Workflows
 
@@ -991,6 +992,213 @@ EOF
 it2 session send-text "source /tmp/perf-testing.sh"
 
 echo "✅ Performance testing automation ready!"
+```
+
+## Claude Code Automation
+
+### Recipe: Claude Session Monitor
+
+Monitor and auto-manage Claude Code sessions:
+
+```bash
+#!/bin/bash
+# claude-session-monitor.sh
+# Monitors Claude sessions and handles modals automatically
+
+POLL_INTERVAL=3
+
+echo "🤖 Claude Session Monitor"
+echo "Watching for Claude sessions..."
+
+while true; do
+    # Find all Claude sessions
+    for session in $(it2 session list --filter claude -q 2>/dev/null); do
+        # Get state
+        STATE=$(it2 session get-state "$session" --agent=claude --format=json 2>/dev/null)
+
+        if [ -z "$STATE" ]; then
+            continue
+        fi
+
+        # Check if actively working
+        if it2 session is-active "$session" --agent=claude 2>/dev/null; then
+            echo "[$session] Active - Claude is working..."
+            continue
+        fi
+
+        # Check for modals
+        MODAL=$(it2 session has-modal "$session" 2>/dev/null)
+        if [ "$MODAL" != "none" ] && [ -n "$MODAL" ]; then
+            echo "[$session] Modal detected: $MODAL"
+
+            # Get safety assessment
+            SAFE=$(echo "$STATE" | jq -r '.modal.safe // false')
+
+            if [ "$SAFE" = "true" ]; then
+                echo "[$session] Auto-approving safe modal..."
+                it2 session send-key "$session" Return
+            else
+                echo "[$session] Modal requires human review"
+                it2 notify "Claude needs attention" "Modal: $MODAL in session $session"
+            fi
+            continue
+        fi
+
+        # Check for suggested action
+        ACTION=$(it2 session suggest-action "$session" 2>/dev/null)
+        case "$ACTION" in
+            continue)
+                echo "[$session] Sending 'continue'..."
+                it2 session send-text "$session" "continue"
+                ;;
+            tab)
+                echo "[$session] Accepting edits with Tab..."
+                it2 session send-key "$session" Tab
+                ;;
+            none)
+                # Session idle, no action needed
+                ;;
+        esac
+    done
+
+    sleep "$POLL_INTERVAL"
+done
+```
+
+### Recipe: Multi-Claude Orchestration
+
+Coordinate multiple Claude sessions working on related tasks:
+
+```bash
+#!/bin/bash
+# multi-claude-orchestrate.sh
+# Run multiple Claude sessions in parallel
+
+PROJECT_DIR="$1"
+if [ -z "$PROJECT_DIR" ]; then
+    echo "Usage: $0 <project-dir>"
+    exit 1
+fi
+
+echo "🎭 Multi-Claude Orchestration"
+
+# Create Claude sessions tab
+it2 tab create "Default" --badge "Claude Team"
+
+# Session 1: Frontend analysis
+FRONTEND=$(it2 session split --horizontal --cwd "$PROJECT_DIR" -q)
+it2 session set-badge "$FRONTEND" "$(echo $FRONTEND | cut -c1-8)\nFrontend"
+
+# Session 2: Backend analysis
+BACKEND=$(it2 session split --vertical --cwd "$PROJECT_DIR" -q)
+it2 session set-badge "$BACKEND" "$(echo $BACKEND | cut -c1-8)\nBackend"
+
+# Session 3: Testing
+TESTING=$(it2 session split --horizontal --cwd "$PROJECT_DIR" -q)
+it2 session set-badge "$TESTING" "$(echo $TESTING | cut -c1-8)\nTesting"
+
+echo "Sessions created:"
+echo "  Frontend: $FRONTEND"
+echo "  Backend:  $BACKEND"
+echo "  Testing:  $TESTING"
+
+# Wait for all to complete
+wait_for_completion() {
+    local sessions=("$@")
+
+    while true; do
+        all_idle=true
+        for session in "${sessions[@]}"; do
+            if it2 session is-active "$session" --agent=claude 2>/dev/null; then
+                all_idle=false
+                break
+            fi
+        done
+
+        if [ "$all_idle" = "true" ]; then
+            echo "All sessions idle"
+            return 0
+        fi
+
+        sleep 5
+    done
+}
+
+echo "Waiting for all Claude sessions to complete..."
+wait_for_completion "$FRONTEND" "$BACKEND" "$TESTING"
+
+echo "✅ All analysis complete!"
+```
+
+### Recipe: Claude Status Dashboard
+
+Create a real-time dashboard showing Claude session states:
+
+```bash
+#!/bin/bash
+# claude-dashboard.sh
+# Real-time Claude session status dashboard
+
+clear
+echo "╔════════════════════════════════════════════════════════════════╗"
+echo "║             Claude Code Session Dashboard                       ║"
+echo "╚════════════════════════════════════════════════════════════════╝"
+echo ""
+
+while true; do
+    # Move cursor to line 4
+    tput cup 3 0
+
+    # Get all sessions with Claude detection
+    for session in $(it2 session list -q 2>/dev/null | head -10); do
+        SHORT_ID=$(echo "$session" | cut -c1-8)
+
+        # Get state
+        STATUS=$(it2 session claude-status "$session" 2>/dev/null | head -1)
+
+        if echo "$STATUS" | grep -q "Claude Code"; then
+            STATE=$(echo "$STATUS" | grep -oE '\(.*\)' | tr -d '()')
+            TODOS=$(it2 session get-state "$session" --agent=claude --format=json 2>/dev/null | jq -r '.agent.todo_count // 0')
+
+            case "$STATE" in
+                active)  ICON="🟢" ;;
+                idle)    ICON="⚪" ;;
+                modal)   ICON="🟡" ;;
+                error)   ICON="🔴" ;;
+                *)       ICON="⚫" ;;
+            esac
+
+            printf "  %s %-8s │ %-8s │ Todos: %-3s\n" "$ICON" "$SHORT_ID" "$STATE" "$TODOS"
+        fi
+    done
+
+    echo ""
+    echo "Press Ctrl+C to exit"
+
+    sleep 2
+done
+```
+
+### Recipe: Watch with Auto-Act
+
+Use the native watch command with auto-execution:
+
+```bash
+#!/bin/bash
+# claude-watch-autoact.sh
+# Watch a Claude session and auto-handle interventions
+
+SESSION="${1:-$ITERM_SESSION_ID}"
+
+echo "👀 Watching session $SESSION with auto-act enabled"
+echo "This will automatically:"
+echo "  - Send 'continue' when todos are pending"
+echo "  - Accept edits with Tab"
+echo "  - Approve safe modals"
+echo ""
+echo "Press Ctrl+C to stop"
+
+it2 session watch "$SESSION" --agent=claude --auto-act --verbose
 ```
 
 ## Usage Tips

@@ -152,6 +152,66 @@ it2 arrangement list
 it2 arrangement restore "my-dev-setup"
 ```
 
+### Claude Code Session Monitoring
+
+Monitor and automate Claude Code sessions:
+
+```bash
+# Check Claude session status
+it2 session claude-status
+
+# Watch for state changes (NDJSON output)
+it2 session watch --agent=claude
+
+# Auto-execute suggested actions
+it2 session watch --agent=claude --auto-act
+
+# Get comprehensive state as JSON
+it2 session get-state --agent=claude --format=json
+
+# Script-friendly checks with exit codes
+if it2 session is-active; then
+    echo "Claude is working..."
+fi
+
+if it2 session has-modal; then
+    echo "Modal detected: $(it2 session has-modal)"
+fi
+
+# Get suggested action
+ACTION=$(it2 session suggest-action)
+case "$ACTION" in
+    continue) it2 session send-text "continue" ;;
+    modal:approve) it2 session send-key Return ;;
+esac
+```
+
+### Session Filtering
+
+Find sessions by name or title:
+
+```bash
+# Filter by name/title (case-insensitive)
+it2 session list --filter vim
+it2 session list --filter "my project"
+
+# Combine with scope filtering
+it2 session list --filter claude --scope window
+```
+
+### Split with Working Directory
+
+Create splits that start in a specific directory:
+
+```bash
+# Split with custom working directory
+it2 session split --horizontal --cwd /path/to/project
+
+# Create a project-specific layout
+it2 session split --vertical --cwd ~/myproject
+it2 session send-text "npm run dev"
+```
+
 ## Command Reference
 
 ### Essential Commands
@@ -171,6 +231,14 @@ it2 arrangement restore "my-dev-setup"
 **Monitoring:**
 - `it2 notification monitor --type <type>` - Monitor events
 - `it2 variable monitor <scope> <name>` - Watch variable changes
+
+**Session State Detection (Claude Code):**
+- `it2 session get-state` - Comprehensive state analysis with agent detection
+- `it2 session is-active` - Check if session is actively working
+- `it2 session has-modal` - Detect modal dialogs requiring input
+- `it2 session suggest-action` - Get suggested intervention action
+- `it2 session claude-status` - Human-readable Claude Code status
+- `it2 session watch` - Real-time state monitoring with NDJSON output
 
 ### All Command Categories
 
