@@ -46,6 +46,9 @@ func newListCommand() *cobra.Command {
 			# List sessions in a specific window (by window ID)
 			$ it2 session list --window 1
 
+			# Filter sessions by name or title
+			$ it2 session list --filter vim
+
 			# List sessions with custom columns
 			$ it2 session list --columns id,name,title
 
@@ -91,6 +94,7 @@ func newListCommand() *cobra.Command {
 			if tabID == "" {
 				tabID, _ = cmd.Flags().GetString("tab-id")
 			}
+			filter, _ := cmd.Flags().GetString("filter")
 
 			// Get --json and --jq flags
 			_, _ = cmd.Flags().GetString("json") // Keep flag registered but value unused
@@ -138,6 +142,7 @@ func newListCommand() *cobra.Command {
 			return sharedOps.ListSessions(cmdutil.SharedListOptions{
 				WindowID:      windowID,
 				TabID:         tabID,
+				Filter:        filter,
 				ScopeFlag:     scopeFlag,
 				Format:        format,
 				Columns:       columns,
@@ -160,6 +165,7 @@ func newListCommand() *cobra.Command {
 	// Add filtering flags
 	cmd.Flags().String("window", "", "Filter sessions by window ID")
 	cmd.Flags().String("tab", "", "Filter sessions by tab ID")
+	cmd.Flags().String("filter", "", "Filter sessions by name or title (case-insensitive substring match)")
 	// Keep old flag names for backward compatibility (hidden)
 	cmd.Flags().String("window-id", "", "Filter sessions by window ID (deprecated, use --window)")
 	cmd.Flags().String("tab-id", "", "Filter sessions by tab ID (deprecated, use --tab)")

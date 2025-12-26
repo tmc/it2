@@ -19,6 +19,7 @@ type SharedListOptions struct {
 	WindowID      string
 	TabID         string
 	SessionID     string
+	Filter        string
 	ScopeFlag     string
 	Format        string
 	Columns       []string
@@ -85,6 +86,18 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 		// Apply session filter if specified
 		if opts.SessionID != "" && session.SessionID != opts.SessionID {
 			continue
+		}
+		// Apply name/title filter if specified
+		if opts.Filter != "" {
+			filterLower := strings.ToLower(opts.Filter)
+			sessionNameLower := strings.ToLower(session.SessionName)
+			tabTitleLower := strings.ToLower(session.TabTitle)
+			windowTitleLower := strings.ToLower(session.WindowTitle)
+			if !strings.Contains(sessionNameLower, filterLower) &&
+			   !strings.Contains(tabTitleLower, filterLower) &&
+			   !strings.Contains(windowTitleLower, filterLower) {
+				continue
+			}
 		}
 		filteredSessions = append(filteredSessions, session)
 	}
