@@ -302,6 +302,9 @@ func NewCommand() *cobra.Command {
 	claudeCmd.GroupID = "monitoring"
 	cmd.AddCommand(claudeCmd)
 
+	tagCmd := newTagCommand()
+	tagCmd.GroupID = "properties"
+	cmd.AddCommand(tagCmd)
 	// Hidden/Advanced commands (no group)
 	cmd.AddCommand(newSplitsCommand())
 	cmd.AddCommand(newSplitsAliasCommand())
