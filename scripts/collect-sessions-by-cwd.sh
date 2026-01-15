@@ -2,21 +2,94 @@
 
 set -e
 
-echo "=== Consolidating sessions by CWD and ordering by creation time ==="
+# Parse flags
+USE_GIT_ROOT=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --git-root|-g)
+            USE_GIT_ROOT=true
+            shift
+            ;;
+        -h|--help)
+            echo "Usage: $0 [--git-root|-g]"
+            echo ""
+            echo "Consolidate iTerm2 sessions by working directory into vertical splits."
+            echo ""
+            echo "Options:"
+            echo "  --git-root, -g  Group sessions by nearest git repository root instead of exact CWD"
+            echo "  --help, -h      Show this help message"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
 
-# Get all sessions grouped by CWD, sorted by PID within each group
-it2 session list --format=json | jq -r '
-  group_by(.WorkingDirectory) |
-  map(
-    select(length > 1) |
-    {
-      cwd: .[0].WorkingDirectory,
-      sessions: (. | sort_by(.ShellPID) | map({id: .SessionID, short: .ShortID, pid: .ShellPID}))
-    }
-  )
-' > /tmp/session_groups.json
+if $USE_GIT_ROOT; then
+    echo "=== Consolidating sessions by Git repository root ==="
+else
+    echo "=== Consolidating sessions by CWD and ordering by creation time ==="
+fi
 
-echo "Session groups by CWD:"
+# Function to find git root for a directory
+find_git_root() {
+    local dir="$1"
+    if [[ ! -d "$dir" ]]; then
+        echo "$dir"
+        return
+    fi
+    local git_root
+    git_root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || git_root="$dir"
+    echo "$git_root"
+}
+
+# Get all sessions as JSON
+it2 session list --format=json > /tmp/sessions_raw.json
+
+if $USE_GIT_ROOT; then
+    # Build a mapping of session ID -> git root
+    echo "{}" > /tmp/git_roots.json
+    jq -r '.[].SessionID' /tmp/sessions_raw.json | while read -r sid; do
+        cwd=$(jq -r --arg sid "$sid" '.[] | select(.SessionID == $sid) | .WorkingDirectory' /tmp/sessions_raw.json)
+        git_root=$(find_git_root "$cwd")
+        # Update the JSON with git root
+        jq --arg sid "$sid" --arg root "$git_root" '. + {($sid): $root}' /tmp/git_roots.json > /tmp/git_roots.json.tmp
+        mv /tmp/git_roots.json.tmp /tmp/git_roots.json
+    done
+
+    # Add GitRoot field to each session and group by it
+    jq --slurpfile roots /tmp/git_roots.json '
+      map(. + {GitRoot: $roots[0][.SessionID]}) |
+      group_by(.GitRoot) |
+      map(
+        select(length > 1) |
+        {
+          cwd: .[0].GitRoot,
+          sessions: (. | sort_by(.ShellPID) | map({id: .SessionID, short: .ShortID, pid: .ShellPID, original_cwd: .WorkingDirectory}))
+        }
+      )
+    ' /tmp/sessions_raw.json > /tmp/session_groups.json
+else
+    # Get all sessions grouped by CWD, sorted by PID within each group
+    jq '
+      group_by(.WorkingDirectory) |
+      map(
+        select(length > 1) |
+        {
+          cwd: .[0].WorkingDirectory,
+          sessions: (. | sort_by(.ShellPID) | map({id: .SessionID, short: .ShortID, pid: .ShellPID}))
+        }
+      )
+    ' /tmp/sessions_raw.json > /tmp/session_groups.json
+fi
+
+if $USE_GIT_ROOT; then
+    echo "Session groups by Git root:"
+else
+    echo "Session groups by CWD:"
+fi
 cat /tmp/session_groups.json | jq -r '.[] | "\(.cwd): \(.sessions | length) sessions"'
 echo ""
 
