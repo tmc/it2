@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -53,6 +55,9 @@ With --auto-act, automatically executes suggested actions:
   - Sends "continue" when idle with todos
   - Accepts pending edits
 
+With --on-transition, executes a command on each state transition.
+Template variables: %s=session-id, %S=state, %P=previous-state
+
 Events are output as NDJSON (one JSON object per line).
 
 Examples:
@@ -61,6 +66,9 @@ Examples:
 
   # Watch and auto-execute suggested actions
   it2 session watch E0A8 --agent=claude --auto-act
+
+  # Execute command on each state transition
+  it2 session watch E0A8 --on-transition "eslogs annotate %s state=%S"
 
   # Verbose output with full state on each transition
   it2 session watch E0A8 --agent=claude --verbose`,
@@ -93,6 +101,7 @@ Examples:
 			autoAct, _ := sc.GetCommand().Flags().GetBool("auto-act")
 			verbose, _ := sc.GetCommand().Flags().GetBool("verbose")
 			pollInterval, _ := sc.GetCommand().Flags().GetDuration("poll-interval")
+			onTransition, _ := sc.GetCommand().Flags().GetString("on-transition")
 
 			// Handle backward compat for --detect-claude
 			if detectClaude, _ := sc.GetCommand().Flags().GetBool("detect-claude"); detectClaude && agentName == "" {
@@ -112,7 +121,7 @@ Examples:
 			fmt.Fprintf(os.Stderr, "Press Ctrl+C to stop\n\n")
 
 			// Run the watch loop
-			return runWatchLoop(ctx, c, sessionID, agentName, autoAct, verbose, pollInterval)
+			return runWatchLoop(ctx, c, sessionID, agentName, autoAct, verbose, pollInterval, onTransition)
 		},
 	}
 
@@ -125,6 +134,7 @@ Examples:
 	cmd.Flags().Bool("auto-act", false, "Automatically execute suggested actions")
 	cmd.Flags().BoolP("verbose", "v", false, "Output full state on each transition")
 	cmd.Flags().Duration("poll-interval", 2*time.Second, "Interval between state checks")
+	cmd.Flags().String("on-transition", "", "Execute command on state transition (%s=session-id, %S=state, %P=previous)")
 
 	// Hide deprecated flag
 	_ = cmd.Flags().MarkHidden("detect-claude")
@@ -133,7 +143,7 @@ Examples:
 }
 
 // runWatchLoop implements the main watch loop
-func runWatchLoop(ctx context.Context, c *client.Client, sessionID string, agentName string, autoAct, verbose bool, pollInterval time.Duration) error {
+func runWatchLoop(ctx context.Context, c *client.Client, sessionID string, agentName string, autoAct, verbose bool, pollInterval time.Duration, onTransition string) error {
 	opts := sessionstate.DetectOptions{
 		AgentName:   agentName,
 		RecentLines: 20,
@@ -205,6 +215,13 @@ func runWatchLoop(ctx context.Context, c *client.Client, sessionID string, agent
 					}
 				}
 
+				// Execute on-transition hook if configured
+				if onTransition != "" {
+					if err := executeTransitionHook(onTransition, sessionID, transition); err != nil {
+						fmt.Fprintf(os.Stderr, "Hook error: %v\n", err)
+					}
+				}
+
 				// Output transition
 				if verbose {
 					// Full state output
@@ -240,5 +257,32 @@ func printJSON(v interface{}) error {
 		return err
 	}
 	fmt.Println(string(data))
+	return nil
+}
+
+// executeTransitionHook expands template variables and executes a command.
+// Template variables:
+//   - %s: session ID (full)
+//   - %S: current state
+//   - %P: previous state
+//   - %M: modal type (if any)
+//   - %A: suggested action
+func executeTransitionHook(template, sessionID string, transition StateTransition) error {
+	// Expand template variables
+	cmd := template
+	cmd = strings.ReplaceAll(cmd, "%s", sessionID)
+	cmd = strings.ReplaceAll(cmd, "%S", string(transition.State))
+	cmd = strings.ReplaceAll(cmd, "%P", string(transition.PreviousState))
+	cmd = strings.ReplaceAll(cmd, "%M", string(transition.ModalType))
+	cmd = strings.ReplaceAll(cmd, "%A", string(transition.Action))
+
+	// Execute via shell for proper parsing
+	execCmd := exec.Command("sh", "-c", cmd)
+	execCmd.Stdout = os.Stderr // Log hook output to stderr
+	execCmd.Stderr = os.Stderr
+
+	if err := execCmd.Run(); err != nil {
+		return fmt.Errorf("execute hook %q: %w", cmd, err)
+	}
 	return nil
 }
