@@ -10,6 +10,8 @@ import (
 
 // newCurrentCommand creates the session current command.
 func newCurrentCommand() *cobra.Command {
+	var short bool
+
 	cmd := &cobra.Command{
 		Use:   "current",
 		Short: "Show the current session ID",
@@ -17,6 +19,10 @@ func newCurrentCommand() *cobra.Command {
 		Example: `  # Basic Usage
 
   it2 session current
+
+  # Short form (first 8 characters)
+
+  it2 session current --short
 
   # Scripting Example
 
@@ -30,11 +36,16 @@ func newCurrentCommand() *cobra.Command {
 			}
 
 			sessionID = sessionid.Normalize(sessionID)
+			if short {
+				sessionID = sessionid.Shorten(sessionID)
+			}
 			// Output just the session ID for easy scripting
 			fmt.Println(sessionID)
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolVarP(&short, "short", "s", false, "Output only the first 8 characters of the session ID")
 
 	return cmd
 }
