@@ -273,6 +273,11 @@ func gatherSessionInfo(ctx context.Context, c *client.Client, sessionID string, 
 		}
 	}
 
+	// Load session tags
+	if tags, err := LoadSessionTags(sessionID); err == nil && len(tags) > 0 {
+		info["tags"] = tags
+	}
+
 	// Apply plugin enrichment
 	registry := plugins.NewRegistry()
 	if err := registry.DiscoverAndRegister(); err == nil {
@@ -403,6 +408,14 @@ func printSessionInfo(info map[string]interface{}) error {
 		}
 		if uniqueID, ok := prompt["unique_id"]; ok {
 			fmt.Printf("  Unique ID:         %v\n", uniqueID)
+		}
+	}
+
+	// Print tags if included
+	if tags, ok := info["tags"].(map[string]string); ok && len(tags) > 0 {
+		fmt.Printf("\nTags:\n")
+		for key, value := range tags {
+			fmt.Printf("  %s=%s\n", key, value)
 		}
 	}
 
