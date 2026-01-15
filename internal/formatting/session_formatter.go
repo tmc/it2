@@ -29,6 +29,8 @@ func (f *Formatter) FormatSessions(sessions []*client.SessionInfo) error {
 		return f.formatJSON(sessions)
 	case "yaml":
 		return f.formatYAML(sessions)
+	case "ndjson":
+		return f.formatSessionsNDJSON(sessions)
 	case "table":
 		return f.formatSessionsTable(sessions)
 	case "text":
@@ -82,6 +84,17 @@ func (f *Formatter) formatText(sessions []*client.SessionInfo) error {
 			}
 		}
 		fmt.Println(strings.Repeat("-", 40))
+	}
+	return nil
+}
+
+// formatSessionsNDJSON outputs sessions as newline-delimited JSON (one JSON object per line).
+// This format is useful for streaming and processing with tools like jq.
+func (f *Formatter) formatSessionsNDJSON(sessions []*client.SessionInfo) error {
+	for _, session := range sessions {
+		if err := PrintCompactJSON(session); err != nil {
+			return err
+		}
 	}
 	return nil
 }

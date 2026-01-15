@@ -110,6 +110,12 @@ func newListCommand() *cobra.Command {
 				format = "json"
 			}
 
+			// If --ndjson is specified, override format to ndjson
+			ndjson, _ := cmd.Flags().GetBool("ndjson")
+			if ndjson {
+				format = "ndjson"
+			}
+
 			// Get no-hyperlinks flag
 			noHyperlinks, _ := cmd.Flags().GetBool("no-hyperlinks")
 
@@ -175,6 +181,7 @@ func newListCommand() *cobra.Command {
 	// Add JSON and jq flags (GitHub CLI pattern)
 	cmd.Flags().String("json", "", "Output JSON with specified fields (comma-separated, or empty for all fields)")
 	cmd.Flags().String("jq", "", "Filter JSON output using a jq expression (requires --json)")
+	cmd.Flags().Bool("ndjson", false, "Output as newline-delimited JSON (one object per line)")
 
 	// Plugin control flags
 	cmd.Flags().String("plugins", "", "Regular expression of plugin names to run (case-sensitive)")
