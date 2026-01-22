@@ -11,9 +11,19 @@ import (
 	"strings"
 	"time"
 
+	"bytes"
+
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/formatting"
 )
+
+// PluginInput represents the data passed to a plugin via stdin
+type PluginInput struct {
+	SessionID   string   `json:"session_id"`
+	SessionName string   `json:"session_name,omitempty"`
+	Cwd         string   `json:"cwd,omitempty"`
+	BufferLines []string `json:"buffer_lines,omitempty"`
+}
 
 // PluginType identifies the scope a plugin enriches.
 type PluginType string
@@ -174,6 +184,15 @@ func (p *ExecPlugin) EnrichSession(ctx context.Context, session *client.SessionI
 	}
 	cmd := exec.CommandContext(pluginCtx, p.executable, args...)
 	setupPluginEnv(cmd)
+
+	// prepare input
+	input := PluginInput{
+		SessionID:   session.SessionID,
+		SessionName: session.SessionName,
+	}
+	inputBytes, _ := json.Marshal(input)
+	cmd.Stdin = bytes.NewReader(inputBytes)
+
 	output, err := cmd.CombinedOutput() // Get both stdout and stderr
 	if err != nil {
 		// If the command fails, return empty data instead of error
@@ -218,6 +237,19 @@ func (p *ExecPlugin) EnrichTab(ctx context.Context, tab *formatting.TabInfo) (ma
 	}
 	cmd := exec.CommandContext(pluginCtx, p.executable, args...)
 	setupPluginEnv(cmd)
+
+	input := struct {
+		TabID    string `json:"tab_id"`
+		WindowID string `json:"window_id"`
+		Title    string `json:"title,omitempty"`
+	}{
+		TabID:    tab.TabID,
+		WindowID: tab.WindowID,
+		Title:    tab.Title,
+	}
+	inputBytes, _ := json.Marshal(input)
+	cmd.Stdin = bytes.NewReader(inputBytes)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return map[string]interface{}{}, nil
@@ -252,6 +284,17 @@ func (p *ExecPlugin) EnrichWindow(ctx context.Context, window *client.WindowInfo
 	}
 	cmd := exec.CommandContext(pluginCtx, p.executable, args...)
 	setupPluginEnv(cmd)
+
+	input := struct {
+		WindowID string `json:"window_id"`
+		Title    string `json:"title,omitempty"`
+	}{
+		WindowID: window.WindowID,
+		Title:    window.Title,
+	}
+	inputBytes, _ := json.Marshal(input)
+	cmd.Stdin = bytes.NewReader(inputBytes)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return map[string]interface{}{}, nil
@@ -283,6 +326,17 @@ func (p *ExecPlugin) EnrichProcess(ctx context.Context, sessionID string, pid in
 	args := []string{sessionID, fmt.Sprintf("%d", pid)}
 	cmd := exec.CommandContext(pluginCtx, p.executable, args...)
 	setupPluginEnv(cmd)
+
+	input := struct {
+		SessionID string `json:"session_id"`
+		PID       int    `json:"pid"`
+	}{
+		SessionID: sessionID,
+		PID:       pid,
+	}
+	inputBytes, _ := json.Marshal(input)
+	cmd.Stdin = bytes.NewReader(inputBytes)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return map[string]interface{}{}, nil

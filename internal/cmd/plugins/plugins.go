@@ -1,7 +1,9 @@
 package plugins
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -94,26 +96,40 @@ Examples:
 
 // runPlugin executes a plugin with the given arguments
 func runPlugin(ctx context.Context, meta plugins.PluginMetadata, args []string) error {
-	// Create the command
-	execCmd := exec.CommandContext(ctx, meta.Path, args...)
-	execCmd.Stdin = os.Stdin
+	sessionID := os.Getenv("ITERM_SESSION_ID")
+
+	// Prepare arguments
+	// If no args provided, we default to passing the sessionID as the first argument
+	// to match the legacy/simple behavior of plugins.
+	cmdArgs := args
+	if len(args) == 0 && sessionID != "" {
+		if meta.Type == plugins.PluginTypeSession || meta.Type == plugins.PluginTypeSessionProcess {
+			cmdArgs = []string{sessionID}
+		}
+	}
+
+	execCmd := exec.CommandContext(ctx, meta.Path, cmdArgs...)
 	execCmd.Stdout = os.Stdout
 	execCmd.Stderr = os.Stderr
 
-	// For session plugins, we might want to provide session ID via stdin if needed
-	// This allows plugins to work both standalone and with piped input
-	if meta.Type == plugins.PluginTypeSession || meta.Type == plugins.PluginTypeSessionProcess {
-		// If no session ID provided in args, try to get current session
-		if len(args) == 0 {
-			sessionID := os.Getenv("ITERM_SESSION_ID")
-			if sessionID != "" {
-				// Create a new command with the session ID as first arg
-				execCmd = exec.CommandContext(ctx, meta.Path, sessionID)
-				execCmd.Stdin = os.Stdin
-				execCmd.Stdout = os.Stdout
-				execCmd.Stderr = os.Stderr
-			}
+	// Handle Stdin
+	// If running interactively (TTY) or IT2_PLUGIN_CONTEXT is set, inject the JSON protocol input.
+	// This simulates the real execution environment.
+	stat, _ := os.Stdin.Stat()
+	isTTY := (stat.Mode() & os.ModeCharDevice) != 0
+	forceContext := os.Getenv("IT2_PLUGIN_CONTEXT") != ""
+
+	if (isTTY || forceContext) && sessionID != "" {
+		input := plugins.PluginInput{
+			SessionID: sessionID,
 		}
+		if jsonBytes, err := json.Marshal(input); err == nil {
+			execCmd.Stdin = bytes.NewReader(jsonBytes)
+		} else {
+			execCmd.Stdin = os.Stdin
+		}
+	} else {
+		execCmd.Stdin = os.Stdin
 	}
 
 	// Run the plugin
