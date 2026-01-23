@@ -318,3 +318,12 @@ func findWorkingDirsFromHistory(sessionID string) []string {
 	// For now, return nil as this is a future enhancement
 	return nil
 }
+
+// findEslogsBinary looks for the eslogs binary in PATH
+func findEslogsBinary() string {
+	path, err := exec.LookPath("eslogs")
+	if err != nil {
+		return ""
+	}
+	return path
+}

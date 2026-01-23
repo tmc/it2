@@ -66,6 +66,7 @@ var rootCmd = &cobra.Command{
 	// Disable Cobra's built-in suggestions to use our own
 	DisableSuggestions: true,
 	SilenceErrors:      true, // Handle errors ourselves
+	SilenceUsage:       true, // Don't show usage on runtime errors
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// Set IT2_PLUGIN_PATHS environment variable from flag
 		if len(pluginPaths) > 0 {
