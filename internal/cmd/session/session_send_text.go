@@ -174,6 +174,23 @@ func sendTextWithConfirmation(ctx context.Context, c *client.Client, sessionID, 
 				ExitCode:  0,
 				Delivered: true,
 			}
+		case "tui-collapsed":
+			// TUI applications like Claude Code collapse long pastes into summaries
+			// The text was received but displayed as "[Pasted text #N +M lines]"
+			if opts.terminator != "" {
+				if opts.delayBeforeTerminator > 0 {
+					time.Sleep(opts.delayBeforeTerminator)
+				}
+				if err := c.SendText(ctx, sessionID, opts.terminator); err != nil {
+					return fmt.Errorf("failed to send terminator: %w", err)
+				}
+			}
+			lastResult = DeliveryResult{
+				Status:    "success",
+				Message:   "Text delivered (TUI collapsed paste to summary)",
+				ExitCode:  0,
+				Delivered: true,
+			}
 		case "partial":
 			message := "Text partially delivered (some characters may be missing); use 'it2 session get-screen' to check session state"
 			if opts.terminator != "" {
@@ -273,6 +290,23 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 	// Remove trailing newlines/carriage returns from sent text for comparison
 	cleanSentText := strings.TrimRight(strings.TrimRight(sentText, "\n"), "\r")
 
+	// Debug logging (enabled with IT2_DEBUG_DELIVERY=1)
+	debugDelivery := os.Getenv("IT2_DEBUG_DELIVERY") != ""
+	if debugDelivery {
+		fmt.Fprintf(os.Stderr, "\n[DEBUG] analyzeTextDelivery:\n")
+		fmt.Fprintf(os.Stderr, "  Sent: %q (%d chars)\n", truncate(cleanSentText, 80), len(cleanSentText))
+	}
+
+	// Check for TUI paste collapsing FIRST (before screen comparison)
+	// Applications like Claude Code collapse long pastes to "[Pasted text #N +M lines]"
+	// This can make the screen appear unchanged or minimally changed
+	if tuiResult := detectTUIPasteCollapse(beforeStr, afterStr, cleanSentText); tuiResult != "" {
+		if debugDelivery {
+			fmt.Fprintf(os.Stderr, "  TUI paste collapse detected: %s\n", tuiResult)
+		}
+		return tuiResult
+	}
+
 	// If screen contents are identical, nothing was delivered
 	if beforeStr == afterStr {
 		return "none-sent"
@@ -281,15 +315,12 @@ func analyzeTextDelivery(before, after *pb.GetBufferResponse, sentText, sessionI
 	// Calculate the delta (what changed)
 	diff := strings.Replace(afterStr, beforeStr, "", 1)
 
-	// Debug logging (enabled with IT2_DEBUG_DELIVERY=1)
-	if os.Getenv("IT2_DEBUG_DELIVERY") != "" {
-		fmt.Fprintf(os.Stderr, "\n[DEBUG] analyzeTextDelivery:\n")
-		fmt.Fprintf(os.Stderr, "  Sent: %q (%d chars)\n", truncate(cleanSentText, 80), len(cleanSentText))
+	if debugDelivery {
 		fmt.Fprintf(os.Stderr, "  Delta: %q (%d chars)\n", truncate(diff, 150), len(diff))
 		fmt.Fprintf(os.Stderr, "  Exact match: %v\n", strings.Contains(afterStr, cleanSentText))
 	}
 
-	// Check for bracketed paste mode indicator
+	// Check for bracketed paste mode indicator (legacy check, kept for compatibility)
 	if strings.Contains(afterStr, "[Pasted text #") && strings.Contains(afterStr, "lines]") {
 		return "success"
 	}
@@ -514,6 +545,65 @@ func truncate(s string, maxLen int) string {
 		return s
 	}
 	return s[:maxLen] + "..."
+}
+
+// detectTUIPasteCollapse detects when a TUI application has collapsed pasted text
+// into a summary indicator. This handles applications like Claude Code that show
+// "[Pasted text #N +M lines]" instead of the full pasted content.
+//
+// Returns "tui-collapsed" if collapse was detected, empty string otherwise.
+func detectTUIPasteCollapse(beforeStr, afterStr, sentText string) string {
+	// Pattern 1: Claude Code style "[Pasted text #N +M lines]"
+	// Check if this pattern appears in the after screen but not before
+	pasteIndicator := "[Pasted text #"
+	if strings.Contains(afterStr, pasteIndicator) && strings.Contains(afterStr, "lines]") {
+		// Verify it's a new indicator (not already present)
+		if !strings.Contains(beforeStr, pasteIndicator) || countOccurrences(afterStr, pasteIndicator) > countOccurrences(beforeStr, pasteIndicator) {
+			return "tui-collapsed"
+		}
+	}
+
+	// Pattern 2: Generic "pasted N lines" patterns (other TUIs may use variations)
+	genericPatterns := []string{
+		"pasted text",
+		"Pasted text",
+		"[paste]",
+		"[Paste]",
+	}
+	for _, pattern := range genericPatterns {
+		if strings.Contains(afterStr, pattern) && !strings.Contains(beforeStr, pattern) {
+			return "tui-collapsed"
+		}
+	}
+
+	// Pattern 3: Detect if the screen changed significantly but shows a summary
+	// This handles cases where the TUI replaced content with a collapsed view
+	if len(sentText) > 100 && beforeStr != afterStr {
+		// Count newlines in sent text
+		sentLines := strings.Count(sentText, "\n") + 1
+		if sentLines >= 3 {
+			// Look for any pattern indicating line count in the new screen content
+			// e.g., "+56 lines", "56 lines", "(56 lines)"
+			lineCountStr := fmt.Sprintf("%d lines", sentLines)
+			if strings.Contains(afterStr, lineCountStr) && !strings.Contains(beforeStr, lineCountStr) {
+				return "tui-collapsed"
+			}
+			// Also check for approximate counts (+/- a few lines)
+			for delta := -2; delta <= 2; delta++ {
+				approxLines := fmt.Sprintf("%d lines", sentLines+delta)
+				if strings.Contains(afterStr, approxLines) && !strings.Contains(beforeStr, approxLines) {
+					return "tui-collapsed"
+				}
+			}
+		}
+	}
+
+	return ""
+}
+
+// countOccurrences counts non-overlapping occurrences of substr in s
+func countOccurrences(s, substr string) int {
+	return strings.Count(s, substr)
 }
 
 func newSendTextCommand() *cobra.Command {

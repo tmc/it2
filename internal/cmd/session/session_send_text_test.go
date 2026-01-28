@@ -350,6 +350,44 @@ func TestAnalyzeTextDelivery(t *testing.T) {
 			sentText: "echo hello world and more text that didn't appear",
 			want:     "partial",
 		},
+		{
+			name: "TUI paste collapse - Claude Code style",
+			before: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("❯ ")},
+				},
+			},
+			after: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("❯ [Pasted text #1 +56 lines]")},
+				},
+			},
+			sentText: "line1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\n" +
+				"line11\nline12\nline13\nline14\nline15\nline16\nline17\nline18\nline19\nline20\n" +
+				"line21\nline22\nline23\nline24\nline25\nline26\nline27\nline28\nline29\nline30\n" +
+				"line31\nline32\nline33\nline34\nline35\nline36\nline37\nline38\nline39\nline40\n" +
+				"line41\nline42\nline43\nline44\nline45\nline46\nline47\nline48\nline49\nline50\n" +
+				"line51\nline52\nline53\nline54\nline55\nline56",
+			want: "tui-collapsed",
+		},
+		{
+			name: "TUI paste collapse - already had paste indicator",
+			before: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("❯ [Pasted text #1 +10 lines]")},
+					{Text: strPtr("❯ ")},
+				},
+			},
+			after: &pb.GetBufferResponse{
+				Contents: []*pb.LineContents{
+					{Text: strPtr("❯ [Pasted text #1 +10 lines]")},
+					{Text: strPtr("❯ [Pasted text #2 +20 lines]")},
+				},
+			},
+			sentText: "multi\nline\ntext\nwith\nmany\nlines\nhere\nfor\ntesting\npurposes\n" +
+				"more\nlines\nhere\nfor\ntesting\npurposes\nagain\nand\nagain\nend",
+			want: "tui-collapsed",
+		},
 	}
 
 	for _, tt := range tests {
@@ -444,6 +482,68 @@ func TestFormatScreenResponse(t *testing.T) {
 			got := formatScreenResponse(tt.resp)
 			if got != tt.want {
 				t.Errorf("formatScreenResponse() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDetectTUIPasteCollapse(t *testing.T) {
+	tests := []struct {
+		name     string
+		before   string
+		after    string
+		sentText string
+		want     string
+	}{
+		{
+			name:     "no paste indicator",
+			before:   "$ ",
+			after:    "$ echo hello",
+			sentText: "echo hello",
+			want:     "",
+		},
+		{
+			name:     "Claude Code paste indicator appears",
+			before:   "❯ ",
+			after:    "❯ [Pasted text #1 +10 lines]",
+			sentText: "line1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10",
+			want:     "tui-collapsed",
+		},
+		{
+			name:     "paste indicator already existed - new one added",
+			before:   "❯ [Pasted text #1 +5 lines]\n❯ ",
+			after:    "❯ [Pasted text #1 +5 lines]\n❯ [Pasted text #2 +10 lines]",
+			sentText: "line1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10",
+			want:     "tui-collapsed",
+		},
+		{
+			name:     "paste indicator unchanged - no delivery",
+			before:   "❯ [Pasted text #1 +5 lines]\n❯ ",
+			after:    "❯ [Pasted text #1 +5 lines]\n❯ ",
+			sentText: "new text",
+			want:     "",
+		},
+		{
+			name:     "generic pasted text pattern",
+			before:   "prompt> ",
+			after:    "prompt> [paste] received",
+			sentText: "some pasted content",
+			want:     "tui-collapsed",
+		},
+		{
+			name:     "line count appears for large paste",
+			before:   "$ ",
+			after:    "$ Processing 10 lines...",
+			sentText: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10 - this is a longer line to make sentText > 100 chars for the check to trigger properly",
+			want:     "tui-collapsed",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := detectTUIPasteCollapse(tt.before, tt.after, tt.sentText)
+			if got != tt.want {
+				t.Errorf("detectTUIPasteCollapse() = %q, want %q", got, tt.want)
 			}
 		})
 	}
