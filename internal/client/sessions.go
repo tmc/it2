@@ -31,6 +31,7 @@ type SessionInfo struct {
 	CommandCount     int32  // Number of commands executed
 	ShellPID         int32  // Process ID of the shell
 	JobPID           int32  // Process ID of current job
+	ProcessName      string // Name of the primary running process (from JobPID)
 	WorkingDirectory string // Current working directory from session.path
 }
 
@@ -255,7 +256,7 @@ func (c *Client) populateSessionJobInfo(ctx context.Context, session *SessionInf
 	// Get all variables in a single batched call (pid, jobPid, path)
 	go func() {
 		defer wg.Done()
-		vars, err := c.GetMultipleVariablesWithScope(ctx, "session", session.SessionID, []string{"pid", "jobPid", "path"})
+		vars, err := c.GetMultipleVariablesWithScope(ctx, "session", session.SessionID, []string{"pid", "jobPid", "path", "processTitle"})
 		if err != nil {
 			return
 		}
@@ -285,7 +286,13 @@ func (c *Client) populateSessionJobInfo(ctx context.Context, session *SessionInf
 				session.WorkingDirectory = path
 			}
 		}
+
+		// Parse process title
+		if title, ok := vars["processTitle"]; ok && title != "" {
+			session.ProcessName = title
+		}
 	}()
 
 	wg.Wait()
+
 }

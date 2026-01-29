@@ -107,7 +107,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 	}
 
 	// Determine columns to include - put long fields at end as requested
-	headers := []string{"ID", "Split From", "PID", "State", "Window", "Tab", "Path", "Title", "Command"}
+	headers := []string{"ID", "Split From", "PID", "Process", "State", "Window", "Tab", "Path", "Title", "Command"}
 
 	// Check if any sessions have plugin data to determine additional columns
 	pluginColumns := make(map[string]bool)
@@ -215,6 +215,7 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			shortID,
 			parentDisplay,
 			pidDisplay,
+			session.ProcessName,
 			state,
 			fmt.Sprintf("%d", session.WindowNumber),
 			session.TabID,
