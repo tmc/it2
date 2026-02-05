@@ -49,8 +49,20 @@ import (
 	"github.com/tmc/it2/internal/cmd/window"
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/config"
+	"github.com/tmc/it2/internal/hints"
+	"github.com/tmc/it2/internal/prime"
 	"github.com/tmc/it2/internal/suggestions"
 )
+
+// primeVersion returns the version hash of the embedded prime message
+func primeVersion() string {
+	return prime.Version()
+}
+
+// renderPrime renders the prime message with session-specific placeholders
+func renderPrime(sessionID string) string {
+	return prime.Render(sessionID)
+}
 
 var (
 	wsURL          string
@@ -75,6 +87,12 @@ var rootCmd = &cobra.Command{
 		// Set IT2_PLUGIN_DEADLINE environment variable from flag
 		if pluginDeadline > 0 {
 			os.Setenv("IT2_PLUGIN_DEADLINE", pluginDeadline.String())
+		}
+		// Show helpful hints for multi-agent workflows (unless suppressed)
+		// Skip for help/completion commands to avoid cluttering output
+		if !hints.IsSuppressed() && cmd.Name() != "help" && cmd.Name() != "completion" &&
+			cmd.Name() != "quickstart" && cmd.Name() != "prime" {
+			hints.CheckAndShowHints()
 		}
 	},
 	Long: `A powerful command-line tool for controlling iTerm2. Provides comprehensive access to terminal automation,
@@ -451,6 +469,42 @@ Agent workflow with bd (Beads issue tracker):
   bd close $TASK
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ INTER-SESSION COMMUNICATION (Multi-Agent)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+When one Claude session messages another and expects a response,
+ALWAYS include explicit response instructions.
+
+The Problem:
+  # BAD - Target session doesn't know how to respond
+  it2 session send-text "$OTHER" "What are the naming conventions?"
+
+The Solution:
+  # GOOD - Include your session ID and response format
+  MY_SID=$(echo $ITERM_SESSION_ID | cut -c1-8)
+  it2 session send-text "$OTHER" "What are the naming conventions?
+
+  ---
+  RESPOND: it2 session send-text $MY_SID \"your answer\"
+  FORMAT: brief text with examples"
+
+Oracle Pattern (expert session that others query):
+  # Setup: Tell the oracle how to sign off responses
+  it2 session send-text "$ORACLE" "You are a codebase expert.
+  End all responses with:
+  REMINDER: Message me at it2 session send-text ${ORACLE:0:8} 'question'"
+
+  # Query: Include response protocol
+  it2 session send-text "$ORACLE" "Explain the auth flow.
+  ---
+  RESPOND: it2 session send-text $MY_SID \"answer\""
+
+Key Elements:
+  • RESPOND: The exact command to send a reply back
+  • FORMAT: Expected output format (text, json, code)
+  • WHEN: Timing (immediately, when done, async)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  CONFIGURATION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -484,7 +538,41 @@ Learn more:
 	return cmd
 }
 
+// newPrimeCommand creates the prime command for multi-agent session communication
+func newPrimeCommand() *cobra.Command {
+	var sessionID string
+	var showVersion bool
+	cmd := &cobra.Command{
+		Use:   "prime",
+		Short: "Output multi-agent communication guidelines for Claude sessions",
+		Long:  "Outputs guidelines for inter-session communication that can be pasted into a Claude session to prime it for multi-agent workflows.",
+		Run: func(cmd *cobra.Command, args []string) {
+			// Import prime package inline to avoid circular dependency
+			// The actual implementation is in internal/prime
+			sid := sessionID
+			if sid == "" {
+				sid = os.Getenv("ITERM_SESSION_ID")
+			}
+
+			if showVersion {
+				// Show version hash of prime message
+				fmt.Printf("Prime protocol version: %s\n", primeVersion())
+				return
+			}
+
+			// Render and output the prime message
+			fmt.Print(renderPrime(sid))
+		},
+	}
+	cmd.Flags().StringVarP(&sessionID, "session", "s", "", "Session ID to use (defaults to $ITERM_SESSION_ID)")
+	cmd.Flags().BoolVar(&showVersion, "version", false, "Show prime protocol version hash")
+	return cmd
+}
+
 func init() {
+	// Wire up prime version function for hints tracking
+	hints.SetPrimeVersionFunc(prime.Version)
+
 	// Load configuration from file/env and use as defaults
 	cfg, err := config.Load()
 	defaultURL := "ws://localhost:1912"
@@ -523,6 +611,7 @@ func init() {
 	rootCmd.AddCommand(newCompletionCommand())
 	rootCmd.AddCommand(newConfigCommand())
 	rootCmd.AddCommand(newQuickstartCommand())
+	rootCmd.AddCommand(newPrimeCommand())
 
 	// Add shortcut commands (top-level shortcuts)
 	rootCmd.AddCommand(shortcuts.NewGetScreenCommand())
