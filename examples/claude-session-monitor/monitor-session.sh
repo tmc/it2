@@ -3,7 +3,7 @@
 # Enhanced self-monitoring script for single Claude session with modal detection
 #
 # This script monitors a Claude Code session and automatically intervenes when:
-#   - Session has incomplete todos and is idle at prompt
+#   - Session has incomplete todos (☐ or ◻) and is idle at prompt
 #   - Session shows inefficient sleep polling patterns
 #   - Session has vague monitoring todos without milestones
 #   - Claude approval modals appear (Do you want to proceed?)
@@ -52,7 +52,7 @@ if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
     echo "Usage: $0 [SESSION_ID] [--help]"
     echo ""
     echo "Monitors a Claude Code session and automatically intervenes when:"
-    echo "  - Session has incomplete todos (☐) and is idle at prompt (>)"
+    echo "  - Session has incomplete todos (☐ or ◻) and is idle at prompt (>)"
     echo "  - Session shows inefficient sleep polling patterns"
     echo "  - Session has vague monitoring todos without milestones"
     echo "  - Claude approval modals appear (Do you want to proceed?)"
@@ -473,7 +473,7 @@ while true; do
     # Auto-continue: If session has active todos, send 'continue' every 5 minutes
     # This keeps sessions progressing without manual intervention
     TIME_SINCE_AUTO_CONTINUE=$((CURRENT_TIME - LAST_AUTO_CONTINUE_TIME))
-    if echo "$CURRENT_CONTENT" | grep -q "☐" && \
+    if echo "$CURRENT_CONTENT" | grep -qE "☐|◻" && \
        echo "$CURRENT_CONTENT" | grep -qE "^>[[:space:]]*$|────────────" && \
        [ $TIME_SINCE_AUTO_CONTINUE -ge $AUTO_CONTINUE_INTERVAL ]; then
         # Check if session appears idle (no active work indicators)
@@ -504,8 +504,8 @@ while true; do
         LAST_ACTION_TIME=$CURRENT_TIME
 
     # Check for vague todos
-    elif echo "$CURRENT_CONTENT" | grep -q "☐ Monitor.*progress" && \
-         ! echo "$CURRENT_CONTENT" | grep -qE "☐.*Phase|☐.*completion|☐.*milestone" && \
+    elif echo "$CURRENT_CONTENT" | grep -qE "(☐|◻) Monitor.*progress" && \
+         ! echo "$CURRENT_CONTENT" | grep -qE "(☐|◻).*Phase|(☐|◻).*completion|(☐|◻).*milestone" && \
          echo "$CURRENT_CONTENT" | grep -qE "^>[[:space:]]*$"; then
         log_action "TODOS" "Detected vague monitoring todos - suggesting milestones" "$CYAN"
         it2 session send-text "$SESSION_ID" --send-cr=false "Let me break down monitoring into specific milestones: Phase 1, Phase 2, Phase 3 completion."
@@ -522,7 +522,7 @@ while true; do
         fi
 
     # Check for stuck session with todos (with safety checks)
-    elif echo "$CURRENT_CONTENT" | grep -q "☐" && \
+    elif echo "$CURRENT_CONTENT" | grep -qE "☐|◻" && \
          echo "$CURRENT_CONTENT" | grep -qE "^>[[:space:]]*$|────────────"; then
 
         # Additional safety: Check if content has changed recently (even slightly)
@@ -574,7 +574,7 @@ while true; do
             log_action "TYPING" "Content unchanged but user may be typing${STUCK_CONTEXT} - skipping" "$CYAN"
         # Check for empty prompt waiting for user (active input session)
         # Check CURRENT_CONTENT for todos since they may have scrolled out of LAST_LINES
-        elif echo "$LAST_LINES" | grep -qE "^>[[:space:]]*$|────────────" && ! echo "$CURRENT_CONTENT" | grep -qE "☐"; then
+        elif echo "$LAST_LINES" | grep -qE "^>[[:space:]]*$|────────────" && ! echo "$CURRENT_CONTENT" | grep -qE "☐|◻"; then
             log_action "WAITING" "Active input prompt detected (no todos) - not sending Enter" "$CYAN"
         else
             log_action "STUCK" "Content unchanged for 60s - sending Enter" "$YELLOW"
