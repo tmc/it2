@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os/exec"
+	"strings"
 	"sync"
 
 	pb "github.com/tmc/it2/proto"
@@ -256,7 +258,7 @@ func (c *Client) populateSessionJobInfo(ctx context.Context, session *SessionInf
 	// Get all variables in a single batched call (pid, jobPid, path)
 	go func() {
 		defer wg.Done()
-		vars, err := c.GetMultipleVariablesWithScope(ctx, "session", session.SessionID, []string{"pid", "jobPid", "path", "processTitle"})
+		vars, err := c.GetMultipleVariablesWithScope(ctx, "session", session.SessionID, []string{"pid", "jobPid", "path"})
 		if err != nil {
 			return
 		}
@@ -287,12 +289,35 @@ func (c *Client) populateSessionJobInfo(ctx context.Context, session *SessionInf
 			}
 		}
 
-		// Parse process title
-		if title, ok := vars["processTitle"]; ok && title != "" {
-			session.ProcessName = title
-		}
 	}()
 
 	wg.Wait()
 
+	// Look up the child process of JobPID (the foreground command under the shell).
+	if session.JobPID != 0 {
+		session.ProcessName = childProcessName(int(session.JobPID))
+	}
+}
+
+// childProcessName returns the name of the first child process of pid,
+// or empty string if there is no child (session is idle).
+func childProcessName(pid int) string {
+	out, err := exec.Command("pgrep", "-P", fmt.Sprintf("%d", pid)).Output()
+	if err != nil {
+		return ""
+	}
+	// Take first child PID
+	childPID := strings.TrimSpace(strings.SplitN(string(out), "\n", 2)[0])
+	if childPID == "" {
+		return ""
+	}
+	out, err = exec.Command("ps", "-p", childPID, "-o", "comm=").Output()
+	if err != nil {
+		return ""
+	}
+	name := strings.TrimSpace(string(out))
+	if i := strings.LastIndex(name, "/"); i >= 0 {
+		name = name[i+1:]
+	}
+	return name
 }
