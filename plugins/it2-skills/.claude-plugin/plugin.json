@@ -1,0 +1,12 @@
+{
+  "name": "it2-skills",
+  "version": "1.0.0",
+  "description": "Skills for iTerm2 terminal automation using the it2 CLI tool",
+  "author": {
+    "name": "Travis Cline",
+    "url": "https://github.com/tmc"
+  },
+  "repository": "https://github.com/tmc/it2",
+  "license": "MIT",
+  "keywords": ["iterm2", "terminal", "automation", "session-management", "cli"]
+}
