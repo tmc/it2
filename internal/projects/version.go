@@ -14,10 +14,10 @@ import (
 // This is written to project directories to track what version created/modified them.
 type VersionInfo struct {
 	// Core version info
-	Version   string `json:"version,omitempty"`   // From build tags or module version
-	GoVersion string `json:"go_version"`          // e.g., "go1.22.0"
-	OS        string `json:"os"`                  // e.g., "darwin"
-	Arch      string `json:"arch"`                // e.g., "arm64"
+	Version   string `json:"version,omitempty"` // From build tags or module version
+	GoVersion string `json:"go_version"`        // e.g., "go1.22.0"
+	OS        string `json:"os"`                // e.g., "darwin"
+	Arch      string `json:"arch"`              // e.g., "arm64"
 
 	// Build metadata (from debug.BuildInfo)
 	ModulePath    string            `json:"module_path,omitempty"`    // e.g., "github.com/tmc/it2"

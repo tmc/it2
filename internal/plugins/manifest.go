@@ -169,7 +169,7 @@ func DefaultSandboxConfig() SandboxConfig {
 func RelaxedSandboxConfig() SandboxConfig {
 	return SandboxConfig{
 		Timeout:        2 * time.Second, // More time for verified plugins
-		MaxOutputBytes: 4096,             // 4KB
+		MaxOutputBytes: 4096,            // 4KB
 		MaxMemoryBytes: 0,
 		MaxCPUMillis:   0,
 	}

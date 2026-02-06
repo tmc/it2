@@ -8,11 +8,11 @@ import (
 
 func TestDetectorIsStable(t *testing.T) {
 	tests := []struct {
-		name              string
-		config            Config
-		setup             func(*Detector)
-		expectedStable    bool
-		expectedWaitTime  time.Duration
+		name             string
+		config           Config
+		setup            func(*Detector)
+		expectedStable   bool
+		expectedWaitTime time.Duration
 	}{
 		{
 			name: "stability disabled returns false",

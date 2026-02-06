@@ -137,15 +137,15 @@ func (p *Profile) DisplayName() string {
 func (p *Profile) Detect(content string) bool {
 	// Look for Claude Code-specific indicators
 	indicators := []string{
-		"Claude Code",           // Direct mention
-		"claude.ai",             // Domain reference
-		"claude-code",           // CLI reference
-		"⏺",                     // Claude's primary spinner
-		"esc to interrupt",      // Claude's interrupt hint
-		"ctrl+t to hide",        // Claude's hide hint
-		"☐",                     // Claude's todo checkbox
-		"⏵⏵ accept edits",       // Claude's edit prompt
-		"queued messages",       // Claude's queue indicator
+		"Claude Code",      // Direct mention
+		"claude.ai",        // Domain reference
+		"claude-code",      // CLI reference
+		"⏺",                // Claude's primary spinner
+		"esc to interrupt", // Claude's interrupt hint
+		"ctrl+t to hide",   // Claude's hide hint
+		"☐",                // Claude's todo checkbox
+		"⏵⏵ accept edits",  // Claude's edit prompt
+		"queued messages",  // Claude's queue indicator
 	}
 
 	// Compile a detection pattern

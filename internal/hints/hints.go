@@ -19,8 +19,8 @@ type HintState struct {
 	PrimeShownAt     *time.Time `json:"prime_shown_at,omitempty"`
 	QuickstartShown  *time.Time `json:"quickstart_shown_at,omitempty"`
 	LastCommandRunAt *time.Time `json:"last_command_run_at,omitempty"`
-	LastVersionHash  string     `json:"last_version_hash,omitempty"`       // Hash of binary version info
-	LastPrimeVersion string     `json:"last_prime_version,omitempty"`      // Hash of prime message content
+	LastVersionHash  string     `json:"last_version_hash,omitempty"`  // Hash of binary version info
+	LastPrimeVersion string     `json:"last_prime_version,omitempty"` // Hash of prime message content
 }
 
 const (

@@ -48,11 +48,11 @@ type SessionState struct {
 // AgentInfo contains agent-specific state information.
 // This generalizes what was previously Claude-specific.
 type AgentInfo struct {
-	Name          string     `json:"name"`            // Agent identifier
-	DisplayName   string     `json:"display_name"`    // Human-readable name
-	Detected      bool       `json:"detected"`        // Agent was detected
-	HasTodos      bool       `json:"has_todos"`       // Has incomplete todos
-	TodoCount     int        `json:"todo_count"`      // Number of incomplete todos
+	Name          string     `json:"name"`         // Agent identifier
+	DisplayName   string     `json:"display_name"` // Human-readable name
+	Detected      bool       `json:"detected"`     // Agent was detected
+	HasTodos      bool       `json:"has_todos"`    // Has incomplete todos
+	TodoCount     int        `json:"todo_count"`   // Number of incomplete todos
 	Spinner       *string    `json:"spinner,omitempty"`
 	Modal         *ModalInfo `json:"modal,omitempty"`
 	WorkIndicator *string    `json:"work_indicator,omitempty"`

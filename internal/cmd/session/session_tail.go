@@ -174,17 +174,17 @@ Stability options (when using --wait-stable):
 
 			// Start tailing with filters
 			opts := tailOptions{
-				interval:              interval,
-				colorized:             colorized,
-				grepPattern:           grepRE,
-				grepInvert:            grepInvertRE,
-				outputOnly:            outputOnly,
-				showPrompts:           showPrompts,
-				onFinish:              onFinish,
-				format:                sc.GetFlags().Format,
-				waitStableDuration:    waitStableDuration,
-				waitStableMaxWait:     waitStableMaxWait,
-				waitStableTolerance:   waitStableTolerance,
+				interval:            interval,
+				colorized:           colorized,
+				grepPattern:         grepRE,
+				grepInvert:          grepInvertRE,
+				outputOnly:          outputOnly,
+				showPrompts:         showPrompts,
+				onFinish:            onFinish,
+				format:              sc.GetFlags().Format,
+				waitStableDuration:  waitStableDuration,
+				waitStableMaxWait:   waitStableMaxWait,
+				waitStableTolerance: waitStableTolerance,
 			}
 			return tailSession(ctx, sc, sessionID, opts)
 		},
@@ -210,17 +210,17 @@ Stability options (when using --wait-stable):
 
 // tailOptions contains configuration for the tail operation
 type tailOptions struct {
-	interval              time.Duration
-	colorized             bool
-	grepPattern           *regexp.Regexp
-	grepInvert            *regexp.Regexp
-	outputOnly            bool
-	showPrompts           bool
-	onFinish              bool
-	format                string
-	waitStableDuration    time.Duration
-	waitStableMaxWait     time.Duration
-	waitStableTolerance   string
+	interval            time.Duration
+	colorized           bool
+	grepPattern         *regexp.Regexp
+	grepInvert          *regexp.Regexp
+	outputOnly          bool
+	showPrompts         bool
+	onFinish            bool
+	format              string
+	waitStableDuration  time.Duration
+	waitStableMaxWait   time.Duration
+	waitStableTolerance string
 }
 
 // getBufferLines fetches and displays the last N lines from a session
@@ -299,10 +299,10 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 	var detector *waitstable.Detector
 	if opts.waitStableDuration > 0 {
 		config := waitstable.Config{
-			WaitStable:  opts.waitStableDuration,
-			Tolerance:   waitstable.Tolerance(opts.waitStableTolerance),
-			MaxWait:     opts.waitStableMaxWait,
-			Threshold:   opts.interval,
+			WaitStable: opts.waitStableDuration,
+			Tolerance:  waitstable.Tolerance(opts.waitStableTolerance),
+			MaxWait:    opts.waitStableMaxWait,
+			Threshold:  opts.interval,
 		}
 		detector = waitstable.New(config, nil)
 	}
@@ -337,7 +337,7 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 							// Note: We don't have exit status here since we're looking at the NEW prompt
 							printPromptInfo(promptResp, opts.format)
 							lastPromptID = currentPromptID
-							lastPromptState = ""  // Reset so we can catch next FINISHED
+							lastPromptState = "" // Reset so we can catch next FINISHED
 						} else {
 							// Update tracking vars without printing
 							if currentState != lastPromptState {

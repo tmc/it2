@@ -226,7 +226,7 @@ func runWatchLoop(ctx context.Context, c *client.Client, sessionID string, agent
 				if verbose {
 					// Full state output
 					output := struct {
-						Transition StateTransition           `json:"transition"`
+						Transition StateTransition            `json:"transition"`
 						State      *sessionstate.SessionState `json:"state"`
 					}{
 						Transition: transition,

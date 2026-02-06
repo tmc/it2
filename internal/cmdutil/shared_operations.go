@@ -94,8 +94,8 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 			tabTitleLower := strings.ToLower(session.TabTitle)
 			windowTitleLower := strings.ToLower(session.WindowTitle)
 			if !strings.Contains(sessionNameLower, filterLower) &&
-			   !strings.Contains(tabTitleLower, filterLower) &&
-			   !strings.Contains(windowTitleLower, filterLower) {
+				!strings.Contains(tabTitleLower, filterLower) &&
+				!strings.Contains(windowTitleLower, filterLower) {
 				continue
 			}
 		}
@@ -230,7 +230,7 @@ func (s *SharedListOperations) buildTabInfoFromSessions(sessions []*client.Sessi
 				WindowNumber: int(session.WindowNumber),
 				TabID:        session.TabID,
 				Title:        title,
-				Position:     0,       // Position needs to be determined differently
+				Position:     0,        // Position needs to be determined differently
 				Active:       isActive, // Set based on selected tab
 				Sessions:     []*client.SessionInfo{session},
 			}

@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	sessionID    = flag.String("session", "", "iTerm2 session ID (uses $ITERM_SESSION_ID if not provided)")
-	templateStr  = flag.String("template", "{{.SessionID | trunc 8}}\n{{.EventCount}} events", "Go template for badge")
-	minInterval  = flag.Duration("min-interval", 5*time.Second, "Minimum interval between updates")
-	eventFile    = flag.String("events", "", "Plugin events file to monitor (default: session artifacts)")
-	verbose      = flag.Bool("verbose", false, "Verbose output")
+	sessionID   = flag.String("session", "", "iTerm2 session ID (uses $ITERM_SESSION_ID if not provided)")
+	templateStr = flag.String("template", "{{.SessionID | trunc 8}}\n{{.EventCount}} events", "Go template for badge")
+	minInterval = flag.Duration("min-interval", 5*time.Second, "Minimum interval between updates")
+	eventFile   = flag.String("events", "", "Plugin events file to monitor (default: session artifacts)")
+	verbose     = flag.Bool("verbose", false, "Verbose output")
 )
 
 type SessionData struct {

@@ -51,7 +51,7 @@ Examples:
   # Replaces the pattern: sleep 5 && it2 session get-screen E0A8
   it2 session send-text E0A8 "long-running-command"
   it2 session get-screen E0A8 --wait-stable | tail -20`,
-		Args: cobra.RangeArgs(0, 1),
+		Args:           cobra.RangeArgs(0, 1),
 		RequiresClient: true,
 		SupportsFormat: true,
 		ValidArgsFunc:  completion.SessionIDCompletion,

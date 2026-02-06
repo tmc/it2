@@ -16,12 +16,12 @@ const (
 
 // Formatter handles formatting of iTerm2 data structures for display.
 type Formatter struct {
-	format           string
-	columns          []string
-	sortBy           string
-	sortReverse      bool
-	quiet            bool
-	hyperlinks       bool // Enable OSC 8 terminal hyperlinks
+	format            string
+	columns           []string
+	sortBy            string
+	sortReverse       bool
+	quiet             bool
+	hyperlinks        bool // Enable OSC 8 terminal hyperlinks
 	includeEmptyLines bool // Include trailing empty lines in buffer output
 }
 

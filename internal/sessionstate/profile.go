@@ -56,19 +56,19 @@ type PatternSet struct {
 
 // CompiledPatterns holds pre-compiled regexes for a PatternSet.
 type CompiledPatterns struct {
-	SpinnerRegex       *regexp.Regexp
-	WorkWordRegex      *regexp.Regexp
-	ActiveHintRegex    *regexp.Regexp
-	ModalPhraseRegex   *regexp.Regexp
-	YesNoRegex         *regexp.Regexp
-	ChoiceRegex        *regexp.Regexp
-	InputPromptRegex   *regexp.Regexp
-	EditPromptRegex    *regexp.Regexp
-	UIFilterRegex      *regexp.Regexp
-	TodoRegex          *regexp.Regexp
-	ErrorPrefixRegex   *regexp.Regexp
-	SafeOpRegex        *regexp.Regexp
-	UnsafeOpRegex      *regexp.Regexp
+	SpinnerRegex     *regexp.Regexp
+	WorkWordRegex    *regexp.Regexp
+	ActiveHintRegex  *regexp.Regexp
+	ModalPhraseRegex *regexp.Regexp
+	YesNoRegex       *regexp.Regexp
+	ChoiceRegex      *regexp.Regexp
+	InputPromptRegex *regexp.Regexp
+	EditPromptRegex  *regexp.Regexp
+	UIFilterRegex    *regexp.Regexp
+	TodoRegex        *regexp.Regexp
+	ErrorPrefixRegex *regexp.Regexp
+	SafeOpRegex      *regexp.Regexp
+	UnsafeOpRegex    *regexp.Regexp
 }
 
 // Compile creates compiled regex patterns from a PatternSet.

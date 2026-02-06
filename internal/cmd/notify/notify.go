@@ -11,9 +11,9 @@ import (
 // NewCommand creates the notify command.
 func NewCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:     "notify <message> [session-id]",
-		Short:   "Post macOS notification",
-		Long:    "Post a notification to macOS Notification Center via iTerm2.\n\nThe notification is posted using iTerm2's escape sequence mechanism (OSC 9).\nIf no session ID is provided, uses the current session.",
+		Use:   "notify <message> [session-id]",
+		Short: "Post macOS notification",
+		Long:  "Post a notification to macOS Notification Center via iTerm2.\n\nThe notification is posted using iTerm2's escape sequence mechanism (OSC 9).\nIf no session ID is provided, uses the current session.",
 		Example: cmdutil.Doc(`
 			# Notify current session
 			$ it2 notify "Build completed"

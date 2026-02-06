@@ -99,4 +99,3 @@ func runPlugin(ctx context.Context, meta plugins.PluginMetadata, args []string) 
 	// Run the plugin
 	return execCmd.Run()
 }
-

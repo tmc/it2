@@ -173,8 +173,8 @@ Stability options:
 			// Format the response based on flags
 			formatter := formatting.NewWithOptions(
 				sc.GetFlags().Format,
-				nil, // columns
-				"",  // sortBy
+				nil,   // columns
+				"",    // sortBy
 				false, // sortReverse
 				false, // quiet
 			)

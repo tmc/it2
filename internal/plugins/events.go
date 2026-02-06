@@ -12,21 +12,21 @@ import (
 
 // PluginExecutionEvent represents a single plugin execution event for metrics.
 type PluginExecutionEvent struct {
-	Timestamp   time.Time `json:"timestamp"`
-	PluginName  string    `json:"plugin_name"`
-	PluginType  string    `json:"plugin_type"`
-	SessionID   string    `json:"session_id,omitempty"`
-	DurationMs  float64   `json:"duration_ms"`
-	DurationUs  int64     `json:"duration_us"`
-	Success     bool      `json:"success"`
-	Error       string    `json:"error,omitempty"`
+	Timestamp  time.Time `json:"timestamp"`
+	PluginName string    `json:"plugin_name"`
+	PluginType string    `json:"plugin_type"`
+	SessionID  string    `json:"session_id,omitempty"`
+	DurationMs float64   `json:"duration_ms"`
+	DurationUs int64     `json:"duration_us"`
+	Success    bool      `json:"success"`
+	Error      string    `json:"error,omitempty"`
 }
 
 var (
-	globalEventFile   *os.File
-	globalEventMu     sync.Mutex
-	globalEventPath   string
-	globalEventOnce   sync.Once
+	globalEventFile *os.File
+	globalEventMu   sync.Mutex
+	globalEventPath string
+	globalEventOnce sync.Once
 )
 
 // initGlobalEventFile initializes the global plugin events file
