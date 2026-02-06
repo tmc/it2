@@ -245,7 +245,7 @@ func getBufferLines(sc *cmdutil.StandardCommand, sessionID string, lines int32, 
 		// Join soft-wrapped lines
 		var currentLine string
 		for i, line := range contents {
-			currentLine += line.GetText()
+			currentLine += formatting.ExpandLineText(line)
 			// Check if this line is soft-wrapped (continues on next line)
 			isSoftWrap := line.GetContinuation().String() == "CONTINUATION_SOFT_EOL"
 			// Output the line if it's not soft-wrapped or if it's the last line
@@ -373,7 +373,7 @@ func tailSession(ctx context.Context, sc *cmdutil.StandardCommand, sessionID str
 			var currentLines []string
 			var currentLine string
 			for i, line := range contents {
-				currentLine += line.GetText()
+				currentLine += formatting.ExpandLineText(line)
 				// Check if this line is soft-wrapped (continues on next line)
 				isSoftWrap := line.GetContinuation().String() == "CONTINUATION_SOFT_EOL"
 				// Append the line if it's not soft-wrapped or if it's the last line

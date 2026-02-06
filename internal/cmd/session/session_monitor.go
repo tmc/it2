@@ -302,7 +302,7 @@ func handlePromptNotification(ctx context.Context, c *client.Client, notif *pb.P
 								var outputLines []string
 								var currentLine string
 								for i, line := range contents {
-									currentLine += line.GetText()
+									currentLine += formatting.ExpandLineText(line)
 									// Check if this line is soft-wrapped (continues on next line)
 									isSoftWrap := line.GetContinuation().String() == "CONTINUATION_SOFT_EOL"
 									// Output the line if it's not soft-wrapped or if it's the last line

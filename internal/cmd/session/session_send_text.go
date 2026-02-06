@@ -18,6 +18,7 @@ import (
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/formatting"
 	"github.com/tmc/it2/internal/plugins"
 	"github.com/tmc/it2/internal/sessionid"
 	pb "github.com/tmc/it2/proto"
@@ -521,8 +522,7 @@ func formatScreenResponse(resp *pb.GetBufferResponse) string {
 	contents := resp.GetContents()
 
 	for i, line := range contents {
-		text := line.GetText()
-		result.WriteString(text)
+		result.WriteString(formatting.ExpandLineText(line))
 
 		// Add separator based on continuation type
 		if i < len(contents)-1 {

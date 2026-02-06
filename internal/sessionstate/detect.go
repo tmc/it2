@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/tmc/it2/internal/client"
+	"github.com/tmc/it2/internal/formatting"
 )
 
 // State represents the overall state of a session.
@@ -86,7 +87,7 @@ func DetectState(ctx context.Context, c *client.Client, sessionID string, opts D
 	var contentBuilder strings.Builder
 	if screenResp != nil {
 		for _, line := range screenResp.GetContents() {
-			contentBuilder.WriteString(line.GetText())
+			contentBuilder.WriteString(formatting.ExpandLineText(line))
 			contentBuilder.WriteString("\n")
 		}
 	}

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/tmc/it2/internal/cmdutil"
+	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
 )
 
@@ -17,7 +18,7 @@ func formatBufferForComparison(resp *pb.GetBufferResponse) string {
 	}
 	var lines []string
 	for _, line := range resp.GetContents() {
-		lines = append(lines, line.GetText())
+		lines = append(lines, formatting.ExpandLineText(line))
 	}
 	return strings.Join(lines, "\n")
 }

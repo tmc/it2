@@ -13,6 +13,7 @@ import (
 	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/completion"
+	"github.com/tmc/it2/internal/formatting"
 )
 
 // ArtifactCategory defines the type of artifact being stored
@@ -154,7 +155,7 @@ func addArtifact(ctx context.Context, c *client.Client, sessionID, category, fil
 		// Extract text from buffer response
 		var lines []string
 		for _, line := range buffer.GetContents() {
-			lines = append(lines, line.GetText())
+			lines = append(lines, formatting.ExpandLineText(line))
 		}
 		content = []byte(strings.Join(lines, "\n"))
 		filename = fmt.Sprintf("%s.txt", name)

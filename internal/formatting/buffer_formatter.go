@@ -7,6 +7,45 @@ import (
 	pb "github.com/tmc/it2/proto"
 )
 
+// ExpandLineText reconstructs the screen-visible text from a LineContents.
+// The text field in the protobuf is compact: uninitialized cells (spaces) have
+// num_code_points=0 and contribute no characters to the text string. This
+// function walks code_points_per_cell to reinsert spaces where they belong.
+func ExpandLineText(line *pb.LineContents) string {
+	text := line.GetText()
+	cppc := line.GetCodePointsPerCell()
+	if len(cppc) == 0 {
+		return text
+	}
+
+	runes := []rune(text)
+	var out strings.Builder
+	ri := 0 // index into runes
+	for _, cp := range cppc {
+		n := int(cp.GetNumCodePoints())
+		repeats := int(cp.GetRepeats())
+		if repeats == 0 {
+			repeats = 1
+		}
+		for i := 0; i < repeats; i++ {
+			if n == 0 {
+				out.WriteByte(' ')
+			} else {
+				for j := 0; j < n && ri < len(runes); j++ {
+					out.WriteRune(runes[ri])
+					ri++
+				}
+			}
+		}
+	}
+	// Append any remaining runes not covered by code_points_per_cell.
+	for ri < len(runes) {
+		out.WriteRune(runes[ri])
+		ri++
+	}
+	return out.String()
+}
+
 // stripTrailingEmptyLines removes empty lines from the end of the buffer contents.
 // This is useful for TUI applications where trailing blank lines clutter the output.
 func stripTrailingEmptyLines(contents []*pb.LineContents) []*pb.LineContents {
@@ -52,8 +91,7 @@ func (f *Formatter) FormatBuffer(resp *pb.GetBufferResponse) error {
 	}
 
 	for _, line := range linesToPrint {
-		text := line.GetText()
-		fmt.Println(text)
+		fmt.Println(ExpandLineText(line))
 	}
 	return nil
 }
@@ -83,41 +121,36 @@ func (f *Formatter) FormatBufferWithColors(resp *pb.GetBufferResponse) error {
 	}
 
 	for _, line := range linesToPrint {
-		text := line.GetText()
 		styles := line.GetStyle()
 
 		if len(styles) == 0 {
-			// No style information, print plain text
-			fmt.Println(text)
+			fmt.Println(ExpandLineText(line))
 			continue
 		}
 
-		// Convert text to runes for proper indexing
-		runes := []rune(text)
+		// Expand text to screen representation, then apply styles.
+		expanded := []rune(ExpandLineText(line))
 		var output strings.Builder
 		styleIndex := 0
 		runeIndex := 0
 
-		for styleIndex < len(styles) && runeIndex < len(runes) {
+		for styleIndex < len(styles) && runeIndex < len(expanded) {
 			style := styles[styleIndex]
 			repeats := int(style.GetRepeats())
 			if repeats == 0 {
 				repeats = 1
 			}
 
-			// Generate ANSI escape codes for this style
 			ansiCode := styleToANSI(style)
 			if ansiCode != "" {
 				output.WriteString(ansiCode)
 			}
 
-			// Write the characters with this style
-			for i := 0; i < repeats && runeIndex < len(runes); i++ {
-				output.WriteRune(runes[runeIndex])
+			for i := 0; i < repeats && runeIndex < len(expanded); i++ {
+				output.WriteRune(expanded[runeIndex])
 				runeIndex++
 			}
 
-			// Reset style after writing
 			if ansiCode != "" {
 				output.WriteString("\033[0m")
 			}
@@ -125,17 +158,14 @@ func (f *Formatter) FormatBufferWithColors(resp *pb.GetBufferResponse) error {
 			styleIndex++
 		}
 
-		// Write any remaining characters without style
-		for runeIndex < len(runes) {
-			output.WriteRune(runes[runeIndex])
+		for runeIndex < len(expanded) {
+			output.WriteRune(expanded[runeIndex])
 			runeIndex++
 		}
 
 		fmt.Println(output.String())
 	}
 
-	// Ensure terminal formatting is reset after all output
-	// This prevents ANSI codes from bleeding into the calling session
 	fmt.Print("\033[0m")
 
 	return nil
@@ -255,38 +285,32 @@ func (f *Formatter) FormatBufferEscaped(resp *pb.GetBufferResponse, includeColor
 	}
 
 	for _, line := range linesToPrint {
-		text := line.GetText()
 		styles := line.GetStyle()
+		expanded := []rune(ExpandLineText(line))
 
 		var output strings.Builder
 
 		if includeColors && len(styles) > 0 {
-			// Include color codes, but show them as escaped
-			runes := []rune(text)
 			styleIndex := 0
 			runeIndex := 0
 
-			for styleIndex < len(styles) && runeIndex < len(runes) {
+			for styleIndex < len(styles) && runeIndex < len(expanded) {
 				style := styles[styleIndex]
 				repeats := int(style.GetRepeats())
 				if repeats == 0 {
 					repeats = 1
 				}
 
-				// Generate ANSI escape codes for this style
 				ansiCode := styleToANSI(style)
 				if ansiCode != "" {
-					// Show the escape sequence as visible characters
 					output.WriteString(escapeString(ansiCode))
 				}
 
-				// Write the characters with this style
-				for i := 0; i < repeats && runeIndex < len(runes); i++ {
-					output.WriteString(escapeChar(runes[runeIndex]))
+				for i := 0; i < repeats && runeIndex < len(expanded); i++ {
+					output.WriteString(escapeChar(expanded[runeIndex]))
 					runeIndex++
 				}
 
-				// Show reset sequence as visible
 				if ansiCode != "" {
 					output.WriteString("^[[0m")
 				}
@@ -294,14 +318,12 @@ func (f *Formatter) FormatBufferEscaped(resp *pb.GetBufferResponse, includeColor
 				styleIndex++
 			}
 
-			// Write any remaining characters without style
-			for runeIndex < len(runes) {
-				output.WriteString(escapeChar(runes[runeIndex]))
+			for runeIndex < len(expanded) {
+				output.WriteString(escapeChar(expanded[runeIndex]))
 				runeIndex++
 			}
 		} else {
-			// Just escape control characters in the text
-			for _, r := range text {
+			for _, r := range expanded {
 				output.WriteString(escapeChar(r))
 			}
 		}

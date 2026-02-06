@@ -3,9 +3,46 @@ package client
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	pb "github.com/tmc/it2/proto"
 )
+
+// expandLineText reconstructs screen-visible text from a LineContents.
+// The text field omits uninitialized cells (spaces); code_points_per_cell
+// provides the mapping to reinsert them.
+func expandLineText(line *pb.LineContents) string {
+	text := line.GetText()
+	cppc := line.GetCodePointsPerCell()
+	if len(cppc) == 0 {
+		return text
+	}
+	runes := []rune(text)
+	var out strings.Builder
+	ri := 0
+	for _, cp := range cppc {
+		n := int(cp.GetNumCodePoints())
+		repeats := int(cp.GetRepeats())
+		if repeats == 0 {
+			repeats = 1
+		}
+		for i := 0; i < repeats; i++ {
+			if n == 0 {
+				out.WriteByte(' ')
+			} else {
+				for j := 0; j < n && ri < len(runes); j++ {
+					out.WriteRune(runes[ri])
+					ri++
+				}
+			}
+		}
+	}
+	for ri < len(runes) {
+		out.WriteRune(runes[ri])
+		ri++
+	}
+	return out.String()
+}
 
 // GetBufferWithStyles retrieves the buffer contents of a session with optional style information
 func (c *Client) GetBufferWithStyles(ctx context.Context, sessionID string, lines int32, includeStyles bool) (*pb.GetBufferResponse, error) {

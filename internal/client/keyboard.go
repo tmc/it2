@@ -325,7 +325,7 @@ func (c *Client) FindText(ctx context.Context, sessionID, pattern string, regex,
 			break
 		}
 
-		text := lineContent.GetText()
+		text := expandLineText(lineContent)
 		if text == "" {
 			continue
 		}
