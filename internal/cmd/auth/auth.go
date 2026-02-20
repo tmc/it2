@@ -39,7 +39,7 @@ func newCheckCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "check",
 		Short: "Check if authentication is configured",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if auth.HasAuthentication() {
 				fmt.Println("Authentication is configured")
 				if cookie := os.Getenv("ITERM2_COOKIE"); cookie != "" {
@@ -48,10 +48,12 @@ func newCheckCommand() *cobra.Command {
 				if key := os.Getenv("ITERM2_KEY"); key != "" {
 					fmt.Printf("Key: %s...\n", key[:min(len(key), 10)])
 				}
-			} else {
-				fmt.Println("Authentication is not configured")
-				fmt.Println("Run 'it2 auth request' to request authentication")
+				return nil
 			}
+			fmt.Println("Authentication is not configured")
+			fmt.Println("Run 'it2 auth request' to request authentication")
+			os.Exit(1)
+			return nil
 		},
 	}
 }
