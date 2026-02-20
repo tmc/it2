@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmd/app/settings"
+	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/launcher"
 )
 
@@ -62,32 +62,12 @@ Common variables:
 				}
 			}
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-
-			// Use parent command flags if not set
-			if wsURL == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
-							wsURL = urlFlag.Value.String()
-						}
-					}
-				}
-			}
-			if timeout == 0 {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						timeout, _ = root.PersistentFlags().GetDuration("timeout")
-					}
-				}
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
+			c, err := cmdcore.ConnectClient(ctx)
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
@@ -125,43 +105,23 @@ func newSetVariableCommand() *cobra.Command {
 				return fmt.Errorf("invalid JSON value: %w", err)
 			}
 
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-
-			// Use parent command flags if not set
-			if wsURL == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
-							wsURL = urlFlag.Value.String()
-						}
-					}
-				}
-			}
-			if timeout == 0 {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						timeout, _ = root.PersistentFlags().GetDuration("timeout")
-					}
-				}
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			_, timeout, _ := cmdcore.GetFlags(cmd)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
+			c, err := cmdcore.ConnectClient(ctx)
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
 
 			// Set variable via API
-			err := c.SetVariable(ctx, "", varName, varValue)
+			err = c.SetVariable(ctx, "", varName, varValue)
 			if err != nil {
 				return fmt.Errorf("failed to set variable: %w", err)
 			}
 
-			fmt.Printf("Variable '%s' set successfully\n", varName)
+			fmt.Fprintf(os.Stderr, "Variable '%s' set successfully\n", varName)
 			return nil
 		},
 	}
@@ -173,42 +133,13 @@ func newVersionCommand() *cobra.Command {
 		Short: "Get iTerm2 version information",
 		Long:  "Display iTerm2 version and build information",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			wsURL, _ := cmd.Flags().GetString("url")
-			timeout, _ := cmd.Flags().GetDuration("timeout")
-			format, _ := cmd.Flags().GetString("format")
+			_, timeout, format := cmdcore.GetFlags(cmd)
 
-			// Use parent command flags if not set
-			if wsURL == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if urlFlag := root.PersistentFlags().Lookup("url"); urlFlag != nil {
-							wsURL = urlFlag.Value.String()
-						}
-					}
-				}
-			}
-			if timeout == 0 {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						timeout, _ = root.PersistentFlags().GetDuration("timeout")
-					}
-				}
-			}
-			if format == "" {
-				if parent := cmd.Parent(); parent != nil {
-					if root := parent.Root(); root != nil {
-						if formatFlag := root.PersistentFlags().Lookup("format"); formatFlag != nil {
-							format = formatFlag.Value.String()
-						}
-					}
-				}
-			}
-
-			ctx, cancel := context.WithTimeout(context.Background(), timeout)
+			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c := client.New(wsURL)
-			if err := c.Connect(ctx); err != nil {
+			c, err := cmdcore.ConnectClient(ctx)
+			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
 			defer c.Close()
