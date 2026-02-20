@@ -263,8 +263,6 @@ func (f *Formatter) formatSessionsTree(sessions []*client.SessionInfo) error {
 
 	// Print header
 	fmt.Println("Session Hierarchy:")
-	fmt.Println("sh")
-	fmt.Println("sh")
 
 	// Sort windows by number
 	var windowNumbers []int32

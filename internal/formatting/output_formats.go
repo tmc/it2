@@ -37,7 +37,7 @@ func PrintYAML(v interface{}) error {
 	return encoder.Encode(v)
 }
 
-// FormatGeneric formats any interface{} as JSON.
+// FormatGeneric formats any value according to the configured output format.
 func (f *Formatter) FormatGeneric(v interface{}) error {
 	switch f.format {
 	case "json":
@@ -45,7 +45,9 @@ func (f *Formatter) FormatGeneric(v interface{}) error {
 	case "yaml":
 		return f.formatYAML(v)
 	default:
-		// For text format, just use JSON as well
-		return f.formatJSON(v)
+		// For text format, use pretty-printed JSON as a readable fallback
+		encoder := json.NewEncoder(os.Stdout)
+		encoder.SetIndent("", "  ")
+		return encoder.Encode(v)
 	}
 }
