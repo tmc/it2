@@ -131,7 +131,7 @@ func addArtifact(ctx context.Context, c *client.Client, sessionID, category, fil
 		return nil, fmt.Errorf("failed to get artifact directory: %w", err)
 	}
 
-	if err := os.MkdirAll(artifactDir, 0755); err != nil {
+	if err := os.MkdirAll(artifactDir, 0700); err != nil {
 		return nil, fmt.Errorf("failed to create artifact directory: %w", err)
 	}
 
@@ -198,7 +198,7 @@ func addArtifact(ctx context.Context, c *client.Client, sessionID, category, fil
 
 	// Write artifact file
 	artifactPath := filepath.Join(artifactDir, filename)
-	if err := os.WriteFile(artifactPath, content, 0644); err != nil {
+	if err := os.WriteFile(artifactPath, content, 0600); err != nil {
 		return nil, fmt.Errorf("failed to write artifact: %w", err)
 	}
 
@@ -257,9 +257,9 @@ func updateArtifactIndex(sessionID string, metadata *ArtifactMetadata) error {
 	}
 
 	indexDir := filepath.Dir(indexPath)
-	if err := os.MkdirAll(indexDir, 0755); err != nil {
+	if err := os.MkdirAll(indexDir, 0700); err != nil {
 		return err
 	}
 
-	return os.WriteFile(indexPath, data, 0644)
+	return os.WriteFile(indexPath, data, 0600)
 }

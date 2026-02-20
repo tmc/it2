@@ -114,7 +114,7 @@ func appendToArtifact(sessionID, artifactName, data string, addTimestamp bool) e
 
 	// Store JSONL files in custom category
 	artifactDir := filepath.Join(homeDir, ".it2", "sessions", sessionID, "artifacts", "jsonl")
-	if err := os.MkdirAll(artifactDir, 0755); err != nil {
+	if err := os.MkdirAll(artifactDir, 0700); err != nil {
 		return fmt.Errorf("failed to create artifact directory: %w", err)
 	}
 

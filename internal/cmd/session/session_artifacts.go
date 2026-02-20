@@ -126,7 +126,7 @@ The directory path is written to stdout, making it easy to use in scripts:
 			artifactsDir := filepath.Join(homeDir, ".it2", "sessions", sessionID)
 
 			// Create directory if it doesn't exist
-			if err := os.MkdirAll(artifactsDir, 0755); err != nil {
+			if err := os.MkdirAll(artifactsDir, 0700); err != nil {
 				return fmt.Errorf("failed to create artifacts directory: %w", err)
 			}
 

@@ -87,10 +87,10 @@ func installClaudeCodeHooks(scope string) error {
 	// Create settings file if it doesn't exist
 	if _, err := os.Stat(settingsFile); os.IsNotExist(err) {
 		dir := filepath.Dir(settingsFile)
-		if err := os.MkdirAll(dir, 0755); err != nil {
+		if err := os.MkdirAll(dir, 0700); err != nil {
 			return fmt.Errorf("failed to create directory %s: %w", dir, err)
 		}
-		if err := os.WriteFile(settingsFile, []byte("{}"), 0644); err != nil {
+		if err := os.WriteFile(settingsFile, []byte("{}"), 0600); err != nil {
 			return fmt.Errorf("failed to create settings file: %w", err)
 		}
 	}

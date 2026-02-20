@@ -140,18 +140,54 @@ func (p *ExecPlugin) Type() PluginType {
 	return p.pluginType
 }
 
-// setupPluginEnv adds iTerm2 authentication credentials to the command environment
-func setupPluginEnv(cmd *exec.Cmd) {
-	// Inherit parent environment
-	cmd.Env = os.Environ()
+// pluginEnvWhitelist is the set of environment variable names and prefixes
+// passed to plugins. Everything else is filtered out to prevent leaking
+// credentials (AWS keys, API tokens, etc.) to untrusted executables.
+var pluginEnvWhitelist = []string{
+	"HOME",
+	"PATH",
+	"SHELL",
+	"TERM",
+	"TMPDIR",
+	"USER",
+	"LOGNAME",
+	"LANG",
+}
 
-	// Add iTerm2 authentication if available
-	if cookie := os.Getenv("ITERM2_COOKIE"); cookie != "" {
-		cmd.Env = append(cmd.Env, "ITERM2_COOKIE="+cookie)
+// pluginEnvPrefixes are prefixes that are also allowed through.
+var pluginEnvPrefixes = []string{
+	"LC_",
+	"IT2_",
+	"ITERM2_",
+	"ITERM_",
+}
+
+// setupPluginEnv builds a filtered environment for plugin execution.
+// Only whitelisted variables are passed through to prevent leaking
+// secrets from the parent process environment.
+func setupPluginEnv(cmd *exec.Cmd) {
+	var env []string
+	for _, kv := range os.Environ() {
+		key, _, _ := strings.Cut(kv, "=")
+		if pluginEnvAllowed(key) {
+			env = append(env, kv)
+		}
 	}
-	if key := os.Getenv("ITERM2_KEY"); key != "" {
-		cmd.Env = append(cmd.Env, "ITERM2_KEY="+key)
+	cmd.Env = env
+}
+
+func pluginEnvAllowed(key string) bool {
+	for _, allowed := range pluginEnvWhitelist {
+		if key == allowed {
+			return true
+		}
 	}
+	for _, prefix := range pluginEnvPrefixes {
+		if strings.HasPrefix(key, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 // getPluginDeadline returns the configured plugin deadline from environment or default
@@ -193,17 +229,15 @@ func (p *ExecPlugin) EnrichSession(ctx context.Context, session *client.SessionI
 	inputBytes, _ := json.Marshal(input)
 	cmd.Stdin = bytes.NewReader(inputBytes)
 
-	output, err := cmd.CombinedOutput() // Get both stdout and stderr
+	stdout, stderr, err := runPlugin(cmd)
 	if err != nil {
-		// If the command fails, return empty data instead of error
-		// This allows plugins to be optional
+		if len(stderr) > 0 {
+			fmt.Fprintf(os.Stderr, "plugin %s: %s\n", p.name, stderr)
+		}
 		return map[string]interface{}{}, nil
 	}
 
-	// Parse the output - for now just return the trimmed output as a string
-	result := strings.TrimSpace(string(output))
-
-	// Don't add empty results
+	result := strings.TrimSpace(string(stdout))
 	if result == "" {
 		return map[string]interface{}{}, nil
 	}
@@ -245,12 +279,15 @@ func (p *ExecPlugin) EnrichTab(ctx context.Context, tab *formatting.TabInfo) (ma
 	inputBytes, _ := json.Marshal(input)
 	cmd.Stdin = bytes.NewReader(inputBytes)
 
-	output, err := cmd.CombinedOutput()
+	stdout, stderr, err := runPlugin(cmd)
 	if err != nil {
+		if len(stderr) > 0 {
+			fmt.Fprintf(os.Stderr, "plugin %s: %s\n", p.name, stderr)
+		}
 		return map[string]interface{}{}, nil
 	}
 
-	result := strings.TrimSpace(string(output))
+	result := strings.TrimSpace(string(stdout))
 	if result == "" {
 		return map[string]interface{}{}, nil
 	}
@@ -290,12 +327,15 @@ func (p *ExecPlugin) EnrichWindow(ctx context.Context, window *client.WindowInfo
 	inputBytes, _ := json.Marshal(input)
 	cmd.Stdin = bytes.NewReader(inputBytes)
 
-	output, err := cmd.CombinedOutput()
+	stdout, stderr, err := runPlugin(cmd)
 	if err != nil {
+		if len(stderr) > 0 {
+			fmt.Fprintf(os.Stderr, "plugin %s: %s\n", p.name, stderr)
+		}
 		return map[string]interface{}{}, nil
 	}
 
-	result := strings.TrimSpace(string(output))
+	result := strings.TrimSpace(string(stdout))
 	if result == "" {
 		return map[string]interface{}{}, nil
 	}
@@ -332,12 +372,15 @@ func (p *ExecPlugin) EnrichProcess(ctx context.Context, sessionID string, pid in
 	inputBytes, _ := json.Marshal(input)
 	cmd.Stdin = bytes.NewReader(inputBytes)
 
-	output, err := cmd.CombinedOutput()
+	stdout, stderr, err := runPlugin(cmd)
 	if err != nil {
+		if len(stderr) > 0 {
+			fmt.Fprintf(os.Stderr, "plugin %s: %s\n", p.name, stderr)
+		}
 		return map[string]interface{}{}, nil
 	}
 
-	result := strings.TrimSpace(string(output))
+	result := strings.TrimSpace(string(stdout))
 	if result == "" {
 		return map[string]interface{}{}, nil
 	}
@@ -345,6 +388,16 @@ func (p *ExecPlugin) EnrichProcess(ctx context.Context, sessionID string, pid in
 	return map[string]interface{}{
 		p.name: result,
 	}, nil
+}
+
+// runPlugin executes the command and returns stdout and stderr separately.
+// This avoids the CombinedOutput bug where stderr warnings corrupt JSON on stdout.
+func runPlugin(cmd *exec.Cmd) (stdout, stderr []byte, err error) {
+	var outBuf, errBuf bytes.Buffer
+	cmd.Stdout = &outBuf
+	cmd.Stderr = &errBuf
+	err = cmd.Run()
+	return outBuf.Bytes(), errBuf.Bytes(), err
 }
 
 // StartMonitoring starts monitoring for events from the plugin

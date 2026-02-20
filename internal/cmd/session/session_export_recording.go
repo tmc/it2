@@ -94,7 +94,7 @@ generate a timestamped filename in the artifacts directory.`,
 				}
 
 				recordingsDir := filepath.Join(homeDir, ".it2", "sessions", sessionID, "recordings")
-				if err := os.MkdirAll(recordingsDir, 0755); err != nil {
+				if err := os.MkdirAll(recordingsDir, 0700); err != nil {
 					return fmt.Errorf("failed to create recordings directory: %w", err)
 				}
 
@@ -118,7 +118,7 @@ generate a timestamped filename in the artifacts directory.`,
 			}
 
 			// Ensure parent directory exists
-			if err := os.MkdirAll(filepath.Dir(finalOutputPath), 0755); err != nil {
+			if err := os.MkdirAll(filepath.Dir(finalOutputPath), 0700); err != nil {
 				return fmt.Errorf("failed to create output directory: %w", err)
 			}
 

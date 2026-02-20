@@ -38,12 +38,12 @@ func initGlobalEventFile() error {
 		}
 
 		dir := filepath.Join(home, ".it2")
-		if err := os.MkdirAll(dir, 0755); err != nil {
+		if err := os.MkdirAll(dir, 0700); err != nil {
 			return
 		}
 
 		globalEventPath = filepath.Join(dir, "plugin-events.ndjson")
-		globalEventFile, _ = os.OpenFile(globalEventPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		globalEventFile, _ = os.OpenFile(globalEventPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	})
 	return nil
 }
@@ -89,12 +89,12 @@ func RecordPluginEvent(pluginName, pluginType, sessionID string, duration time.D
 func appendWithLock(path string, data []byte) {
 	// Ensure directory exists
 	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0700); err != nil {
 		return
 	}
 
 	// Try to open and lock the file
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return
 	}
@@ -108,10 +108,10 @@ func appendWithLock(path string, data []byte) {
 	} else {
 		// Failed to get lock, spill to overflow file
 		overflowPath := filepath.Join(dir, ".overflow", fmt.Sprintf("%d.ndjson", os.Getpid()))
-		if err := os.MkdirAll(filepath.Dir(overflowPath), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(overflowPath), 0700); err != nil {
 			return
 		}
-		of, err := os.OpenFile(overflowPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		of, err := os.OpenFile(overflowPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
 			return
 		}
@@ -157,7 +157,7 @@ func MergeOverflowFiles(basePath string) (int, error) {
 	}
 
 	// Try to open and lock the main file
-	f, err := os.OpenFile(basePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(basePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return 0, err
 	}

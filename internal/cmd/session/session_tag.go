@@ -175,7 +175,7 @@ func loadTags(path string) (map[string]string, error) {
 func saveTags(path string, tags map[string]string) error {
 	// Ensure directory exists
 	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0700); err != nil {
 		return fmt.Errorf("create directory: %w", err)
 	}
 
@@ -184,7 +184,7 @@ func saveTags(path string, tags map[string]string) error {
 		return fmt.Errorf("marshal tags: %w", err)
 	}
 
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	if err := os.WriteFile(path, data, 0600); err != nil {
 		return fmt.Errorf("write tags: %w", err)
 	}
 
