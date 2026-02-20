@@ -57,10 +57,6 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newSubscribeCommand())
 	cmd.AddCommand(newListCommand())
 
-	logCmd := newLogCommand()
-	logCmd.Hidden = true
-	cmd.AddCommand(logCmd)
-
 	return cmd
 }
 
@@ -203,52 +199,6 @@ Examples:
 			return nil
 		},
 	}
-
-	return cmd
-}
-
-func newLogCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "log",
-		Short: "Show event history",
-		Long: `Show the history of events that occurred during this session.
-
-This command displays events that were captured during the current
-monitoring session. To capture event history, you need to run
-'it2 event subscribe <type>' in the background or have previously run it.
-
-Note: This is a placeholder implementation. In a real system, you would
-want to persist event logs to a file or database.
-
-Examples:
-  # Show event log
-  it2 event log
-
-  # Show with JSON output
-  it2 event log --format json
-
-  # Show last 20 events
-  it2 event log --limit 20`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			_, _, format := cmdcore.GetFlags(cmd)
-			limit, _ := cmd.Flags().GetInt("limit")
-
-			// This is a placeholder - in a real implementation you would
-			// read from a persistent event log
-			fmt.Println("Event logging is not yet implemented.")
-			fmt.Println("To see events in real-time, use: it2 event subscribe <type>")
-
-			if format == "json" {
-				fmt.Println("[]")
-			}
-
-			_ = limit // TODO: Implement actual event logging
-
-			return nil
-		},
-	}
-
-	cmd.Flags().Int("limit", 50, "Limit number of events to show")
 
 	return cmd
 }
