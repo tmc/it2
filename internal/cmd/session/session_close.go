@@ -11,12 +11,17 @@ import (
 
 func newCloseCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
-		Use:   "close <session-id> [<session-id>...]",
+		Use:   "close [<session-id>...]",
 		Short: "Close one or more sessions",
-		Long:  "Close the specified iTerm2 session(s). Use --force to close without prompting",
+		Long: `Close the specified iTerm2 session(s). Use --force to close without prompting.
+
+The session can be specified as a positional argument or with the -s flag.`,
 		Example: cmdutil.Doc(`
 			# Close a specific session
 			$ it2 session close abc123
+
+			# Close using -s flag
+			$ it2 session close -s abc123
 
 			# Close multiple sessions
 			$ it2 session close abc123 def456 ghi789
@@ -33,32 +38,38 @@ func newCloseCommand() *cobra.Command {
 			# Close all sessions in window
 			$ IT2_SCOPE=window it2 session close $(it2 session list --format id)
 		`),
-		Args:            cobra.MinimumNArgs(1),
+		Args:            cobra.ArbitraryArgs,
 		RequiresClient:  true,
-		RequiresSession: true, // First session ID is auto-resolved by template
+		RequiresSession: false, // We handle session resolution ourselves to support -s flag
 		SupportsFormat:  true,
 		ValidArgsFunc:   completion.SessionIDCompletion,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
 			force, _ := sc.GetCommand().Flags().GetBool("force")
 			stopOnError, _ := sc.GetCommand().Flags().GetBool("stop-on-error")
+			sessionFlag, _ := sc.GetCommand().Flags().GetString("session")
 
-			// args[0] is already resolved by RequiresSession template
-			// Resolve remaining session IDs if any
-			resolvedIDs := make([]string, 0, len(args))
+			// Collect raw session IDs from -s flag and positional args
+			var rawIDs []string
+			if sessionFlag != "" {
+				rawIDs = append(rawIDs, sessionFlag)
+			}
+			rawIDs = append(rawIDs, args...)
+
+			if len(rawIDs) == 0 {
+				return sc.ReportError("close sessions", fmt.Errorf("session ID is required (use positional argument or -s flag)"))
+			}
+
+			// Resolve all session IDs
+			resolvedIDs := make([]string, 0, len(rawIDs))
 			var resolveErrors []string
 
-			// First ID is already resolved
-			resolvedIDs = append(resolvedIDs, args[0])
-
-			// Resolve the rest
-			for i := 1; i < len(args); i++ {
-				resolved, err := sc.GetClient().ResolveSessionID(sc.GetContext(), args[i])
+			for _, rawID := range rawIDs {
+				resolved, err := sc.GetClient().ResolveSessionID(sc.GetContext(), rawID)
 				if err != nil {
 					if stopOnError {
 						return sc.ReportError("resolve session ID", err)
 					}
-					// Track errors but continue with other sessions
-					resolveErrors = append(resolveErrors, fmt.Sprintf("%s: %v", args[i], err))
+					resolveErrors = append(resolveErrors, fmt.Sprintf("%s: %v", rawID, err))
 					continue
 				}
 				resolvedIDs = append(resolvedIDs, resolved)
@@ -110,6 +121,7 @@ func newCloseCommand() *cobra.Command {
 
 	cmd := cmdutil.NewCommandFromTemplate(template)
 	cmd.Flags().Bool("force", false, "Force close the session without prompting")
+	cmd.Flags().StringP("session", "s", "", "Target session ID to close")
 
 	// Add scope support
 	cmd.Flags().String("scope", "", "Filter sessions by scope (default: all sessions). Options: none, window, tab, parents, siblings, peers, lineage. Overrides IT2_SCOPE env var.")
