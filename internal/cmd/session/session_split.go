@@ -76,7 +76,9 @@ to control positioning.`,
 			badge, _ := cmd.Flags().GetString("badge")
 			command, _ := cmd.Flags().GetString("command")
 			cwd, _ := cmd.Flags().GetString("cwd")
-			jsonOutput, _ := cmd.Flags().GetBool("json")
+			jsonFlag, _ := cmd.Flags().GetBool("json")
+			_, _, format := cmdcore.GetFlags(cmd)
+			jsonOutput := jsonFlag || format == "json"
 			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			// Validate flags
@@ -282,7 +284,8 @@ to control positioning.`,
 	cmd.Flags().String("badge", "", "Set badge text on new session(s)")
 	cmd.Flags().String("command", "", "Command to run in the new session")
 	cmd.Flags().String("cwd", "", "Working directory for the new session (defaults to caller's CWD)")
-	cmd.Flags().Bool("json", false, "Output result as JSON")
+	cmd.Flags().Bool("json", false, "Output result as JSON (equivalent to --format json)")
+	cmd.Flags().MarkHidden("json")
 	cmd.Flags().BoolP("quiet", "q", false, "Only output the new session ID (for scripting)")
 	return cmd
 }

@@ -28,7 +28,8 @@ func newMonitorCommand() *cobra.Command {
 
 	cmd.Flags().StringP("type", "t", "", "Filter by notification type (comma-separated for multiple)")
 	cmd.Flags().StringP("session", "s", "", "Filter by session ID")
-	cmd.Flags().BoolP("json", "j", false, "Output notifications in JSON format")
+	cmd.Flags().BoolP("json", "j", false, "Output notifications in JSON format (equivalent to --format json)")
+	cmd.Flags().MarkHidden("json")
 	cmd.Flags().Bool("timestamps", true, "Include timestamps in output")
 	cmd.Flags().Bool("summary", false, "Show summary statistics on exit")
 
@@ -38,9 +39,13 @@ func newMonitorCommand() *cobra.Command {
 func runMonitorCommand(cmd *cobra.Command, args []string) error {
 	typeFilter, _ := cmd.Flags().GetString("type")
 	sessionFilter, _ := cmd.Flags().GetString("session")
-	jsonFormat, _ := cmd.Flags().GetBool("json")
 	showTimestamps, _ := cmd.Flags().GetBool("timestamps")
 	showSummary, _ := cmd.Flags().GetBool("summary")
+
+	// Determine JSON format from --json flag or global --format flag
+	jsonFlag, _ := cmd.Flags().GetBool("json")
+	_, _, format := cmdcore.GetFlags(cmd)
+	jsonFormat := jsonFlag || format == "json"
 
 	// Parse and validate notification types
 	var notificationTypes []string

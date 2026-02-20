@@ -20,15 +20,20 @@ func newStatusCommand() *cobra.Command {
 		RunE:  runStatusCommand,
 	}
 
-	cmd.Flags().BoolP("json", "j", false, "Output in JSON format")
+	cmd.Flags().BoolP("json", "j", false, "Output in JSON format (equivalent to --format json)")
+	cmd.Flags().MarkHidden("json")
 	cmd.Flags().Bool("detailed", false, "Show detailed subscription information")
 
 	return cmd
 }
 
 func runStatusCommand(cmd *cobra.Command, args []string) error {
-	jsonFormat, _ := cmd.Flags().GetBool("json")
 	detailed, _ := cmd.Flags().GetBool("detailed")
+
+	// Determine JSON format from --json flag or global --format flag
+	jsonFlag, _ := cmd.Flags().GetBool("json")
+	_, _, format := cmdcore.GetFlags(cmd)
+	jsonFormat := jsonFlag || format == "json"
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

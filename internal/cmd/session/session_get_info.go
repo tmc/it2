@@ -64,7 +64,7 @@ This command combines multiple API calls to provide a complete view of the sessi
 				sessionID = args[0]
 			}
 
-			format, _ := cmd.Flags().GetString("format")
+			_, _, format := cmdcore.GetFlags(cmd)
 			jsonOutput, _ := cmd.Flags().GetBool("json")
 			includeProperties, _ := cmd.Flags().GetBool("properties")
 			extractPath, _ := cmd.Flags().GetString("extract")
@@ -73,7 +73,7 @@ This command combines multiple API calls to provide a complete view of the sessi
 			if jsonOutput {
 				format = "json"
 			}
-			if format == "" {
+			if format == "" || format == "table" {
 				format = "text"
 			}
 
@@ -125,8 +125,8 @@ This command combines multiple API calls to provide a complete view of the sessi
 		},
 	}
 
-	cmd.Flags().String("format", "", "Output format: text, json, yaml (default: text)")
-	cmd.Flags().Bool("json", false, "Output result as JSON (deprecated, use --format=json)")
+	cmd.Flags().Bool("json", false, "Output result as JSON (equivalent to --format json)")
+	cmd.Flags().MarkHidden("json")
 	cmd.Flags().Bool("properties", false, "Include session properties")
 	cmd.Flags().Bool("prompt", false, "Include current prompt information")
 	cmd.Flags().String("extract", "", "Extract specific property value (e.g., 'frame', 'frame.coords', 'name')")
