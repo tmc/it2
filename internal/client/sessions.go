@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os/exec"
-	"strings"
 	"sync"
 
 	pb "github.com/tmc/it2/proto"
@@ -40,6 +38,7 @@ type SessionInfo struct {
 // ListSessionsOptions controls optional session listing behaviour.
 type ListSessionsOptions struct {
 	IncludeBuried bool
+	IncludeJobInfo bool // populate process info (pgrep, API calls per session); expensive with many sessions
 }
 
 // ListSessionsRaw returns the raw protobuf response with full window/tab tree
@@ -64,15 +63,14 @@ func (c *Client) ListSessionsRaw(ctx context.Context) (*pb.ListSessionsResponse,
 }
 
 func (c *Client) ListSessions(ctx context.Context) ([]*SessionInfo, error) {
-	return c.listSessions(ctx, true)
+	return c.ListSessionsWithOptions(ctx, ListSessionsOptions{
+		IncludeBuried:  true,
+		IncludeJobInfo: true,
+	})
 }
 
 // ListSessionsWithOptions returns sessions using the provided options.
 func (c *Client) ListSessionsWithOptions(ctx context.Context, opts ListSessionsOptions) ([]*SessionInfo, error) {
-	return c.listSessions(ctx, opts.IncludeBuried)
-}
-
-func (c *Client) listSessions(ctx context.Context, includeBuried bool) ([]*SessionInfo, error) {
 	listResp, err := c.ListSessionsRaw(ctx)
 	if err != nil {
 		return nil, err
@@ -88,7 +86,7 @@ func (c *Client) listSessions(ctx context.Context, includeBuried bool) ([]*Sessi
 		}
 	}
 
-	if includeBuried {
+	if opts.IncludeBuried {
 		for _, buried := range listResp.GetBuriedSessions() {
 			sessions = append(sessions, &SessionInfo{
 				SessionID:   buried.GetUniqueIdentifier(),
@@ -97,8 +95,9 @@ func (c *Client) listSessions(ctx context.Context, includeBuried bool) ([]*Sessi
 		}
 	}
 
-	// Populate job information for all sessions
-	c.populateJobInfo(ctx, sessions)
+	if opts.IncludeJobInfo {
+		c.populateJobInfo(ctx, sessions)
+	}
 
 	return sessions, nil
 }
@@ -255,10 +254,10 @@ func (c *Client) populateSessionJobInfo(ctx context.Context, session *SessionInf
 		}
 	}()
 
-	// Get all variables in a single batched call (pid, jobPid, path)
+	// Get all variables in a single batched call (pid, jobPid, path, processTitle)
 	go func() {
 		defer wg.Done()
-		vars, err := c.GetMultipleVariablesWithScope(ctx, "session", session.SessionID, []string{"pid", "jobPid", "path"})
+		vars, err := c.GetMultipleVariablesWithScope(ctx, "session", session.SessionID, []string{"pid", "jobPid", "path", "processTitle"})
 		if err != nil {
 			return
 		}
@@ -289,35 +288,16 @@ func (c *Client) populateSessionJobInfo(ctx context.Context, session *SessionInf
 			}
 		}
 
+		// Use processTitle from iTerm2 instead of pgrep
+		if title, ok := vars["processTitle"]; ok && title != "" {
+			var unescaped string
+			if err := json.Unmarshal([]byte(title), &unescaped); err == nil {
+				session.ProcessName = unescaped
+			} else {
+				session.ProcessName = title
+			}
+		}
 	}()
 
 	wg.Wait()
-
-	// Look up the child process of JobPID (the foreground command under the shell).
-	if session.JobPID != 0 {
-		session.ProcessName = childProcessName(int(session.JobPID))
-	}
-}
-
-// childProcessName returns the name of the first child process of pid,
-// or empty string if there is no child (session is idle).
-func childProcessName(pid int) string {
-	out, err := exec.Command("pgrep", "-P", fmt.Sprintf("%d", pid)).Output()
-	if err != nil {
-		return ""
-	}
-	// Take first child PID
-	childPID := strings.TrimSpace(strings.SplitN(string(out), "\n", 2)[0])
-	if childPID == "" {
-		return ""
-	}
-	out, err = exec.Command("ps", "-p", childPID, "-o", "comm=").Output()
-	if err != nil {
-		return ""
-	}
-	name := strings.TrimSpace(string(out))
-	if i := strings.LastIndex(name, "/"); i >= 0 {
-		name = name[i+1:]
-	}
-	return name
 }

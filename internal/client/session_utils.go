@@ -46,8 +46,11 @@ func (c *Client) ResolveSessionID(ctx context.Context, sessionID string) (string
 		return "", fmt.Errorf("session ID prefix too short (minimum 4 characters): %s", sessionID)
 	}
 
-	// Otherwise, try to expand it as a prefix
-	sessions, err := c.ListSessions(ctx)
+	// Otherwise, try to expand it as a prefix.
+	// Use lightweight listing (no job info) to avoid pgrep/API overhead.
+	sessions, err := c.ListSessionsWithOptions(ctx, ListSessionsOptions{
+		IncludeBuried: true,
+	})
 	if err != nil {
 		return "", fmt.Errorf("failed to list sessions for prefix matching: %w", err)
 	}

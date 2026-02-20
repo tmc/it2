@@ -19,6 +19,7 @@ import (
 	"github.com/tmc/it2/internal/auth"
 	"github.com/tmc/it2/internal/iterm2settings"
 	pb "github.com/tmc/it2/proto"
+	"golang.org/x/term"
 	protobuf "google.golang.org/protobuf/proto"
 )
 
@@ -242,6 +243,11 @@ func (c *Client) formatConnectionError(err error) error {
 // offerToEnableAutomation prompts the user to enable automation if it's disabled
 // Returns true if automation was enabled, false otherwise
 func offerToEnableAutomation() bool {
+	// Skip interactive prompt if stdin is not a terminal to avoid hanging
+	if !term.IsTerminal(int(os.Stdin.Fd())) {
+		return false
+	}
+
 	fmt.Fprintln(os.Stderr, "\niTerm2 API automation is not enabled.")
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprint(os.Stderr, "Would you like to enable it now? [Y/n]: ")
