@@ -20,23 +20,15 @@ func isWindowUUID(s string) bool {
 // NewCommand creates the window command with support for both flat and hierarchical modes.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "window [<window-id>] [command]",
-		Short:   "Manage iTerm2 windows or navigate to window context",
+		Use:     "window [command]",
+		Short:   "Manage iTerm2 windows",
 		GroupID: "core",
-		Long: `Manage iTerm2 windows with support for both flat and hierarchical command styles.
+		Long: `Manage iTerm2 windows.
 
-Flat Command Examples:
+Examples:
   it2 window list                   # List all windows
   it2 window create                 # Create new window
-  it2 window close 1                # Close window 1
-
-Hierarchical Command Examples:
-  it2 window 1 tab list            # List tabs in window 1
-  it2 window 1 session list        # List sessions in window 1
-  it2 window 1 tab 2 session list  # List sessions in tab 2 of window 1
-
-The hierarchical style provides context-aware navigation while maintaining
-full compatibility with existing flat commands.`,
+  it2 window close 1                # Close window 1`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// If no args, show help
 			if len(args) == 0 {

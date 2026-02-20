@@ -56,7 +56,10 @@ func NewCommand() *cobra.Command {
 
 	cmd.AddCommand(newSubscribeCommand())
 	cmd.AddCommand(newListCommand())
-	cmd.AddCommand(newLogCommand())
+
+	logCmd := newLogCommand()
+	logCmd.Hidden = true
+	cmd.AddCommand(logCmd)
 
 	return cmd
 }

@@ -265,25 +265,25 @@ func NewCommand() *cobra.Command {
 	watchCmd.GroupID = "monitoring"
 	cmd.AddCommand(watchCmd)
 
-	// Claude Code state detection commands
+	// Claude Code state detection commands (experimental, hidden)
 	getStateCmd := newGetStateCommand()
-	getStateCmd.GroupID = "monitoring"
+	getStateCmd.Hidden = true
 	cmd.AddCommand(getStateCmd)
 
 	isActiveCmd := newIsActiveCommand()
-	isActiveCmd.GroupID = "monitoring"
+	isActiveCmd.Hidden = true
 	cmd.AddCommand(isActiveCmd)
 
 	hasModalCmd := newHasModalCommand()
-	hasModalCmd.GroupID = "monitoring"
+	hasModalCmd.Hidden = true
 	cmd.AddCommand(hasModalCmd)
 
 	suggestActionCmd := newSuggestActionCommand()
-	suggestActionCmd.GroupID = "monitoring"
+	suggestActionCmd.Hidden = true
 	cmd.AddCommand(suggestActionCmd)
 
 	claudeStatusCmd := newClaudeStatusCommand()
-	claudeStatusCmd.GroupID = "monitoring"
+	claudeStatusCmd.Hidden = true
 	cmd.AddCommand(claudeStatusCmd)
 
 	hasShellIntegrationCmd := newHasShellIntegrationCmd()
@@ -299,11 +299,11 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(artifactsCmd)
 
 	exportRecordingCmd := newExportRecordingCommand()
-	exportRecordingCmd.GroupID = "monitoring"
+	exportRecordingCmd.Hidden = true
 	cmd.AddCommand(exportRecordingCmd)
 
 	claudeCmd := newClaudeCommand()
-	claudeCmd.GroupID = "monitoring"
+	claudeCmd.Hidden = true
 	cmd.AddCommand(claudeCmd)
 
 	tagCmd := newTagCommand()
