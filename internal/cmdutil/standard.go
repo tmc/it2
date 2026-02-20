@@ -3,6 +3,7 @@ package cmdutil
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -177,8 +178,12 @@ func (sc *StandardCommand) ReportSuccess(format string, args ...interface{}) {
 	fmt.Printf(format+"\n", args...)
 }
 
-// ReportError reports an error with standard formatting
+// ReportError reports an error with standard formatting.
+// Context deadline errors include the configured timeout and a hint about --timeout.
 func (sc *StandardCommand) ReportError(operation string, err error) error {
+	if errors.Is(err, context.DeadlineExceeded) {
+		return fmt.Errorf("failed to %s: timed out after %s (use --timeout to increase, e.g. --timeout=30s)", operation, sc.flags.Timeout)
+	}
 	return cmderr.NewOperationError(operation, err)
 }
 

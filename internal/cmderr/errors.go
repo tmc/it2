@@ -14,10 +14,20 @@ type StandardError struct {
 
 // Error implements the error interface.
 func (e *StandardError) Error() string {
+	var msg string
 	if e.Cause != nil {
-		return fmt.Sprintf("failed to %s: %v", e.Operation, e.Cause)
+		msg = fmt.Sprintf("failed to %s: %v", e.Operation, e.Cause)
+	} else {
+		msg = fmt.Sprintf("failed to %s", e.Operation)
 	}
-	return fmt.Sprintf("failed to %s", e.Operation)
+	if e.Details != nil {
+		if hint, ok := e.Details["hint"]; ok {
+			if hintStr, ok := hint.(string); ok && hintStr != "" {
+				msg += fmt.Sprintf("\n\nHint: %s", hintStr)
+			}
+		}
+	}
+	return msg
 }
 
 // Unwrap returns the underlying cause.
