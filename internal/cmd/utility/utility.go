@@ -827,7 +827,7 @@ func newPasswordManagerSetCommand() *cobra.Command {
 func newSSHCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ssh",
-		Short: "SSH integration utilities",
+		Short: "Manage SSH integration",
 		Long:  "Commands for SSH integration and key management",
 	}
 
@@ -899,7 +899,7 @@ func newSSHConnectCommand() *cobra.Command {
 func newSSHKeyCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "key",
-		Short: "SSH key management",
+		Short: "Manage SSH keys",
 		Long:  "Manage SSH keys and agent integration",
 	}
 

@@ -15,7 +15,7 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "selection",
 		GroupID: "content",
-		Short:   "Text selection operations in iTerm2",
+		Short:   "Manage text selection",
 		Long:    "Commands for getting, setting, and managing text selection",
 	}
 
