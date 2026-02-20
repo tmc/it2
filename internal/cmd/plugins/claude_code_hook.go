@@ -11,7 +11,12 @@ import (
 	"github.com/tmc/it2/internal/plugins"
 )
 
-// newClaudeCodeHookCommand creates a special command for claude-code-hook with --install flag
+// NewClaudeCodeHookCommand creates a special command for claude-code-hook with --install flag.
+// Exported so that the deprecated tool command can delegate to this implementation.
+func NewClaudeCodeHookCommand(meta plugins.PluginMetadata) *cobra.Command {
+	return newClaudeCodeHookCommand(meta)
+}
+
 func newClaudeCodeHookCommand(meta plugins.PluginMetadata) *cobra.Command {
 	var install bool
 	var scope string
@@ -22,7 +27,7 @@ func newClaudeCodeHookCommand(meta plugins.PluginMetadata) *cobra.Command {
 		Long: fmt.Sprintf(`Run the claude-code-hook plugin or install it to Claude Code settings.
 
 The claude-code-hook plugin logs all Claude Code events to your iTerm2 session's
-artifact directory: ~/.it2/sessions/$ITERM_SESSION_ID/claude-code-hook-events.jsonl
+artifact directory: ~/.it2/sessions/$ITERM_SESSION_ID/claude-code-events.ndjson
 
 Plugin Information:
   Source: %s
@@ -63,7 +68,12 @@ Examples:
 	return cmd
 }
 
-// installClaudeCodeHooks installs Claude Code hooks to the specified settings file
+// InstallClaudeCodeHooks installs Claude Code hooks to the specified settings file.
+// Exported so that the deprecated tool command can delegate to this implementation.
+func InstallClaudeCodeHooks(scope string) error {
+	return installClaudeCodeHooks(scope)
+}
+
 func installClaudeCodeHooks(scope string) error {
 	// Determine settings file path
 	var settingsFile string
@@ -158,10 +168,10 @@ func installClaudeCodeHooks(scope string) error {
 		fmt.Println("  -", hookType)
 	}
 	fmt.Println()
-	fmt.Println("Events will be logged to: ~/.it2/sessions/$ITERM_SESSION_ID/claude-code-hook-events.jsonl")
+	fmt.Println("Events will be logged to: ~/.it2/sessions/$ITERM_SESSION_ID/claude-code-events.ndjson")
 	fmt.Println()
 	fmt.Println("To view events for current session:")
-	fmt.Println("  tail -f ~/.it2/sessions/$(it2 session current)/claude-code-hook-events.jsonl")
+	fmt.Println("  tail -f ~/.it2/sessions/$(it2 session current)/claude-code-events.ndjson")
 	fmt.Println()
 	fmt.Println("To view events with it2 artifacts command:")
 	fmt.Println("  it2 session artifacts directory")

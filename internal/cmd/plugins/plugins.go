@@ -28,7 +28,7 @@ They are discovered automatically from PATH and can enrich session listings
 or perform automation tasks.
 
 See 'it2 plugin list' to discover available plugins.
-Run a plugin directly with 'it2 plugin run <name> [args...]'.`,
+Run a plugin directly with 'it2 plugin <name> [args...]'.`,
 		GroupID: "config",
 	}
 
@@ -52,7 +52,59 @@ Run a plugin directly with 'it2 plugin run <name> [args...]'.`,
 	runCmd.GroupID = "run"
 	cmd.AddCommand(runCmd)
 
+	// Discover plugins and register special subcommands (e.g., claude-code-hook)
+	if err := addPluginSubcommands(cmd); err != nil {
+		// Log error but don't fail - command will work without direct plugin subcommands
+		fmt.Fprintf(os.Stderr, "Warning: failed to discover plugins for subcommands: %v\n", err)
+	}
+
 	return cmd
+}
+
+// addPluginSubcommands discovers all plugins and registers them as direct subcommands.
+// This enables `it2 plugin <name> [args...]` as a shorthand for `it2 plugin run <name> [args...]`.
+func addPluginSubcommands(parent *cobra.Command) error {
+	metadata, err := plugins.DiscoverPluginMetadata()
+	if err != nil {
+		return err
+	}
+
+	for _, meta := range metadata {
+		pluginMeta := meta // Capture for closure
+
+		// Special handling for claude-code-hook plugin (has --install flag)
+		if pluginMeta.Name == "claude-code-hook" {
+			pluginCmd := newClaudeCodeHookCommand(pluginMeta)
+			pluginCmd.GroupID = "run"
+			parent.AddCommand(pluginCmd)
+			continue
+		}
+
+		pluginCmd := &cobra.Command{
+			Use:   pluginMeta.Name,
+			Short: fmt.Sprintf("Run %s plugin (%s)", pluginMeta.Name, pluginMeta.Type),
+			Long: fmt.Sprintf(`Run the %s plugin (%s type).
+
+Source: %s
+Path: %s
+SHA256: %s`,
+				pluginMeta.Name,
+				pluginMeta.Type,
+				pluginMeta.Source,
+				pluginMeta.Path,
+				pluginMeta.SHA256,
+			),
+			RunE: func(cmd *cobra.Command, args []string) error {
+				return runPlugin(cmd.Context(), pluginMeta, args)
+			},
+			DisableFlagParsing: true, // Pass all flags through to the plugin
+			GroupID:            "run",
+		}
+
+		parent.AddCommand(pluginCmd)
+	}
+
+	return nil
 }
 
 // newRunCommand creates a command that runs plugins with lazy discovery.
