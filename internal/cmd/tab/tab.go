@@ -40,8 +40,13 @@ func NewCommand() *cobra.Command {
 	closeCmd.GroupID = "management"
 	cmd.AddCommand(closeCmd)
 
+	focusCmd := newFocusCommand()
+	focusCmd.GroupID = "management"
+	cmd.AddCommand(focusCmd)
+
 	activateCmd := newActivateCommand()
 	activateCmd.GroupID = "management"
+	activateCmd.Hidden = true
 	cmd.AddCommand(activateCmd)
 
 	reorderCmd := newReorderCommand()

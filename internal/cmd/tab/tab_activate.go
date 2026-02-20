@@ -7,6 +7,60 @@ import (
 	"github.com/tmc/it2/internal/validate"
 )
 
+func newFocusCommand() *cobra.Command {
+	template := cmdutil.CommandTemplate{
+		Use:   "focus <tab-id>",
+		Short: "Focus a tab",
+		Long:  "Focus and optionally select a tab in the iTerm2 interface",
+		Example: cmdutil.Doc(`
+			# Focus a specific tab
+			$ it2 tab focus tab-123
+
+			# Focus without selecting
+			$ it2 tab focus --select-tab=false tab-123
+
+			# Focus with JSON output
+			$ it2 tab focus --format json tab-123
+
+			# Focus next tab
+			$ it2 tab focus $(it2 tab list --format id | head -2 | tail -1)
+		`),
+		Args:           cobra.ExactArgs(1),
+		RequiresClient: true,
+		SupportsFormat: true,
+		ValidArgsFunc:  completion.TabIDCompletion,
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return validate.TabID(args[0])
+		},
+		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			tabID := args[0]
+			selectTab, _ := sc.GetCommand().Flags().GetBool("select-tab")
+
+			_, err := sc.GetClient().ActivateTab(sc.GetContext(), tabID, selectTab)
+			if err != nil {
+				return sc.ReportError("focus tab", err)
+			}
+
+			if sc.GetFlags().Format == "json" {
+				result := map[string]interface{}{
+					"tab_id":   tabID,
+					"focused":  true,
+					"selected": selectTab,
+				}
+				return sc.FormatOutput(result)
+			}
+
+			sc.ReportSuccess("Focused tab: %s", tabID)
+			return nil
+		},
+	}
+
+	cmd := cmdutil.NewCommandFromTemplate(template)
+	cmd.Flags().Bool("select-tab", true, "Select the tab after focusing")
+
+	return cmd
+}
+
 func newActivateCommand() *cobra.Command {
 	template := cmdutil.CommandTemplate{
 		Use:   "activate <tab-id>",
