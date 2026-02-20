@@ -100,6 +100,7 @@ The session can be specified as a positional argument or with the -s flag.`,
 	}
 
 	cmd.Flags().StringP("session", "s", "", "Target session ID")
+	cmd.Flags().Duration("timeout", 60*time.Second, "Timeout for the command")
 	cmd.Flags().Bool("allow-self", false, "Allow running command in the same session (disabled by default for safety)")
 
 	cmd.ValidArgsFunction = completion.SessionIDCompletion

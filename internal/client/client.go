@@ -23,7 +23,7 @@ import (
 	protobuf "google.golang.org/protobuf/proto"
 )
 
-// TODO: commeant well
+// Client manages a WebSocket connection to the iTerm2 API.
 type Client struct {
 	conn           *websocket.Conn
 	url            string

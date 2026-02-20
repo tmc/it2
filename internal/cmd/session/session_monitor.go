@@ -91,7 +91,7 @@ The command will run until interrupted (Ctrl+C).`, sessionEvents, globalEvents),
 
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			// TODO: best-effor unsubscribe on exit
+			// TODO: best-effort unsubscribe on exit
 
 			// Handle interruption signals
 			sigChan := make(chan os.Signal, 1)

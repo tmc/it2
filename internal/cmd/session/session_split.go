@@ -178,23 +178,21 @@ to control positioning.`,
 				newSessionIDs := response.GetSessionId()
 				if len(newSessionIDs) > 0 {
 					// Check if the new session is too small and warn the user
-					if len(newSessionIDs) > 0 {
-						gridSizeJSON, err := c.GetSessionProperty(ctx, newSessionIDs[0], "grid_size")
-						if err == nil {
-							var gridSize struct {
-								Width  int `json:"width"`
-								Height int `json:"height"`
-							}
-							if err := json.Unmarshal([]byte(gridSizeJSON), &gridSize); err == nil {
-								const minComfortableWidth = 80
-								const minComfortableHeight = 25
+					gridSizeJSON, err := c.GetSessionProperty(ctx, newSessionIDs[0], "grid_size")
+					if err == nil {
+						var gridSize struct {
+							Width  int `json:"width"`
+							Height int `json:"height"`
+						}
+						if err := json.Unmarshal([]byte(gridSizeJSON), &gridSize); err == nil {
+							const minComfortableWidth = 80
+							const minComfortableHeight = 25
 
-								if gridSize.Width < minComfortableWidth || gridSize.Height < minComfortableHeight {
-									fmt.Fprintf(os.Stderr, "WARNING: New session is small (%dx%d). Consider:\n", gridSize.Width, gridSize.Height)
-									fmt.Fprintf(os.Stderr, "  - Using 'it2 tab layout' to inspect your tab layout\n")
-									fmt.Fprintf(os.Stderr, "  - Splitting in a different tab or window\n")
-									fmt.Fprintf(os.Stderr, "  - Closing unused panes to free up space\n\n")
-								}
+							if gridSize.Width < minComfortableWidth || gridSize.Height < minComfortableHeight {
+								fmt.Fprintf(os.Stderr, "WARNING: New session is small (%dx%d). Consider:\n", gridSize.Width, gridSize.Height)
+								fmt.Fprintf(os.Stderr, "  - Using 'it2 tab layout' to inspect your tab layout\n")
+								fmt.Fprintf(os.Stderr, "  - Splitting in a different tab or window\n")
+								fmt.Fprintf(os.Stderr, "  - Closing unused panes to free up space\n\n")
 							}
 						}
 					}

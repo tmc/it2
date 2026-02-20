@@ -3,6 +3,7 @@ package session
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdutil"
@@ -78,7 +79,7 @@ The session can be specified as a positional argument or with the -s flag.`,
 			if len(resolvedIDs) == 0 {
 				if len(resolveErrors) > 0 {
 					return sc.ReportError("close sessions", fmt.Errorf("no valid session IDs to close. Errors:\n  %s",
-						fmt.Sprintf("%s", resolveErrors)))
+						strings.Join(resolveErrors, "\n  ")))
 				}
 				return sc.ReportError("close sessions", fmt.Errorf("no valid session IDs to close"))
 			}
