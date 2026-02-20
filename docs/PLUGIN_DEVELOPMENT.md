@@ -18,7 +18,7 @@ Plugins can:
 
 | Concept | Definition | Invocation |
 |---------|------------|------------|
-| **Plugin** | Extends it2, auto-discovered | By it2 (`it2 plugin <name>`) |
+| **Plugin** | Extends it2, auto-discovered | By it2 (`it2 plugin run <name>`) |
 | **Hook** | Responds to external tool events | By Claude Code, Gemini CLI, etc. |
 | **Tool** | Standalone CLI program | Directly by user |
 
@@ -382,7 +382,7 @@ it2 plugin list
 
 ```bash
 # Via it2 (automatic session ID injection)
-it2 plugin <name> [args...]
+it2 plugin run <name> [args...]
 
 # Or directly (if in PATH)
 it2-session-example <session-id> [args...]

@@ -159,9 +159,6 @@ it2 text set-cursor --x 10 --y 5
 # Select text range
 it2 text select --start-x 0 --start-y 10 --end-x 20 --end-y 10
 
-# Copy selection to clipboard
-it2 selection copy
-
 # Get current selection
 it2 selection get
 ```
@@ -189,10 +186,10 @@ it2 profile get-property "Default" "background_color"
 it2 profile set-property "Development" "background_color" '{"red": 0.1, "green": 0.1, "blue": 0.1}'
 
 # Apply profile to current session
-it2 session set-property profile "Development"
+it2 session set-property "profile" "Development"
 
 # Get current session's profile
-it2 session get-property profile
+it2 session get-property "profile"
 ```
 
 ## Shell Integration Features
@@ -376,7 +373,7 @@ it2 auth request
 ITERM2_DEBUG=1 it2 session list
 
 # Test connection
-it2 app get-info
+it2 app version
 ```
 
 ### Session debugging

@@ -75,10 +75,10 @@ it2 tab splits
 ### Text and Buffer
 ```bash
 # Get current screen contents
-it2 text get-screen
+it2 get-screen
 
 # Get scrollback buffer
-it2 text get-buffer
+it2 get-buffer
 
 # Search buffer for text
 it2 text search "error"
@@ -272,7 +272,7 @@ it2 variable get             # iTerm2 variables
 
 ### Real-time Monitoring
 ```bash
-it2 notification monitor --type session    # Watch session events
+it2 notification monitor --type new-session    # Watch session events
 it2 variable monitor session user.pwd      # Watch directory changes
 ```
 
@@ -370,7 +370,7 @@ it2 session suggest-action          # Get suggested action
 it2 session watch --agent=claude    # Real-time monitoring
 
 # Pro tips:
-it2 session get-info --json         # Detailed session data
+it2 session get-info --format json   # Detailed session data
 it2 tab create "Default" --badge "Label"  # Labeled tabs
 ITERM2_DEBUG=1 it2 [cmd]           # Debug mode
 ```

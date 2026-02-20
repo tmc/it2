@@ -2,7 +2,7 @@
 
 ## Active Development
 - [ ] Documentation Cleanup
-  - [ ] Rename `CLAUDE_EXTENSIONS_REFERENCE.md` to `CLAUDE_PLUGINS_REFERENCE.md`
+  - [x] Rename `CLAUDE_EXTENSIONS_REFERENCE.md` to `CLAUDE_PLUGINS_REFERENCE.md`
   - [ ] Update README to link to new docs
 - [ ] Plugin System Refactor
   - [ ] Integrate plugin hook (`internal/cmd/plugins/claude_code_hook.go`)

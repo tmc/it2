@@ -402,10 +402,9 @@ done
 
 ### Plugin Discovery
 Plugins are loaded from multiple locations in priority order:
-1. Command-line specified paths (`--plugin-path`)
-2. External extensions (`it2-extensions/`)
-3. Internal plugins (`internal/plugins/scripts/`)
-4. Embedded plugins (`internal/embedded/plugins/`)
+1. Directories from `PATH` environment variable (highest priority)
+2. Directories from `IT2_PLUGIN_PATHS` / `--plugin-path` flag (middle priority)
+3. Embedded plugins bundled in the it2 binary (lowest priority, fallback)
 
 ### Integration with it2 Commands
 Plugins are automatically invoked by `it2 session list` for session property enrichment:

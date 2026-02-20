@@ -51,7 +51,7 @@ it2 <resource> <action> [options]
 For example:
 - `it2 session list` - List all sessions
 - `it2 tab create` - Create a new tab
-- `it2 text send "echo hello"` - Send text to current session
+- `it2 session send-text "echo hello"` - Send text to current session
 
 ## Documentation Structure
 
@@ -79,19 +79,18 @@ Control iTerm2 sessions with commands like:
 ### Window & Tab Control
 Manage your workspace:
 - `it2 window create` - Open new windows
-- `it2 tab split` - Split panes
+- `it2 session split` - Split panes
 - `it2 arrangement save` - Save layouts
 
 ### Text Operations
 Powerful text manipulation:
 - `it2 text search` - Search buffer content
 - `it2 text replace` - Find and replace
-- `it2 selection copy` - Copy selected text
 
 ### Profile Management
 Dynamic profile control:
 - `it2 profile list` - View available profiles
-- `it2 profile set` - Apply profiles to sessions
+- `it2 profile property set` - Apply profiles to sessions
 - `it2 profile export` - Export profile settings
 
 ## Contributing
@@ -106,7 +105,6 @@ it2 is open source! Visit the [GitHub repository](https://github.com/tmc/it2) to
 
 - [Troubleshooting Guide](TROUBLESHOOTING.md)
 - [GitHub Issues](https://github.com/tmc/it2/issues)
-- [Documentation](DOCUMENTATION.md)
 
 ---
 

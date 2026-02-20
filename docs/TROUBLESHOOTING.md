@@ -460,7 +460,7 @@ it2 session create --help
 
 ### Version information:
 ```bash
-it2 version  # If implemented
+it2 app version
 ```
 
 ### Report issues:

@@ -49,7 +49,7 @@ Plugins are automatically discovered from your PATH or embedded in the binary (e
 it2 plugin list
 
 # Run a plugin
-it2 plugin <name> [args...]
+it2 plugin run <name> [args...]
 
 # Install Claude Code hooks
 it2 plugin claude-code-hook --install

@@ -785,7 +785,7 @@ For Claude Code configuration file locations, see the [official documentation](h
 
 1. Create agent definition following the [plugin manifest schema](https://docs.claude.com/en/docs/claude-code/plugins-reference)
 2. Add entry to `.claude-plugin/marketplace.json`
-2. Add plugin to `integration/claude-code/plugins/*`
+2. Add plugin to `integrations/claude-code/plugins/*`
 
 ### Reporting Issues
 
