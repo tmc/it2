@@ -23,10 +23,55 @@ func SocketExists() bool {
 	return err == nil
 }
 
-// LaunchITerm2 starts iTerm2 if it's not already running
+// IsITerm2Installed checks if iTerm2.app exists on the system
+func IsITerm2Installed() bool {
+	// Check /Applications/iTerm.app
+	if _, err := os.Stat("/Applications/iTerm.app"); err == nil {
+		return true
+	}
+	// Check ~/Applications/iTerm.app
+	home, err := os.UserHomeDir()
+	if err == nil {
+		if _, err := os.Stat(filepath.Join(home, "Applications", "iTerm.app")); err == nil {
+			return true
+		}
+	}
+	return false
+}
+
+// InstallITerm2 attempts to install iTerm2 via Homebrew.
+// It prints progress messages to stderr.
+func InstallITerm2() error {
+	// Check if brew is available
+	brewPath, err := exec.LookPath("brew")
+	if err == nil {
+		fmt.Fprintln(os.Stderr, "Installing iTerm2 via Homebrew...")
+		cmd := exec.Command(brewPath, "install", "--cask", "iterm2")
+		cmd.Stdout = os.Stderr
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("brew install --cask iterm2 failed: %w", err)
+		}
+		fmt.Fprintln(os.Stderr, "iTerm2 installed successfully via Homebrew.")
+		return nil
+	}
+
+	return fmt.Errorf("Homebrew is not installed. Please install iTerm2 manually:\n  brew install --cask iterm2\n  or download from https://iterm2.com/downloads/stable/latest")
+}
+
+// LaunchITerm2 starts iTerm2 if it's not already running.
+// If iTerm2 is not installed, it attempts to install it first.
 func LaunchITerm2(ctx context.Context) error {
 	if IsITerm2Running() {
 		return nil
+	}
+
+	// If iTerm2 is not installed, try to install it
+	if !IsITerm2Installed() {
+		fmt.Fprintln(os.Stderr, "iTerm2 is not installed.")
+		if err := InstallITerm2(); err != nil {
+			return fmt.Errorf("iTerm2 is not installed and auto-install failed: %w", err)
+		}
 	}
 
 	// Try to launch iTerm2

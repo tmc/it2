@@ -34,6 +34,7 @@ import (
 	"github.com/tmc/it2/internal/cmd/prompt"
 	"github.com/tmc/it2/internal/cmd/selection"
 	"github.com/tmc/it2/internal/cmd/session"
+	"github.com/tmc/it2/internal/cmd/setup"
 	"github.com/tmc/it2/internal/cmd/shell"
 	"github.com/tmc/it2/internal/cmd/shortcuts"
 	"github.com/tmc/it2/internal/cmd/snippet"
@@ -50,6 +51,7 @@ import (
 	"github.com/tmc/it2/internal/completion"
 	"github.com/tmc/it2/internal/config"
 	"github.com/tmc/it2/internal/hints"
+	"github.com/tmc/it2/internal/launcher"
 	"github.com/tmc/it2/internal/prime"
 	"github.com/tmc/it2/internal/suggestions"
 )
@@ -64,6 +66,8 @@ func renderPrime(sessionID string) string {
 	return prime.Render(sessionID)
 }
 
+var version = "dev"
+
 var (
 	wsURL          string
 	timeout        time.Duration
@@ -73,8 +77,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "it2",
-	Short: "Comprehensive command-line interface for iTerm2 automation",
+	Use:     "it2",
+	Short:   "Comprehensive command-line interface for iTerm2 automation",
+	Version: version,
 	// Disable Cobra's built-in suggestions to use our own
 	DisableSuggestions: true,
 	SilenceErrors:      true, // Handle errors ourselves
@@ -126,6 +131,15 @@ REQUIREMENTS:
   • iTerm2 version 3.3.0 or later
   • Python API enabled in iTerm2 preferences
   • macOS (iTerm2 is macOS-only)`,
+	Run: func(cmd *cobra.Command, args []string) {
+		// Detect first-run: iTerm2 not installed or API not reachable
+		if !launcher.IsITerm2Installed() || !launcher.IsITerm2Running() {
+			fmt.Fprintln(os.Stderr, "Tip: iTerm2 does not appear to be installed or running.")
+			fmt.Fprintln(os.Stderr, "     Run 'it2 setup' to install and configure everything.")
+			fmt.Fprintln(os.Stderr)
+		}
+		cmd.Help()
+	},
 	Example: `  # Core Operations
 
   it2 session list
@@ -569,6 +583,18 @@ func newPrimeCommand() *cobra.Command {
 	return cmd
 }
 
+// newVersionCommand creates a top-level version command that prints the CLI version
+// without requiring an iTerm2 connection (unlike "it2 app version").
+func newVersionCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:   "version",
+		Short: "Print the it2 CLI version",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("it2 version %s\n", version)
+		},
+	}
+}
+
 func init() {
 	// Wire up prime version function for hints tracking
 	hints.SetPrimeVersionFunc(prime.Version)
@@ -612,6 +638,8 @@ func init() {
 	rootCmd.AddCommand(newConfigCommand())
 	rootCmd.AddCommand(newQuickstartCommand())
 	rootCmd.AddCommand(newPrimeCommand())
+	rootCmd.AddCommand(newVersionCommand())
+	rootCmd.AddCommand(setup.NewCommand())
 
 	// Add shortcut commands (top-level shortcuts)
 	rootCmd.AddCommand(shortcuts.NewGetScreenCommand())
@@ -724,7 +752,12 @@ func main() {
 			}
 		}
 
-		fmt.Fprintln(os.Stderr, "Run 'it2 --help' for usage.")
+		// Show context-aware help suggestion
+		helpCmd := "it2 --help"
+		if cmd, _, _ := rootCmd.Find(os.Args[1:]); cmd != nil && cmd != rootCmd {
+			helpCmd = "it2 " + cmd.CommandPath()[len("it2 "):] + " --help"
+		}
+		fmt.Fprintf(os.Stderr, "Run '%s' for usage.\n", helpCmd)
 		os.Exit(1)
 	}
 }
