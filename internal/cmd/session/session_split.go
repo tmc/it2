@@ -20,7 +20,7 @@ func newSplitCommand() *cobra.Command {
 		Short: "Split a session pane",
 		Long: `Split a session pane horizontally or vertically, creating a new session.
 
-If no session-id is provided, uses $ITERM_SESSION_ID environment variable.
+If no session-id is provided, uses -s/--session flag, then $ITERM_SESSION_ID environment variable.
 If neither --horizontal nor --vertical is specified, automatically chooses based on
 session dimensions: vertical split when width > height, horizontal otherwise.
 
@@ -33,9 +33,12 @@ to control positioning.`,
 			$ it2 session split
 
 			# Split current session vertically
-			$ it2 session split --vertical
+			$ it2 session split -v
 
-			# Split specific session horizontally
+			# Split specific session horizontally using -s flag
+			$ it2 session split -s SESSION-ID --horizontal
+
+			# Split specific session horizontally (positional arg)
 			$ it2 session split SESSION-ID --horizontal
 
 			# Split with badge text
@@ -45,20 +48,24 @@ to control positioning.`,
 			$ it2 session split --quiet
 
 			# Split and run a command in the new session
-			$ it2 session split --vertical --command "ssh vm1"
+			$ it2 session split -v --command "ssh vm1"
 
 			# Split with a specific working directory
 			$ it2 session split --cwd /path/to/project
 
 			# Create left-right layout: use --before for left, default for right
-			$ LEFT=$(it2 session split --vertical --before)
-			$ RIGHT=$(it2 session split --vertical)
+			$ LEFT=$(it2 session split -v --before)
+			$ RIGHT=$(it2 session split -v)
 			# Result: [LEFT] [ORIGINAL] [RIGHT]
 		`),
 		Args: cobra.RangeArgs(0, 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var sessionID string
-			if len(args) > 0 {
+			// Prefer -s/--session flag, then positional arg, then $ITERM_SESSION_ID (handled by ResolveSessionID)
+			sessionFlag, _ := cmd.Flags().GetString("session")
+			if sessionFlag != "" {
+				sessionID = sessionFlag
+			} else if len(args) > 0 {
 				sessionID = args[0]
 			}
 
@@ -229,7 +236,7 @@ to control positioning.`,
 						}
 						return formatting.PrintJSON(result)
 					} else {
-						fmt.Printf("Session split successfully. New session ID: %s\n", newSessionIDs[0])
+						fmt.Printf("Created new pane: %s\n", newSessionIDs[0])
 						if len(newSessionIDs) > 1 {
 							fmt.Printf("All session IDs in split: %v\n", newSessionIDs)
 						}
@@ -245,11 +252,11 @@ to control positioning.`,
 						if jsonOutput {
 							result := map[string]interface{}{
 								"success": true,
-								"message": "Session split successfully but no new session ID returned",
+								"message": "Created new pane but no session ID returned",
 							}
 							return formatting.PrintJSON(result)
 						} else {
-							fmt.Printf("Session split successfully\n")
+							fmt.Printf("Created new pane\n")
 						}
 					}
 				}
@@ -269,9 +276,10 @@ to control positioning.`,
 		},
 	}
 
-	cmd.Flags().Bool("vertical", false, "Split vertically")
+	cmd.Flags().BoolP("vertical", "v", false, "Split vertically")
 	cmd.Flags().Bool("horizontal", false, "Split horizontally")
 	cmd.Flags().Bool("before", false, "Create new pane before the current one")
+	cmd.Flags().StringP("session", "s", "", "Target session ID (alternative to positional arg)")
 	cmd.Flags().String("profile", "", "Profile name for the new session (optional, uses default if not specified)")
 	cmd.Flags().String("badge", "", "Set badge text on new session(s)")
 	cmd.Flags().String("command", "", "Command to run in the new session")
