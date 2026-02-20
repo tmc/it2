@@ -165,6 +165,10 @@ func NewCommand() *cobra.Command {
 	sendTextCmd.GroupID = "interaction"
 	cmd.AddCommand(sendTextCmd)
 
+	runCmd := newRunCommand()
+	runCmd.GroupID = "interaction"
+	cmd.AddCommand(runCmd)
+
 	sendKeyCmd := newSendKeyCommand()
 	sendKeyCmd.GroupID = "interaction"
 	cmd.AddCommand(sendKeyCmd)
