@@ -197,16 +197,11 @@ func (p *ExecPlugin) EnrichSession(ctx context.Context, session *client.SessionI
 	if err != nil {
 		// If the command fails, return empty data instead of error
 		// This allows plugins to be optional
-		// Debug output
-		//fmt.Fprintf(os.Stderr, "Plugin %s error for session %s: %v, output: %s\n", p.name, session.SessionID, err, string(output))
 		return map[string]interface{}{}, nil
 	}
 
 	// Parse the output - for now just return the trimmed output as a string
 	result := strings.TrimSpace(string(output))
-
-	// Debug output
-	//fmt.Fprintf(os.Stderr, "Plugin %s returned: '%s' for session %s\n", p.name, result, session.SessionID)
 
 	// Don't add empty results
 	if result == "" {

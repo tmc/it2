@@ -68,12 +68,6 @@ Examples:
 	return cmd
 }
 
-// InstallClaudeCodeHooks installs Claude Code hooks to the specified settings file.
-// Exported so that the deprecated tool command can delegate to this implementation.
-func InstallClaudeCodeHooks(scope string) error {
-	return installClaudeCodeHooks(scope)
-}
-
 func installClaudeCodeHooks(scope string) error {
 	// Determine settings file path
 	var settingsFile string
