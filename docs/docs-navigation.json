@@ -39,11 +39,40 @@
       ]
     },
     {
-      "title": "Claude Code Integration",
+      "title": "AI Integrations",
       "items": [
         {
-          "title": "Overview",
+          "title": "Claude Code Integration",
           "path": "/CLAUDE_CODE_INTEGRATION"
+        },
+        {
+          "title": "Claude Session Linking",
+          "path": "/claude-session-linking"
+        },
+        {
+          "title": "Gemini CLI Integration",
+          "path": "/GEMINI_CLI_INTEGRATION"
+        },
+        {
+          "title": "OpenAI Codex Integration",
+          "path": "/OPENAI_CODEX_INTEGRATION"
+        }
+      ]
+    },
+    {
+      "title": "Reference",
+      "items": [
+        {
+          "title": "Plugin Reference",
+          "path": "/CLAUDE_PLUGINS_REFERENCE"
+        },
+        {
+          "title": "Plugin Manifest Schema",
+          "path": "/plugin-manifest-schema"
+        },
+        {
+          "title": "Taxonomy",
+          "path": "/TAXONOMY"
         }
       ]
     }

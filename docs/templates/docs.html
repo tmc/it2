@@ -33,28 +33,9 @@
             </ul>
         </div>
         {{end}}
-        <div class="nav-section">
-            <h3>Core Command</h3>
-            <ul class="nav-list">
-                <li><a href="/{{$hierarchy.cli.name}}.html">{{$hierarchy.cli.name}}</a></li>
-            </ul>
-        </div>
-        {{range $parent := $hierarchy.cli.subcommands}}
-        <div class="nav-section">
-            <h3>{{$parent.name}}</h3>
-            <ul class="nav-list">
-                <li><a href="/it2_{{$parent.name}}.html">{{$parent.short}}</a>
-                {{if $parent.subcommands}}
-                    <ul class="nav-list">
-                        {{range $parent.subcommands}}
-                        <li><a href="/it2_{{$parent.name}}_{{.name}}.html">{{.name}}</a></li>
-                        {{end}}
-                    </ul>
-                {{end}}
-                </li>
-            </ul>
-        </div>
-        {{end}}
+        {{/* Command hierarchy navigation is disabled until command reference
+             pages are auto-generated. Re-enable this block when per-command
+             HTML pages (e.g. it2_session_list.html) exist in the docs output. */}}
     </div>
 {{end}}
 
