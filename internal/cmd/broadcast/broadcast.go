@@ -123,7 +123,7 @@ func newSetCommand() *cobra.Command {
 				return fmt.Errorf("failed to set broadcast domain: %w", err)
 			}
 
-			fmt.Printf("Set broadcast domain with %d sessions\n", len(sessionIDs))
+			fmt.Fprintf(os.Stderr, "Set broadcast domain with %d sessions\n", len(sessionIDs))
 			return nil
 		},
 	}
@@ -149,11 +149,11 @@ func newClearCommand() *cobra.Command {
 			force, _ := cmd.Flags().GetBool("force")
 
 			if !force {
-				fmt.Print("This will clear all broadcast domains. Are you sure? (y/N): ")
+				fmt.Fprint(os.Stderr, "This will clear all broadcast domains. Are you sure? (y/N): ")
 				var response string
 				fmt.Scanln(&response)
 				if strings.ToLower(response) != "y" && strings.ToLower(response) != "yes" {
-					fmt.Println("Cancelled")
+					fmt.Fprintln(os.Stderr, "Cancelled")
 					return nil
 				}
 			}
@@ -173,7 +173,7 @@ func newClearCommand() *cobra.Command {
 				return fmt.Errorf("failed to clear broadcast domains: %w", err)
 			}
 
-			fmt.Println("All broadcast domains cleared")
+			fmt.Fprintln(os.Stderr, "All broadcast domains cleared")
 			return nil
 		},
 	}

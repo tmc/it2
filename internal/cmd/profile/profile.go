@@ -291,10 +291,10 @@ Example: it2 profile set "Default" --properties '{"Background Color": {"Red Comp
 				if err := c.SetProfileProperty(ctx, profileName, key, value); err != nil {
 					return fmt.Errorf("failed to set property %s: %w", key, err)
 				}
-				fmt.Printf("Set %s for profile '%s'\n", key, profileName)
+				fmt.Fprintf(os.Stderr, "Set %s for profile '%s'\n", key, profileName)
 			}
 
-			fmt.Printf("Successfully updated %d properties for profile '%s'\n", len(properties), profileName)
+			fmt.Fprintf(os.Stderr, "Successfully updated %d properties for profile '%s'\n", len(properties), profileName)
 			return nil
 		},
 	}
@@ -347,7 +347,7 @@ func newSetPropertyCommand() *cobra.Command {
 				return fmt.Errorf("failed to set property: %w", err)
 			}
 
-			fmt.Printf("Set %s = %s for profile '%s'\n", propertyKey, propertyValue, profileName)
+			fmt.Fprintf(os.Stderr, "Set %s = %s for profile '%s'\n", propertyKey, propertyValue, profileName)
 			return nil
 		},
 	}
