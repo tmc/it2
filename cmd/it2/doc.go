@@ -16,7 +16,7 @@
 //
 // # Global Flags
 //
-//	--format string      Output format: text, json, yaml (default "text")
+//	--format string      Output format: table, text, json, yaml (default "table")
 //	--timeout duration   Connection timeout (default 5s)
 //	--url string         API URL (default "ws://localhost:1912", auto-detects Unix socket)
 //
@@ -83,7 +83,7 @@
 //
 // Global flags available for all commands:
 //
-//	--format string      Output format: text, json, yaml (default "text")
+//	--format string      Output format: table, text, json, yaml (default "table")
 //	--timeout duration   Connection timeout (default 5s)
 //	--url string         API URL (default "ws://localhost:1912", auto-detects Unix socket)
 //
@@ -133,7 +133,7 @@
 //
 // Most commands support multiple output formats:
 //
-//	# Human-readable text (default)
+//	# Human-readable table (default)
 //	it2 session list
 //
 //	# JSON for scripting
