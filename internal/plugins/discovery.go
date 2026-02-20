@@ -215,13 +215,20 @@ func DiscoverPluginMetadata() ([]PluginMetadata, error) {
 			}
 
 			name := entry.Name()
+
+			// Classify by name before doing any I/O — skip non-plugins early.
+			plugin := NewExecPlugin(name)
+			if plugin.Type() == PluginTypeUnknown {
+				continue
+			}
+
 			fullPath := filepath.Join(dir, name)
 			info, err := os.Stat(fullPath)
 			if err != nil || info.Mode()&0111 == 0 {
 				continue
 			}
 
-			// Calculate SHA256
+			// Calculate SHA256 only for confirmed plugins
 			f, err := os.Open(fullPath)
 			if err != nil {
 				continue
@@ -234,11 +241,6 @@ func DiscoverPluginMetadata() ([]PluginMetadata, error) {
 			f.Close()
 			sha := fmt.Sprintf("%x", h.Sum(nil))[:16] // First 16 chars
 
-			// Determine plugin name (remove prefix)
-			plugin := NewExecPlugin(fullPath)
-			if plugin.Type() == PluginTypeUnknown {
-				continue
-			}
 			pluginName := plugin.Name()
 			key := discoveryKey(plugin.Type(), pluginName)
 
@@ -269,16 +271,19 @@ func DiscoverPluginMetadata() ([]PluginMetadata, error) {
 			}
 
 			name := entry.Name()
+
+			// Classify by name before I/O — skip non-plugins early.
+			plugin := NewExecPlugin(name)
+			if plugin.Type() == PluginTypeUnknown {
+				continue
+			}
+
 			fullPath := filepath.Join(dir, name)
 			info, err := os.Stat(fullPath)
 			if err != nil || info.Mode()&0111 == 0 {
 				continue
 			}
 
-			plugin := NewExecPlugin(fullPath)
-			if plugin.Type() == PluginTypeUnknown {
-				continue
-			}
 			pluginName := plugin.Name()
 			key := discoveryKey(plugin.Type(), pluginName)
 

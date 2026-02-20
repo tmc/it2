@@ -52,10 +52,18 @@ Run a plugin directly with 'it2 plugin <name> [args...]'.`,
 	runCmd.GroupID = "run"
 	cmd.AddCommand(runCmd)
 
-	// Discover plugins and register special subcommands (e.g., claude-code-hook)
-	if err := addPluginSubcommands(cmd); err != nil {
-		// Log error but don't fail - command will work without direct plugin subcommands
-		fmt.Fprintf(os.Stderr, "Warning: failed to discover plugins for subcommands: %v\n", err)
+	// Lazily discover plugins and register as direct subcommands on first use.
+	// This avoids scanning PATH at startup for every it2 invocation.
+	var pluginsDiscovered bool
+	cmd.PersistentPreRunE = func(c *cobra.Command, args []string) error {
+		if pluginsDiscovered {
+			return nil
+		}
+		pluginsDiscovered = true
+		if err := addPluginSubcommands(cmd); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: failed to discover plugins for subcommands: %v\n", err)
+		}
+		return nil
 	}
 
 	return cmd
