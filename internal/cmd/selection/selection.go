@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/formatting"
 )
@@ -42,9 +41,9 @@ func newGetCommand() *cobra.Command {
 }
 
 func runGetCommand(cmd *cobra.Command, args []string) error {
-	sessionID := "active"
+	var rawSessionID string
 	if len(args) > 0 {
-		sessionID = client.NormalizeSessionID(args[0])
+		rawSessionID = args[0]
 	}
 
 	getText, _ := cmd.Flags().GetBool("text")
@@ -57,6 +56,11 @@ func runGetCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
 	defer c.Close()
+
+	sessionID, err := c.ResolveSessionID(ctx, rawSessionID)
+	if err != nil {
+		return fmt.Errorf("failed to resolve session ID: %w", err)
+	}
 
 	if getText {
 		text, err := c.GetSelectionText(ctx, sessionID)
@@ -103,9 +107,9 @@ Coordinates can be specified as:
 }
 
 func runSetCommand(cmd *cobra.Command, args []string) error {
-	sessionID := "active"
+	var rawSessionID string
 	if len(args) > 0 {
-		sessionID = client.NormalizeSessionID(args[0])
+		rawSessionID = args[0]
 	}
 
 	// Parse coordinates from various flag formats
@@ -195,6 +199,11 @@ func runSetCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer c.Close()
 
+	sessionID, err := c.ResolveSessionID(ctx, rawSessionID)
+	if err != nil {
+		return fmt.Errorf("failed to resolve session ID: %w", err)
+	}
+
 	if err := c.SetSelectionRange(ctx, sessionID, int32(coords[0]), coords[1], int32(coords[2]), coords[3], modeStr); err != nil {
 		return fmt.Errorf("failed to set selection: %w", err)
 	}
@@ -214,9 +223,9 @@ func newClearCommand() *cobra.Command {
 }
 
 func runClearCommand(cmd *cobra.Command, args []string) error {
-	sessionID := "active"
+	var rawSessionID string
 	if len(args) > 0 {
-		sessionID = client.NormalizeSessionID(args[0])
+		rawSessionID = args[0]
 	}
 
 	_, timeout, _ := cmdcore.GetFlags(cmd)
@@ -228,6 +237,11 @@ func runClearCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to connect: %w", err)
 	}
 	defer c.Close()
+
+	sessionID, err := c.ResolveSessionID(ctx, rawSessionID)
+	if err != nil {
+		return fmt.Errorf("failed to resolve session ID: %w", err)
+	}
 
 	if err := c.ClearSelection(ctx, sessionID); err != nil {
 		return fmt.Errorf("failed to clear selection: %w", err)

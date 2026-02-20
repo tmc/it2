@@ -14,7 +14,6 @@ import (
 	"github.com/tmc/it2/internal/cmdutil"
 	"github.com/tmc/it2/internal/formatting"
 	"github.com/tmc/it2/internal/plugins"
-	"github.com/tmc/it2/internal/sessionid"
 )
 
 // NewCommand creates the broadcast command with all subcommands.
@@ -122,10 +121,14 @@ func newSetCommand() *cobra.Command {
 			}
 			defer c.Close()
 
-			// Normalize session IDs
+			// Resolve session IDs
 			normalizedIDs := make([]string, len(sessionIDs))
 			for i, id := range sessionIDs {
-				normalizedIDs[i] = sessionid.Normalize(id)
+				resolved, err := c.ResolveSessionID(ctx, id)
+				if err != nil {
+					return fmt.Errorf("failed to resolve session ID %q: %w", id, err)
+				}
+				normalizedIDs[i] = resolved
 			}
 
 			// Create a single broadcast domain with all sessions
@@ -257,9 +260,7 @@ This ensures all sessions are ready before broadcasting.`,
 			// Collect all session IDs from all domains
 			var allSessions []string
 			for _, domain := range domains {
-				for _, sessionID := range domain.SessionIds {
-					allSessions = append(allSessions, sessionid.Normalize(sessionID))
-				}
+				allSessions = append(allSessions, domain.SessionIds...)
 			}
 
 			// Prompt for confirmation if requested

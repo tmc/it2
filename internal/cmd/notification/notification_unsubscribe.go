@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdcore"
 )
 
@@ -40,9 +39,12 @@ func runUnsubscribeCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer c.Close()
 
-	// Normalize session ID if provided
+	// Resolve session ID if provided
 	if sessionID != "" {
-		sessionID = client.NormalizeSessionID(sessionID)
+		sessionID, err = c.ResolveSessionID(ctx, sessionID)
+		if err != nil {
+			return fmt.Errorf("failed to resolve session ID: %w", err)
+		}
 	}
 
 	// Unsubscribe from notifications

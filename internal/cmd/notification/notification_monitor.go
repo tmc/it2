@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tmc/it2/internal/client"
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
@@ -93,9 +92,12 @@ func runMonitorCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer c.Close()
 
-	// Normalize session ID if provided
+	// Resolve session ID if provided
 	if sessionFilter != "" {
-		sessionFilter = client.NormalizeSessionID(sessionFilter)
+		sessionFilter, err = c.ResolveSessionID(ctx, sessionFilter)
+		if err != nil {
+			return fmt.Errorf("failed to resolve session ID: %w", err)
+		}
 	}
 
 	// Set up monitoring channels
