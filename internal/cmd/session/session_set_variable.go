@@ -8,7 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"
-	"github.com/tmc/it2/internal/connect"
 )
 
 func newSetVariableCommand() *cobra.Command {
@@ -57,7 +56,7 @@ Examples:
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := connect.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

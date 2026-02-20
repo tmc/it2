@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/completion"
-	"github.com/tmc/it2/internal/connect"
 )
 
 // NewBadgeCommand creates the badge subcommand group
@@ -66,7 +65,7 @@ Examples:
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := connect.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -119,7 +118,7 @@ Examples:
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := connect.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -169,7 +168,7 @@ Examples:
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := connect.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

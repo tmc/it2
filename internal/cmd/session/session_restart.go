@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
-	"github.com/tmc/it2/internal/connect"
 	pb "github.com/tmc/it2/proto"
 )
 
@@ -46,7 +45,7 @@ func newRestartCommand() *cobra.Command {
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := connect.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"
 	"github.com/tmc/it2/internal/cmdutil"
-	"github.com/tmc/it2/internal/connect"
 )
 
 func newCloseCommand() *cobra.Command {
@@ -40,7 +39,7 @@ func newCloseCommand() *cobra.Command {
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			client, err := connect.ConnectClient(ctx)
+			client, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

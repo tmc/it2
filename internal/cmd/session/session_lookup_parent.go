@@ -6,7 +6,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"
-	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
 	"github.com/tmc/it2/internal/sessionid"
 )
@@ -57,7 +56,7 @@ If the session has no parent (e.g., it's the original session in a tab), no outp
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := connect.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}

@@ -10,7 +10,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tmc/it2/internal/cmdcore"
-	"github.com/tmc/it2/internal/connect"
 	"github.com/tmc/it2/internal/formatting"
 	pb "github.com/tmc/it2/proto"
 )
@@ -48,7 +47,7 @@ func newListCommand() *cobra.Command {
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := connect.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -179,7 +178,7 @@ func newGetCommand() *cobra.Command {
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := connect.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
@@ -242,7 +241,7 @@ func newMonitorCommand() *cobra.Command {
 			defer cancel()
 
 			connectCtx, connectCancel := cmdcore.CreateContext(timeout)
-			c, err := connect.ConnectClient(connectCtx)
+			c, err := cmdcore.ConnectClient(connectCtx)
 			connectCancel()
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
@@ -288,7 +287,7 @@ func newSearchCommand() *cobra.Command {
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
 
-			c, err := connect.ConnectClient(ctx)
+			c, err := cmdcore.ConnectClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to connect: %w", err)
 			}
