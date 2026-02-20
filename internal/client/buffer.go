@@ -9,13 +9,13 @@ import (
 )
 
 // expandLineText reconstructs screen-visible text from a LineContents.
-// The text field omits uninitialized cells (spaces); code_points_per_cell
-// provides the mapping to reinsert them.
+// NUL bytes represent empty cells; code_points_per_cell entries with
+// num_code_points=0 indicate uninitialized cells needing space insertion.
 func expandLineText(line *pb.LineContents) string {
 	text := line.GetText()
 	cppc := line.GetCodePointsPerCell()
 	if len(cppc) == 0 {
-		return text
+		return strings.ReplaceAll(text, "\x00", " ")
 	}
 	runes := []rune(text)
 	var out strings.Builder
@@ -31,14 +31,22 @@ func expandLineText(line *pb.LineContents) string {
 				out.WriteByte(' ')
 			} else {
 				for j := 0; j < n && ri < len(runes); j++ {
-					out.WriteRune(runes[ri])
+					r := runes[ri]
+					if r == 0 {
+						r = ' '
+					}
+					out.WriteRune(r)
 					ri++
 				}
 			}
 		}
 	}
 	for ri < len(runes) {
-		out.WriteRune(runes[ri])
+		r := runes[ri]
+		if r == 0 {
+			r = ' '
+		}
+		out.WriteRune(r)
 		ri++
 	}
 	return out.String()

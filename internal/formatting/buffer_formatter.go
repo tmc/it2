@@ -8,14 +8,19 @@ import (
 )
 
 // ExpandLineText reconstructs the screen-visible text from a LineContents.
-// The text field in the protobuf is compact: uninitialized cells (spaces) have
-// num_code_points=0 and contribute no characters to the text string. This
-// function walks code_points_per_cell to reinsert spaces where they belong.
+//
+// iTerm2's API encodes line text in two ways that need handling:
+//  1. NUL bytes (\x00) represent empty/space cells in the text field.
+//  2. When code_points_per_cell is present, entries with num_code_points=0
+//     indicate uninitialized cells that have no characters in the text string
+//     and need spaces reinserted.
 func ExpandLineText(line *pb.LineContents) string {
 	text := line.GetText()
 	cppc := line.GetCodePointsPerCell()
+
 	if len(cppc) == 0 {
-		return text
+		// No cell mapping — just replace NUL bytes with spaces.
+		return strings.ReplaceAll(text, "\x00", " ")
 	}
 
 	runes := []rune(text)
@@ -32,15 +37,22 @@ func ExpandLineText(line *pb.LineContents) string {
 				out.WriteByte(' ')
 			} else {
 				for j := 0; j < n && ri < len(runes); j++ {
-					out.WriteRune(runes[ri])
+					r := runes[ri]
+					if r == 0 {
+						r = ' '
+					}
+					out.WriteRune(r)
 					ri++
 				}
 			}
 		}
 	}
-	// Append any remaining runes not covered by code_points_per_cell.
 	for ri < len(runes) {
-		out.WriteRune(runes[ri])
+		r := runes[ri]
+		if r == 0 {
+			r = ' '
+		}
+		out.WriteRune(r)
 		ri++
 	}
 	return out.String()
