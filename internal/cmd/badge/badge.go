@@ -211,10 +211,19 @@ func newListCommand() *cobra.Command {
 This command shows which sessions have per-session badges set and what the badge text is.`,
 		RequiresClient: true,
 		RunE: func(sc *cmdutil.StandardCommand, args []string) error {
+			quiet, _ := sc.GetCommand().Flags().GetBool("quiet")
+
 			// Get all sessions
 			sessions, err := sc.GetClient().ListSessions(sc.GetContext())
 			if err != nil {
 				return sc.ReportError("list sessions", err)
+			}
+
+			if quiet {
+				for _, session := range sessions {
+					fmt.Println(session.SessionID)
+				}
+				return nil
 			}
 
 			// Check badge for each session
@@ -241,5 +250,7 @@ This command shows which sessions have per-session badges set and what the badge
 		},
 	}
 
-	return cmdutil.NewCommandFromTemplate(template)
+	cmd := cmdutil.NewCommandFromTemplate(template)
+	cmd.Flags().BoolP("quiet", "q", false, "Output only session IDs")
+	return cmd
 }

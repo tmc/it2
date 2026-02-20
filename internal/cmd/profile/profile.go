@@ -127,6 +127,7 @@ func newListCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_, timeout, format := cmdcore.GetFlags(cmd)
 			detailed, _ := cmd.Flags().GetBool("detailed")
+			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
@@ -146,24 +147,31 @@ func newListCommand() *cobra.Command {
 
 				formatter := formatting.New(format)
 				return formatter.FormatGeneric(profiles)
-			} else {
-				// Get simple profile names
-				profiles, err := c.ListProfiles(ctx, false)
-				if err != nil {
-					return fmt.Errorf("failed to list profiles: %w", err)
-				}
+			}
 
-				formatter := formatting.New(format)
-				if format == "json" || format == "yaml" {
-					return formatter.FormatGeneric(profiles)
-				} else {
-					// Text format
-					fmt.Printf("Available Profiles (%d):\n", len(profiles))
-					fmt.Println("----------------------------------------")
-					for _, profile := range profiles {
-						fmt.Printf("• %s\n", profile)
-					}
+			// Get simple profile names
+			profiles, err := c.ListProfiles(ctx, false)
+			if err != nil {
+				return fmt.Errorf("failed to list profiles: %w", err)
+			}
+
+			if quiet {
+				for _, profile := range profiles {
+					fmt.Println(profile)
 				}
+				return nil
+			}
+
+			formatter := formatting.New(format)
+			if format == "json" || format == "yaml" {
+				return formatter.FormatGeneric(profiles)
+			}
+
+			// Text format
+			fmt.Printf("Available Profiles (%d):\n", len(profiles))
+			fmt.Println("----------------------------------------")
+			for _, profile := range profiles {
+				fmt.Printf("• %s\n", profile)
 			}
 
 			return nil
@@ -171,6 +179,7 @@ func newListCommand() *cobra.Command {
 	}
 
 	cmd.Flags().Bool("detailed", false, "Show detailed profile information")
+	cmd.Flags().BoolP("quiet", "q", false, "Output only profile names")
 
 	return cmd
 }

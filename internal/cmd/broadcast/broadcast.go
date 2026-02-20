@@ -35,7 +35,7 @@ func NewCommand() *cobra.Command {
 }
 
 func newListCommand() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List broadcast domains",
 		Long:  "List broadcast domains showing domain groups and session membership",
@@ -46,11 +46,15 @@ func newListCommand() *cobra.Command {
 			# List with JSON output
 			$ it2 broadcast list --format json
 
+			# Output only session IDs in broadcast domains
+			$ it2 broadcast list -q
+
 			# Check current broadcast configuration
 			$ it2 broadcast list --format yaml
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_, timeout, format := cmdcore.GetFlags(cmd)
+			quiet, _ := cmd.Flags().GetBool("quiet")
 
 			ctx, cancel := cmdcore.CreateContext(timeout)
 			defer cancel()
@@ -66,10 +70,23 @@ func newListCommand() *cobra.Command {
 				return fmt.Errorf("failed to get broadcast domains: %w", err)
 			}
 
+			if quiet {
+				for _, domain := range domains {
+					for _, id := range domain.SessionIds {
+						fmt.Println(id)
+					}
+				}
+				return nil
+			}
+
 			formatter := formatting.New(format)
 			return formatter.FormatBroadcastDomains(domains)
 		},
 	}
+
+	cmd.Flags().BoolP("quiet", "q", false, "Output only session IDs")
+
+	return cmd
 }
 
 func newSetCommand() *cobra.Command {
