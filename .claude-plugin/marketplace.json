@@ -13,12 +13,20 @@
   },
   "plugins": [
     {
+      "name": "it2",
+      "source": "./integrations/claude-code/plugins/it2"
+    },
+    {
       "name": "core",
       "source": "./integrations/claude-code/plugins/it2-core"
     },
     {
       "name": "claude-automation",
       "source": "./integrations/claude-code/plugins/it2-claude-automation"
+    },
+    {
+      "name": "claude-irc",
+      "source": "./integrations/claude-code/plugins/it2-claude-irc"
     },
     {
       "name": "claude-plugin-development",
