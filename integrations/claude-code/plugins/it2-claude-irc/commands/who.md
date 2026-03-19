@@ -3,8 +3,8 @@ name: who
 description: List all active Claude Code sessions (like IRC /who)
 auto-approve:
   - Bash(it2 session list:*)
-  - Bash(it2 text get-buffer:*)
-  - Bash(it2 text get-screen:*)
+  - Bash(it2 session get-buffer:*)
+  - Bash(it2 session get-screen:*)
 ---
 
 List all active iTerm2 sessions that appear to be running Claude Code.

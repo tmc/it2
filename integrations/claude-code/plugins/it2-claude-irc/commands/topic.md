@@ -5,8 +5,8 @@ argument-hint: [session-id] [new-topic]
 auto-approve:
   - Bash(it2 session list:*)
   - Bash(it2 session set-badge:*)
-  - Bash(it2 session set-title:*)
-  - Bash(it2 session get-title:*)
+  - Bash(it2 session title set:*)
+  - Bash(it2 session title:*)
 ---
 
 Set or view the badge and title for a Claude Code session.
