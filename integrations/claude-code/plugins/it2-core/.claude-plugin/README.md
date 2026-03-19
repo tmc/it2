@@ -10,11 +10,11 @@ The it2-core plugin provides the fundamental iTerm2 automation agent and basic s
 
 ### Agents
 
-- **iterm2-terminal-automation** (v2.0.0) - Comprehensive iTerm2 automation covering 150+ it2 commands across 15 categories including session management, monitoring, text operations, and more.
+- **iterm2-terminal-automation** - iTerm2 automation specialist covering session management, monitoring, text operations, configuration, and advanced features using the it2 CLI.
 
 ### Slash Commands
 
-- **/it2-split** - Create an iTerm2 vertical split, navigate to the current directory, and launch Claude Code
+- **/it2-split** - Create an iTerm2 split session and navigate to the current directory
 
 ## Installation
 
@@ -40,17 +40,15 @@ The iterm2-terminal-automation agent is automatically available for all iTerm2 a
 
 ### Using Slash Commands
 
-**/it2-split** - Quickly create a new Claude session:
+**/it2-split** - Create a new split session:
 
 ```bash
 /it2-split
 ```
 
 This will:
-1. Create a vertical split in iTerm2
-2. Navigate to your current working directory
-3. Launch Claude Code
-4. Set a badge showing the session ID
+1. Create a split in iTerm2 (direction auto-detected based on space)
+2. Navigate the new session to your current working directory
 
 ## Requirements
 

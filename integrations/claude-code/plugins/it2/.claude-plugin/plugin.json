@@ -11,7 +11,6 @@
   "license": "MIT",
   "keywords": ["iterm2", "terminal", "automation", "claude-code", "ai-cli"],
   "agents": [
-      "./agents/iterm2-terminal-automation.md",
       "./agents/session-work-analyzer.md"
   ]
 }
