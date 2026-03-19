@@ -1,6 +1,6 @@
 ---
 name: claude-code-automation
-description: Manage Claude Code configuration across project-local, project, and user scopes. Automate sessions, settings, hooks, and rules. Includes session-to-agent analysis to understand work patterns and suggest specialized agents.
+description: Manage Claude Code configuration across project-local, project, and user scopes. Automate sessions, settings, hooks, and rules. Use this when the user wants to configure Claude Code settings, manage permissions, set up hooks, automate Claude sessions via iTerm2, or analyze session work patterns. Trigger on "configure Claude Code", "set up hooks", "manage settings", "automate Claude sessions", or session configuration requests.
 version: 1.1.0
 model: sonnet
 ---

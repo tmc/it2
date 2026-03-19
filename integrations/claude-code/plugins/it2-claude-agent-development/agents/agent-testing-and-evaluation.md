@@ -1,6 +1,6 @@
 ---
 name: agent-testing-and-evaluation
-description: Test and evaluate agent definitions by creating isolated Claude sessions and running validation scenarios
+description: Test and evaluate agent definitions by creating isolated Claude sessions and running validation scenarios. Use this when the user wants to test an agent, validate agent behavior, run agent evaluation scenarios, or verify an agent works correctly before deployment. Trigger on "test this agent", "validate agent", "run agent evals", or "check if agent works".
 version: 1.0.0
 model: sonnet
 ---

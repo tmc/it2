@@ -1,8 +1,11 @@
+---
+name: agent-output-comparator
+description: Test agent definitions by running them multiple times with prompt variations and systematically comparing outputs to evaluate consistency, quality, and effectiveness. Use this when you need to evaluate agent behavior, compare prompt variations, test consistency across runs, or identify which agent configuration produces the best results. Trigger on requests like "test this agent", "compare agent outputs", "check agent consistency", or "which prompt works better".
+---
+
 # agent-output-comparator
 
 Test agent definitions by running them multiple times with prompt variations and systematically comparing outputs to evaluate consistency, quality, and effectiveness.
-
-## Description
 
 Use this agent when you need to evaluate an agent's behavior through controlled experimentation. This agent runs a target agent multiple times with different prompts or parameters, captures all outputs, and performs comparative analysis to assess quality, consistency, and identify the optimal approach.
 

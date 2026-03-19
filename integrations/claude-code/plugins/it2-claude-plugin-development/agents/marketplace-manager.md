@@ -1,6 +1,6 @@
 ---
 name: marketplace-manager
-description: Manage Claude Code plugin marketplaces, add/remove plugins, validate marketplace structure, and maintain marketplace documentation.
+description: Manage Claude Code plugin marketplaces, add/remove plugins, validate marketplace structure, and maintain marketplace documentation. Use this when the user wants to create a marketplace, add plugins to a marketplace, validate marketplace.json, or organize plugin distribution. Trigger on "create marketplace", "add plugin to marketplace", "validate marketplace", or plugin cataloging requests.
 version: 1.0.0
 model: sonnet
 ---
