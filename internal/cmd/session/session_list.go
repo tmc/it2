@@ -75,8 +75,9 @@ func newListCommand() *cobra.Command {
 			}
 			defer c.Close()
 
-			// Get quiet flag
+			// Get quiet and wide flags
 			quiet, _ := cmd.Flags().GetBool("quiet")
+			wide, _ := cmd.Flags().GetBool("wide")
 
 			// Include buried flag
 			includeBuried, _ := cmd.Flags().GetBool("include-buried")
@@ -155,6 +156,7 @@ func newListCommand() *cobra.Command {
 				SortBy:        sortBy,
 				SortReverse:   sortReverse,
 				Quiet:         quiet,
+				Wide:          wide,
 				NoHyperlinks:  noHyperlinks,
 				PluginPattern: pluginPattern,
 				SkipPlugins:   skipPlugins,
@@ -190,8 +192,9 @@ func newListCommand() *cobra.Command {
 	// Add scope support for session filtering
 	cmd.Flags().String("scope", "", "Filter sessions by scope (default: all sessions). Options: none, window, tab, parents, siblings, peers, lineage. Overrides IT2_SCOPE env var.")
 
-	// Add quiet flag
+	// Add quiet and wide flags
 	cmd.Flags().BoolP("quiet", "q", false, "Output only session IDs")
+	cmd.Flags().BoolP("wide", "w", false, "Show full session IDs instead of short IDs")
 
 	// Add include-buried flag
 	cmd.Flags().Bool("include-buried", false, "Include buried sessions")

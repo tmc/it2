@@ -22,6 +22,7 @@ type Formatter struct {
 	sortReverse       bool
 	quiet             bool
 	hyperlinks        bool // Enable OSC 8 terminal hyperlinks
+	wide              bool // Show full IDs instead of short IDs
 	includeEmptyLines bool // Include trailing empty lines in buffer output
 }
 
@@ -51,6 +52,11 @@ func NewWithHyperlinks(format string, columns []string, sortBy string, sortRever
 // GetFormat returns the current format string.
 func (f *Formatter) GetFormat() string {
 	return f.format
+}
+
+// SetWide sets whether to show full IDs instead of short IDs.
+func (f *Formatter) SetWide(wide bool) {
+	f.wide = wide
 }
 
 // SetIncludeEmptyLines sets whether to include trailing empty lines in buffer output.

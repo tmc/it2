@@ -26,6 +26,7 @@ type SharedListOptions struct {
 	SortBy        string
 	SortReverse   bool
 	Quiet         bool
+	Wide          bool
 	NoHyperlinks  bool
 	PluginPattern *regexp.Regexp
 	SkipPlugins   bool
@@ -125,6 +126,7 @@ func (s *SharedListOperations) ListSessions(opts SharedListOptions) error {
 	// Disable hyperlinks by default
 	enableHyperlinks := false
 	formatter := formatting.NewWithHyperlinks(opts.Format, opts.Columns, opts.SortBy, opts.SortReverse, opts.Quiet, enableHyperlinks)
+	formatter.SetWide(opts.Wide)
 
 	// Use raw tree structure for tree format
 	if opts.Format == "tree" && rawResp != nil {

@@ -170,20 +170,18 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			}
 		}
 
-		// Format parent ID - use short form (first 8 chars) with hyperlink
+		// Format parent ID - use short form (first 8 chars) or full ID in wide mode
 		parentDisplay := ""
 		if session.ParentSessionID != "" {
-			// Extract first 8 characters for short ID (consistent with session ShortID)
-			shortParentID := session.ParentSessionID
-			if len(shortParentID) > 8 {
-				shortParentID = shortParentID[:8]
+			parentID := session.ParentSessionID
+			if !f.wide && len(parentID) > 8 {
+				parentID = parentID[:8]
 			}
-			// Apply hyperlink if enabled
 			if f.hyperlinks {
 				url := SessionActivateURL(session.ParentSessionID)
-				parentDisplay = OSC8Hyperlink(url, shortParentID)
+				parentDisplay = OSC8Hyperlink(url, parentID)
 			} else {
-				parentDisplay = shortParentID
+				parentDisplay = parentID
 			}
 		}
 
@@ -204,15 +202,18 @@ func (f *Formatter) formatSessionsTable(sessions []*client.SessionInfo) error {
 			workingDir = "..." + workingDir[len(workingDir)-37:]
 		}
 
-		// Apply hyperlinks to ShortID if enabled (display ShortID, link to full ID)
-		shortID := session.ShortID
+		// Apply hyperlinks to ID if enabled (display ShortID or full ID, link to full ID)
+		displayID := session.ShortID
+		if f.wide {
+			displayID = session.SessionID
+		}
 		if f.hyperlinks {
 			url := SessionActivateURL(session.SessionID)
-			shortID = OSC8Hyperlink(url, session.ShortID)
+			displayID = OSC8Hyperlink(url, displayID)
 		}
 
 		row := []string{
-			shortID,
+			displayID,
 			parentDisplay,
 			pidDisplay,
 			session.ProcessName,
